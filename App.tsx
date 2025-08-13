@@ -62,6 +62,7 @@ const App = () => {
       </TranslationProvider>
     );
   }
+  
   return (
     <TranslationProvider >
       <Provider store={store}>

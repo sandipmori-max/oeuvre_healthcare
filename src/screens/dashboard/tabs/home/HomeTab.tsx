@@ -27,13 +27,24 @@ const HomeScreen = () => {
   const renderDashboardItem = (item: DashboardItem, index: number) => (
     <TouchableOpacity 
       key={item.id || index} 
-      style={styles.dashboardItem}
+      style={[
+      styles.dashboardItem,
+      {
+        paddingLeft: 4,
+        backgroundColor: accentColors[index % accentColors.length],
+        borderRadius: 8,
+      }
+    ]}
       activeOpacity={0.7}
       onPress={async () => {
         navigation.navigate('List', {item})
       }}
     >
-      <View style={styles.dashboardItemContent}>
+      <View style={{
+        backgroundColor: 'white',
+         borderRadius: 8,
+        }}>
+        <View style={styles.dashboardItemContent}>
         {/* Header with icon, name and badge */}
         <View style={styles.dashboardItemHeader}>
           <View style={styles.dashboardItemTopRow}>
@@ -99,6 +110,7 @@ const HomeScreen = () => {
           <Text style={styles.chevron}>›</Text>
         </TouchableOpacity>
         </View>
+      </View>
       </View>
     </TouchableOpacity>
   );

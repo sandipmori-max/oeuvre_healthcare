@@ -72,7 +72,6 @@ const LoginScreen = ({ navigation, route }: any) => {
             </TouchableOpacity>
           )}
         </View>
-        <KeyboardAwareWrapper />
         <CustomAlert
           visible={alertVisible}
           title={alertConfig.title}
