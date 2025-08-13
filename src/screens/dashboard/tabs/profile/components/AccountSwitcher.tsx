@@ -13,6 +13,7 @@ import { removeAccountThunk, switchAccountThunk } from '../../../../../store/sli
 import { Account } from '../../../../../store/slices/auth/type';
 import CustomAlert from '../../../../../components/CustomAlert';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { DevERPService } from '../../../../../services/api';
 
 interface AccountSwitcherProps {
   visible: boolean;
@@ -59,8 +60,13 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({
       <TouchableOpacity
         style={[styles.accountItem, isActive && styles.activeAccount]}
         onPress={async() => {
-            await AsyncStorage.setItem('erp_token', item?.user?.token || '');
-            handleSwitchAccount(item?.id)
+            if (new Date(item?.user?.tokenValidTill) > new Date()) {
+                console.log("🚀 ~ item:", item)
+                await AsyncStorage.setItem('erp_token', item?.user?.token || '');
+                await AsyncStorage.setItem('auth_token', item?.user?.token || '');
+                DevERPService.setToken(item?.user?.token || '');
+                handleSwitchAccount(item?.id)
+            }  
           }}>
         <View style={styles.accountContent}>
           <Image source={{uri: item?.user?.avatar}} style={styles.avatar} />

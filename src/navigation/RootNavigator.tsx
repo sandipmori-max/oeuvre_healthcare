@@ -6,8 +6,7 @@ import { checkAuthStateThunk, getERPMenuThunk, getERPDashboardThunk } from '../s
 import DevERPService from '../services/api/deverp';
 
 import AuthNavigator from './AuthNavigator';
-import { ERP_COLOR_CODE } from '../utils/constants';
-import { styles } from './styles';
+
 import StackNavigator from './StackNavigator';
 import FullViewLoader from '../components/FullViewLoader';
 
@@ -15,7 +14,8 @@ const RootNavigator = () => {
   const dispatch = useAppDispatch();
   const {
     isLoading,
-    isAuthenticated
+    isAuthenticated, 
+    activeToken
   } = useAppSelector(state => state.auth);
 
   useEffect(() => {
@@ -24,11 +24,12 @@ const RootNavigator = () => {
   }, [dispatch]);
 
   useEffect(() => {
+    console.log("🚀 ~ RootNavigator ~ activeToken-*-*-*-*-*-*-*-*-*-*-*-*:", activeToken)
     if (isAuthenticated) {
       dispatch(getERPMenuThunk());
       dispatch(getERPDashboardThunk());
     }
-  }, [isAuthenticated, dispatch]);
+  }, [isAuthenticated, dispatch, activeToken]);
 
   if (isLoading) {
     return (
