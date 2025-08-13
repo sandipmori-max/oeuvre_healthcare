@@ -10,7 +10,7 @@ import {
   removeAccount as sqliteRemoveAccount,
 } from '../../../utils/sqlite';
 import { Account, User } from './type';
-import { AuthService, DevERPService } from '../../../services/api';
+import { DevERPService } from '../../../services/api';
 
 // Async thunks
 export const checkAuthStateThunk = createAsyncThunk(
@@ -242,30 +242,6 @@ export const logoutUserThunk = createAsyncThunk(
   },
 );
 
-export const refreshTokenThunk = createAsyncThunk(
-  'auth/refreshToken',
-  async (_, { rejectWithValue }) => {
-    try {
-      const refreshToken = await AsyncStorage.getItem('refresh_token');
-      if (!refreshToken) {
-        throw new Error('No refresh token available');
-      }
-      const response = await AuthService.refreshToken(refreshToken);
-      await AsyncStorage.setItem('auth_token', response.token);
-      await AsyncStorage.setItem('refresh_token', response.refreshToken);
-      await AsyncStorage.setItem('token_expires_at', response.expiresAt);
-      return response;
-    } catch (error: any) {
-      console.error('Token refresh error:', error);
-      await AsyncStorage.multiRemove([
-        'auth_token',
-        'refresh_token',
-        'token_expires_at',
-      ]);
-      return rejectWithValue(error?.message || 'Token refresh failed');
-    }
-  },
-);
 
 export const validateCompanyCodeThunk = createAsyncThunk(
   'auth/validateCompanyCode',

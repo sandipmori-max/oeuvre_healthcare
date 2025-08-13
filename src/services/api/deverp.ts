@@ -26,19 +26,14 @@ class DevERPService {
   private appid: string = '';
   private device: string = 'mobile';
 
-  /**
-   * Get application link for specific code (like payroll, attendance, etc.)
-   * Example: getAppLink('payroll') returns the payroll application URL
-   */
+
   async getAppLink(code: string): Promise<DevERPResponse> {
     try {
       const response = await apiClient.post<DevERPResponse>(
         `${this.baseUrl}/appcode.aspx/getLink`,
         { code }
       );
-      console.log("🚀 ~ DevERPService ~ getAppLink ~ response:", response);
-      
-      // Store the link for future use
+     
       if (response.data.success === 1 && response.data.link) {
         this.link = response.data.link;
         await AsyncStorage.setItem('erp_link', this.link);
@@ -51,9 +46,6 @@ class DevERPService {
     }
   }
 
-  /**
-   * Validate company code and get application details
-   */
   async validateCompanyCode(code: string): Promise<{
     isValid: boolean;
     appName?: string;
@@ -62,7 +54,6 @@ class DevERPService {
   }> {
     try {
       const response = await this.getAppLink(code);
-      console.log("🚀 ~ DevERPService ~ validateCompanyCode ~ response:", response)
       
       if (response.success === 1) {
         return {
@@ -86,9 +77,6 @@ class DevERPService {
     }
   }
 
-  /**
-   * Login to ERP system
-   */
   async loginToERP(credentials: {
     user: string;
     pass: string;
@@ -96,13 +84,11 @@ class DevERPService {
     firebaseid?: string;
   }): Promise<LoginResponse> {
     try {
-      // Check network connectivity
       const netInfo = await NetInfo.fetch();
       if (!netInfo.isConnected) {
         throw new Error('No internet connection');
       }
 
-      // Get stored link or use default
       this.link = await AsyncStorage.getItem('erp_link') || this.link;
       if (!this.link) {
         throw new Error('No ERP link available. Please validate company code first.');
@@ -124,27 +110,21 @@ class DevERPService {
         loginData
       );
       
-      console.log("🚀 ~ DevERPService ~ loginToERP ~ response:", response);
       return response.data;
     } catch (error) {
       console.error("🚀 ~ DevERPService ~ loginToERP ~ error:", error);
       throw error;
     }
   }
-
-  /**
-   * Get authentication token
-   */
+ 
   async getAuth(isFromAddAccount?: boolean): Promise<string> {
     console.log("🚀 ~ DevERPService ~ getAuth ~ isFromAddAccount:*-*-*-*-*-*-*-*-*", isFromAddAccount)
     try {
-      // Check network connectivity
       const netInfo = await NetInfo.fetch();
       if (!netInfo.isConnected) {
         throw new Error('No internet connection');
       }
 
-      // Check if token is still valid
       if(!isFromAddAccount){
       if (this.token && this.tokenValidTill) {
               const validTill = new Date(this.tokenValidTill);
@@ -153,8 +133,6 @@ class DevERPService {
               }
             }
       }
-    console.log("🚀 ~ DevERPService ~ getAuth ~ isFromAddAccount:*-*-*-*-*-*-*-*-------------------------*", isFromAddAccount)
-     
 
       const tokenData: TokenRequest = {
         appid: this.appid,
@@ -166,13 +144,11 @@ class DevERPService {
         tokenData
       );
 
-      console.log("🚀 ~ DevERPService ~ getAuth ~ response:------------------", response);
 
       if (String(response.data.success) === '1') {
         this.token = response.data.token || '';
         this.tokenValidTill = response.data.validTill || '';
         
-        // Store token info
         await AsyncStorage.setItem('erp_token', this.token);
         await AsyncStorage.setItem('erp_token_valid_till', this.tokenValidTill);
         
@@ -185,40 +161,30 @@ class DevERPService {
       throw error;
     }
   }
-
-  /**
-   * Get menu data
-   */
+ 
   async getMenu(): Promise<string> {
     try {
-      // Check network connectivity
       const netInfo = await NetInfo.fetch();
       if (!netInfo.isConnected) {
         throw new Error('No internet connection');
       }
 
-      // First, try to get stored token from AsyncStorage if not available in memory
       if (!this.token || !this.tokenValidTill) {
         const storedToken = await AsyncStorage.getItem('erp_token');
         const storedTokenValidTill = await AsyncStorage.getItem('erp_token_valid_till');
         
         if (storedToken && storedTokenValidTill) {
-          // Check if stored token is still valid
           const validTill = new Date(storedTokenValidTill);
           if (validTill > new Date()) {
-            // Use stored token
             this.token = storedToken;
             this.tokenValidTill = storedTokenValidTill;
           } else {
-            // Stored token expired, get new one
             await this.getAuth();
           }
         } else {
-          // No stored token, get new one
           await this.getAuth();
         }
       } else {
-        // Check if current token is still valid
         const validTill = new Date(this.tokenValidTill);
         if (validTill <= new Date()) {
           await this.getAuth();
@@ -234,19 +200,15 @@ class DevERPService {
         menuData
       );
 
-      console.log("🚀 ~ DevERPService ~ getMenu ~ response:", response);
 
       if (String(response.data.success) === '0' && response.data.message?.includes('Token Expire')) {
-        // Token expired, get new token and retry
         await this.getAuth();
         const retryResponse = await apiClient.post<MenuResponse>(
           `${this.link}/msp_api.aspx/getMenu`,
           { token: this.token }
         );
-        // Return the entire response data for retry
         return JSON.stringify(retryResponse.data);
       } else if (String(response.data.success) === '1') {
-        // The API returns data directly in response.data with success and menus
         return JSON.stringify(response.data);
       } else {
         throw new Error(response.data.message || 'Failed to get menu');
@@ -257,39 +219,29 @@ class DevERPService {
     }
   }
 
-  /**
-   * Get dashboard data
-   */
   async getDashboard(): Promise<string> {
     try {
-      // Check network connectivity
       const netInfo = await NetInfo.fetch();
       if (!netInfo.isConnected) {
         throw new Error('No internet connection');
       }
 
-      // First, try to get stored token from AsyncStorage if not available in memory
       if (!this.token || !this.tokenValidTill) {
         const storedToken = await AsyncStorage.getItem('erp_token');
         const storedTokenValidTill = await AsyncStorage.getItem('erp_token_valid_till');
         
         if (storedToken && storedTokenValidTill) {
-          // Check if stored token is still valid
           const validTill = new Date(storedTokenValidTill);
           if (validTill > new Date()) {
-            // Use stored token
             this.token = storedToken;
             this.tokenValidTill = storedTokenValidTill;
           } else {
-            // Stored token expired, get new one
             await this.getAuth();
           }
         } else {
-          // No stored token, get new one
           await this.getAuth();
         }
       } else {
-        // Check if current token is still valid
         const validTill = new Date(this.tokenValidTill);
         if (validTill <= new Date()) {
           await this.getAuth();
@@ -305,19 +257,14 @@ class DevERPService {
         dashboardData
       );
 
-      console.log("🚀 ~ DevERPService ~ getDashboard ~ response:", response);
-
       if (String(response.data.success) === '0' && response.data.message?.includes('Token Expire')) {
-        // Token expired, get new token and retry
         await this.getAuth();
         const retryResponse = await apiClient.post<DashboardResponse>(
           `${this.link}msp_api.aspx/getDB`,
           { token: this.token }
         );
-        // Return the entire response data for retry
         return JSON.stringify(retryResponse.data);
       } else if (String(response.data.success) === '1') {
-        // Return the entire response data
         return JSON.stringify(response.data);
       } else {
         throw new Error(response.data.message || 'Failed to get dashboard data');
@@ -327,41 +274,30 @@ class DevERPService {
       throw error;
     }
   }
-
-  /**
-   * Get page data
-   */
+ 
   async getPage(page: string): Promise<string> {
     try {
-      // Check network connectivity
       const netInfo = await NetInfo.fetch();
       if (!netInfo.isConnected) {
         throw new Error('No internet connection');
       }
 
-      // First, try to get stored token from AsyncStorage if not available in memory
       if (!this.token || !this.tokenValidTill) {
         const storedToken = await AsyncStorage.getItem('erp_token');
-        console.log("🚀 ~ DevERPService ~ getPage ~ storedToken:", storedToken)
         const storedTokenValidTill = await AsyncStorage.getItem('erp_token_valid_till');
         
         if (storedToken && storedTokenValidTill) {
-          // Check if stored token is still valid
           const validTill = new Date(storedTokenValidTill);
           if (validTill > new Date()) {
-            // Use stored token
             this.token = storedToken;
             this.tokenValidTill = storedTokenValidTill;
           } else {
-            // Stored token expired, get new one
             await this.getAuth();
           }
         } else {
-          // No stored token, get new one
           await this.getAuth();
         }
       } else {
-        // Check if current token is still valid
         const validTill = new Date(this.tokenValidTill);
         if (validTill <= new Date()) {
           await this.getAuth();
@@ -378,10 +314,8 @@ class DevERPService {
         pageData
       );
 
-      console.log("🚀 ~ DevERPService ~ getPage ~ response:", response);
 
       if (String(response.data.success) === '0' && (response.data as any).message?.includes('Token Expire')) {
-        // Token expired, get new token and retry
         await this.getAuth();
         const retryResponse = await apiClient.post<PageResponse>(
           `${this.link}/msp_api.aspx/getPage`,
@@ -395,7 +329,6 @@ class DevERPService {
         const parsed: any = response.data as any;
         if (typeof parsed?.data === 'string' && parsed.data) return parsed.data;
         if (parsed?.data && typeof parsed.data.d === 'string') return parsed.data.d;
-        // Interceptor may already have parsed the inner object (id, name, title, pagectl...)
         return JSON.stringify(parsed);
       } else {
         throw new Error(response.data.message || 'Failed to get page data');
@@ -406,39 +339,29 @@ class DevERPService {
     }
   }
 
-  /**
-   * Get list data
-   */
   async getListData(page: string, fromDate: string, toDate: string): Promise<string> {
     try {
-      // Check network connectivity
       const netInfo = await NetInfo.fetch();
       if (!netInfo.isConnected) {
         throw new Error('No internet connection');
       }
 
-      // First, try to get stored token from AsyncStorage if not available in memory
       if (!this.token || !this.tokenValidTill) {
         const storedToken = await AsyncStorage.getItem('erp_token');
         const storedTokenValidTill = await AsyncStorage.getItem('erp_token_valid_till');
         
         if (storedToken && storedTokenValidTill) {
-          // Check if stored token is still valid
           const validTill = new Date(storedTokenValidTill);
           if (validTill > new Date()) {
-            // Use stored token
             this.token = storedToken;
             this.tokenValidTill = storedTokenValidTill;
           } else {
-            // Stored token expired, get new one
             await this.getAuth();
           }
         } else {
-          // No stored token, get new one
           await this.getAuth();
         }
       } else {
-        // Check if current token is still valid
         const validTill = new Date(this.tokenValidTill);
         if (validTill <= new Date()) {
           await this.getAuth();
@@ -457,10 +380,8 @@ class DevERPService {
         listData
       );
 
-      console.log("🚀 ~ DevERPService ~ getListData ~ response:", response);
 
       if (response.data.success === 0 && response.data.message?.includes('Token Expire')) {
-        // Token expired, get new token and retry
         await this.getAuth();
         const retryResponse = await apiClient.post<ListDataResponse>(
           `${this.link}msp_api.aspx/getListData`,
@@ -477,27 +398,18 @@ class DevERPService {
       throw error;
     }
   }
-
-  /**
-   * Initialize the service with stored data
-   */
+ 
   async initialize(): Promise<void> {
     try {
       this.link = await AsyncStorage.getItem('erp_link') || '';
       this.token = await AsyncStorage.getItem('erp_token') || '';
       this.tokenValidTill = await AsyncStorage.getItem('erp_token_valid_till') || '';
       this.appid = await AsyncStorage.getItem('erp_appid') || '';
-      
-      console.log("🚀 ~ DevERPService ~ initialize ~ loaded token:", !!this.token);
-      console.log("🚀 ~ DevERPService ~ initialize ~ token valid till:", this.tokenValidTill);
     } catch (error) {
       console.error("🚀 ~ DevERPService ~ initialize ~ error:", error);
     }
   }
 
-  /**
-   * Clear stored data
-   */
   async clearData(): Promise<void> {
     try {
       this.link = '';
@@ -518,7 +430,7 @@ class DevERPService {
 
   setToken(token: string) {
     this.token = token;
-    AsyncStorage.setItem('erp_token', token); // Optionally persist
+    AsyncStorage.setItem('erp_token', token);
   }
 
 }

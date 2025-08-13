@@ -1,7 +1,6 @@
 import React from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 
-// Import screen components 
 import TabIcon from '../components/TabIcon';
 import { ERP_COLOR_CODE } from '../utils/constants';
 import EntryTab from '../screens/dashboard/tabs/entry/EntryTab';

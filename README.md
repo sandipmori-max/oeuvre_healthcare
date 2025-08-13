@@ -117,3 +117,7 @@ Custom alert / loader
 App icon
 
 HomeScreen empty view load - issue
+
+eslint
+git
+git pre hooks

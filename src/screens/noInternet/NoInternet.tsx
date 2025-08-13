@@ -4,16 +4,14 @@ import {
   Text,
   TouchableOpacity, 
 } from 'react-native';
+
 import { styles } from './nointernet_style';
 import useTranslations from '../../hooks/useTranslations';
 import { ERP_GIF } from '../../assets';
 import FastImage from 'react-native-fast-image';
+import { NoInterNetProps } from './types';
 
-interface Props {
-  onRetry: () => void;
-}
-
-const NoInternetScreen: React.FC<Props> = ({ onRetry }) => {
+const NoInternetScreen: React.FC<NoInterNetProps> = ({ onRetry }) => {
   const { t } = useTranslations();
   
   return (

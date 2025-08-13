@@ -1,16 +1,17 @@
 import React, { useEffect, useState }  from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {Provider} from 'react-redux';
+import DeviceInfo from 'react-native-device-info';
+
 import {store} from './src/store/store';
 import RootNavigator from './src/navigation/RootNavigator';
 import NoInternetScreen from './src/screens/noInternet/NoInternet';
 import useNetworkStatus from './src/hooks/useNetworkStatus';
 import CustomSplashScreen from './src/screens/splash/SplashScreen';
-import DeviceInfo from 'react-native-device-info';
 import CustomAlert from './src/components/alert/CustomAlert';
+import { TranslationProvider } from './src/components/TranslationProvider';
 
 import './src/i18n';
-import { TranslationProvider } from './src/components/TranslationProvider';
 
 const App = () => {
   const isConnected = useNetworkStatus();

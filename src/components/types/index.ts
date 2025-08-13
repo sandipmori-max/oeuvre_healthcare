@@ -1,3 +1,4 @@
+import { TextInputProps, StyleProp, TextStyle, ViewStyle } from 'react-native';
 export interface TabIconProps {
   name: string;
   color: string;
@@ -17,3 +18,19 @@ export type DrawerItemConfig = {
   route: string;
   icon?: string;
 };
+
+
+export interface ERPTextInputProps extends TextInputProps {
+  label?: string;
+  error?: string;
+  touched?: boolean;
+  helperText?: string;
+  secureTextEntry?: boolean;
+  showToggle?: boolean;
+  icon?: React.ReactNode;
+  containerStyle?: StyleProp<ViewStyle>;
+  labelStyle?: StyleProp<TextStyle>;
+  inputStyle?: StyleProp<TextStyle>;
+  errorStyle?: StyleProp<TextStyle>;
+  helperStyle?: StyleProp<TextStyle>;
+}
