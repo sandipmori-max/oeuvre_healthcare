@@ -64,6 +64,7 @@ export const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 12,
     marginBottom: 15,
+    
   },
   loginButton: {
     backgroundColor: ERP_COLOR_CODE.ERP_ACTIVE_BUTTON,
