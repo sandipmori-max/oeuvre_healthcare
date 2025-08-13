@@ -1,6 +1,7 @@
-import { Text, View, FlatList, ActivityIndicator, TextInput, TouchableOpacity, Alert, ScrollView, Dimensions } from 'react-native'
+import { Text, View, FlatList, TextInput, TouchableOpacity, Alert, ScrollView, Dimensions } from 'react-native'
 import React, { useEffect, useLayoutEffect, useState, useCallback, useMemo } from 'react'
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
+
 import { useAppDispatch } from '../../../store/hooks';
 import { getERPListDataThunk } from '../../../store/slices/auth/thunk';
 import { styles } from './list_page_style';
@@ -8,8 +9,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { formatHeaderTitle } from '../../../utils/helpers';
 import FullViewLoader from '../../../components/loader/FullViewLoader';
 import NoData from '../../../components/no_data/NoData';
-
-type ListRouteParams = { List: { item: any } };
+import { ListRouteParams } from './types';
 
 const ListScreen = () => {
   const navigation = useNavigation();
@@ -52,7 +52,7 @@ const ListScreen = () => {
   }, []);
 
    const debouncedSearch = useCallback(
-  useMemo(() => {
+    useMemo(() => {
     let timeoutId: NodeJS.Timeout;
 
     return (query: string, data: any[]) => {
@@ -66,7 +66,6 @@ const ListScreen = () => {
           return;
         }
 
-        // Detect key:value syntax
         const keySearchMatch = trimmedQuery.match(/^(\w+):(.+)$/);
         let filtered;
 
@@ -85,7 +84,6 @@ const ListScreen = () => {
             return stringValue.toLowerCase().includes(lowerValue);
           });
         } else {
-          // 🔄 Search across all keys dynamically
           filtered = data.filter(item => {
             const allValues = Object.values(item)
               .map(val => {
@@ -95,17 +93,15 @@ const ListScreen = () => {
               })
               .join(' ')
               .toLowerCase();
-
             return allValues.includes(trimmedQuery.toLowerCase());
           });
         }
-
         setFilteredData(filtered);
       }, 300);
     };
-  }, []),
-  []
-);
+    }, []),
+    []
+  );
 
   const handleSearchChange = (text: string) => {
     setSearchQuery(text);
@@ -116,8 +112,8 @@ const ListScreen = () => {
     setSearchQuery('');
     setFilteredData(listData);
   };
-function parseCustomDate(dateStr: string): Date {
-  // dateStr: "01-Aug-2025"
+
+const parseCustomDate = (dateStr: string): Date =>{
   const [day, monthStr, year] = dateStr.split('-');
   const month = [
     'Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'
@@ -125,12 +121,10 @@ function parseCustomDate(dateStr: string): Date {
   return new Date(Number(year), month, Number(day));
 }
  const handleDateChange = (event: any, selectedDate?: Date) => {
-  // Cancel button pressed
   if (event.type === 'dismissed' || !selectedDate) {
     setShowDatePicker(null);
     return;
   }
-
   const { type } = showDatePicker!;
   const formattedDate = formatDateForAPI(selectedDate);
 
@@ -143,7 +137,6 @@ function parseCustomDate(dateStr: string): Date {
       setShowDatePicker(null);
       return;
     }
-
     if (fromDate) {
       const fromDateObj = new Date(fromDate.split('-').reverse().join('-'));
       if (selectedDate < fromDateObj) {
@@ -152,11 +145,9 @@ function parseCustomDate(dateStr: string): Date {
         return;
       }
     }
-
     setToDate(formattedDate);
   } else {
     setFromDate(formattedDate);
-
     if (toDate) {
       const toDateObj = new Date(toDate.split('-').reverse().join('-'));
       if (selectedDate > toDateObj) {
@@ -164,7 +155,6 @@ function parseCustomDate(dateStr: string): Date {
       }
     }
   }
-
   setShowDatePicker(null);
 };
 

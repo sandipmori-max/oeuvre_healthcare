@@ -12,7 +12,12 @@ export const styles = StyleSheet.create({
     borderRadius: 12,
     height: Dimensions.get('screen').height,
     justifyContent:'center',
-    
+  },
+  helperText: {
+    fontSize: 12,
+    color: '#888',
+    marginTop: 4,
+    marginLeft: 2,
   },
   logo: {
     width: 100,
@@ -64,7 +69,6 @@ export const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 12,
     marginBottom: 15,
-     
   },
   loginButton: {
     backgroundColor: ERP_COLOR_CODE.ERP_ACTIVE_BUTTON,

@@ -26,13 +26,13 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({
   visible,
   onClose,
 }) => {
-  console.log("🚀 ~ AddAccountScreen ~ visible:", visible)
   const dispatch = useAppDispatch();
-  const {isLoading, accounts} = useAppSelector(state => state?.auth);
-  const { execute: validateCompanyCode } = useApi();
-  const { execute: loginWithERP } = useApi();
+  const { isLoading } = useAppSelector(state => state?.auth);
+  const { execute: validateCompanyCode, execute: loginWithERP } = useApi();
+
   const appId = DeviceInfo.getBundleId();
   const deviceId = DeviceInfo.getDeviceId();
+  
   const [alertVisible, setAlertVisible] = useState(false);
   const [alertConfig, setAlertConfig] = useState({
     title: '',
@@ -45,35 +45,25 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({
   };
 
   const handleAddAccount = async (values: {company_code: string; user: string; password: string}) => {
-    console.log("🚀 ~ handleAddAccount ~ values:", values)
     try {
-       
-
-      // 1) Validate company code
       const validation = await validateCompanyCode(() => DevERPService.validateCompanyCode(values.company_code));
-      console.log("🚀 ~ handleAddAccount ~ validation:", validation)
       if (!validation?.isValid) {
-        
         return;
       }
 
-      // 2) Login to ERP
       const loginResult = await loginWithERP(() => DevERPService.loginToERP({
         user: values.user,
         pass: values.password,
         appid: appId,
         firebaseid: '',
       }));
-      console.log("🚀 ~ handleAddAccount ~ loginResult:", loginResult)
 
       if (!loginResult || loginResult?.success !== 1) {
-      console.log("🚀 ~ handleAddAccount ~ loginResult:", loginResult)
         setAlertConfig({ title: 'Login failed', message: loginResult?.message || 'Unable to login', type: 'error' });
         setAlertVisible(true);
         return;
       }
 
-      // 3) Get token and persist
       await DevERPService.getAuth(true);
       dispatch(loginUserThunk({ 
         newToken: loginResult?.token,
@@ -104,10 +94,10 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({
 
         <View style={styles.formContainer}>
            <Image
-                   source={ERP_ICON.APP_LOGO}
+                    source={ERP_ICON.APP_LOGO}
                     style={styles.logo}
                     resizeMode="contain"
-                  />
+            />
           
           <Text style={styles.subtitle}>Sign in to add another account</Text>
 

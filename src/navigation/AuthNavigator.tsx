@@ -18,7 +18,6 @@ const AuthNavigator = () => {
         headerTitleStyle: {
           fontWeight: 'bold',
         },
-        headerBackTitleVisible: false,
         headerShown: false
       }}>
       <Stack.Screen

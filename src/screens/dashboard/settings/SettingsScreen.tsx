@@ -36,7 +36,6 @@ const SettingsScreen = () => {
   const [settings, setSettings] = useState<SettingItem[]>([]);
 
   useEffect(() => {
-    // Initialize settings with translations
     setSettings([
         { id: '1', title: t('settings.pushNotifications'), subtitle: t('settings.receiveAlerts'), icon: '🔔', type: 'toggle', value: true },
         { id: '2', title: t('settings.emailNotifications'), subtitle: t('settings.getEmailUpdates'), icon: '📧', type: 'toggle', value: false },

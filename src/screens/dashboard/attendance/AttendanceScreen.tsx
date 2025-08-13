@@ -4,45 +4,20 @@ import {
   Text,
   TouchableOpacity,
   Image,
-  StyleSheet,
-  Platform,
-  Alert,
   ActivityIndicator,
   TextInput,
 } from 'react-native';
 import { launchCamera } from 'react-native-image-picker';
-import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 import Geolocation from '@react-native-community/geolocation';
 import {Formik} from 'formik';
 import * as Yup from 'yup';
+
 import CustomAlert from '../../../components/alert/CustomAlert';
 import {styles} from './attandance_style';
 import useTranslations from '../../../hooks/useTranslations';
 import FullViewLoader from '../../../components/loader/FullViewLoader';
-
-// Type definitions for user and location
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  image: string;
-  status: 'checkin' | 'checkout';
-}
-interface UserLocation {
-  latitude: number;
-  longitude: number;
-}
-
-interface AttendanceFormValues {
-  name: string;
-  email: string;
-  status: 'checkin' | 'checkout';
-  latitude: string; // keep as string for TextInput
-  longitude: string;
-  remark: string;
-  dateTime: string;
-}
+import { AttendanceFormValues, User, UserLocation } from './types';
+import { requestCameraAndLocationPermission } from '../../../utils/helpers';
 
 const dummyUser: User = {
   id: '1',
@@ -54,7 +29,9 @@ const dummyUser: User = {
 };
 
 const AttendanceScreen = ({ navigation }: { navigation: any }) => {
+
   const { t } = useTranslations();
+  
   const [user, setUser] = useState<User>(dummyUser);
   const [statusImage, setStatusImage] = useState<string | null>(null);
   const [userLocation, setUserLocation] = useState<UserLocation | null>(null);
@@ -75,38 +52,11 @@ const AttendanceScreen = ({ navigation }: { navigation: any }) => {
     return () => clearTimeout(timer);
   }, []);
 
-  const requestCameraAndLocationPermission = async (): Promise<boolean> => {
-    try {
-      const cameraPerm = Platform.OS === 'ios'
-        ? PERMISSIONS.IOS.CAMERA
-        : PERMISSIONS.ANDROID.CAMERA;
-      const locationPerm = Platform.OS === 'ios'
-        ? PERMISSIONS.IOS.LOCATION_WHEN_IN_USE
-        : PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION;
 
-      const cameraStatus = await check(cameraPerm);
-      const locationStatus = await check(locationPerm);
-
-      const cameraGranted = cameraStatus === RESULTS.GRANTED
-        ? true
-        : (await request(cameraPerm)) === RESULTS.GRANTED;
-
-      const locationGranted = locationStatus === RESULTS.GRANTED
-        ? true
-        : (await request(locationPerm)) === RESULTS.GRANTED;
-
-      return cameraGranted && locationGranted;
-    } catch (error) {
-      console.warn('Permission error:', error);
-      return false;
-    }
-  };
-
-  // Toggle current user's status with location + camera capture
   const handleStatusToggle = async (
     setFieldValue: (field: keyof AttendanceFormValues, value: any) => void
   ) => {
-    if (locationLoading) return; // Prevent double click
+    if (locationLoading) return; 
     const hasPermission = await requestCameraAndLocationPermission();
     if (!hasPermission) {
       setAlertConfig({
@@ -127,7 +77,6 @@ const AttendanceScreen = ({ navigation }: { navigation: any }) => {
         setFieldValue('longitude', String(longitude));
         setLocationLoading(false);
 
-        // Only after location, open camera
         launchCamera(
           {
             mediaType: 'photo',
@@ -144,7 +93,6 @@ const AttendanceScreen = ({ navigation }: { navigation: any }) => {
             const photoUri = response.assets?.[0]?.uri;
             if (!photoUri) return;
 
-            // Toggle status
             setUser((prev) => ({
               ...prev,
               status: (prev.status === 'checkin' ? 'checkout' : 'checkin') as 'checkin' | 'checkout',
@@ -180,7 +128,6 @@ const AttendanceScreen = ({ navigation }: { navigation: any }) => {
 
   return (
     <View style={styles.container}>
-      
       {isLoading ? (
                      <FullViewLoader />
       ) : (
@@ -218,7 +165,6 @@ const AttendanceScreen = ({ navigation }: { navigation: any }) => {
                     
                   </View>
 
-                  {/* Form Fields */}
                  <View style={{bottom: 52}}>
                    <View style={styles.formGroup}>
                     <Text style={styles.label}>{t('attendance.employeeName')}</Text>
@@ -294,10 +240,8 @@ const AttendanceScreen = ({ navigation }: { navigation: any }) => {
               )}
             </Formik>
 
-            
           </View>
 
-          {/* Loader Overlay */}
           {locationLoading && (
             <View style={styles.loaderOverlay} pointerEvents="auto">
               <ActivityIndicator size="large" color="#673AB7" />

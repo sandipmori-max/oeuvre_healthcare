@@ -6,19 +6,15 @@ import {
   StatusBar,
   Animated,
 } from 'react-native';
+
 import { ERP_ICON } from '../../assets';
 import { styles } from './splash_style';
+import { SplashProps } from './types';
 
-interface Props {
-  onFinish: () => void;
-}
-
-
-const CustomSplashScreen: React.FC<Props> = ({ onFinish }) => {
+const CustomSplashScreen: React.FC<SplashProps> = ({ onFinish }) => {
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-
     Animated.timing(fadeAnim, {
       toValue: 1,
       duration: 800,
