@@ -1,0 +1,120 @@
+import { StyleSheet } from "react-native";
+import { ERP_COLOR_CODE } from "../../../../../utils/constants";
+
+export 
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: ERP_COLOR_CODE.ERP_BACKGROUND,
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 20,
+    backgroundColor: ERP_COLOR_CODE.ERP_WHITE,
+    borderBottomWidth: 1,
+    borderBottomColor: ERP_COLOR_CODE.ERP_BORDER,
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  closeButton: {
+    paddingHorizontal: 15,
+    paddingVertical: 8,
+    backgroundColor: ERP_COLOR_CODE.ERP_CANCEL_BUTTON,
+    borderRadius: 8,
+  },
+  closeButtonText: {
+    color: ERP_COLOR_CODE.ERP_BLACK,
+    fontWeight: '600',
+  },
+  accountsList: {
+    flex: 1,
+    padding: 20,
+  },
+  accountItem: {
+    backgroundColor: ERP_COLOR_CODE.ERP_WHITE,
+    borderRadius: 12,
+    padding: 15,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: 'transparent',
+  },
+  activeAccount: {
+    borderColor: ERP_COLOR_CODE.ERP_ACTIVE_BUTTON,
+    backgroundColor: ERP_COLOR_CODE.ERP_ACTIVE_BACKGROUND,
+  },
+  accountContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  avatar: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    marginRight: 15,
+  },
+  accountInfo: {
+    flex: 1,
+  },
+  accountName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 4,
+  },
+  accountEmail: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 4,
+  },
+  lastLogin: {
+    fontSize: 12,
+    color: '#999',
+  },
+  activeText: {
+    color: ERP_COLOR_CODE.ERP_ACTIVE_BUTTON,
+  },
+  activeIndicator: {
+    backgroundColor: ERP_COLOR_CODE.ERP_ACTIVE_BUTTON,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 24,
+  },
+  activeLabel: {
+    color: ERP_COLOR_CODE.ERP_WHITE,
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  removeButton: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: ERP_COLOR_CODE.ERP_REMOVE_BUTTON,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  removeButtonText: {
+    color: ERP_COLOR_CODE.ERP_WHITE,
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  addAccountButton: {
+    margin: 20,
+    padding: 15,
+    backgroundColor: ERP_COLOR_CODE.ERP_ACTIVE_BUTTON,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  addAccountText: {
+    color: ERP_COLOR_CODE.ERP_WHITE,
+    fontSize: 16,
+    fontWeight: '600',
+  },
+});
