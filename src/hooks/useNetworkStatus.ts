@@ -1,11 +1,6 @@
-// hooks/useNetworkStatus.ts
 import { useEffect, useState } from 'react';
 import NetInfo from '@react-native-community/netinfo';
 
-/**
- * Hook to get real-time internet connection status
- * @returns {boolean} isConnected - whether the device is online
- */
 const useNetworkStatus = (): boolean => {
   const [isConnected, setIsConnected] = useState<boolean>(true);
 

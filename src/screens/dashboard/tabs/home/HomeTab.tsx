@@ -5,8 +5,8 @@ import { styles } from './home_style';
 import { useAppDispatch, useAppSelector } from '../../../../store/hooks';
 import { DashboardItem } from '../../../../store/slices/auth/type';
 import { useNavigation } from '@react-navigation/native';
-import FullViewLoader from '../../../../components/FullViewLoader';
-import NoData from '../../../../components/NoData';
+import FullViewLoader from '../../../../components/loader/FullViewLoader';
+import NoData from '../../../../components/no_data/NoData';
  
 
 const HomeScreen = () => {

@@ -34,12 +34,10 @@ export const useApi = <T = any>(options: UseApiOptions = {}) => {
 
   const execute = useCallback(
     async (apiCall: () => Promise<T>) => {
-      // Cancel previous request if it's still running
       if (abortControllerRef.current) {
         abortControllerRef.current.abort();
       }
 
-      // Create new abort controller
       abortControllerRef.current = new AbortController();
 
       setState(prev => ({
@@ -64,7 +62,6 @@ export const useApi = <T = any>(options: UseApiOptions = {}) => {
         onSuccess?.(data);
         return data;
       } catch (error: any) {
-        // Don't update state if request was cancelled
         if (error.name === 'AbortError') {
           return;
         }
@@ -137,7 +134,6 @@ export const useApi = <T = any>(options: UseApiOptions = {}) => {
   };
 };
 
-// Specialized hooks for common API operations
 export const useApiCall = <T = any>(apiCall: () => Promise<T>, options: UseApiOptions = {}) => {
   const api = useApi<T>(options);
 

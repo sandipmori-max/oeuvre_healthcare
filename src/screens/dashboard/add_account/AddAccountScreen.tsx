@@ -20,7 +20,7 @@ import { ERP_ICON } from '../../../assets';
 import { DevERPService } from '../../../services/api';
 import { useApi } from '../../../hooks/useApi';
 import DeviceInfo from 'react-native-device-info';
-import CustomAlert from '../../../components/CustomAlert';
+import CustomAlert from '../../../components/alert/CustomAlert';
 
 const AddAccountScreen: React.FC<AddAccountScreenProps> = ({
   visible,

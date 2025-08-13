@@ -2,7 +2,7 @@ import { Dimensions, FlatList, StyleSheet, Text, TouchableOpacity, View } from '
 import React from 'react'
 import { useNavigation } from '@react-navigation/native';
 import { useAppSelector } from '../../../../store/hooks';
-import NoData from '../../../../components/NoData';
+import NoData from '../../../../components/no_data/NoData';
 
 const ReportTab = () => {
 const navigation = useNavigation();

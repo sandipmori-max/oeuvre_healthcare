@@ -15,10 +15,10 @@ import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 import Geolocation from '@react-native-community/geolocation';
 import {Formik} from 'formik';
 import * as Yup from 'yup';
-import CustomAlert from '../../../components/CustomAlert';
+import CustomAlert from '../../../components/alert/CustomAlert';
 import {styles} from './attandance_style';
 import useTranslations from '../../../hooks/useTranslations';
-import FullViewLoader from '../../../components/FullViewLoader';
+import FullViewLoader from '../../../components/loader/FullViewLoader';
 
 // Type definitions for user and location
 interface User {

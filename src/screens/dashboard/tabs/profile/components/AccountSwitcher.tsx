@@ -11,7 +11,7 @@ import { styles } from './components_style';
 import { useAppDispatch, useAppSelector } from '../../../../../store/hooks';
 import { removeAccountThunk, switchAccountThunk } from '../../../../../store/slices/auth/thunk';
 import { Account } from '../../../../../store/slices/auth/type';
-import CustomAlert from '../../../../../components/CustomAlert';
+import CustomAlert from '../../../../../components/alert/CustomAlert';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { DevERPService } from '../../../../../services/api';
 

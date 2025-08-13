@@ -1,3 +1,5 @@
+import { ERP_GIF } from "../../assets";
+
 export const getBottomTabIcon = (iconName: string) => {
     switch (iconName) {
       case 'home':
@@ -33,3 +35,14 @@ export const firstLetterUpperCase = (str: string): string => {
   if (!str) return '';
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
+
+export const getGifSource = (type: 'error' | 'success' | 'info') => {
+  switch (type) {
+    case 'error':
+      return ERP_GIF.ERROR;
+    case 'success':
+      return ERP_GIF.SUCCESS; 
+    default:
+      return ERP_GIF.SEARCH_LOADER;
+  }
+};

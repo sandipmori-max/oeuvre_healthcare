@@ -2,8 +2,8 @@ import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native
 import React from 'react'
 import { useNavigation } from '@react-navigation/native';
 import { useAppSelector } from '../../../../store/hooks';
-import NoData from '../../../../components/NoData';
-import FullViewLoader from '../../../../components/FullViewLoader';
+import NoData from '../../../../components/no_data/NoData';
+import FullViewLoader from '../../../../components/loader/FullViewLoader';
 
 const EntryTab = () => {
     const navigation = useNavigation();
