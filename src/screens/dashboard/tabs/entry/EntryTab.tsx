@@ -13,7 +13,18 @@ const EntryTab = () => {
   
   return (
     <View>
-        {
+
+      {
+         list?.length === 0 && !isMenuLoading ?
+           <View style={{ 
+            flex: 1, 
+            justifyContent: 'center', 
+            alignItems: 'center', 
+            alignContent:'center',
+            }}>
+                <NoData />
+           </View> : <>
+            {
             isMenuLoading ? <FullViewLoader /> :
            <>
         
@@ -59,6 +70,9 @@ const EntryTab = () => {
            </>
            
         }
+           </>
+      }
+       
        
     </View>
   )

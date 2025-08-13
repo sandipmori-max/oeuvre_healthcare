@@ -116,7 +116,14 @@ const ListScreen = () => {
     setSearchQuery('');
     setFilteredData(listData);
   };
-
+function parseCustomDate(dateStr: string): Date {
+  // dateStr: "01-Aug-2025"
+  const [day, monthStr, year] = dateStr.split('-');
+  const month = [
+    'Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'
+  ].indexOf(monthStr);
+  return new Date(Number(year), month, Number(day));
+}
  const handleDateChange = (event: any, selectedDate?: Date) => {
   // Cancel button pressed
   if (event.type === 'dismissed' || !selectedDate) {
@@ -292,10 +299,10 @@ const ListScreen = () => {
       {showDatePicker?.show && (
         <DateTimePicker
          value={
-            showDatePicker?.type === 'from'
-              ? new Date(fromDate.split('-').reverse().join('-'))
-              : new Date()
-          }
+    showDatePicker?.type === 'from' && fromDate
+      ? parseCustomDate(fromDate)
+      : new Date()
+  }
           mode="date"
           display="default"
           onChange={handleDateChange}
@@ -303,28 +310,28 @@ const ListScreen = () => {
         />
       )}
 
-      {loadingListId && (
+  {!!error ? <Text style={styles.errorText}>{error}</Text> : <> {loadingListId ? (
              <FullViewLoader />
-      )}
-
-      {!!error && <Text style={styles.errorText}>{error}</Text>}
-  <ScrollView horizontal>
-    <FlatList
-      data={filteredData}
-      keyExtractor={(item, idx) => String(item?.id || idx)}
-      renderItem={renderItem}
-      ListHeaderComponent={filteredData.length ? TableHeader : null}
-      contentContainerStyle={styles.listContent}
-      ListEmptyComponent={!loadingListId ? (
-        <View style={{
-          width: Dimensions.get('screen').width,
-          height: Dimensions.get('screen').height / 2.5,
-          justifyContent:'center', alignContent:'center', alignItems:'center'}}>
-          <NoData />
-        </View>
-      ) : null}
-    />
-  </ScrollView>
+      ) : <>
+       <ScrollView horizontal>
+          <FlatList
+            data={filteredData}
+            keyExtractor={(item, idx) => String(item?.id || idx)}
+            renderItem={renderItem}
+            ListHeaderComponent={filteredData.length ? TableHeader : null}
+            contentContainerStyle={styles.listContent}
+            ListEmptyComponent={!loadingListId ? (
+              <View style={{
+                width: Dimensions.get('screen').width,
+                height: Dimensions.get('screen').height / 2.5,
+                justifyContent:'center', alignContent:'center', alignItems:'center'}}>
+                <NoData />
+              </View>
+            ) : null}
+          />
+        </ScrollView>
+      </>}
+      </>}
     </View>
   );
 };

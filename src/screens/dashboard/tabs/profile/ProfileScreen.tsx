@@ -7,7 +7,7 @@ import { useNavigation } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import { ProfileStackParamList } from '../../../../navigation/types';
 import { useAppSelector } from '../../../../store/hooks';
-import { formatDateMonthDateYear } from '../../../../utils/helpers';
+import { firstLetterUpperCase, formatDateMonthDateYear } from '../../../../utils/helpers';
 import AddAccountScreen from '../../add_account/AddAccountScreen';
 
 const ProfileScreen = () => {
@@ -23,7 +23,6 @@ const ProfileScreen = () => {
   };
 
   const activeAccount = accounts.find(acc => acc.user.id === user?.id);
-  const DEFAULT_AVATAR = 'https://dummyimage.com/80x80/ccc/fff&text=User';
 
   return (
     <View style={styles.container}>
@@ -42,7 +41,7 @@ const ProfileScreen = () => {
                 <Text style={{ fontSize: 32 }}>👤</Text>
               </View>
               <View style={styles.profileInfo}>
-                <Text style={styles.profileName}>{user?.name}</Text>
+                <Text style={styles.profileName}>{firstLetterUpperCase(user?.name)}</Text>
                 <Text style={styles.profileEmail}>{user?.company_code}</Text>
                 <Text style={styles.accountType}>
                   {(user?.accountType?.toUpperCase() || 'PERSONAL') + ' ACCOUNT'}

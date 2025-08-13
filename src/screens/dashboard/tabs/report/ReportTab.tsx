@@ -1,17 +1,30 @@
-import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Dimensions, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React from 'react'
 import { useNavigation } from '@react-navigation/native';
 import { useAppSelector } from '../../../../store/hooks';
+import NoData from '../../../../components/NoData';
 
 const ReportTab = () => {
 const navigation = useNavigation();
     const {menu, isMenuLoading} = useAppSelector(state => state.auth);
+    const list = menu?.filter(item => item?.isReport === true)
+    console.log("🚀 ~ ReportTab ~ list:", list)
  
    return (
-   <View>
-           {
+   <View style={{ flex: 1, backgroundColor: '#f5f5f5' }}>
+       {
+        list?.length === 0 && !isMenuLoading ?
+           <View style={{ 
+            flex: 1, 
+            justifyContent: 'center', 
+            alignItems: 'center', 
+            alignContent:'center',
+            }}>
+                <NoData />
+           </View> : <>
+            {
                isMenuLoading ? <></> : <FlatList
-                           data={menu?.filter(item => item?.isReport === true)}
+                           data={list}
                            keyExtractor={item => item?.id}
                            horizontal={false}
                            numColumns={2}
@@ -48,6 +61,9 @@ const navigation = useNavigation();
                            )}
                        />
            }
+           </>
+       }
+          
           
        </View>
    )
