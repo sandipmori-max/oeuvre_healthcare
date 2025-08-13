@@ -10,7 +10,6 @@ const NO_INTERNET = require(`${ERP_BASE_URL_GIF}/nointernet.gif`);
 const NO_DATA = require(`${ERP_BASE_URL_GIF}/nodata.gif`);
 const SUCCESS = require(`${ERP_BASE_URL_GIF}/success.gif`);
 
-
 export const ERP_ICON = {
     APP_LOGO
 };

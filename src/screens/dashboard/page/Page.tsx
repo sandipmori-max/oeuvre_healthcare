@@ -4,8 +4,8 @@ import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { useAppDispatch } from '../../../store/hooks';
 import { getERPPageThunk } from '../../../store/slices/auth/thunk';
 import { formatHeaderTitle } from '../../../utils/helpers';
-import FullViewLoader from '../../../components/FullViewLoader';
-import NoData from '../../../components/NoData';
+import FullViewLoader from '../../../components/loader/FullViewLoader';
+import NoData from '../../../components/no_data/NoData';
 
 type PageRouteParams = { PageScreen: { item: any } };
 

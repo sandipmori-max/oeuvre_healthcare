@@ -1,5 +1,4 @@
 import React, {useEffect} from 'react';
-import {View, ActivityIndicator} from 'react-native';
 
 import {useAppDispatch, useAppSelector} from '../store/hooks';
 import { checkAuthStateThunk, getERPMenuThunk, getERPDashboardThunk } from '../store/slices/auth/thunk';
@@ -8,7 +7,7 @@ import DevERPService from '../services/api/deverp';
 import AuthNavigator from './AuthNavigator';
 
 import StackNavigator from './StackNavigator';
-import FullViewLoader from '../components/FullViewLoader';
+import FullViewLoader from '../components/loader/FullViewLoader';
 
 const RootNavigator = () => {
   const dispatch = useAppDispatch();
@@ -24,7 +23,6 @@ const RootNavigator = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    console.log("🚀 ~ RootNavigator ~ activeToken-*-*-*-*-*-*-*-*-*-*-*-*:", activeToken)
     if (isAuthenticated) {
       dispatch(getERPMenuThunk());
       dispatch(getERPDashboardThunk());

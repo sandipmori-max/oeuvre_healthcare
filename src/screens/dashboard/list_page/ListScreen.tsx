@@ -6,8 +6,8 @@ import { getERPListDataThunk } from '../../../store/slices/auth/thunk';
 import { styles } from './list_page_style';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { formatHeaderTitle } from '../../../utils/helpers';
-import FullViewLoader from '../../../components/FullViewLoader';
-import NoData from '../../../components/NoData';
+import FullViewLoader from '../../../components/loader/FullViewLoader';
+import NoData from '../../../components/no_data/NoData';
 
 type ListRouteParams = { List: { item: any } };
 

@@ -1,31 +1,12 @@
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import {
-  Keyboard,
   View,
-  StyleSheet, 
 } from 'react-native';
+import useKeyboardVisible from '../hooks/useKeyboardVisible';
 
- 
-
-const KeyboardAwareWrapper  = ({
-  
-}) => {
-  const [keyboardVisible, setKeyboardVisible] = useState(false);
-
-  useEffect(() => {
-    const showSub = Keyboard.addListener('keyboardDidShow', () =>
-      setKeyboardVisible(true),
-    );
-    const hideSub = Keyboard.addListener('keyboardDidHide', () =>
-      setKeyboardVisible(false),
-    );
-
-    return () => {
-      showSub.remove();
-      hideSub.remove();
-    };
-  }, []);
+const KeyboardAwareWrapper  = ({}) => {
+  const keyboardVisible = useKeyboardVisible();
 
   return (
     <View style={{
@@ -36,8 +17,3 @@ const KeyboardAwareWrapper  = ({
 
 export default KeyboardAwareWrapper;
 
-const styles = StyleSheet.create({
-  flex: {
-    flex: 1,
-  },
-});

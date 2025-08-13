@@ -6,7 +6,7 @@ import { MenuItem } from '../../../store/slices/auth/type';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ERP_COLOR_CODE } from '../../../utils/constants';
 import useTranslations from '../../../hooks/useTranslations';
-import FullViewLoader from '../../../components/FullViewLoader';
+import FullViewLoader from '../../../components/loader/FullViewLoader';
 
 type WebRouteParams = { Web: { item: MenuItem } };
 

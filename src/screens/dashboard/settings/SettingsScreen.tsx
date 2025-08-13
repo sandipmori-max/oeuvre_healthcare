@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, FlatList, Switch, ScrollView, Modal } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { styles } from './settings_style';
-import CustomAlert from '../../../components/CustomAlert';
+import CustomAlert from '../../../components/alert/CustomAlert';
 import useTranslations from '../../../hooks/useTranslations';
 
 interface SettingItem {

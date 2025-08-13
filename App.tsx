@@ -7,11 +7,9 @@ import NoInternetScreen from './src/screens/noInternet/NoInternet';
 import useNetworkStatus from './src/hooks/useNetworkStatus';
 import CustomSplashScreen from './src/screens/splash/SplashScreen';
 import DeviceInfo from 'react-native-device-info';
-import CustomAlert from './src/components/CustomAlert';
+import CustomAlert from './src/components/alert/CustomAlert';
 
-// Import i18n (must be imported before any component using translations)
 import './src/i18n';
-// Import TranslationProvider after i18n is imported
 import { TranslationProvider } from './src/components/TranslationProvider';
 
 const App = () => {

@@ -5,7 +5,7 @@ import DisplayScreen from '../screens/dashboard/display/DisplayScreen';
 import AlertScreen from '../screens/dashboard/alert/AlertScreen';
 import PrivacyPolicyScreen from '../screens/dashboard/privacy/PrivacyPolicyScreen';
 import TabNavigator from './TabNavigator';
-import CustomDrawerContent from '../components/CustomDrawerContent';
+import CustomDrawerContent from '../components/drawer/CustomDrawerContent';
 import useTranslations from '../hooks/useTranslations';
 
 const Drawer = createDrawerNavigator();
