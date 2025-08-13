@@ -1,0 +1,108 @@
+import { Dimensions, StyleSheet } from "react-native";
+import { ERP_COLOR_CODE } from "../../../utils/constants";
+
+export const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: ERP_COLOR_CODE.ERP_BACKGROUND,
+    justifyContent: 'center',
+    paddingHorizontal: 20,
+  },
+  formContainer: {
+    borderRadius: 12,
+    height: Dimensions.get('screen').height,
+    justifyContent:'center',
+    
+  },
+  logo: {
+    width: 100,
+    height: 100,
+    alignSelf: 'center',
+    marginBottom: 25,
+    borderRadius: 20,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 6,
+    color: '#333',
+  },
+  subtitle: {
+    fontSize: 16,
+    textAlign: 'center',
+    marginBottom: 30,
+    color: '#666',
+  },
+  inputContainer: {
+    marginBottom: 8,
+  },
+  inputLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#444',
+    marginBottom: 6,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    padding: 15,
+    borderRadius: 10,
+    fontSize: 16,
+    backgroundColor: ERP_COLOR_CODE.ERP_INPUT_BACKGROUND,
+    color: '#333',
+  },
+  errorText: {
+    color: 'red',
+    fontSize: 13,
+    marginTop: 5,
+  },
+  errorContainer: {
+    backgroundColor: '#ffebee',
+    borderColor: '#f44336',
+    borderWidth: 1,
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 15,
+  },
+  loginButton: {
+    backgroundColor: ERP_COLOR_CODE.ERP_ACTIVE_BUTTON,
+    padding: 16,
+    borderRadius: 10,
+    marginBottom: 20,
+    shadowColor: ERP_COLOR_CODE.ERP_ACTIVE_BUTTON,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.6,
+    shadowRadius: 6,
+    elevation: 6,
+    marginTop : 12
+  },
+  errorButton: {
+    backgroundColor: ERP_COLOR_CODE.ERP_DE_ACTIVE_BUTTON,
+    padding: 16,
+    borderRadius: 10,
+    marginBottom: 20,
+  },
+  disabledButton: {
+    backgroundColor: '#ccc',
+    shadowOpacity: 0,
+  },
+  loginButtonText: {
+    color: ERP_COLOR_CODE.ERP_WHITE,
+    fontSize: 18,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  cancelButton: {
+    backgroundColor: ERP_COLOR_CODE.ERP_CANCEL_BUTTON,
+    padding: 15,
+    borderRadius: 10,
+    marginBottom: 10,
+  },
+  cancelButtonText: {
+    color: '#666',
+    fontSize: 16,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+});
