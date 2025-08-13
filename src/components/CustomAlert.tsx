@@ -5,8 +5,9 @@ import {
   TouchableOpacity,
   Modal,
   StyleSheet,
-  Dimensions,
 } from 'react-native';
+import FastImage from 'react-native-fast-image';
+import { ERP_GIF } from '../assets';
 
 interface CustomAlertProps {
   visible: boolean;
@@ -15,6 +16,17 @@ interface CustomAlertProps {
   type?: 'error' | 'success' | 'info';
   onClose: () => void;
 }
+
+const getGifSource = (type: 'error' | 'success' | 'info') => {
+  switch (type) {
+    case 'error':
+      return ERP_GIF.ERROR;
+    case 'success':
+      return ERP_GIF.SUCCESS; 
+    default:
+      return ERP_GIF.SEARCH_LOADER;
+  }
+};
 
 const CustomAlert: React.FC<CustomAlertProps> = ({
   visible,
@@ -30,29 +42,24 @@ const CustomAlert: React.FC<CustomAlertProps> = ({
           container: styles.errorContainer,
           title: styles.errorTitle,
           message: styles.errorMessage,
-          closeButton: styles.errorCloseButton,
-          closeText: styles.errorCloseText,
         };
       case 'success':
         return {
           container: styles.successContainer,
           title: styles.successTitle,
           message: styles.successMessage,
-          closeButton: styles.successCloseButton,
-          closeText: styles.successCloseText,
         };
       default:
         return {
           container: styles.infoContainer,
           title: styles.infoTitle,
           message: styles.infoMessage,
-          closeButton: styles.infoCloseButton,
-          closeText: styles.infoCloseText,
         };
     }
   };
 
   const alertStyles = getAlertStyles();
+  const gifSource = getGifSource(type);
 
   return (
     <Modal
@@ -69,14 +76,17 @@ const CustomAlert: React.FC<CustomAlertProps> = ({
               <Text style={styles.closeIconText}>✕</Text>
             </TouchableOpacity>
           </View>
+          <FastImage
+            source={gifSource}
+            style={styles.gif}
+            resizeMode={FastImage.resizeMode.contain}
+          />
           <Text style={alertStyles.message}>{message}</Text>
         </View>
       </View>
     </Modal>
   );
 };
-
-const { width } = Dimensions.get('window');
 
 const styles = StyleSheet.create({
   overlay: {
@@ -89,14 +99,16 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     padding: 20,
-    minHeight: 200,
-    maxHeight: 300,
+    minHeight: 220,
+    maxHeight: 340,
+    alignItems: 'center',
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 10,
+    width: '100%',
   },
   closeIcon: {
     width: 30,
@@ -111,14 +123,11 @@ const styles = StyleSheet.create({
     color: '#666',
     fontWeight: 'bold',
   },
-  closeButton: {
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginTop: 16,
+  gif: {
+    width: 120,
+    height: 120,
+    marginBottom: 6,
   },
-  // Error styles
   errorContainer: {
     backgroundColor: '#fff',
   },
@@ -131,14 +140,8 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#666',
     lineHeight: 20,
-  },
-  errorCloseButton: {
-    backgroundColor: '#dc3545',
-  },
-  errorCloseText: {
-    color: '#fff',
-    fontWeight: '600',
-    fontSize: 16,
+    textAlign: 'center',
+    marginBottom: 8,
   },
   // Success styles
   successContainer: {
@@ -147,20 +150,14 @@ const styles = StyleSheet.create({
   successTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#28a745',
+    color: 'green',
   },
   successMessage: {
     fontSize: 14,
     color: '#666',
     lineHeight: 20,
-  },
-  successCloseButton: {
-    backgroundColor: '#28a745',
-  },
-  successCloseText: {
-    color: '#fff',
-    fontWeight: '600',
-    fontSize: 16,
+    textAlign: 'center',
+    marginBottom: 8,
   },
   // Info styles
   infoContainer: {
@@ -175,14 +172,8 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#666',
     lineHeight: 20,
-  },
-  infoCloseButton: {
-    backgroundColor: '#007bff',
-  },
-  infoCloseText: {
-    color: '#fff',
-    fontWeight: '600',
-    fontSize: 16,
+    textAlign: 'center',
+    marginBottom: 8,
   },
 });
 

@@ -6,6 +6,7 @@ import {
   Image,
   TouchableOpacity,
   ImageSourcePropType,
+  Alert,
 } from 'react-native';
 import {
   DrawerContentComponentProps,
@@ -35,6 +36,7 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = (props) => {
   const {user} = useAppSelector(state => state?.auth);
   
   const currentRoute = props.state.routeNames[props.state.index];
+  console.log("🚀 ~ CustomDrawerContent ~ currentRoute:", currentRoute)
   return (
     <DrawerContentScrollView {...props} contentContainerStyle={{ flex: 1 }}>
       <View style={styles.header}>
@@ -54,7 +56,16 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = (props) => {
           <TouchableOpacity
             key={item.route}
             style={[styles.drawerItem, isActive && styles.activeItemBackground]}
-            onPress={() => navigation.navigate(item.route as never)}
+            onPress={() => 
+            {
+                if(item.route === 'Home'){
+                      props.navigation.navigate('Home', { screen: 'Home' });
+                      props.navigation.closeDrawer();
+                      return;
+                } else {
+                  navigation.navigate(item.route as never)
+                }
+            }}
           >
             <View style={styles.itemRow}>
               <Text style={[styles.itemIcon, isActive && styles.activeText]}>
