@@ -95,25 +95,41 @@ const PageScreen = () => {
   return (
     <View style={styles.container}>
        
-      {loadingPageId && (
-             <FullViewLoader />
-      )}
+     
 
-      {!!error && (
-        <Text style={styles.errorText}>{error}</Text>
-      )}
-       <ScrollView horizontal>
-       <FlatList
+      {!!error ? (
+        <Text style={styles.errorText}>{error}</Text>) : <>
+       {loadingPageId ? (
+             <FullViewLoader />
+      ) : <>
+      <ScrollView horizontal>
+       <View style={{
+        flexDirection:'column'
+       }}>
+        <View style={{
+          backgroundColor: '#f8f9fa',
+          justifyContent: 'center',
+        }}>
+          <TableHeader />
+        </View>
+       <View  >
+        <FlatList
             data={controls}
             keyExtractor={(item, idx) => String(item?.id || idx)}
             renderItem={renderItem}
-            ListHeaderComponent={controls.length ? TableHeader : null}
+            // ListHeaderComponent={controls.length ? TableHeader : null}
             contentContainerStyle={styles.listContent}
             ListEmptyComponent={!loadingPageId ? (
                <NoData />
             ) : null}
           />
+       </View>
+       </View>
         </ScrollView>
+      </>}  
+        </>
+      }
+       
     </View>
   )
 }

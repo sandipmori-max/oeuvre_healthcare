@@ -314,21 +314,33 @@ function parseCustomDate(dateStr: string): Date {
              <FullViewLoader />
       ) : <>
        <ScrollView horizontal>
-          <FlatList
-            data={filteredData}
-            keyExtractor={(item, idx) => String(item?.id || idx)}
-            renderItem={renderItem}
-            ListHeaderComponent={filteredData.length ? TableHeader : null}
-            contentContainerStyle={styles.listContent}
-            ListEmptyComponent={!loadingListId ? (
-              <View style={{
-                width: Dimensions.get('screen').width,
-                height: Dimensions.get('screen').height / 2.5,
-                justifyContent:'center', alignContent:'center', alignItems:'center'}}>
-                <NoData />
-              </View>
-            ) : null}
-          />
+         <View style={{
+                flexDirection:'column'
+               }}>
+                <View style={{
+                  backgroundColor: '#f8f9fa',
+                  justifyContent: 'center',
+                }}>
+                  <TableHeader />
+                </View>
+               <View  style={{ flex: 1 }}>
+              <FlatList
+                          data={filteredData}
+                          keyExtractor={(item, idx) => String(item?.id || idx)}
+                          renderItem={renderItem}
+                          contentContainerStyle={styles.listContent}
+                          ListEmptyComponent={!loadingListId ? (
+                            <View style={{
+                              width: Dimensions.get('screen').width,
+                              height: Dimensions.get('screen').height / 2.5,
+                              justifyContent:'center', alignContent:'center', alignItems:'center'}}>
+                              <NoData />
+                            </View>
+                          ) : null}
+                        />
+               </View>
+         
+          </View>
         </ScrollView>
       </>}
       </>}
