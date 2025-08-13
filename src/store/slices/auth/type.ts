@@ -50,4 +50,5 @@ export interface AuthState {
   isMenuLoading: boolean;
   dashboard: DashboardItem[];
   isDashboardLoading: boolean;
+  activeToken: string | null; 
 }

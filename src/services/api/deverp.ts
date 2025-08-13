@@ -515,6 +515,12 @@ class DevERPService {
       console.error("🚀 ~ DevERPService ~ clearData ~ error:", error);
     }
   }
+
+  setToken(token: string) {
+    this.token = token;
+    AsyncStorage.setItem('erp_token', token); // Optionally persist
+  }
+
 }
 
 export default new DevERPService();

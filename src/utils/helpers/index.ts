@@ -11,15 +11,15 @@ export const getBottomTabIcon = (iconName: string) => {
       default:
         return '📱';
     }
-  };
+};
 
-  export const formatDateMonthDateYear = (dateString: string) => {
+export const formatDateMonthDateYear = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
     });
-  };
+};
 
 export function formatHeaderTitle(key: string): string {
   let result = key.replace(/[_\.\-]+/g, ' ');
@@ -27,4 +27,9 @@ export function formatHeaderTitle(key: string): string {
   result = result.replace(/([a-zA-Z])([0-9]+)/g, '$1 $2');
   result = result.toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
   return result.trim();
+};
+
+export const firstLetterUpperCase = (str: string): string => {
+  if (!str) return '';
+  return str.charAt(0).toUpperCase() + str.slice(1);
 }

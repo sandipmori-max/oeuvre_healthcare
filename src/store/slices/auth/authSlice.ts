@@ -14,6 +14,7 @@ const initialState: AuthState = {
   isMenuLoading: false,
   dashboard: [],
   isDashboardLoading: false,
+  activeToken: null,
 };
 
 // Auth slice
@@ -27,7 +28,7 @@ const authSlice = createSlice({
     setLoading: (state, action: PayloadAction<boolean>) => {
       state.isLoading = action.payload;
     },
-         logout: state => {
+     logout: state => {
        state.user = null;
        state.accounts = [];
        state.activeAccountId = null;
@@ -48,6 +49,9 @@ const authSlice = createSlice({
     setDashboardLoading: (state, action: PayloadAction<boolean>) => {
       state.isDashboardLoading = action.payload;
     },
+    setActiveToken: (state, action: PayloadAction<string | null>) => {
+      state.activeToken = action.payload;
+    }
   },
   extraReducers: builder => {
     builder
@@ -62,6 +66,7 @@ const authSlice = createSlice({
           state.accounts = action?.payload?.accounts;
           state.activeAccountId = action?.payload?.activeAccountId;
           state.user = action?.payload?.user;
+          state.activeToken = action?.payload?.user?.token || null;
           state.isAuthenticated = !!action?.payload?.user;
         }
         state.error = null;
@@ -91,6 +96,8 @@ const authSlice = createSlice({
           }));
         }
         state.isAuthenticated = true;
+        state.activeToken = action?.payload?.user?.token || null;
+
         state.error = null;
       })
       .addCase(loginUserThunk.rejected, (state, action) => {
@@ -109,6 +116,9 @@ const authSlice = createSlice({
         state.user = action?.payload?.user;
         state.activeAccountId = action?.payload?.accountId;
         state.accounts = action?.payload?.accounts;
+        console.log("🚀 ~ action-------->:", action?.payload?.user )
+        state.activeToken = action?.payload?.user?.token || null;
+
         state.error = null;
       })
       .addCase(switchAccountThunk.rejected, (state, action) => {
@@ -126,6 +136,7 @@ const authSlice = createSlice({
         state.user = action?.payload?.user;
         state.activeAccountId = action?.payload?.activeAccountId;
         state.isAuthenticated = !!action?.payload?.user;
+        state.activeToken = action?.payload?.user?.token || null;
         state.error = null;
       })
       .addCase(removeAccountThunk.rejected, (state, action) => {
@@ -141,6 +152,9 @@ const authSlice = createSlice({
         state.activeAccountId = null;
         state.isAuthenticated = false;
         state.error = null;
+        state.menu = [];
+        state.dashboard = [];
+        state.activeToken = null;
       })
       .addCase(logoutUserThunk.rejected, (state, action) => {
         state.isLoading = false;
@@ -303,5 +317,5 @@ const authSlice = createSlice({
    },
  });
 
-export const {clearError, setLoading, logout, setMenu, setMenuLoading, setDashboard, setDashboardLoading} = authSlice.actions;
+export const {clearError, setLoading, logout, setMenu, setMenuLoading, setDashboard, setDashboardLoading, setActiveToken} = authSlice.actions;
 export default authSlice.reducer;

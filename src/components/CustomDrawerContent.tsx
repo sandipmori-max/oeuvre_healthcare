@@ -14,6 +14,7 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { ERP_ICON } from '../assets';
 import { useAppSelector } from '../store/hooks';
+import { firstLetterUpperCase } from '../utils/helpers';
 
 type DrawerItemConfig = {
   label: string;
@@ -41,7 +42,9 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = (props) => {
           source={ERP_ICON.APP_LOGO}
           style={styles.profileImage}
         />
-        <Text style={styles.username}>{user?.name}</Text>
+        <Text style={styles.username}>
+         {firstLetterUpperCase(user?.name || '')}
+        </Text>
       </View>
 
       <View style={styles.menuContainer}>
