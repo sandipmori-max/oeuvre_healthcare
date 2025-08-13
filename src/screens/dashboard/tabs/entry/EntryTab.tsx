@@ -39,8 +39,8 @@ const EntryTab = () => {
                         renderItem={({ item }) => (
                             <TouchableOpacity
                                 style={{
-                                    flex: 1,
-                                    margin: 8,
+                                  width: '46%',
+                                     margin: 8,
                                     borderRadius: 16,
                                     padding: 24,
                                     alignItems: 'center',

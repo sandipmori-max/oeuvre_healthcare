@@ -1,20 +1,23 @@
 import { Platform } from "react-native";
-import { ERP_GIF } from "../../assets";
+import { ERP_GIF, ERP_ICON } from "../../assets";
 import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 
-export const getBottomTabIcon = (iconName: string) => {
-    switch (iconName) {
-      case 'home':
-        return '🏠';
-      case 'profile':
-        return '👤';
-      case 'report':
-        return '📋';
-      case 'entry':
-        return '📝';
-      default:
-        return '📱';
-    }
+
+export const getBottomTabIcon = (iconName: string, focused: boolean) => {
+  switch (iconName) {
+    case 'home':
+      return focused ? ERP_ICON.ACTIVE_HOME : ERP_ICON.HOME;
+    case 'profile':
+      return focused ? ERP_ICON.ACTIVE_PROFILE : ERP_ICON.PROFILE;
+    case 'report':
+      return focused ? ERP_ICON.ACTIVE_REPORT : ERP_ICON.REPORT;
+    case 'entry':
+      return focused ? ERP_ICON.ACTIVE_ENTRY : ERP_ICON.ENTRY;
+    case 'auth':
+      return focused ? ERP_ICON.ACTIVE_AUTH : ERP_ICON.AUTH;
+    default:
+      return ERP_ICON.HOME;
+  }
 };
 
 export const formatDateMonthDateYear = (dateString: string) => {

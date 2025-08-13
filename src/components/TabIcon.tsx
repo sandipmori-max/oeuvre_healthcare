@@ -1,14 +1,20 @@
 import React from 'react';
-import {Text} from 'react-native';
-
+import { Image } from 'react-native';
 import { TabIconProps } from './types';
 import { getBottomTabIcon } from '../utils/helpers';
 
-const TabIcon: React.FC<TabIconProps> = ({name, color, size}) => {
+const TabIcon: React.FC<TabIconProps & { focused: boolean }> = ({ name, color, size, focused }) => {
+  const iconSource = getBottomTabIcon(name, focused);
   return (
-    <Text style={{fontSize: size - 4, color}}>
-      {getBottomTabIcon(name)}
-    </Text>
+    <Image
+      source={iconSource}
+      style={{
+        width: focused ? size + 14 : size,
+        height: focused ? size + 14 : size,
+        tintColor: color,
+        resizeMode: 'contain',
+      }}
+    />
   );
 };
 
