@@ -1,4 +1,4 @@
-import { Text, View, FlatList, Image, TextInput, TouchableOpacity, Alert, ScrollView, Dimensions } from 'react-native'
+import { Text, View, FlatList, Image, TextInput, TouchableOpacity, Alert, ScrollView, Dimensions, Linking } from 'react-native'
 import React, { useEffect, useLayoutEffect, useState, useCallback, useMemo } from 'react'
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 
@@ -237,162 +237,271 @@ const parseCustomDate = (dateStr: string): Date =>{
     }
   }, [fromDate, toDate]);
 
-const allKeys = filteredData && filteredData.length > 0 
-  ? Object.keys(filteredData[0]) 
-  : [];
-console.log("🚀 ~ allKeys:", allKeys)
-function splitInto4Columns(keys: string[]): Record<string, string[]> {
-  const result: Record<string, string[]> = { clm1: [], clm2: [], clm3: [], clm4: [] };
-
-  // Filter out keys starting with "btn_"
-  const filteredKeys = keys.filter(key => !key.startsWith('btn_'));
-
-  // First 4 keys — one per column
-  const firstFour = filteredKeys.slice(0, 4);
-  const rest = filteredKeys.slice(4);
-
-  result.clm1.push(firstFour[0] || '');
-  result.clm2.push(firstFour[1] || '');
-  result.clm3.push(firstFour[2] || '');
-  result.clm4.push(firstFour[3] || '');
-
-  // Distribute remaining keys round-robin
-  rest.forEach((key, index) => {
-    const colIndex = index % 4;
-    const columnKey = `clm${colIndex + 1}` as keyof typeof result;
-    result[columnKey].push(key);
-  });
-
-  return result;
-}
-
- function splitInto4Rows(keys: string[]): Record<string, string[]> {
-  const result: Record<string, string[]> = { clm1: [], clm2: [], clm3: [], clm4: [] };
-
-  // First 4 keys — one per column
-  const firstFour = keys.slice(0, 4);
-  const rest = keys.slice(4);
-
-  result.clm1.push(firstFour[0] || '');
-  result.clm2.push(firstFour[1] || '');
-  result.clm3.push(firstFour[2] || '');
-  result.clm4.push(firstFour[3] || '');
-
-  // Distribute remaining keys round-robin
-  rest.forEach((key, index) => {
-    const colIndex = index % 4;
-    const columnKey = `clm${colIndex + 1}` as keyof typeof result;
-    result[columnKey].push(key);
-  });
-
-  return result;
-}
-
-const columns = splitInto4Columns(allKeys);
-const rows = splitInto4Rows(allKeys);
-
-console.log("🚀 ~ columns:", columns)
-
-const TableHeader = () => (
-  <View style={[styles.tableRow, styles.tableHeaderRow]}>
-    {Object.values(columns).map((colItems, colIndex) => (
-      <View key={`col-${colIndex}`} style={{ flexDirection: 'column', marginRight: 1 }}>
-        {colItems.map(key => (
-          <Text
-            key={key}
-            style={[styles.tableHeaderCell, { minWidth: 96, maxWidth: 100, marginBottom: 0 }]}
-            numberOfLines={1}
-          >
-            {formatHeaderTitle(key)}
-          </Text>
-        ))}
-      </View>
-    ))}
-  </View>
-);
-
-const renderItem = ({ item, index }: { item: any; index: number }) => {
-  const isEven = index % 2 === 0;
-  const rowBackgroundColor = isEven ? '#ffffff' : '#f8faf3ff';
-
-  const btnKeys = Object.keys(item).filter(key => key.startsWith('btn_'));
  
-  return (
-    <> <View style={[styles.tableRow, { backgroundColor: rowBackgroundColor, flexDirection: 'row' }]}>
-      {Object.values(rows).map((colItems, colIndex) => (
-    <View key={`row-col-${colIndex}`} style={{ flexDirection: 'column', marginRight: 1 }}>
-        {colItems
-          .filter(key => !key.startsWith('btn_')) 
-          .map(key => {
-            let value = item[key];
-            if (typeof value === 'object' && value !== null) {
-              value = JSON.stringify(value);
-            } else if (value === null || value === undefined) {
-              value = '';
-            } else {
-              value = String(value);
-            }
-            return (
-              <Text
-                key={`${key}-${item?.id || Math.random()}`}
-                style={[styles.tableCell, { minWidth: 96, maxWidth: 100, marginBottom: 0 }]}
-                numberOfLines={1}
-              >
-                {value || '-'}
-              </Text>
-            );
-          })}
-      </View>
-    ))}
 
-
-    </View>
-     <View 
-      style={{ 
-        borderBottomWidth: 1, 
-        borderBottomColor: '#ccc', 
-        flexDirection: 'row', 
-        flexWrap: 'wrap', 
-        alignItems: 'center', 
-        minWidth: 120 
-      }}
-    >
-  {btnKeys.map((key, idx) => {
-    const label = item[key] || 'Action';
-    const [, , hex] = key.split('_');
-
-    return (
-      <TouchableOpacity
-        key={`${key}-${idx}`}
-        style={{
-          paddingHorizontal: 8,
-          paddingVertical: 4,
-          backgroundColor: `#${hex}`,
-          borderRadius: 4,
-          marginRight: 6,
-          marginBottom: 4,
-          flexGrow: 1,
-          flexBasis: 'auto',   
-          maxWidth: (screenWidth - 40) / 4,
-          justifyContent: 'center',
-          alignItems: 'center',
-          minWidth: 50,
-        }}
-        onPress={() => Alert.alert(`${label} pressed`)}
-      >
-        <Text style={{ color: '#fff', fontSize: 12, fontWeight: '700' }} numberOfLines={1} ellipsizeMode="tail">
-          {label.split('_')[0]}
-        </Text>
-      </TouchableOpacity>
-    );
-  })}
-</View>
-    </>
-   
-  );
+// Map status to colors
+const statusColors: Record<string, string> = {
+  active: '#4CAF50',
+  inactive: '#F44336',
+  pending: '#FF9800',
+  approved: '#2196F3',
+  default: '#888888',
 };
 
+const getStatusColor = (status: string) => {
+  if (!status) return statusColors.default;
+  const key = status.toLowerCase();
+  return statusColors[key] || statusColors.default;
+};
+const findKeyByKeywords = (obj: any, keywords: string[]) => {
+  if (!obj) return null;
+  const lowerKeys = Object.keys(obj).map(k => k.toLowerCase());
+  for (const keyword of keywords) {
+    const found = lowerKeys.find(k => k.includes(keyword.toLowerCase()));
+    if (found) return found;
+  }
+  return null;
+};
+const SOCIAL_KEYS = ['linkedin', 'facebook', 'twitter', 'instagram', 'github', 'website'];
+const RenderCard = ({ item, index }) => {
+  const [expanded, setExpanded] = useState(false);
 
+  const nameKey = findKeyByKeywords(item, ['deptname' , 'fullname',  'name',  ]) || 'id';
+  const statusKey = findKeyByKeywords(item, ['status', 'state', 'flag']);
+  const dateKey = findKeyByKeywords(item, ['date', 'cdt', 'created', 'birthdate']);
+  const remarksKey = findKeyByKeywords(item, ['remark', 'comments', 'note']);
+  const addressKey = findKeyByKeywords(item, ['address', 'location', 'place']);
+  const amountKey = findKeyByKeywords(item, ['amount', 'price', 'cost', 'total']);
+
+  const name = item[nameKey] || `Item #${index + 1}`;
+  const status = statusKey ? item[statusKey] : '';
+  const date = dateKey ? item[dateKey] : '';
+  const remarks = remarksKey ? item[remarksKey] : '';
+  const address = addressKey ? item[addressKey] : '';
+  const amount = amountKey ? item[amountKey] : '';
+
+  const btnKeys = Object.keys(item).filter(key => key.startsWith('btn_'));
+
+  const filteredKeys = Object.keys(item).filter(
+    key =>
+      !key.startsWith('btn_') &&
+      key !== nameKey &&
+      key !== statusKey &&
+      key !== dateKey &&
+      key !== remarksKey &&
+      key !== addressKey &&
+      key !== amountKey &&
+      item[key] !== null &&
+      item[key] !== ''
+  );
+
+   const avatarLetter = name
+                      .split('')
+                      .filter(Boolean)
+                      .slice(0, 2)
+                      .map(word => word.charAt(0).toUpperCase())
+                      .join('');
+
+
+  const renderDetailRow = (key) => {
+    let value = item[key];
+
+    if (typeof value === 'object' && value !== null) {
+      value = JSON.stringify(value);
+    }
+
+    if (key.toLowerCase().includes('image') && typeof value === 'string' && value.startsWith('http')) {
+      return (
+        <Image
+          key={key}
+          source={{ uri: value }}
+          style={{ width: 100, height: 100, borderRadius: 8, marginBottom: 10 }}
+          resizeMode="cover"
+        />
+      );
+    }
+
+    if (SOCIAL_KEYS.includes(key.toLowerCase()) && typeof value === 'string' && value.startsWith('http')) {
+      return (
+        <Text
+          key={key}
+          style={{ color: '#1e90ff', marginBottom: 8 }}
+          onPress={() => Linking.openURL(value)}
+        >
+          {formatHeaderTitle(key)}: {value}
+        </Text>
+      );
+    }
+
+    return (
+ <View
+  key={key}
+  style={{
+    flexDirection: 'row',
+    marginBottom: 8,
+    alignItems: 'flex-start',
+    justifyContent: 'space-between', // Add this
+  }}
+>
+  <Text
+    style={{
+      fontWeight: '600',
+      color: '#000',
+      fontSize: 16,
+      lineHeight: 20,
+      marginRight: 8, 
+    }}
+    numberOfLines={1}
+  >
+    {formatHeaderTitle(key)}
+  </Text>
+
+  <Text
+    style={{
+      fontSize: 14,
+      color: '#333',
+      lineHeight: 20,
+      textAlign: 'right',
+      flexShrink: 1,
+    }}
+  >
+    {String(value)}
+  </Text>
+</View>
+
+    );
+  };
+
+  return (
+    <View
+      style={{
+        backgroundColor: '#fff',
+        borderRadius: 12,
+        padding: 16,
+        marginVertical: 8,
+        borderWidth: 1,
+        borderColor: '#ddd',
+        
+      }}
+    >
+      <TouchableOpacity
+        activeOpacity={0.8}
+        style={{ flexDirection: 'row', alignItems: 'center' }}
+      >
+        <View
+          style={{
+            width: 48,
+            height: 48,
+            borderRadius: 24,
+            backgroundColor: '#007AFF',
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginRight: 12,
+          }}
+        >
+          <Text style={{ color: '#fff', fontWeight: '700', fontSize: 18 }}>{avatarLetter}</Text>
+        </View>
+
+        <View style={{ flex: 1 }}>
+          <Text style={{ fontSize: 16, fontWeight: '700' }} numberOfLines={1}>
+            {name}
+          </Text>
+          {!!date && (
+            <Text style={{ fontSize: 13, color: '#666', marginTop: 2 }}>
+              {date}
+            </Text>
+          )}
+        </View>
+
+        {!!status && (
+          <View
+            style={{
+              backgroundColor: getStatusColor(status),
+              paddingHorizontal: 10,
+              paddingVertical: 4,
+              borderRadius: 12,
+            }}
+          >
+            <Text style={{ color: '#fff', fontWeight: '600', fontSize: 12 }}>
+              {status}
+            </Text>
+          </View>
+        )}
+      </TouchableOpacity>
+
+      {/* Metadata Preview */}
+      {(remarks || address || amount) && (
+        <View style={{ marginTop: 12 }}>
+          {!!remarks && (
+            <Text style={{ color: '#777', fontStyle: 'italic', marginBottom: 6 }}>
+              {remarks}
+            </Text>
+          )}
+          {!!address && (
+            <Text style={{ color: '#444', marginBottom: 6 }}>
+              📍 {address}
+            </Text>
+          )}
+          {!!amount && (
+            <Text style={{ fontWeight: '700', color: '#28a745' }}>
+              ₹ {amount}
+            </Text>
+          )}
+        </View>
+      )}
+
+      {/* Expandable Details */}
+      {expanded && (
+        <View style={{ marginTop: 14, borderTopWidth: 1, borderTopColor: '#eee', paddingTop: 12 }}>
+          {filteredKeys.length === 0 ? (
+            <Text style={{ fontStyle: 'italic', color: '#999' }}>No extra details</Text>
+          ) : (
+            filteredKeys.map(renderDetailRow)
+          )}
+        </View>
+      )}
+
+      {/* Expand/Collapse Indicator */}
+<TouchableOpacity
+  onPress={() => setExpanded(!expanded)}
+  style={{ marginTop: 12, alignItems: 'center' }} // Center the button
+>
+  <Text style={{ color: '#b1b4b8ff', fontWeight: '600', textAlign: 'center', fontSize: 14 }}>
+    {expanded ? 'Hide Details ▲' : 'Show Details ▼'}
+  </Text>
+</TouchableOpacity>
+      {/* Buttons */}
+      {expanded && btnKeys.length > 0 && (
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginTop: 14, gap: 8 }}>
+          {btnKeys.map((key, idx) => {
+            const label = item[key] || 'Action';
+            const [, , hex] = key.split('_');
+
+            return (
+              <TouchableOpacity
+                key={`${key}-${idx}`}
+                style={{
+                  backgroundColor: `#${hex}`,
+                  paddingHorizontal: 12,
+                  paddingVertical: 8,
+                  borderRadius: 6,
+                  flexGrow: 1,
+                  maxWidth: (screenWidth - 64) / 2,
+                  alignItems: 'center',
+                }}
+                onPress={() => Alert.alert(`${label} pressed`)}
+              >
+                <Text style={{ color: '#fff', fontWeight: '600', fontSize: 13 }}>
+                  {label.split('_')[0]}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+      )}
+    </View>
+  );
+};
 
 
   return (
@@ -459,33 +568,24 @@ const renderItem = ({ item, index }: { item: any; index: number }) => {
              <FullViewLoader />
       ) : <>
        <FlatList
-        data={[""]}
-        showsVerticalScrollIndicator={false}
-        ListHeaderComponent={() =>{
-        return ( <TableHeader />)
-       }}
-       renderItem={() =>{
-        return(
-          <FlatList
-                          showsVerticalScrollIndicator={false}
-                          data={filteredData}
-                          keyExtractor={(item, idx) => String(item?.id || idx)}
-                          renderItem={renderItem}
-                          contentContainerStyle={styles.listContent}
-                          ListEmptyComponent={!loadingListId ? (
-                            <View style={{
-                              width: Dimensions.get('screen').width,
-                              height: Dimensions.get('screen').height / 2.5,
-                              justifyContent:'center', alignContent:'center', alignItems:'center'}}>
-                              <NoData />
-                            </View>
-                          ) : null} 
-                        />
-        )
-       }}
-       >
-        
-        </FlatList>
+  data={filteredData}
+  showsHorizontalScrollIndicator={false}
+  showsVerticalScrollIndicator={false}
+  keyExtractor={(item, idx) => String(item?.id || idx)}
+  renderItem={({ item, index }) => <RenderCard item={item} index={index} />}
+  contentContainerStyle={styles.listContent}
+  ListEmptyComponent={!loadingListId ? (
+    <View style={{
+      width: Dimensions.get('screen').width,
+      height: Dimensions.get('screen').height / 2.5,
+      justifyContent:'center',
+      alignItems:'center'
+    }}>
+      <NoData />
+    </View>
+  ) : null}
+/>
+
       </>}
       </>}
 
