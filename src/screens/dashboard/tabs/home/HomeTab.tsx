@@ -102,13 +102,7 @@ const HomeScreen = () => {
           <Text style={styles.footerLink}>View</Text>
           <Text style={styles.chevron}>›</Text>
         </TouchableOpacity>
-
-         <TouchableOpacity
-        onPress={() => navigation.navigate('Page', { item })}
-        style={styles.cardFooter}>
-          <Text style={styles.footerLink}>Page</Text>
-          <Text style={styles.chevron}>›</Text>
-        </TouchableOpacity>
+ 
         </View>
       </View>
       </View>

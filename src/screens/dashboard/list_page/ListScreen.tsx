@@ -1,4 +1,4 @@
-import { Text, View, FlatList, TextInput, TouchableOpacity, Alert, ScrollView, Dimensions } from 'react-native'
+import { Text, View, FlatList, Image, TextInput, TouchableOpacity, Alert, ScrollView, Dimensions } from 'react-native'
 import React, { useEffect, useLayoutEffect, useState, useCallback, useMemo } from 'react'
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 
@@ -10,6 +10,7 @@ import { formatHeaderTitle } from '../../../utils/helpers';
 import FullViewLoader from '../../../components/loader/FullViewLoader';
 import NoData from '../../../components/no_data/NoData';
 import { ListRouteParams } from './types';
+import { ERP_ICON } from '../../../assets';
 
 const ListScreen = () => {
   const navigation = useNavigation();
@@ -25,12 +26,28 @@ const ListScreen = () => {
   const [fromDate, setFromDate] = useState<string>('');
   const [toDate, setToDate] = useState<string>('');
   const [showDatePicker, setShowDatePicker] = useState<null | { type: 'from' | 'to'; show: boolean }>(null);
+  const [refreshing, setRefreshing] = useState(false);
+const screenWidth = Dimensions.get('window').width;
 
   const route = useRoute<RouteProp<ListRouteParams, 'List'>>();
   const { item } = route.params;
 
   useLayoutEffect(() => {
-    navigation.setOptions({ title: item?.title || 'List Data' });
+    navigation.setOptions({ title: item?.title || 'List Data' ,
+      headerRight: () => (
+      <TouchableOpacity onPress={()=>{
+        console.log("🚀 ~ onPress:", 'onRefresh')
+
+        onRefresh();
+      }} style={{ marginRight: 16 }}>
+        <Image 
+        source={ERP_ICON.REFRESH}
+        style={{ width: 18, height: 18, }}
+        alt="Refresh Icon"
+        />
+      </TouchableOpacity>
+    ),
+    });
   }, [navigation, item?.title]);
 
   const formatDateForAPI = (date: Date): string => {
@@ -102,6 +119,20 @@ const ListScreen = () => {
     }, []),
     []
   );
+
+  const onRefresh = async () => {
+  console.log("🚀 ~ onRefresh ~ onRefresh:", 'onRefresh')
+
+  try {
+    setRefreshing(true);
+    await fetchListData(fromDate, toDate);
+  } catch (e) {
+    console.error('Refresh failed', e);
+  } finally {
+    setRefreshing(false);
+  }
+};
+
 
   const handleSearchChange = (text: string) => {
     setSearchQuery(text);
@@ -206,49 +237,163 @@ const parseCustomDate = (dateStr: string): Date =>{
     }
   }, [fromDate, toDate]);
 
-  const allKeys = filteredData && filteredData.length > 0 
+const allKeys = filteredData && filteredData.length > 0 
   ? Object.keys(filteredData[0]) 
   : [];
+console.log("🚀 ~ allKeys:", allKeys)
+function splitInto4Columns(keys: string[]): Record<string, string[]> {
+  const result: Record<string, string[]> = { clm1: [], clm2: [], clm3: [], clm4: [] };
 
-  const TableHeader = () => (
-    <View style={[styles.tableRow, styles.tableHeaderRow]}>
-      {allKeys.map(key => (
-        <Text
-          key={key}
-          style={[styles.tableHeaderCell,{ minWidth: 100, maxWidth: 100 }]}
-          numberOfLines={1}
-        >
-        {formatHeaderTitle(key)}
-        </Text>
-      ))}
-    </View>
-  );
+  // Filter out keys starting with "btn_"
+  const filteredKeys = keys.filter(key => !key.startsWith('btn_'));
 
-  const renderItem = ({ item, index }: { item: any; index: number }) => {
-  return (
-    <View style={styles.tableRow}>
-      {allKeys.map(key => {
-        let value = item[key];
-        if (typeof value === 'object' && value !== null) {
-          value = JSON.stringify(value);
-        } else if (value === null || value === undefined) {
-          value = '';
-        } else {
-          value = String(value);
-        }
-        return (
+  // First 4 keys — one per column
+  const firstFour = filteredKeys.slice(0, 4);
+  const rest = filteredKeys.slice(4);
+
+  result.clm1.push(firstFour[0] || '');
+  result.clm2.push(firstFour[1] || '');
+  result.clm3.push(firstFour[2] || '');
+  result.clm4.push(firstFour[3] || '');
+
+  // Distribute remaining keys round-robin
+  rest.forEach((key, index) => {
+    const colIndex = index % 4;
+    const columnKey = `clm${colIndex + 1}` as keyof typeof result;
+    result[columnKey].push(key);
+  });
+
+  return result;
+}
+
+ function splitInto4Rows(keys: string[]): Record<string, string[]> {
+  const result: Record<string, string[]> = { clm1: [], clm2: [], clm3: [], clm4: [] };
+
+  // First 4 keys — one per column
+  const firstFour = keys.slice(0, 4);
+  const rest = keys.slice(4);
+
+  result.clm1.push(firstFour[0] || '');
+  result.clm2.push(firstFour[1] || '');
+  result.clm3.push(firstFour[2] || '');
+  result.clm4.push(firstFour[3] || '');
+
+  // Distribute remaining keys round-robin
+  rest.forEach((key, index) => {
+    const colIndex = index % 4;
+    const columnKey = `clm${colIndex + 1}` as keyof typeof result;
+    result[columnKey].push(key);
+  });
+
+  return result;
+}
+
+const columns = splitInto4Columns(allKeys);
+const rows = splitInto4Rows(allKeys);
+
+console.log("🚀 ~ columns:", columns)
+
+const TableHeader = () => (
+  <View style={[styles.tableRow, styles.tableHeaderRow]}>
+    {Object.values(columns).map((colItems, colIndex) => (
+      <View key={`col-${colIndex}`} style={{ flexDirection: 'column', marginRight: 1 }}>
+        {colItems.map(key => (
           <Text
             key={key}
-            style={[styles.tableCell, { minWidth: 100, maxWidth: 100 }]}
+            style={[styles.tableHeaderCell, { minWidth: 96, maxWidth: 100, marginBottom: 0 }]}
             numberOfLines={1}
           >
-            {value}
+            {formatHeaderTitle(key)}
           </Text>
-        );
-      })}
+        ))}
+      </View>
+    ))}
+  </View>
+);
+
+const renderItem = ({ item, index }: { item: any; index: number }) => {
+  const isEven = index % 2 === 0;
+  const rowBackgroundColor = isEven ? '#ffffff' : '#f8faf3ff';
+
+  const btnKeys = Object.keys(item).filter(key => key.startsWith('btn_'));
+ 
+  return (
+    <> <View style={[styles.tableRow, { backgroundColor: rowBackgroundColor, flexDirection: 'row' }]}>
+      {Object.values(rows).map((colItems, colIndex) => (
+    <View key={`row-col-${colIndex}`} style={{ flexDirection: 'column', marginRight: 1 }}>
+        {colItems
+          .filter(key => !key.startsWith('btn_'))  // <-- filter out keys starting with "btn_"
+          .map(key => {
+            let value = item[key];
+            if (typeof value === 'object' && value !== null) {
+              value = JSON.stringify(value);
+            } else if (value === null || value === undefined) {
+              value = '';
+            } else {
+              value = String(value);
+            }
+            return (
+              <Text
+                key={`${key}-${item?.id || Math.random()}`}
+                style={[styles.tableCell, { minWidth: 96, maxWidth: 100, marginBottom: 0 }]}
+                numberOfLines={1}
+              >
+                {value || '-'}
+              </Text>
+            );
+          })}
+      </View>
+    ))}
+
+
     </View>
+     <View 
+      style={{ 
+        borderBottomWidth: 1, 
+        borderBottomColor: '#ccc', 
+        flexDirection: 'row', 
+        flexWrap: 'wrap', 
+        alignItems: 'center', 
+        minWidth: 120 
+      }}
+    >
+  {btnKeys.map((key, idx) => {
+    const label = item[key] || 'Action';
+    const [, , hex] = key.split('_');
+
+    return (
+      <TouchableOpacity
+        key={`${key}-${idx}`}
+        style={{
+          paddingHorizontal: 8,
+          paddingVertical: 4,
+          backgroundColor: `#${hex}`,
+          borderRadius: 4,
+          marginRight: 6,
+          marginBottom: 4,
+          flexGrow: 1,
+          flexBasis: 'auto',   
+          maxWidth: (screenWidth - 40) / 4,
+          justifyContent: 'center',
+          alignItems: 'center',
+          minWidth: 50,
+        }}
+        onPress={() => Alert.alert(`${label} pressed`)}
+      >
+        <Text style={{ color: '#fff', fontSize: 12, fontWeight: '700' }} numberOfLines={1} ellipsizeMode="tail">
+          {label.split('_')[0]}
+        </Text>
+      </TouchableOpacity>
     );
-  };
+  })}
+</View>
+    </>
+   
+  );
+};
+
+
+
 
   return (
     <View style={styles.container}>
@@ -284,36 +429,45 @@ const parseCustomDate = (dateStr: string): Date =>{
           </TouchableOpacity>
         </View>
       </View>
+ 
+   {showDatePicker?.show && (
+  <DateTimePicker
+    value={
+      showDatePicker?.type === 'from' && fromDate
+        ? parseCustomDate(fromDate)
+        : new Date()
+    }
+    mode="date"
+    display="default"
+    onChange={handleDateChange}
+    minimumDate={
+      showDatePicker?.type === 'from'
+        ? new Date(new Date().getFullYear(), new Date().getMonth(), 1) 
+        : new Date()
+    }
+    maximumDate={
+      showDatePicker?.type === 'from'
+        ? new Date()
+        : undefined
+    }
+  />
+)}
 
-      {showDatePicker?.show && (
-        <DateTimePicker
-         value={
-    showDatePicker?.type === 'from' && fromDate
-      ? parseCustomDate(fromDate)
-      : new Date()
-  }
-          mode="date"
-          display="default"
-          onChange={handleDateChange}
-          maximumDate={new Date()}
-        />
-      )}
+
 
   {!!error ? <Text style={styles.errorText}>{error}</Text> : <> {loadingListId ? (
              <FullViewLoader />
       ) : <>
-       <ScrollView horizontal>
-         <View style={{
-                flexDirection:'column'
-               }}>
-                <View style={{
-                  backgroundColor: '#f8f9fa',
-                  justifyContent: 'center',
-                }}>
-                  <TableHeader />
-                </View>
-               <View  style={{ flex: 1 }}>
-              <FlatList
+       <FlatList
+        data={[""]}
+        showsVerticalScrollIndicator={false}
+        ListHeaderComponent={() =>{
+        return ( <TableHeader />)
+       }}
+       renderItem={() =>{
+        return(
+          <FlatList
+                          showsVerticalScrollIndicator={false}
                           data={filteredData}
                           keyExtractor={(item, idx) => String(item?.id || idx)}
                           renderItem={renderItem}
@@ -325,14 +479,22 @@ const parseCustomDate = (dateStr: string): Date =>{
                               justifyContent:'center', alignContent:'center', alignItems:'center'}}>
                               <NoData />
                             </View>
-                          ) : null}
+                          ) : null} 
                         />
-               </View>
-         
-          </View>
-        </ScrollView>
+        )
+       }}
+       >
+        
+        </FlatList>
       </>}
       </>}
+
+      <TouchableOpacity
+        style={styles.addButton}
+        onPress={() => Alert.alert("Add button clicked")}
+      >
+        <Text style={styles.addButtonText}>+ New</Text>
+      </TouchableOpacity>
     </View>
   );
 };
