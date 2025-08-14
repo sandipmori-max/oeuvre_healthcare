@@ -29,6 +29,7 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({
   const dispatch = useAppDispatch();
   const { isLoading } = useAppSelector(state => state?.auth);
   const { execute: validateCompanyCode, execute: loginWithERP } = useApi();
+  const {accounts, activeAccountId} = useAppSelector(state => state.auth);
 
   const appId = DeviceInfo.getBundleId();
   const deviceId = DeviceInfo.getDeviceId();
@@ -46,6 +47,12 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({
 
   const handleAddAccount = async (values: {company_code: string; user: string; password: string}) => {
     try {
+        const userExists = accounts?.some(acc => acc?.user.name === values.user);
+        if (userExists) {
+          setAlertConfig({ title: 'Error', message: 'This user already exists in your accounts.', type: 'error' });
+          setAlertVisible(true);
+          return;
+        }
       const validation = await validateCompanyCode(() => DevERPService.validateCompanyCode(values.company_code));
       if (!validation?.isValid) {
         return;
