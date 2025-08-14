@@ -14,23 +14,18 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
-    alignItems: 'center',
   },
   tableHeaderRow: {
     backgroundColor: '#eee',
   },
   tableHeaderCell: {
     fontWeight: 'bold',
-    padding: 8,
-    borderRightWidth: 1,
+    padding: 2,
     borderRightColor: '#ccc',
-    textAlign: 'center',
   },
   tableCell: {
-    padding: 8,
-    borderRightWidth: 1,
+    padding: 2,
     borderRightColor: '#ccc',
-    textAlign: 'center'
   },
   emptyText: {
     marginTop: 20,
@@ -300,4 +295,22 @@ export const styles = StyleSheet.create({
     color: '#6C757D',
     marginBottom: 2,
   },
+  addButton: {
+    position: 'absolute',
+    bottom: 32,
+    right: 18,
+    backgroundColor: '#000000',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 8,
+    elevation: 5,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  addButtonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+
 })

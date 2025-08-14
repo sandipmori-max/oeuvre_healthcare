@@ -13,6 +13,7 @@ const AUTH = require(`${ERP_BASE_URL_ICONS}/auth.png`);
 const ACTIVE_AUTH = require(`${ERP_BASE_URL_ICONS}/active_auth.png`);
 const PROFILE = require(`${ERP_BASE_URL_ICONS}/user.png`);
 const ACTIVE_PROFILE = require(`${ERP_BASE_URL_ICONS}/active_user.png`);
+const REFRESH = require(`${ERP_BASE_URL_ICONS}/refresh.png`);
 
 
 const ERROR = require(`${ERP_BASE_URL_GIF}/error.gif`);
@@ -33,8 +34,8 @@ export const ERP_ICON = {
     AUTH,
     ACTIVE_AUTH,
     PROFILE,
-    ACTIVE_PROFILE
-    
+    ACTIVE_PROFILE,
+    REFRESH
 };
 
 export const ERP_GIF = {
