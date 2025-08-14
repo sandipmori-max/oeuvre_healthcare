@@ -7,6 +7,187 @@ export const styles = StyleSheet.create({
     paddingTop: 16,
     backgroundColor: '#F8F9FA',
   },
+  card: {
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: 16,
+    marginVertical: 8,
+    marginHorizontal: 16,
+    elevation: 3, // shadow on android
+    shadowColor: '#000', // shadow on ios
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  name: {
+    fontWeight: '700',
+    fontSize: 18,
+    color: '#222',
+    flexShrink: 1,
+  },
+  statusBadge: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 20,
+  },
+  statusText: {
+    color: '#fff',
+    fontWeight: '600',
+    fontSize: 12,
+  },
+  row: {
+    flexDirection: 'row',
+    marginTop: 12,
+    justifyContent: 'space-between',
+  },
+  infoBlock: {
+    flex: 1,
+    marginRight: 12,
+  },
+  label: {
+    fontSize: 10,
+    fontWeight: '600',
+    color: '#888',
+  },
+  value: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#444',
+  },
+  detailsSection: {
+    marginTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: '#eee',
+    paddingTop: 12,
+  },
+  detailRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 6,
+  },
+  detailKey: {
+    fontWeight: '600',
+    color: '#555',
+    flex: 1,
+  },
+  detailValue: {
+    flex: 2,
+    textAlign: 'right',
+    color: '#333',
+  },
+  expandText: {
+    marginTop: 8,
+    textAlign: 'center',
+    color: '#007bff',
+    fontWeight: '600',
+  },
+  card: {
+  backgroundColor: '#fff',
+  borderRadius: 12,
+  padding: 16,
+  marginHorizontal: 16,
+  marginVertical: 10,
+  shadowColor: '#000',
+  shadowOpacity: 0.05,
+  shadowOffset: { width: 0, height: 2 },
+  shadowRadius: 4,
+  elevation: 2,
+},
+
+cardHeader: {
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+},
+
+cardName: {
+  fontSize: 16,
+  fontWeight: '600',
+  color: '#1a1a1a',
+  flexShrink: 1,
+},
+
+statusChip: {
+  paddingVertical: 4,
+  paddingHorizontal: 10,
+  borderRadius: 20,
+},
+
+active: {
+  backgroundColor: '#4CAF50',
+},
+
+inactive: {
+  backgroundColor: '#F44336',
+},
+
+statusText: {
+  color: '#fff',
+  fontSize: 12,
+  fontWeight: '600',
+},
+
+metaRow: {
+  flexDirection: 'row',
+  marginTop: 8,
+  flexWrap: 'wrap',
+  gap: 10,
+},
+
+metaItem: {
+  fontSize: 13,
+  color: '#555',
+},
+
+divider: {
+  height: 1,
+  backgroundColor: '#eee',
+  marginVertical: 10,
+},
+
+infoRow: {
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  marginBottom: 6,
+},
+
+infoKey: {
+  fontSize: 13,
+  color: '#777',
+  fontWeight: '500',
+},
+
+infoValue: {
+  fontSize: 13,
+  color: '#222',
+  fontWeight: '400',
+  maxWidth: '60%',
+  textAlign: 'right',
+},
+
+buttonRow: {
+  flexDirection: 'row',
+  flexWrap: 'wrap',
+  marginTop: 12,
+  gap: 8,
+},
+
+actionBtn: {
+  paddingHorizontal: 12,
+  paddingVertical: 6,
+  borderRadius: 6,
+},
+
+actionBtnText: {
+  color: '#fff',
+  fontSize: 13,
+  fontWeight: '600',
+},
+
    listContent: {
     paddingVertical: 10,
   },
