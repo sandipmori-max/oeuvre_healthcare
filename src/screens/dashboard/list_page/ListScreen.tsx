@@ -322,7 +322,7 @@ const renderItem = ({ item, index }: { item: any; index: number }) => {
       {Object.values(rows).map((colItems, colIndex) => (
     <View key={`row-col-${colIndex}`} style={{ flexDirection: 'column', marginRight: 1 }}>
         {colItems
-          .filter(key => !key.startsWith('btn_'))  // <-- filter out keys starting with "btn_"
+          .filter(key => !key.startsWith('btn_')) 
           .map(key => {
             let value = item[key];
             if (typeof value === 'object' && value !== null) {
