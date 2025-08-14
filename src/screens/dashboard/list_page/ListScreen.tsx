@@ -236,7 +236,6 @@ const parseCustomDate = (dateStr: string): Date =>{
         } else {
           value = String(value);
         }
-
         return (
           <Text
             key={key}
