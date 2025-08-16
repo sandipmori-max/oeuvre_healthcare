@@ -17,7 +17,7 @@ import { useAppDispatch } from '../../../store/hooks';
 import { getERPListDataThunk } from '../../../store/slices/auth/thunk';
 import { styles } from './list_page_style';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { formatHeaderTitle } from '../../../utils/helpers';
+import { formatDateToDDMMMYYYY, formatHeaderTitle } from '../../../utils/helpers';
 import FullViewLoader from '../../../components/loader/FullViewLoader';
 import NoData from '../../../components/no_data/NoData';
 import { ListRouteParams } from './types';
@@ -308,6 +308,7 @@ const ListScreen = () => {
     const subName = item[subNameKey] || `Item #${index + 1}`;
 
     const status = statusKey ? item[statusKey] : '';
+    console.log('🚀 ~ RenderCard ~ status:', status);
     const date = dateKey ? item[dateKey] : '';
     const remarks = remarksKey ? item[remarksKey] : '';
     const address = addressKey ? item[addressKey] : '';
@@ -384,7 +385,6 @@ const ListScreen = () => {
             borderBottomWidth: 1,
             borderBottomColor: '#eee',
             paddingBottom: 8,
-            paddingRight: 16,
           }}
         >
           <Text
@@ -405,7 +405,6 @@ const ListScreen = () => {
               color: '#333',
               textAlign: 'right',
               fontWeight: '600',
-              flexShrink: 1,
             }}
           >
             {String(value)}
@@ -450,21 +449,11 @@ const ListScreen = () => {
             <Text style={{ fontSize: 12 }} numberOfLines={1}>
               {subName}
             </Text>
-            {!!date && <Text style={{ fontSize: 13, color: '#666', marginTop: 2 }}>{date}</Text>}
           </View>
 
-          {!!status && (
-            <View
-              style={{
-                backgroundColor: getStatusColor(status),
-                paddingHorizontal: 10,
-                paddingVertical: 4,
-                borderRadius: 12,
-              }}
-            >
-              <Text style={{ color: '#fff', fontWeight: '600', fontSize: 12 }}>{status}</Text>
-            </View>
-          )}
+          <View>
+            {!!date && <Text style={{ fontWeight: '600' }}>{formatDateToDDMMMYYYY(date)}</Text>}
+          </View>
         </TouchableOpacity>
 
         {/* Metadata Preview */}
@@ -502,7 +491,7 @@ const ListScreen = () => {
           </Text>
         </TouchableOpacity>
 
-        {/* Buttons */}
+        {/* Buttons  "01 Jan 2025"  "1/22/2025 12:00:00 AM" */}
         {expanded && btnKeys.length > 0 && (
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginTop: 14, gap: 8 }}>
             {btnKeys.map((key, idx) => {

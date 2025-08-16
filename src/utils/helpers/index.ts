@@ -74,3 +74,90 @@ export const requestCameraAndLocationPermission = async (): Promise<boolean> => 
     return false;
   }
 };
+
+export function formatDateToDDMMMYYYY(dateStr: string): string {
+  const dmyRegex = /^(\d{1,2}) (\w{3}) (\d{4})$/;
+  const dmyMatch = dateStr.match(dmyRegex);
+  if (dmyMatch) {
+    const [, dayStr, monthStr, yearStr] = dmyMatch;
+    const day = parseInt(dayStr, 10);
+    const year = parseInt(yearStr, 10);
+    const monthNames = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
+    const month = monthNames.findIndex(m => m.toLowerCase() === monthStr.toLowerCase());
+    if (month >= 0) {
+      const date = new Date(year, month, day);
+      if (!isNaN(date.getTime())) {
+        return formatDate(date);
+      }
+    }
+  }
+
+  const mdYRegex = /^(\d{1,2})\/(\d{1,2})\/(\d{4}) (\d{1,2}):(\d{2}):(\d{2}) (\w{2})$/;
+  const mdYMatch = dateStr.match(mdYRegex);
+  if (mdYMatch) {
+    let [, month, day, year, hour, minute, second, ampm] = mdYMatch;
+    month = month.padStart(2, '0');
+    day = day.padStart(2, '0');
+
+    let h = parseInt(hour, 10);
+    if (ampm.toUpperCase() === 'PM' && h < 12) {
+      h += 12;
+    } else if (ampm.toUpperCase() === 'AM' && h === 12) {
+      h = 0;
+    }
+
+    const date = new Date(
+      parseInt(year, 10),
+      parseInt(month, 10) - 1,
+      parseInt(day, 10),
+      h,
+      parseInt(minute, 10),
+      parseInt(second, 10),
+    );
+
+    if (!isNaN(date.getTime())) {
+      return formatDate(date);
+    }
+  }
+
+  const fallbackDate = new Date(dateStr);
+  if (!isNaN(fallbackDate.getTime())) {
+    return formatDate(fallbackDate);
+  }
+
+  return ''; // invalid date fallback
+}
+
+function formatDate(date: Date): string {
+  const day = date.getDate().toString().padStart(2, '0');
+  const monthNames = [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
+  ];
+  const month = monthNames[date.getMonth()];
+  const year = date.getFullYear();
+  return `${day} ${month} ${year}`;
+}
