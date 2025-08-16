@@ -36,22 +36,23 @@ const LoginScreen = ({ navigation, route }: any) => {
   const handlePersistAfterLogin = async (
     company_code: string,
     password: string,
-    user_credentials: { user: string; name?: string }
+    user_credentials: { user: string; name?: string },
   ) => {
     dispatch(loginUserThunk({ company_code, password, isAddingAccount, user_credentials }));
   };
 
-  const showAlert = (config: { title: string; message: string; type: 'error' | 'success' | 'info' }) => {
+  const showAlert = (config: {
+    title: string;
+    message: string;
+    type: 'error' | 'success' | 'info';
+  }) => {
     setAlertConfig(config);
     setAlertVisible(true);
   };
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <ScrollView
-        contentContainerStyle={styles.container}
-        keyboardShouldPersistTaps="handled"
-      >
+      <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
         <View style={styles.formContainer}>
           <LoginHeader isAddingAccount={isAddingAccount} t={t} />
           <LoginForm

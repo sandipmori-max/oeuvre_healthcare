@@ -4,5 +4,5 @@ export type AuthStackParamList = {
 
 export type ProfileStackParamList = {
   Profile: undefined;
-  Settings: undefined
+  Settings: undefined;
 };

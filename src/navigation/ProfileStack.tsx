@@ -1,5 +1,5 @@
 import React from 'react';
-import {createStackNavigator} from '@react-navigation/stack';
+import { createStackNavigator } from '@react-navigation/stack';
 
 import { ProfileStackParamList } from './types';
 import { ERP_COLOR_CODE } from '../utils/constants';
@@ -18,13 +18,10 @@ const ProfileNavigator = () => {
         headerTitleStyle: {
           fontWeight: 'bold',
         },
-        headerShown: false
-      }}>
-      <Stack.Screen
-        name='Profile'
-        component={ProfileScreen}
-      />
-      
+        headerShown: false,
+      }}
+    >
+      <Stack.Screen name="Profile" component={ProfileScreen} />
     </Stack.Navigator>
   );
 };

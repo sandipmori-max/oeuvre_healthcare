@@ -1,11 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import {
-  View,
-  Text,
-  Image,
-  StatusBar,
-  Animated,
-} from 'react-native';
+import { View, Text, Image, StatusBar, Animated } from 'react-native';
 
 import { ERP_ICON } from '../../assets';
 import { styles } from './splash_style';
@@ -32,11 +26,7 @@ const CustomSplashScreen: React.FC<SplashProps> = ({ onFinish }) => {
     <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
       <StatusBar hidden />
       <View style={styles.logoWrapper}>
-        <Image
-         source={ERP_ICON.APP_LOGO}
-          style={styles.logo}
-          resizeMode="contain"
-        />
+        <Image source={ERP_ICON.APP_LOGO} style={styles.logo} resizeMode="contain" />
       </View>
       <Text style={styles.title}>Welcome to DevERP</Text>
       <Text style={styles.subtitle}>Your business, simplified.</Text>

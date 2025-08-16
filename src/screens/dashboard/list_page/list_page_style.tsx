@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
   container: {
@@ -86,109 +86,109 @@ export const styles = StyleSheet.create({
     fontWeight: '600',
   },
   card: {
-  backgroundColor: '#fff',
-  borderRadius: 12,
-  padding: 16,
-  marginHorizontal: 16,
-  marginVertical: 10,
-  shadowColor: '#000',
-  shadowOpacity: 0.05,
-  shadowOffset: { width: 0, height: 2 },
-  shadowRadius: 4,
-  elevation: 2,
-},
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 16,
+    marginHorizontal: 16,
+    marginVertical: 10,
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 4,
+    elevation: 2,
+  },
 
-cardHeader: {
-  flexDirection: 'row',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-},
+  cardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
 
-cardName: {
-  fontSize: 16,
-  fontWeight: '600',
-  color: '#1a1a1a',
-  flexShrink: 1,
-},
+  cardName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1a1a1a',
+    flexShrink: 1,
+  },
 
-statusChip: {
-  paddingVertical: 4,
-  paddingHorizontal: 10,
-  borderRadius: 20,
-},
+  statusChip: {
+    paddingVertical: 4,
+    paddingHorizontal: 10,
+    borderRadius: 20,
+  },
 
-active: {
-  backgroundColor: '#4CAF50',
-},
+  active: {
+    backgroundColor: '#4CAF50',
+  },
 
-inactive: {
-  backgroundColor: '#F44336',
-},
+  inactive: {
+    backgroundColor: '#F44336',
+  },
 
-statusText: {
-  color: '#fff',
-  fontSize: 12,
-  fontWeight: '600',
-},
+  statusText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: '600',
+  },
 
-metaRow: {
-  flexDirection: 'row',
-  marginTop: 8,
-  flexWrap: 'wrap',
-  gap: 10,
-},
+  metaRow: {
+    flexDirection: 'row',
+    marginTop: 8,
+    flexWrap: 'wrap',
+    gap: 10,
+  },
 
-metaItem: {
-  fontSize: 13,
-  color: '#555',
-},
+  metaItem: {
+    fontSize: 13,
+    color: '#555',
+  },
 
-divider: {
-  height: 1,
-  backgroundColor: '#eee',
-  marginVertical: 10,
-},
+  divider: {
+    height: 1,
+    backgroundColor: '#eee',
+    marginVertical: 10,
+  },
 
-infoRow: {
-  flexDirection: 'row',
-  justifyContent: 'space-between',
-  marginBottom: 6,
-},
+  infoRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 6,
+  },
 
-infoKey: {
-  fontSize: 13,
-  color: '#777',
-  fontWeight: '500',
-},
+  infoKey: {
+    fontSize: 13,
+    color: '#777',
+    fontWeight: '500',
+  },
 
-infoValue: {
-  fontSize: 13,
-  color: '#222',
-  fontWeight: '400',
-  maxWidth: '60%',
-  textAlign: 'right',
-},
+  infoValue: {
+    fontSize: 13,
+    color: '#222',
+    fontWeight: '400',
+    maxWidth: '60%',
+    textAlign: 'right',
+  },
 
-buttonRow: {
-  flexDirection: 'row',
-  flexWrap: 'wrap',
-  marginTop: 12,
-  gap: 8,
-},
+  buttonRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginTop: 12,
+    gap: 8,
+  },
 
-actionBtn: {
-  paddingHorizontal: 12,
-  paddingVertical: 6,
-  borderRadius: 6,
-},
+  actionBtn: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 6,
+  },
 
-actionBtnText: {
-  color: '#fff',
-  fontSize: 13,
-  fontWeight: '600',
-},
+  actionBtnText: {
+    color: '#fff',
+    fontSize: 13,
+    fontWeight: '600',
+  },
 
-   listContent: {
+  listContent: {
     paddingVertical: 10,
   },
   tableRow: {
@@ -213,7 +213,7 @@ actionBtnText: {
     textAlign: 'center',
     color: '#888',
   },
- 
+
   // Search styles
   searchContainer: {
     marginBottom: 16,
@@ -255,7 +255,7 @@ actionBtnText: {
   dateContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 16,
+    marginBottom: 4,
   },
   dateRow: {
     flex: 1,
@@ -353,8 +353,8 @@ actionBtnText: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 8,
-    alignContent:'center',
-    justifyContent:'center'
+    alignContent: 'center',
+    justifyContent: 'center',
   },
   loadingText: {
     marginLeft: 8,
@@ -364,7 +364,7 @@ actionBtnText: {
     color: '#D9534F',
     marginBottom: 8,
   },
- 
+
   card: {
     backgroundColor: '#FFFFFF',
     borderRadius: 12,
@@ -493,5 +493,4 @@ actionBtnText: {
     fontSize: 18,
     fontWeight: 'bold',
   },
-
-})
+});

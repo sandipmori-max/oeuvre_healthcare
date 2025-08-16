@@ -4,8 +4,8 @@ import { WebView } from 'react-native-webview';
 
 const PrivacyPolicyScreen = () => {
   return (
-   <SafeAreaView style={styles.container}>
-      <WebView 
+    <SafeAreaView style={styles.container}>
+      <WebView
         source={{ uri: 'http://www.deverp.com/index.aspx?q=deverp_privacy_policy' }}
         startInLoadingState={true}
         javaScriptEnabled={true}
@@ -17,7 +17,7 @@ const PrivacyPolicyScreen = () => {
 };
 
 const styles = StyleSheet.create({
-container: {
+  container: {
     flex: 1,
     marginTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
   },

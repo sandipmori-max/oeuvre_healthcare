@@ -1,5 +1,5 @@
-import { SafeAreaView, StatusBar, View } from 'react-native'
-import React, { useEffect, useLayoutEffect, useMemo, useState } from 'react'
+import { SafeAreaView, StatusBar, View } from 'react-native';
+import React, { useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import WebView from 'react-native-webview';
 import { MenuItem } from '../../../store/slices/auth/type';
@@ -18,11 +18,10 @@ const WebScreen = () => {
   const { item } = route.params;
   const [baseLink, setBaseLink] = useState<string>('');
   const [token, setToken] = useState<string>('');
-  
+
   useLayoutEffect(() => {
     navigation.setOptions({ title: item?.title || t('webScreen.details') });
   }, [navigation, item?.title, t]);
-
 
   useEffect(() => {
     let isMounted = true;
@@ -30,9 +29,9 @@ const WebScreen = () => {
       try {
         const [storedLink, storedToken] = await Promise.all([
           AsyncStorage.getItem('erp_link'),
-          AsyncStorage.getItem('erp_token')
+          AsyncStorage.getItem('erp_token'),
         ]);
-        
+
         if (isMounted) {
           setBaseLink(storedLink || '');
           setToken(storedToken || '');
@@ -47,44 +46,45 @@ const WebScreen = () => {
   }, []);
 
   const targetUrl = useMemo(() => {
-  const itemUrl = item?.url || '';
-  if (!itemUrl || !token) return '';
-  if (/^https?:\/\//i.test(itemUrl)) {
-    const baseUrl = itemUrl.replace(/^https:\/\//i, 'http://');
-    const separator = baseUrl.includes('?') ? '&' : '?';
-    return `${baseUrl}${separator}token=${token}`;
-  }
-  
-  let normalizedBase = (baseLink || '').replace(/\/+$/, '') + '/';
-  normalizedBase = normalizedBase.replace(/\/devws\/?/, '/');
-  normalizedBase = normalizedBase.replace(/^https:\/\//i, 'http://');
-  if (!/^http:\/\//i.test(normalizedBase)) {
-    normalizedBase = 'http://' + normalizedBase.replace(/^\/+/, '');
-  }
-  const cleanedPath = itemUrl.replace(/^\/+/, '');
-  const fullUrl = normalizedBase + cleanedPath;
-  console.log("🚀 ~ WebScreen ~ normalizedBase:", normalizedBase);
-  
-  const separator = fullUrl.includes('?') ? '/' : '?';
-  return `${fullUrl}${separator}token=${token}`;
+    const itemUrl = item?.url || '';
+    if (!itemUrl || !token) return '';
+    if (/^https?:\/\//i.test(itemUrl)) {
+      const baseUrl = itemUrl.replace(/^https:\/\//i, 'http://');
+      const separator = baseUrl.includes('?') ? '&' : '?';
+      return `${baseUrl}${separator}token=${token}`;
+    }
+
+    let normalizedBase = (baseLink || '').replace(/\/+$/, '') + '/';
+    normalizedBase = normalizedBase.replace(/\/devws\/?/, '/');
+    normalizedBase = normalizedBase.replace(/^https:\/\//i, 'http://');
+    if (!/^http:\/\//i.test(normalizedBase)) {
+      normalizedBase = 'http://' + normalizedBase.replace(/^\/+/, '');
+    }
+    const cleanedPath = itemUrl.replace(/^\/+/, '');
+    const fullUrl = normalizedBase + cleanedPath;
+    console.log('🚀 ~ WebScreen ~ normalizedBase:', normalizedBase);
+
+    const separator = fullUrl.includes('?') ? '/' : '?';
+    return `${fullUrl}${separator}token=${token}`;
   }, [baseLink, item?.url, token]);
+  console.log('🚀 ~ WebScreen ~ targetUrl:', targetUrl);
 
   if (!targetUrl) {
     return (
       <SafeAreaView style={styles.container}>
-         <FullViewLoader />
+        <FullViewLoader />
       </SafeAreaView>
     );
   }
 
   return (
-  <SafeAreaView style={styles.container}>
-      <StatusBar 
-        barStyle="dark-content" 
+    <SafeAreaView style={styles.container}>
+      <StatusBar
+        barStyle="dark-content"
         backgroundColor={ERP_COLOR_CODE.ERP_WHITE || '#FFFFFF'}
         translucent={false}
       />
-      <WebView 
+      <WebView
         source={{ uri: targetUrl }}
         startInLoadingState={true}
         javaScriptEnabled={true}
@@ -100,14 +100,14 @@ const WebScreen = () => {
         renderLoading={() => (
           <View style={styles.webviewLoadingContainer}>
             <View style={styles.webviewLoadingContent}>
-             <FullViewLoader />
+              <FullViewLoader />
             </View>
           </View>
         )}
         allowsBackForwardNavigationGestures={true}
         textZoom={100}
         allowsLinkPreview={false}
-        onError={(syntheticEvent) => {
+        onError={syntheticEvent => {
           const { nativeEvent } = syntheticEvent;
           console.warn('WebView error: ', nativeEvent);
         }}
@@ -115,7 +115,7 @@ const WebScreen = () => {
         onLoadEnd={() => console.log('WebView loading finished')}
       />
     </SafeAreaView>
-  )
-}
+  );
+};
 
-export default WebScreen
+export default WebScreen;

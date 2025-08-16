@@ -6,15 +6,15 @@ const useTranslations = () => {
 
   return {
     t,
-    
+
     getCurrentLanguage: () => getCurrentLanguage(),
-    
+
     changeLanguage: async (language: string) => {
       await changeLanguage(language);
     },
-    
+
     getAvailableLanguages: () => getAvailableLanguages(),
-    
+
     getCurrentLanguageDisplayName: () => {
       const currentCode = getCurrentLanguage();
       const languages = getAvailableLanguages();

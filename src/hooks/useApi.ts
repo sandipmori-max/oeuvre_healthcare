@@ -16,13 +16,7 @@ interface UseApiOptions {
 }
 
 export const useApi = <T = any>(options: UseApiOptions = {}) => {
-  const {
-    retryCount = 3,
-    retryDelay = 1000,
-    onSuccess,
-    onError,
-    initialData = null,
-  } = options;
+  const { retryCount = 3, retryDelay = 1000, onSuccess, onError, initialData = null } = options;
 
   const [state, setState] = useState<UseApiState<T>>({
     data: initialData,
@@ -47,11 +41,7 @@ export const useApi = <T = any>(options: UseApiOptions = {}) => {
       }));
 
       try {
-        const data = await retryApiCall(
-          () => apiCall(),
-          retryCount,
-          retryDelay
-        );
+        const data = await retryApiCall(() => apiCall(), retryCount, retryDelay);
 
         setState({
           data,
@@ -67,7 +57,7 @@ export const useApi = <T = any>(options: UseApiOptions = {}) => {
         }
 
         const errorMessage = getErrorMessage(error);
-        
+
         setState(prev => ({
           ...prev,
           loading: false,
@@ -78,7 +68,7 @@ export const useApi = <T = any>(options: UseApiOptions = {}) => {
         throw error;
       }
     },
-    [retryCount, retryDelay, onSuccess, onError]
+    [retryCount, retryDelay, onSuccess, onError],
   );
 
   const reset = useCallback(() => {
@@ -151,7 +141,7 @@ export const useApiCall = <T = any>(apiCall: () => Promise<T>, options: UseApiOp
 export const useApiWithAutoCall = <T = any>(
   apiCall: () => Promise<T>,
   dependencies: any[] = [],
-  options: UseApiOptions = {}
+  options: UseApiOptions = {},
 ) => {
   const api = useApi<T>(options);
 

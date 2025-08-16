@@ -1,9 +1,9 @@
-import React, { useEffect, useState }  from 'react';
-import {NavigationContainer} from '@react-navigation/native';
-import {Provider} from 'react-redux';
+import React, { useEffect, useState } from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { Provider } from 'react-redux';
 import DeviceInfo from 'react-native-device-info';
 
-import {store} from './src/store/store';
+import { store } from './src/store/store';
 import RootNavigator from './src/navigation/RootNavigator';
 import NoInternetScreen from './src/screens/noInternet/NoInternet';
 import useNetworkStatus from './src/hooks/useNetworkStatus';
@@ -36,7 +36,7 @@ const App = () => {
           type: enabled ? 'success' : 'error',
         });
         setAlertVisible(true);
-      } 
+      }
       setLocationEnabled(enabled);
     };
 
@@ -54,7 +54,7 @@ const App = () => {
       </TranslationProvider>
     );
   }
-  
+
   if (isSplashVisible) {
     return (
       <TranslationProvider>
@@ -62,9 +62,9 @@ const App = () => {
       </TranslationProvider>
     );
   }
-  
+
   return (
-    <TranslationProvider >
+    <TranslationProvider>
       <Provider store={store}>
         <NavigationContainer>
           <RootNavigator />

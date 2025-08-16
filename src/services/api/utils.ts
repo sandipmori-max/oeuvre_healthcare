@@ -1,12 +1,13 @@
-
 export const isNetworkError = (error: any): boolean => {
-  return !error.response && error.message && (
-    error.message.includes('Network Error') ||
-    error.message.includes('No internet connection') ||
-    error.message.includes('timeout')
+  return (
+    !error.response &&
+    error.message &&
+    (error.message.includes('Network Error') ||
+      error.message.includes('No internet connection') ||
+      error.message.includes('timeout'))
   );
 };
- 
+
 export const isAuthError = (error: any): boolean => {
   return error.response?.status === 401 || error.response?.status === 403;
 };
@@ -14,7 +15,7 @@ export const isAuthError = (error: any): boolean => {
 export const isServerError = (error: any): boolean => {
   return error.response?.status >= 500;
 };
- 
+
 export const getErrorMessage = (error: any): string => {
   if (isNetworkError(error)) {
     return 'No internet connection. Please check your network and try again.';
@@ -38,11 +39,11 @@ export const getErrorMessage = (error: any): string => {
 
   return 'Something went wrong. Please try again.';
 };
- 
+
 export const retryApiCall = async <T>(
   apiCall: () => Promise<T>,
   maxRetries: number = 3,
-  delay: number = 1000
+  delay: number = 1000,
 ): Promise<T> => {
   let lastError: any;
 
@@ -51,15 +52,17 @@ export const retryApiCall = async <T>(
       return await apiCall();
     } catch (error) {
       lastError = error;
-      
+
       if (isAuthError(error) || (error.response?.status >= 400 && error.response?.status < 500)) {
         throw error;
       }
 
       if (attempt < maxRetries) {
-        console.log(`API call failed, retrying in ${delay}ms... (attempt ${attempt}/${maxRetries})`);
+        console.log(
+          `API call failed, retrying in ${delay}ms... (attempt ${attempt}/${maxRetries})`,
+        );
         await new Promise(resolve => setTimeout(resolve, delay));
-        delay *= 2; 
+        delay *= 2;
       }
     }
   }

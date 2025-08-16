@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
   overlay: {
@@ -55,7 +55,6 @@ export const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 8,
   },
-  // Success styles
   successContainer: {
     backgroundColor: '#fff',
   },
@@ -71,7 +70,6 @@ export const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 8,
   },
-  // Info styles
   infoContainer: {
     backgroundColor: '#fff',
   },
@@ -86,5 +84,29 @@ export const styles = StyleSheet.create({
     lineHeight: 20,
     textAlign: 'center',
     marginBottom: 8,
+  },
+  buttonRow: {
+    flexDirection: 'row',
+    width: '100%',
+    justifyContent: 'flex-end',
+    marginTop: 16,
+    gap: 12,
+  },
+  button: {
+    backgroundColor: '#000',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 6,
+  },
+  buttonCancel: {
+    backgroundColor: '#d0dce9ff',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 6,
+  },
+  buttonText: {
+    color: '#fff',
+    fontWeight: '600',
+    fontSize: 14,
   },
 });

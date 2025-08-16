@@ -19,8 +19,7 @@ const withTranslation = (WrappedComponent: React.ComponentType<any>) => {
   return WithTranslation;
 };
 
-
-export const TranslationProvider: React.FC<{children: React.ReactNode}> = ({ children }) => {
+export const TranslationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return <I18nextProvider i18n={i18n}>{children}</I18nextProvider>;
 };
 

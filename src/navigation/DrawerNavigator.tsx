@@ -13,14 +13,35 @@ const Drawer = createDrawerNavigator();
 const DrawerNavigator = () => {
   const { t } = useTranslations();
   return (
-    <Drawer.Navigator initialRouteName="Home"
-          drawerContent={(props) => <CustomDrawerContent {...props} />}
+    <Drawer.Navigator
+      initialRouteName="Home"
+      drawerContent={props => <CustomDrawerContent {...props} />}
     >
-      <Drawer.Screen name="Home" component={TabNavigator} options={{ title: t('navigation.home') }} />
-      <Drawer.Screen name="Attendance" component={AttendanceScreen} options={{ title: t('navigation.attendance') }} />
-      <Drawer.Screen name="Display" component={DisplayScreen} options={{ title: t('navigation.display') }} />
-      <Drawer.Screen name="Alert" component={AlertScreen} options={{ title: t('navigation.alert') }} />
-      <Drawer.Screen name="Privacy Policy" component={PrivacyPolicyScreen} options={{ title: t('navigation.privacyPolicy') }} />
+      <Drawer.Screen
+        name="Home"
+        component={TabNavigator}
+        options={{ title: t('navigation.home') }}
+      />
+      <Drawer.Screen
+        name="Attendance"
+        component={AttendanceScreen}
+        options={{ title: t('navigation.attendance') }}
+      />
+      <Drawer.Screen
+        name="Display"
+        component={DisplayScreen}
+        options={{ title: t('navigation.display') }}
+      />
+      <Drawer.Screen
+        name="Alert"
+        component={AlertScreen}
+        options={{ title: t('navigation.alert') }}
+      />
+      <Drawer.Screen
+        name="Privacy Policy"
+        component={PrivacyPolicyScreen}
+        options={{ title: t('navigation.privacyPolicy') }}
+      />
     </Drawer.Navigator>
   );
 };

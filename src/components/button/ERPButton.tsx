@@ -21,11 +21,7 @@ const ERPButton: React.FC<ERPButtonProps> = ({
   activeOpacity = 0.8,
 }) => (
   <TouchableOpacity
-    style={[
-      styles.button,
-      { backgroundColor: color, opacity: disabled ? 0.6 : 1 },
-      style,
-    ]}
+    style={[styles.button, { backgroundColor: color, opacity: disabled ? 0.6 : 1 }, style]}
     onPress={onPress}
     disabled={disabled}
     activeOpacity={activeOpacity}

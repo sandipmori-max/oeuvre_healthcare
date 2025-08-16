@@ -54,7 +54,7 @@ const apiClient: AxiosInstance = axios.create({
   timeout: config.TIMEOUT,
   headers: {
     'Content-Type': 'application/json',
-    'Accept': 'application/json',
+    Accept: 'application/json',
   },
 });
 
@@ -92,10 +92,10 @@ apiClient.interceptors.request.use(
 
     return config;
   },
-  (error) => {
+  error => {
     console.error('Request interceptor error:', error);
     return Promise.reject(error);
-  }
+  },
 );
 
 // Response interceptor
@@ -112,7 +112,7 @@ apiClient.interceptors.response.use(
       try {
         const parsedData = JSON.parse(response.data.d);
         console.log('Parsed API Response:', parsedData);
-        
+
         // Check if the parsed response indicates success (accept both 1 and "1")
         if (String(parsedData.success) === '1') {
           return {
@@ -142,7 +142,7 @@ apiClient.interceptors.response.use(
     // Handle successful response
     return response;
   },
-  async (error) => {
+  async error => {
     console.error('API Error:', {
       status: error.response?.status,
       url: error.config?.url,
@@ -189,7 +189,7 @@ apiClient.interceptors.response.use(
     };
 
     return Promise.reject(networkError);
-  }
+  },
 );
 
 export default apiClient;

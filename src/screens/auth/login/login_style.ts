@@ -1,5 +1,5 @@
-import { Dimensions, StyleSheet } from "react-native";
-import { ERP_COLOR_CODE } from "../../../utils/constants";
+import { Dimensions, StyleSheet } from 'react-native';
+import { ERP_COLOR_CODE } from '../../../utils/constants';
 
 export const styles = StyleSheet.create({
   container: {
@@ -11,7 +11,7 @@ export const styles = StyleSheet.create({
   formContainer: {
     borderRadius: 12,
     height: Dimensions.get('screen').height,
-    justifyContent:'center',
+    justifyContent: 'center',
   },
   helperText: {
     fontSize: 12,
@@ -80,7 +80,7 @@ export const styles = StyleSheet.create({
     shadowOpacity: 0.6,
     shadowRadius: 6,
     elevation: 6,
-    marginTop : 12
+    marginTop: 12,
   },
   errorButton: {
     backgroundColor: ERP_COLOR_CODE.ERP_DE_ACTIVE_BUTTON,

@@ -92,8 +92,8 @@ export default {
     selectLanguage: 'Select Language',
     english: 'English',
     hindi: 'Hindi',
-    languageChanged: "Language Changed",
-    languageChangedMessage: "Language Changed Message"
+    languageChanged: 'Language Changed',
+    languageChangedMessage: 'Language Changed Message',
   },
   errors: {
     noInternet: 'No internet connection',

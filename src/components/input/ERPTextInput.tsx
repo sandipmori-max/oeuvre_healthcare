@@ -46,9 +46,7 @@ const ERPTextInput: React.FC<ERPTextInputProps> = ({
             }}
             accessibilityLabel={showPassword ? 'Hide password' : 'Show password'}
           >
-            <Text style={{ fontSize: 18 }}>
-              {showPassword ? '🚫' : '👁️'}
-            </Text>
+            <Text style={{ fontSize: 18 }}>{showPassword ? '🚫' : '👁️'}</Text>
           </TouchableOpacity>
         )}
         {icon}

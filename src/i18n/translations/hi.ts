@@ -86,8 +86,8 @@ export default {
     selectLanguage: 'भाषा चुनें',
     english: 'अंग्रेज़ी',
     hindi: 'हिन्दी',
-    languageChanged: "Language Changed",
-    languageChangedMessage: "Language Changed Message"
+    languageChanged: 'Language Changed',
+    languageChangedMessage: 'Language Changed Message',
   },
   errors: {
     noInternet: 'इंटरनेट कनेक्शन नहीं है',

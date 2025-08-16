@@ -1,4 +1,4 @@
-import {StyleSheet} from 'react-native';
+import { StyleSheet } from 'react-native';
 import { ERP_COLOR_CODE } from '../../../utils/constants';
 
 export const styles = StyleSheet.create({
@@ -17,7 +17,7 @@ export const styles = StyleSheet.create({
     borderBottomColor: '#e0e0e0',
     elevation: 4,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 1},
+    shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
     shadowRadius: 3,
   },
@@ -77,7 +77,7 @@ export const styles = StyleSheet.create({
     marginTop: 10,
     elevation: 2,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 1},
+    shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.2,
     shadowRadius: 2,
   },
@@ -96,7 +96,7 @@ export const styles = StyleSheet.create({
     lineHeight: 20,
     marginTop: 20,
   },
-    logo: {
+  logo: {
     width: 100,
     height: 100,
     alignSelf: 'center',
@@ -104,6 +104,3 @@ export const styles = StyleSheet.create({
     borderRadius: 20,
   },
 });
-
-
-

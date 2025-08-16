@@ -1,19 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  Image,
-  ActivityIndicator,
-  TextInput,
-} from 'react-native';
+import { View, Text, TouchableOpacity, Image, ActivityIndicator, TextInput } from 'react-native';
 import { launchCamera } from 'react-native-image-picker';
 import Geolocation from '@react-native-community/geolocation';
-import {Formik} from 'formik';
+import { Formik } from 'formik';
 import * as Yup from 'yup';
 
 import CustomAlert from '../../../components/alert/CustomAlert';
-import {styles} from './attandance_style';
+import { styles } from './attandance_style';
 import useTranslations from '../../../hooks/useTranslations';
 import FullViewLoader from '../../../components/loader/FullViewLoader';
 import { AttendanceFormValues, User, UserLocation } from './types';
@@ -29,9 +22,8 @@ const dummyUser: User = {
 };
 
 const AttendanceScreen = ({ navigation }: { navigation: any }) => {
-
   const { t } = useTranslations();
-  
+
   const [user, setUser] = useState<User>(dummyUser);
   const [statusImage, setStatusImage] = useState<string | null>(null);
   const [userLocation, setUserLocation] = useState<UserLocation | null>(null);
@@ -52,11 +44,10 @@ const AttendanceScreen = ({ navigation }: { navigation: any }) => {
     return () => clearTimeout(timer);
   }, []);
 
-
   const handleStatusToggle = async (
-    setFieldValue: (field: keyof AttendanceFormValues, value: any) => void
+    setFieldValue: (field: keyof AttendanceFormValues, value: any) => void,
   ) => {
-    if (locationLoading) return; 
+    if (locationLoading) return;
     const hasPermission = await requestCameraAndLocationPermission();
     if (!hasPermission) {
       setAlertConfig({
@@ -70,7 +61,7 @@ const AttendanceScreen = ({ navigation }: { navigation: any }) => {
 
     setLocationLoading(true);
     Geolocation.getCurrentPosition(
-      (position) => {
+      position => {
         const { latitude, longitude } = position.coords;
         setUserLocation({ latitude, longitude });
         setFieldValue('latitude', String(latitude));
@@ -84,7 +75,7 @@ const AttendanceScreen = ({ navigation }: { navigation: any }) => {
             quality: 0.7,
             saveToPhotos: true,
           },
-          (response) => {
+          response => {
             if (response.didCancel || response.errorCode) {
               console.log('User cancelled or error:', response.errorMessage);
               return;
@@ -93,19 +84,21 @@ const AttendanceScreen = ({ navigation }: { navigation: any }) => {
             const photoUri = response.assets?.[0]?.uri;
             if (!photoUri) return;
 
-            setUser((prev) => ({
+            setUser(prev => ({
               ...prev,
-              status: (prev.status === 'checkin' ? 'checkout' : 'checkin') as 'checkin' | 'checkout',
+              status: (prev.status === 'checkin' ? 'checkout' : 'checkin') as
+                | 'checkin'
+                | 'checkout',
             }));
             setFieldValue(
               'status',
-              (user.status === 'checkin' ? 'checkout' : 'checkin') as 'checkin' | 'checkout'
+              (user.status === 'checkin' ? 'checkout' : 'checkin') as 'checkin' | 'checkout',
             );
             setStatusImage(photoUri);
-          }
+          },
         );
       },
-      (error) => {
+      error => {
         setLocationLoading(false);
         setAlertConfig({
           title: t('errors.locationError'),
@@ -114,7 +107,7 @@ const AttendanceScreen = ({ navigation }: { navigation: any }) => {
         });
         setAlertVisible(true);
       },
-      { enableHighAccuracy: true, timeout: 30000, maximumAge: 10000 }
+      { enableHighAccuracy: true, timeout: 30000, maximumAge: 10000 },
     );
   };
 
@@ -129,7 +122,7 @@ const AttendanceScreen = ({ navigation }: { navigation: any }) => {
   return (
     <View style={styles.container}>
       {isLoading ? (
-                     <FullViewLoader />
+        <FullViewLoader />
       ) : (
         <>
           <View style={{ padding: 16 }}>
@@ -145,7 +138,9 @@ const AttendanceScreen = ({ navigation }: { navigation: any }) => {
               }}
               validationSchema={Yup.object({
                 name: Yup.string().required(t('attendance.nameRequired')),
-                email: Yup.string().email(t('attendance.emailInvalid')).required(t('attendance.emailRequired')),
+                email: Yup.string()
+                  .email(t('attendance.emailInvalid'))
+                  .required(t('attendance.emailRequired')),
                 status: Yup.mixed<'checkin' | 'checkout'>()
                   .oneOf(['checkin', 'checkout'])
                   .required(t('attendance.statusRequired')),
@@ -162,84 +157,84 @@ const AttendanceScreen = ({ navigation }: { navigation: any }) => {
                     <View style={styles.imageCol}>
                       <Image source={{ uri: user.image }} style={styles.profileAvatar} />
                     </View>
-                    
                   </View>
 
-                 <View style={{bottom: 52}}>
-                   <View style={styles.formGroup}>
-                    <Text style={styles.label}>{t('attendance.employeeName')}</Text>
-                    <TextInput
-                      style={[styles.input, styles.inputReadonly]}
-                      value={values.name}
-                      editable={false}
-                    />
-                    {touched.name && errors.name ? (
-                      <Text style={styles.errorText}>{errors.name}</Text>
-                    ) : null}
-                  </View>
-                  <View style={styles.formGroup}>
-                    <Text style={styles.label}>{t('attendance.dateTime')}</Text>
-                    <TextInput
-                      style={[styles.input, styles.inputReadonly]}
-                      value={values.dateTime}
-                      editable={false}
-                    />
-                  </View>
-                  <View style={styles.formGroup}>
-                    <Text style={styles.label}>{t('attendance.email')}</Text>
-                    <TextInput
-                      style={[styles.input, styles.inputReadonly]}
-                      value={values.email}
-                      editable={false}
-                    />
-                    {touched.email && errors.email ? (
-                      <Text style={styles.errorText}>{errors.email}</Text>
-                    ) : null}
-                  </View>
-                  
-                  <View style={styles.formGroup}>
-                    <Text style={styles.label}>{t('attendance.remark')}</Text>
-                    <TextInput
-                      style={[styles.input]}
-                      value={values.remark}
-                      onChangeText={(text) => setFieldValue('remark', text)}
-                      placeholder={t('attendance.enterRemark')}
-                      multiline
-                      numberOfLines={3}
-                    />
-                  </View>
-                   {
-                    statusImage &&  <>
-                  <View >
-                      {statusImage ? (
-                        <Image source={{ uri: statusImage }} style={styles.selfyAvatar} />
-                      ) : (
-                        <View style={[styles.selfyAvatar, styles.placeholderAvatar]} />
-                      )}
-                      <Text style={styles.imageLabel}>{t('attendance.capturedPhoto')}</Text>
+                  <View style={{ bottom: 52 }}>
+                    <View style={styles.formGroup}>
+                      <Text style={styles.label}>{t('attendance.employeeName')}</Text>
+                      <TextInput
+                        style={[styles.input, styles.inputReadonly]}
+                        value={values.name}
+                        editable={false}
+                      />
+                      {touched.name && errors.name ? (
+                        <Text style={styles.errorText}>{errors.name}</Text>
+                      ) : null}
                     </View>
-                 </>
-                  }
-                  <View style={{marginVertical: 12}}>
-                     <TouchableOpacity
-                      style={[
-                        styles.statusBtn,
-                        { backgroundColor: user.status === 'checkin' ? '#28a745' : '#dc3545' },
-                        locationLoading && { opacity: 0.5 },
-                      ]}
-                      onPress={() => handleStatusToggle(setFieldValue)}
-                      disabled={locationLoading}
-                    >
-                      <Text style={styles.statusText}>
-                        {user.status === 'checkin' ? t('attendance.checkOut') : t('attendance.checkIn')}
-                      </Text>
-                    </TouchableOpacity>
+                    <View style={styles.formGroup}>
+                      <Text style={styles.label}>{t('attendance.dateTime')}</Text>
+                      <TextInput
+                        style={[styles.input, styles.inputReadonly]}
+                        value={values.dateTime}
+                        editable={false}
+                      />
+                    </View>
+                    <View style={styles.formGroup}>
+                      <Text style={styles.label}>{t('attendance.email')}</Text>
+                      <TextInput
+                        style={[styles.input, styles.inputReadonly]}
+                        value={values.email}
+                        editable={false}
+                      />
+                      {touched.email && errors.email ? (
+                        <Text style={styles.errorText}>{errors.email}</Text>
+                      ) : null}
+                    </View>
+
+                    <View style={styles.formGroup}>
+                      <Text style={styles.label}>{t('attendance.remark')}</Text>
+                      <TextInput
+                        style={[styles.input]}
+                        value={values.remark}
+                        onChangeText={text => setFieldValue('remark', text)}
+                        placeholder={t('attendance.enterRemark')}
+                        multiline
+                        numberOfLines={3}
+                      />
+                    </View>
+                    {statusImage && (
+                      <>
+                        <View>
+                          {statusImage ? (
+                            <Image source={{ uri: statusImage }} style={styles.selfyAvatar} />
+                          ) : (
+                            <View style={[styles.selfyAvatar, styles.placeholderAvatar]} />
+                          )}
+                          <Text style={styles.imageLabel}>{t('attendance.capturedPhoto')}</Text>
+                        </View>
+                      </>
+                    )}
+                    <View style={{ marginVertical: 12 }}>
+                      <TouchableOpacity
+                        style={[
+                          styles.statusBtn,
+                          { backgroundColor: user.status === 'checkin' ? '#28a745' : '#dc3545' },
+                          locationLoading && { opacity: 0.5 },
+                        ]}
+                        onPress={() => handleStatusToggle(setFieldValue)}
+                        disabled={locationLoading}
+                      >
+                        <Text style={styles.statusText}>
+                          {user.status === 'checkin'
+                            ? t('attendance.checkOut')
+                            : t('attendance.checkIn')}
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
                   </View>
-                 </View>
                 </View>
               )}
             </Formik>
-
           </View>
 
           {locationLoading && (
