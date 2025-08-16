@@ -18,13 +18,14 @@ const StackNavigator = () => {
   return (
     <Stack.Navigator
       screenOptions={{
-        headerTitleStyle: {
-          fontWeight: 'bold',
-        },
         headerShown: false,
+        headerStyle: {
+         },
       }}
     >
-      <Stack.Screen name="Drawer" component={DrawerNavigator} />
+      <Stack.Screen
+      
+      name="Drawer" component={DrawerNavigator} />
       <Stack.Screen
         options={{
           headerShown: true,

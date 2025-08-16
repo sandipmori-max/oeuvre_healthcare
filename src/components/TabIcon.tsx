@@ -2,9 +2,12 @@ import React from 'react';
 import { Image } from 'react-native';
 import { TabIconProps } from './types';
 import { getBottomTabIcon } from '../utils/helpers';
+import { useAppSelector } from '../store/hooks';
 
 const TabIcon: React.FC<TabIconProps & { focused: boolean }> = ({ name, color, size, focused }) => {
-  const iconSource = getBottomTabIcon(name, focused);
+    const theme = useAppSelector(state => state.theme);
+  
+  const iconSource = getBottomTabIcon(name, focused, theme);
   return (
     <Image
       source={iconSource}

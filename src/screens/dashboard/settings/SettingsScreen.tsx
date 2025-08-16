@@ -13,6 +13,8 @@ import { useNavigation } from '@react-navigation/native';
 import { styles } from './settings_style';
 import CustomAlert from '../../../components/alert/CustomAlert';
 import useTranslations from '../../../hooks/useTranslations';
+import { useAppDispatch, useAppSelector } from '../../../store/hooks';
+import { toggleTheme } from '../../../store/slices/theme/themeSlice';
 
 interface SettingItem {
   id: string;
@@ -36,6 +38,9 @@ const SettingsScreen = () => {
   const [languageModalVisible, setLanguageModalVisible] = useState(false);
   const [currentLanguage, setCurrentLanguage] = useState(getCurrentLanguage());
   const [languages, setLanguages] = useState<LanguageOption[]>(getAvailableLanguages());
+
+   const theme = useAppSelector(state => state.theme);
+  const dispatch = useAppDispatch();
 
   const [alertConfig, setAlertConfig] = useState({
     title: '',
@@ -218,7 +223,10 @@ const SettingsScreen = () => {
         {item.type === 'toggle' ? (
           <Switch
             value={item.value}
-            onValueChange={() => handleToggle(item.id)}
+            onValueChange={() =>{
+               handleToggle(item.id)
+               dispatch(toggleTheme())
+            }}
             trackColor={{ false: '#e0e0e0', true: '#4CAF50' }}
             thumbColor={item.value ? '#fff' : '#f4f3f4'}
           />

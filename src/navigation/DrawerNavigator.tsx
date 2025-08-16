@@ -7,11 +7,14 @@ import PrivacyPolicyScreen from '../screens/dashboard/privacy/PrivacyPolicyScree
 import TabNavigator from './TabNavigator';
 import CustomDrawerContent from '../components/drawer/CustomDrawerContent';
 import useTranslations from '../hooks/useTranslations';
+import { useAppSelector } from '../store/hooks';
 
 const Drawer = createDrawerNavigator();
 
 const DrawerNavigator = () => {
   const { t } = useTranslations();
+      const theme = useAppSelector(state => state.theme);
+  
   return (
     <Drawer.Navigator
       initialRouteName="Home"
@@ -19,12 +22,20 @@ const DrawerNavigator = () => {
     >
       <Drawer.Screen
         name="Home"
+        options={{
+          headerShown: true,
+          headerStyle: {
+            backgroundColor:  theme === 'dark' ? '#000' : '#fff',  
+          },
+          headerTintColor: theme === 'dark' ? '#fff' : '#000',
+          title: t('navigation.home')
+        }}
         component={TabNavigator}
-        options={{ title: t('navigation.home') }}
       />
       <Drawer.Screen
         name="Attendance"
         component={AttendanceScreen}
+        
         options={{ title: t('navigation.attendance') }}
       />
       <Drawer.Screen

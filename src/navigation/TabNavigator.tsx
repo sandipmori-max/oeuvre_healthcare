@@ -9,10 +9,13 @@ import ProfileNavigator from './ProfileStack';
 import HomeScreen from '../screens/dashboard/tabs/home/HomeTab';
 import AuthTab from '../screens/dashboard/auth/AuthTab';
 import useTranslations from '../hooks/useTranslations';
+import { useAppSelector } from '../store/hooks';
 
 const Tab = createBottomTabNavigator();
 
 const TabNavigator = () => {
+  const theme = useAppSelector(state => state.theme);
+  
   const { t } = useTranslations();
   return (
     <Tab.Navigator
@@ -21,7 +24,7 @@ const TabNavigator = () => {
         tabBarActiveTintColor: ERP_COLOR_CODE.ERP_BLACK,
         tabBarInactiveTintColor: '#8E8E93',
         tabBarStyle: {
-          backgroundColor: ERP_COLOR_CODE.ERP_WHITE,
+          backgroundColor: theme === 'dark' ? ERP_COLOR_CODE.ERP_BLACK : ERP_COLOR_CODE.ERP_WHITE,
           borderTopWidth: 1,
           borderTopColor: '#E5E5EA',
           height: 80,
@@ -44,9 +47,15 @@ const TabNavigator = () => {
       <Tab.Screen
         name="Home"
         component={HomeScreen}
+        
         options={{
           tabBarLabel: t('navigation.home'),
           title: t('navigation.home'),
+          
+          headerStyle: {
+            
+            backgroundColor: theme === 'dark' ? '#000' : ERP_COLOR_CODE.ERP_ACTIVE_BACKGROUND,
+          },
           tabBarLabelStyle: {
             fontSize: 12,
             fontWeight: '500',

@@ -2,7 +2,7 @@ import { Platform } from 'react-native';
 import { ERP_GIF, ERP_ICON } from '../../assets';
 import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 
-export const getBottomTabIcon = (iconName: string, focused: boolean) => {
+export const getBottomTabIcon = (iconName: string, focused: boolean, theme : any) => {
   switch (iconName) {
     case 'home':
       return focused ? ERP_ICON.ACTIVE_HOME : ERP_ICON.HOME;
