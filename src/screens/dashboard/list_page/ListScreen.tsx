@@ -290,12 +290,13 @@ const ListScreen = () => {
     }
     return null;
   };
+
   const SOCIAL_KEYS = ['linkedin', 'facebook', 'twitter', 'instagram', 'github', 'website'];
+  
   const RenderCard = ({ item, index }: any) => {
     const [expanded, setExpanded] = useState(false);
 
     const nameKey = findKeyByKeywords(item, ['deptname', 'fullname', 'name']) || 'id';
-    console.log('🚀 ~ RenderCard ~ nameKey:', nameKey);
     const subNameKey = findKeyByKeywords(item, ['branchname', 'fullname', 'name']) || 'id';
 
     const statusKey = findKeyByKeywords(item, ['status', 'state', 'flag']);
@@ -451,8 +452,15 @@ const ListScreen = () => {
             </Text>
           </View>
 
-          <View>
+          <View style={{
+            alignSelf:'flex-end',
+            alignContent:'flex-end',
+            alignItems:'flex-end',
+            justifyContent:'flex-end',
+
+          }}>
             {!!date && <Text style={{ fontWeight: '600' }}>{formatDateToDDMMMYYYY(date)}</Text>}
+            {!!date && <Text style={{ color:'#9c9696ff' }}>12:00 AM</Text>}
           </View>
         </TouchableOpacity>
 
@@ -463,7 +471,7 @@ const ListScreen = () => {
               <Text style={{ color: '#777', fontStyle: 'italic', marginBottom: 6 }}>{remarks}</Text>
             )}
             {!!address && <Text style={{ color: '#444', marginBottom: 6 }}>📍 {address}</Text>}
-            {!!amount && <Text style={{ fontWeight: '700', color: '#28a745' }}>₹ {amount}</Text>}
+            {!!amount && <Text style={{ fontWeight: '700', color: '#28a745' }}>💰 {amount}</Text>}
           </View>
         )}
 

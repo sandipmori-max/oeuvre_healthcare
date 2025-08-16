@@ -16,7 +16,7 @@ import FullViewLoader from '../components/loader/FullViewLoader';
 const RootNavigator = () => {
   const dispatch = useAppDispatch();
   const { isLoading, isAuthenticated, activeToken } = useAppSelector(state => state.auth);
-
+ 
   useEffect(() => {
     DevERPService.initialize();
     dispatch(checkAuthStateThunk());

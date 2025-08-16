@@ -13,8 +13,10 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
   const navigation = useNavigation();
   const { user } = useAppSelector(state => state?.auth);
   const currentRoute = props.state.routeNames[props.state.index];
+    const theme = useAppSelector(state => state.theme);
+  
   return (
-    <DrawerContentScrollView {...props} contentContainerStyle={{ flex: 1 }}>
+    <DrawerContentScrollView {...props} contentContainerStyle={{ flex: 1, backgroundColor: theme === 'dark' ? 'black': 'white' }}>
       <View style={styles.header}>
         <Image source={ERP_ICON.APP_LOGO} style={styles.profileImage} />
         <Text style={styles.username}>{firstLetterUpperCase(user?.name || '')}</Text>
@@ -39,8 +41,13 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
               }}
             >
               <View style={styles.itemRow}>
-                <Text style={[styles.itemIcon, isActive && styles.activeText]}>{item.icon}</Text>
-                <Text style={[styles.itemLabel, isActive && styles.activeText]}>{item.label}</Text>
+                <Text style={[styles.itemIcon, isActive && styles.activeText,
+                  
+
+                ]}>{item.icon}</Text>
+                <Text style={[styles.itemLabel, isActive && styles.activeText , {
+                  color: theme === 'dark' ? isActive ? '#000' : '#fff' : '#000',
+                }]}>{item.label}</Text>
               </View>
             </TouchableOpacity>
           );

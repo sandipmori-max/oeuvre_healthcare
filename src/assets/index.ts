@@ -14,7 +14,8 @@ const ACTIVE_AUTH = require(`${ERP_BASE_URL_ICONS}/active_auth.png`);
 const PROFILE = require(`${ERP_BASE_URL_ICONS}/user.png`);
 const ACTIVE_PROFILE = require(`${ERP_BASE_URL_ICONS}/active_user.png`);
 const REFRESH = require(`${ERP_BASE_URL_ICONS}/refresh.png`);
-
+const WHITE_ACTIVE_HOME = require(`${ERP_BASE_URL_ICONS}/white_selected_home.png`);
+const WHITE_HOME = require(`${ERP_BASE_URL_ICONS}/white_home.png`);
 
 const ERROR = require(`${ERP_BASE_URL_GIF}/error.gif`);
 const LOADING = require(`${ERP_BASE_URL_GIF}/loader.gif`);
@@ -35,7 +36,9 @@ export const ERP_ICON = {
     ACTIVE_AUTH,
     PROFILE,
     ACTIVE_PROFILE,
-    REFRESH
+    REFRESH,
+    WHITE_ACTIVE_HOME,
+    WHITE_HOME
 };
 
 export const ERP_GIF = {

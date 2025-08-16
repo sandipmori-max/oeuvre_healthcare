@@ -12,6 +12,9 @@ const HomeScreen = () => {
   const navigation = useNavigation<any>();
   const { dashboard, isDashboardLoading } = useAppSelector(state => state.auth);
   const [loadingPageId, setLoadingPageId] = useState<string | null>(null);
+  const theme = useAppSelector(state => state.theme);
+
+  console.log('RootNavigator rendered with theme:', theme );
 
   const getInitials = (text?: string) => {
     if (!text) return '?';
@@ -40,7 +43,7 @@ const HomeScreen = () => {
     >
       <View
         style={{
-          backgroundColor: 'white',
+          backgroundColor: theme === 'dark' ? '#333' : '#fff',
           borderRadius: 8,
         }}
       >
@@ -57,7 +60,9 @@ const HomeScreen = () => {
                 <Text style={styles.iconText}>{getInitials(item.name)}</Text>
               </View>
               <View style={styles.headerTextWrap}>
-                <Text style={styles.dashboardItemText} numberOfLines={2}>
+                <Text style={[styles.dashboardItemText, {
+                  color: theme === 'dark' ? '#fff' : '#000',
+                }]} numberOfLines={2}>
                   {item.title}
                 </Text>
               </View>
@@ -121,7 +126,7 @@ const HomeScreen = () => {
   const renderEmptyState = () => <NoData />;
 
   return (
-    <View style={styles.container}>
+    <View style={theme === 'dark' ?  styles.containerDark : styles.container}>
       {/* Dashboard Section */}
       <View style={styles.dashboardSection}>
         {isDashboardLoading ? (

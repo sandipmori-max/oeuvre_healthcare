@@ -8,7 +8,10 @@ export const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F8F9FA',
   },
-
+  containerDark: {
+      flex: 1,
+      backgroundColor: '#000',
+    },
   // Header Section
   header: {
     backgroundColor: '#FFFFFF',
