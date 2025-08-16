@@ -1,14 +1,6 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  Image,
-  TouchableOpacity, 
-} from 'react-native';
-import {
-  DrawerContentComponentProps,
-  DrawerContentScrollView,
-} from '@react-navigation/drawer';
+import { View, Text, Image, TouchableOpacity } from 'react-native';
+import { DrawerContentComponentProps, DrawerContentScrollView } from '@react-navigation/drawer';
 import { useNavigation } from '@react-navigation/native';
 
 import { ERP_ICON } from '../../assets';
@@ -17,59 +9,45 @@ import { firstLetterUpperCase } from '../../utils/helpers';
 import { ERP_DRAWER_LIST } from '../../constants';
 import { styles } from './drawer_style';
 
-const CustomDrawerContent: React.FC<DrawerContentComponentProps> = (props) => {
+const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
   const navigation = useNavigation();
-  const {user} = useAppSelector(state => state?.auth);
+  const { user } = useAppSelector(state => state?.auth);
   const currentRoute = props.state.routeNames[props.state.index];
   return (
     <DrawerContentScrollView {...props} contentContainerStyle={{ flex: 1 }}>
       <View style={styles.header}>
-        <Image
-          source={ERP_ICON.APP_LOGO}
-          style={styles.profileImage}
-        />
-        <Text style={styles.username}>
-         {firstLetterUpperCase(user?.name || '')}
-        </Text>
+        <Image source={ERP_ICON.APP_LOGO} style={styles.profileImage} />
+        <Text style={styles.username}>{firstLetterUpperCase(user?.name || '')}</Text>
       </View>
 
       <View style={styles.menuContainer}>
-        {ERP_DRAWER_LIST.map((item) => {
+        {ERP_DRAWER_LIST.map(item => {
           const isActive = currentRoute === item.route;
           return (
-          <TouchableOpacity
-            key={item.route}
-            style={[styles.drawerItem, isActive && styles.activeItemBackground]}
-            onPress={() => 
-            {
-                if(item.route === 'Home'){
-                      props.navigation.navigate('Home', { screen: 'Home' });
-                      props.navigation.closeDrawer();
-                      return;
+            <TouchableOpacity
+              key={item.route}
+              style={[styles.drawerItem, isActive && styles.activeItemBackground]}
+              onPress={() => {
+                if (item.route === 'Home') {
+                  props.navigation.navigate('Home', { screen: 'Home' });
+                  props.navigation.closeDrawer();
+                  return;
                 } else {
-                  navigation.navigate(item.route as never)
+                  props.navigation.closeDrawer();
+                  navigation.navigate(item.route as never);
                 }
-            }}
-          >
-            <View style={styles.itemRow}>
-              <Text style={[styles.itemIcon, isActive && styles.activeText]}>
-                {item.icon}
-              </Text>
-              <Text style={[styles.itemLabel, isActive && styles.activeText]}>
-                {item.label}
-              </Text>
-            </View>
-          </TouchableOpacity>
-
+              }}
+            >
+              <View style={styles.itemRow}>
+                <Text style={[styles.itemIcon, isActive && styles.activeText]}>{item.icon}</Text>
+                <Text style={[styles.itemLabel, isActive && styles.activeText]}>{item.label}</Text>
+              </View>
+            </TouchableOpacity>
           );
         })}
       </View>
 
-      <TouchableOpacity
-        style={styles.logoutButton}
-        onPress={() => {
-        }}
-      >
+      <TouchableOpacity style={styles.logoutButton} onPress={() => {}}>
         <Text style={styles.logoutText}>DevERP</Text>
       </TouchableOpacity>
     </DrawerContentScrollView>

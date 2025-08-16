@@ -1,4 +1,4 @@
-import { DrawerItemConfig } from "../components/types";
+import { DrawerItemConfig } from '../components/types';
 
 export const ERP_DRAWER_LIST: DrawerItemConfig[] = [
   { label: 'Home', route: 'Home', icon: '🏠' },

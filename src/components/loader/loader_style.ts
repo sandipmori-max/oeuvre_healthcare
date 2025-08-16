@@ -1,13 +1,13 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
-     loadingContainer: {
+  loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
-   gif: {
+  gif: {
     width: 200,
-    height: 200 
-    },
-})
+    height: 200,
+  },
+});

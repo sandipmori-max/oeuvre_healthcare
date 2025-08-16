@@ -1,5 +1,5 @@
-import { StyleSheet } from "react-native";
-import { ERP_COLOR_CODE } from "../../../../utils/constants";
+import { StyleSheet } from 'react-native';
+import { ERP_COLOR_CODE } from '../../../../utils/constants';
 
 export const styles = StyleSheet.create({
   container: {
@@ -27,7 +27,7 @@ export const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#222',
   },
-  switchButton: { 
+  switchButton: {
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 8,
@@ -36,7 +36,7 @@ export const styles = StyleSheet.create({
     color: ERP_COLOR_CODE.ERP_BLACK,
     fontSize: 24,
     fontWeight: '600',
-    bottom: 2
+    bottom: 2,
   },
   profileCard: {
     backgroundColor: '#fff',

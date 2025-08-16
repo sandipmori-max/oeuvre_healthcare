@@ -1,83 +1,67 @@
-import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import React from 'react'
+import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { useAppSelector } from '../../../../store/hooks';
 import NoData from '../../../../components/no_data/NoData';
 import FullViewLoader from '../../../../components/loader/FullViewLoader';
+import { styles } from './entry_style';
+
+const accentColors = ['#dbe0f5ff', '#c8f3edff', '#faf1e0ff', '#f0e1e1ff', '#f2e3f8ff', '#e0f3edff'];
 
 const EntryTab = () => {
-    const navigation = useNavigation();
-    const {menu, isMenuLoading} = useAppSelector(state => state.auth);
-    const list =  menu?.filter(item => item?.isReport === false);
-    console.log("🚀 ~ EntryTab ~ list:", list.length)
-  
+  const navigation = useNavigation();
+  const { menu, isMenuLoading } = useAppSelector(state => state.auth);
+  const list = menu?.filter(item => item?.isReport === false) ?? [];
+
+  const renderItem = ({ item, index }: any) => {
+    const backgroundColor = accentColors[index % accentColors.length];
+
+    return (
+      <TouchableOpacity
+        style={[styles.card, { backgroundColor }]}
+        activeOpacity={0.7}
+        onPress={() => navigation.navigate('Web', { item })}
+      >
+        <View style={[styles.iconContainer, { backgroundColor: 'rgba(243, 239, 239, 0.42)' }]}>
+          <Text style={styles.iconText}>
+            {item.title ? item.title.trim().slice(0, 2).toUpperCase() : '?'}
+          </Text>
+        </View>
+
+        <Text style={styles.title}>{item.title}</Text>
+
+        <Text style={styles.subtitle}>{item.name}</Text>
+      </TouchableOpacity>
+    );
+  };
+
+  if (isMenuLoading) {
+    return (
+      <View style={styles.centered}>
+        <FullViewLoader />
+      </View>
+    );
+  }
+
+  if (list.length === 0) {
+    return (
+      <View style={styles.centered}>
+        <NoData />
+      </View>
+    );
+  }
+
   return (
-    <View>
+    <FlatList
+      data={list}
+      keyExtractor={item => item?.id}
+      numColumns={2}
+      contentContainerStyle={styles.listContent}
+      columnWrapperStyle={styles.columnWrapper}
+      renderItem={renderItem}
+      showsVerticalScrollIndicator={false}
+    />
+  );
+};
 
-      {
-         list?.length === 0 && !isMenuLoading ?
-           <View style={{ 
-            flex: 1, 
-            justifyContent: 'center', 
-            alignItems: 'center', 
-            alignContent:'center',
-            }}>
-                <NoData />
-           </View> : <>
-            {
-            isMenuLoading ? <FullViewLoader /> :
-           <>
-        
-             {
-                list.length > 0 ?  <FlatList
-                        data={list}
-                        keyExtractor={item => item?.id}
-                        horizontal={false}
-                        numColumns={2}
-                        contentContainerStyle={{ paddingVertical: 16, paddingHorizontal: 8 }}
-                        columnWrapperStyle={{ justifyContent: 'space-between' }}
-                        renderItem={({ item }) => (
-                            <TouchableOpacity
-                                style={{
-                                  width: '46%',
-                                     margin: 8,
-                                    borderRadius: 16,
-                                    padding: 24,
-                                    alignItems: 'center',
-                                    minWidth: 140,
-                                    borderBlockColor: '#fafafa',
-                                    backgroundColor: '#FFFFFF',
-                                    shadowColor: '#000',
-                                    shadowOffset: { width: 0, height: 4 },
-                                    shadowOpacity: 0.08,
-                                    shadowRadius: 12,
-                                    elevation: 1,
-                                }}
-                                activeOpacity={0.8}
-                                  onPress={() => navigation.navigate('Web', { item })}
-
-                                
-                            >
-                                <Text style={{ fontSize: 32, marginBottom: 8 }}>🚀</Text>
-                                <Text style={{
-                                    textAlign: 'center',
-                                    fontSize: 16, fontWeight: '600', color: '#222'
-                                }}>{item?.title}</Text>
-                            </TouchableOpacity>
-                        )}
-                    /> : <NoData />
-             }
-           </>
-           
-        }
-           </>
-      }
-       
-       
-    </View>
-  )
-}
-
-export default EntryTab
-
-const styles = StyleSheet.create({})
+export default EntryTab;

@@ -5,18 +5,16 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import en from './translations/en';
 import hi from './translations/hi';
 
-i18n
-  .use(initReactI18next)
-  .init({
-    fallbackLng: 'en',
-    resources: {
-      en: { translation: en },
-      hi: { translation: hi },
-    },
-    interpolation: {
-      escapeValue: false,
-    },
-  });
+i18n.use(initReactI18next).init({
+  fallbackLng: 'en',
+  resources: {
+    en: { translation: en },
+    hi: { translation: hi },
+  },
+  interpolation: {
+    escapeValue: false,
+  },
+});
 
 export const changeLanguage = async (language: string) => {
   await i18n.changeLanguage(language);

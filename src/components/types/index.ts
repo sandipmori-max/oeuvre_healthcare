@@ -11,6 +11,10 @@ export interface CustomAlertProps {
   message: string;
   type?: 'error' | 'success' | 'info';
   onClose: () => void;
+  onDone?: () => void;
+  onCancel?: () => void;
+  doneText?: string;
+  cancelText?: string;
 }
 
 export type DrawerItemConfig = {
@@ -18,7 +22,6 @@ export type DrawerItemConfig = {
   route: string;
   icon?: string;
 };
-
 
 export interface ERPTextInputProps extends TextInputProps {
   label?: string;

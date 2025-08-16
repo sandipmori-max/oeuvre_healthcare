@@ -1,4 +1,4 @@
-import { Dimensions, StyleSheet } from "react-native";
+import { Dimensions, StyleSheet } from 'react-native';
 const { width } = Dimensions.get('window');
 
 export const styles = StyleSheet.create({
@@ -16,7 +16,7 @@ export const styles = StyleSheet.create({
   logo: {
     width: width * 0.3,
     height: width * 0.3,
-    borderRadius: 100
+    borderRadius: 100,
   },
   title: {
     color: '#000',

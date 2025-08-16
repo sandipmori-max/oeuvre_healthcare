@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
   header: {
@@ -24,7 +24,7 @@ export const styles = StyleSheet.create({
   itemRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    margin: 8
+    margin: 8,
   },
   itemIcon: {
     fontSize: 18,
@@ -41,7 +41,7 @@ export const styles = StyleSheet.create({
   drawerItem: {
     borderRadius: 8,
     marginHorizontal: 8,
-    marginVertical: 6
+    marginVertical: 6,
   },
   activeItemBackground: {
     backgroundColor: '#e6f0ff',
@@ -56,5 +56,5 @@ export const styles = StyleSheet.create({
   },
   logoutText: {
     fontWeight: 'bold',
-  }
+  },
 });

@@ -1,5 +1,5 @@
 import React from 'react';
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 import TabIcon from '../components/TabIcon';
 import { ERP_COLOR_CODE } from '../utils/constants';
@@ -33,13 +33,14 @@ const TabNavigator = () => {
           fontWeight: '500',
         },
         headerStyle: {
-          backgroundColor:  ERP_COLOR_CODE.ERP_ACTIVE_BACKGROUND,
+          backgroundColor: ERP_COLOR_CODE.ERP_ACTIVE_BACKGROUND,
         },
-        headerTintColor:  ERP_COLOR_CODE.ERP_ACTIVE_BACKGROUND,
+        headerTintColor: ERP_COLOR_CODE.ERP_ACTIVE_BACKGROUND,
         headerTitleStyle: {
           fontWeight: 'bold',
         },
-      }}>
+      }}
+    >
       <Tab.Screen
         name="Home"
         component={HomeScreen}
@@ -49,10 +50,10 @@ const TabNavigator = () => {
           tabBarLabelStyle: {
             fontSize: 12,
             fontWeight: '500',
-            marginTop: 8
+            marginTop: 8,
           },
-          tabBarIcon: ({color, size , focused}) => (
-            <TabIcon name="home" color={color} size={size} focused={focused}/>
+          tabBarIcon: ({ color, size, focused }) => (
+            <TabIcon name="home" color={color} size={size} focused={focused} />
           ),
         }}
       />
@@ -62,13 +63,13 @@ const TabNavigator = () => {
         options={{
           tabBarLabel: t('navigation.entry'),
           title: t('navigation.entry'),
-            tabBarLabelStyle: {
+          tabBarLabelStyle: {
             fontSize: 12,
             fontWeight: '500',
-            marginTop: 8
+            marginTop: 8,
           },
-          tabBarIcon: ({color, size, focused}) => (
-            <TabIcon name="entry" color={color} size={size} focused={focused}/>
+          tabBarIcon: ({ color, size, focused }) => (
+            <TabIcon name="entry" color={color} size={size} focused={focused} />
           ),
         }}
       />
@@ -78,33 +79,33 @@ const TabNavigator = () => {
         options={{
           tabBarLabel: t('navigation.report'),
           title: t('navigation.report'),
-            tabBarLabelStyle: {
+          tabBarLabelStyle: {
             fontSize: 12,
             fontWeight: '500',
-            marginTop: 8
+            marginTop: 8,
           },
-          tabBarIcon: ({color, size, focused}) => (
+          tabBarIcon: ({ color, size, focused }) => (
             <TabIcon focused={focused} name="report" color={color} size={size} />
           ),
         }}
       />
-       <Tab.Screen
+      <Tab.Screen
         name="Auth"
         component={AuthTab}
         options={{
           tabBarLabel: t('navigation.auth'),
           title: t('navigation.auth'),
-            tabBarLabelStyle: {
+          tabBarLabelStyle: {
             fontSize: 12,
             fontWeight: '500',
-            marginTop: 8
+            marginTop: 8,
           },
-          tabBarIcon: ({color, size, focused}) => (
+          tabBarIcon: ({ color, size, focused }) => (
             <TabIcon focused={focused} name="auth" color={color} size={size} />
           ),
         }}
       />
-       <Tab.Screen
+      <Tab.Screen
         name="Profile"
         component={ProfileNavigator}
         options={{
@@ -114,16 +115,13 @@ const TabNavigator = () => {
           tabBarLabelStyle: {
             fontSize: 12,
             fontWeight: '500',
-            marginTop: 8
+            marginTop: 8,
           },
-          tabBarIcon: ({color, size, focused}) => (
+          tabBarIcon: ({ color, size, focused }) => (
             <TabIcon focused={focused} name="profile" color={color} size={size} />
           ),
         }}
       />
-     
-      
-   
     </Tab.Navigator>
   );
 };

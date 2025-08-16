@@ -8,32 +8,29 @@ import {
   ActivityIndicator,
   Image,
 } from 'react-native';
-import {Formik} from 'formik';
+import { Formik } from 'formik';
 
-import {useAppDispatch, useAppSelector} from '../../../store/hooks';
-import {loginUserThunk} from '../../../store/slices/auth/thunk';
+import { useAppDispatch, useAppSelector } from '../../../store/hooks';
+import { loginUserThunk } from '../../../store/slices/auth/thunk';
 
-import {styles} from './add_account_style';
-import {erp_add_account_validation_schema} from '../../../utils/validations/add_accounts';
-import {AddAccountScreenProps} from './type';
+import { styles } from './add_account_style';
+import { erp_add_account_validation_schema } from '../../../utils/validations/add_accounts';
+import { AddAccountScreenProps } from './type';
 import { ERP_ICON } from '../../../assets';
 import { DevERPService } from '../../../services/api';
 import { useApi } from '../../../hooks/useApi';
 import DeviceInfo from 'react-native-device-info';
 import CustomAlert from '../../../components/alert/CustomAlert';
 
-const AddAccountScreen: React.FC<AddAccountScreenProps> = ({
-  visible,
-  onClose,
-}) => {
+const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose }) => {
   const dispatch = useAppDispatch();
   const { isLoading } = useAppSelector(state => state?.auth);
   const { execute: validateCompanyCode, execute: loginWithERP } = useApi();
-  const {accounts, activeAccountId} = useAppSelector(state => state.auth);
+  const { accounts, activeAccountId } = useAppSelector(state => state.auth);
 
   const appId = DeviceInfo.getBundleId();
   const deviceId = DeviceInfo.getDeviceId();
-  
+
   const [alertVisible, setAlertVisible] = useState(false);
   const [alertConfig, setAlertConfig] = useState({
     title: '',
@@ -45,42 +42,68 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({
     onClose();
   };
 
-  const handleAddAccount = async (values: {company_code: string; user: string; password: string}) => {
+  const handleAddAccount = async (values: {
+    company_code: string;
+    user: string;
+    password: string;
+  }) => {
     try {
-        const userExists = accounts?.some(acc => acc?.user.name === values.user);
-        if (userExists) {
-          setAlertConfig({ title: 'Error', message: 'This user already exists in your accounts.', type: 'error' });
-          setAlertVisible(true);
-          return;
-        }
-      const validation = await validateCompanyCode(() => DevERPService.validateCompanyCode(values.company_code));
+      const userExists = accounts?.some(acc => acc?.user.name === values.user);
+      if (userExists) {
+        setAlertConfig({
+          title: 'Error',
+          message: 'This user already exists in your accounts.',
+          type: 'error',
+        });
+        setAlertVisible(true);
+        return;
+      }
+      const validation = await validateCompanyCode(() =>
+        DevERPService.validateCompanyCode(values.company_code),
+      );
       if (!validation?.isValid) {
         return;
       }
 
-      const loginResult = await loginWithERP(() => DevERPService.loginToERP({
-        user: values.user,
-        pass: values.password,
-        appid: appId,
-        firebaseid: '',
-      }));
+      const loginResult = await loginWithERP(() =>
+        DevERPService.loginToERP({
+          user: values.user,
+          pass: values.password,
+          appid: appId,
+          firebaseid: '',
+        }),
+      );
 
       if (!loginResult || loginResult?.success !== 1) {
-        setAlertConfig({ title: 'Login failed', message: loginResult?.message || 'Unable to login', type: 'error' });
+        setAlertConfig({
+          title: 'Login failed',
+          message: loginResult?.message || 'Unable to login',
+          type: 'error',
+        });
         setAlertVisible(true);
         return;
       }
 
       await DevERPService.getAuth(true);
-      dispatch(loginUserThunk({ 
-        newToken: loginResult?.token,
-        newvalidTill: loginResult?.validTill,
-        company_code: values.company_code, password: values.password, isAddingAccount: true, user_credentials: { user: values.user, name: values.user } }));
+      dispatch(
+        loginUserThunk({
+          newToken: loginResult?.token,
+          newvalidTill: loginResult?.validTill,
+          company_code: values.company_code,
+          password: values.password,
+          isAddingAccount: true,
+          user_credentials: { user: values.user, name: values.user },
+        }),
+      );
       setAlertConfig({ title: 'Success', message: 'Account added successfully', type: 'success' });
       setAlertVisible(true);
       onClose();
     } catch (e: any) {
-      setAlertConfig({ title: 'Error', message: e?.message || 'Something went wrong', type: 'error' });
+      setAlertConfig({
+        title: 'Error',
+        message: e?.message || 'Something went wrong',
+        type: 'error',
+      });
       setAlertVisible(true);
     }
   };
@@ -90,36 +113,27 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({
       visible={visible}
       animationType="slide"
       presentationStyle="pageSheet"
-      onRequestClose={handleClose}>
+      onRequestClose={handleClose}
+    >
       <View style={styles.container}>
         <View style={styles.header}>
           <Text style={styles.title}>Add Account</Text>
           <TouchableOpacity onPress={handleClose} style={styles.closeButton}>
-            <Text style={styles.closeButtonText}>✖  Cancel</Text>
+            <Text style={styles.closeButtonText}>✖ Cancel</Text>
           </TouchableOpacity>
         </View>
 
         <View style={styles.formContainer}>
-           <Image
-                    source={ERP_ICON.APP_LOGO}
-                    style={styles.logo}
-                    resizeMode="contain"
-            />
-          
+          <Image source={ERP_ICON.APP_LOGO} style={styles.logo} resizeMode="contain" />
+
           <Text style={styles.subtitle}>Sign in to add another account</Text>
 
           <Formik
-            initialValues={{company_code: '', user: '', password: ''}}
+            initialValues={{ company_code: '', user: '', password: '' }}
             validationSchema={erp_add_account_validation_schema}
-            onSubmit={handleAddAccount}>
-            {({
-              handleChange,
-              handleBlur,
-              handleSubmit,
-              values,
-              errors,
-              touched,
-            }) => (
+            onSubmit={handleAddAccount}
+          >
+            {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (
               <>
                 <View style={styles.inputContainer}>
                   <Text style={styles.inputLabel}>Company Code</Text>
@@ -170,12 +184,10 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({
                 </View>
 
                 <TouchableOpacity
-                  style={[
-                    styles.addButton,
-                    isLoading && styles.disabledButton,
-                  ]}
-                   onPress={() => handleSubmit()}
-                  disabled={isLoading}>
+                  style={[styles.addButton, isLoading && styles.disabledButton]}
+                  onPress={() => handleSubmit()}
+                  disabled={isLoading}
+                >
                   {isLoading ? (
                     <ActivityIndicator color="#fff" />
                   ) : (
@@ -187,17 +199,16 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({
           </Formik>
 
           <Text style={styles.note}>
-            This account will be added to your list. You can switch between
-            accounts anytime.
+            This account will be added to your list. You can switch between accounts anytime.
           </Text>
-      </View>
-      <CustomAlert
-        visible={alertVisible}
-        title={alertConfig.title}
-        message={alertConfig.message}
-        type={alertConfig.type}
-        onClose={() => setAlertVisible(false)}
-      />
+        </View>
+        <CustomAlert
+          visible={alertVisible}
+          title={alertConfig.title}
+          message={alertConfig.message}
+          type={alertConfig.type}
+          onClose={() => setAlertVisible(false)}
+        />
       </View>
     </Modal>
   );

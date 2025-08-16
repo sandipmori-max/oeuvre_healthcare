@@ -21,7 +21,7 @@ export const checkAuthStateThunk = createAsyncThunk(
       await createAccountsTable(db);
       const accounts = await getAccounts(db);
       const activeAccount = await getActiveAccount(db);
-      
+
       // Check if we have a valid token for the active account
       if (activeAccount?.user?.token) {
         const tokenValidTill = activeAccount.user.tokenValidTill;
@@ -37,7 +37,7 @@ export const checkAuthStateThunk = createAsyncThunk(
           }
         }
       }
-      
+
       // No valid token found, user needs to login again
       return {
         accounts,
@@ -54,12 +54,16 @@ export const checkAuthStateThunk = createAsyncThunk(
 export const loginUserThunk = createAsyncThunk(
   'auth/loginUser',
   async (
-    { 
+    {
       newToken,
       newvalidTill,
-      company_code, password, isAddingAccount = false, user_credentials }: { 
-      company_code: string; 
-      password: string; 
+      company_code,
+      password,
+      isAddingAccount = false,
+      user_credentials,
+    }: {
+      company_code: string;
+      password: string;
       isAddingAccount?: boolean;
       newToken?: string;
       newvalidTill?: string;
@@ -70,19 +74,21 @@ export const loginUserThunk = createAsyncThunk(
     try {
       // This thunk only handles database operations and local storage
       // The ERP login and token fetch is already done in LoginScreen
-      
+
       // Get authentication token that was already fetched in LoginScreen
       const token = isAddingAccount ? newToken : await AsyncStorage.getItem('erp_token');
-      console.log("🚀 ~ token:", token)
-      const tokenValidTill = isAddingAccount ? newvalidTill : await AsyncStorage.getItem('erp_token_valid_till');
-      console.log("🚀 ~ tokenValidTill:", tokenValidTill)
-      
+      console.log('🚀 ~ token:', token);
+      const tokenValidTill = isAddingAccount
+        ? newvalidTill
+        : await AsyncStorage.getItem('erp_token_valid_till');
+      console.log('🚀 ~ tokenValidTill:', tokenValidTill);
+
       if (!token) {
         return rejectWithValue('No authentication token found. Please login again.');
       }
-      
+
       console.log('🚀 ~ token:------------', token);
-      
+
       // Store tokens in AsyncStorage for consistency
       await AsyncStorage.setItem('auth_token', token);
       await AsyncStorage.setItem('erp_appid', company_code);
@@ -92,7 +98,11 @@ export const loginUserThunk = createAsyncThunk(
         id: `user_${Date.now()}`,
         name: user_credentials?.name || user_credentials?.user || company_code.toUpperCase(),
         company_code: company_code,
-        avatar: `https://ui-avatars.com/api/?name=${(user_credentials?.name || user_credentials?.user || company_code).toUpperCase()}&background=007AFF&color=fff`,
+        avatar: `https://ui-avatars.com/api/?name=${(
+          user_credentials?.name ||
+          user_credentials?.user ||
+          company_code
+        ).toUpperCase()}&background=007AFF&color=fff`,
         accountType: 'erp',
         token: token,
         tokenValidTill: tokenValidTill,
@@ -101,8 +111,10 @@ export const loginUserThunk = createAsyncThunk(
       const db = await getDBConnection();
       await createAccountsTable(db);
       const currentAccounts = await getAccounts(db);
-      const existingAccount = currentAccounts?.find((acc: Account) => acc.user.company_code === company_code);
-      
+      const existingAccount = currentAccounts?.find(
+        (acc: Account) => acc.user.company_code === company_code,
+      );
+
       if (existingAccount && !isAddingAccount) {
         await updateAccountActive(db, existingAccount?.id);
         return {
@@ -123,11 +135,11 @@ export const loginUserThunk = createAsyncThunk(
       for (const acc of currentAccounts ?? []) {
         await insertAccount(db, { ...acc, isActive: false });
       }
-      
+
       await insertAccount(db, newAccount);
       await updateAccountActive(db, newAccount?.id);
       const updatedAccounts = await getAccounts(db);
-      
+
       return {
         user: erpUser,
         accountId: erpUser?.id,
@@ -153,7 +165,7 @@ export const switchAccountThunk = createAsyncThunk(
       if (!targetAccount) {
         return rejectWithValue('Account not found');
       }
-      
+
       // Check if the target account has a valid token
       if (targetAccount?.user?.token) {
         const tokenValidTill = targetAccount.user.tokenValidTill;
@@ -169,7 +181,7 @@ export const switchAccountThunk = createAsyncThunk(
           }
         }
       }
-      
+
       // Token expired or not found, need to login again
       return rejectWithValue('Account token expired. Please login again.');
     } catch (error) {
@@ -242,7 +254,6 @@ export const logoutUserThunk = createAsyncThunk(
   },
 );
 
-
 export const validateCompanyCodeThunk = createAsyncThunk(
   'auth/validateCompanyCode',
   async (companyCode: string, { rejectWithValue }) => {
@@ -261,7 +272,7 @@ export const getERPMenuThunk = createAsyncThunk(
     try {
       const response = await DevERPService.getMenu();
       console.log('🚀 ~ getERPMenuThunk ~ raw response:', response);
-      
+
       // The API can return either a string (JSON) or an object
       if (response && typeof response === 'string') {
         console.log('🚀 ~ getERPMenuThunk ~ response is string, length:', response.length);
@@ -270,7 +281,7 @@ export const getERPMenuThunk = createAsyncThunk(
         console.log('🚀 ~ getERPMenuThunk ~ response is object, returning directly');
         return response; // Return the object directly
       }
-      
+
       console.log('🚀 ~ getERPMenuThunk ~ response is invalid:', typeof response);
       return rejectWithValue('Invalid menu response format');
     } catch (error: any) {
@@ -306,7 +317,10 @@ export const getERPPageThunk = createAsyncThunk(
 
 export const getERPListDataThunk = createAsyncThunk(
   'auth/getERPListData',
-  async ({ page, fromDate, toDate }: { page: string; fromDate: string; toDate: string }, { rejectWithValue }) => {
+  async (
+    { page, fromDate, toDate }: { page: string; fromDate: string; toDate: string },
+    { rejectWithValue },
+  ) => {
     try {
       const listData = await DevERPService.getListData(page, fromDate, toDate);
       return listData;

@@ -1,6 +1,6 @@
 import apiClient from './config';
-import { 
-  DevERPRequest, 
+import {
+  DevERPRequest,
   DevERPResponse,
   LoginRequest,
   LoginResponse,
@@ -13,7 +13,7 @@ import {
   PageRequest,
   PageResponse,
   ListDataRequest,
-  ListDataResponse
+  ListDataResponse,
 } from './types';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import NetInfo from '@react-native-community/netinfo';
@@ -26,22 +26,21 @@ class DevERPService {
   private appid: string = '';
   private device: string = 'mobile';
 
-
   async getAppLink(code: string): Promise<DevERPResponse> {
     try {
       const response = await apiClient.post<DevERPResponse>(
         `${this.baseUrl}/appcode.aspx/getLink`,
-        { code }
+        { code },
       );
-     
+
       if (response.data.success === 1 && response.data.link) {
         this.link = response.data.link;
         await AsyncStorage.setItem('erp_link', this.link);
       }
-      
+
       return response.data;
     } catch (error) {
-      console.error("🚀 ~ DevERPService ~ getAppLink ~ error:", error);
+      console.error('🚀 ~ DevERPService ~ getAppLink ~ error:', error);
       throw error;
     }
   }
@@ -54,7 +53,7 @@ class DevERPService {
   }> {
     try {
       const response = await this.getAppLink(code);
-      
+
       if (response.success === 1) {
         return {
           isValid: true,
@@ -69,7 +68,7 @@ class DevERPService {
         };
       }
     } catch (error) {
-      console.log("🚀 ~ DevERPService ~ validateCompanyCode ~ error:", error)
+      console.log('🚀 ~ DevERPService ~ validateCompanyCode ~ error:', error);
       return {
         isValid: false,
         message: 'Failed to validate company code',
@@ -89,7 +88,7 @@ class DevERPService {
         throw new Error('No internet connection');
       }
 
-      this.link = await AsyncStorage.getItem('erp_link') || this.link;
+      this.link = (await AsyncStorage.getItem('erp_link')) || this.link;
       if (!this.link) {
         throw new Error('No ERP link available. Please validate company code first.');
       }
@@ -107,31 +106,34 @@ class DevERPService {
 
       const response = await apiClient.post<LoginResponse>(
         `${this.link}msp_api.aspx/setAppID`,
-        loginData
+        loginData,
       );
-      
+
       return response.data;
     } catch (error) {
-      console.error("🚀 ~ DevERPService ~ loginToERP ~ error:", error);
+      console.error('🚀 ~ DevERPService ~ loginToERP ~ error:', error);
       throw error;
     }
   }
- 
+
   async getAuth(isFromAddAccount?: boolean): Promise<string> {
-    console.log("🚀 ~ DevERPService ~ getAuth ~ isFromAddAccount:*-*-*-*-*-*-*-*-*", isFromAddAccount)
+    console.log(
+      '🚀 ~ DevERPService ~ getAuth ~ isFromAddAccount:*-*-*-*-*-*-*-*-*',
+      isFromAddAccount,
+    );
     try {
       const netInfo = await NetInfo.fetch();
       if (!netInfo.isConnected) {
         throw new Error('No internet connection');
       }
 
-      if(!isFromAddAccount){
-      if (this.token && this.tokenValidTill) {
-              const validTill = new Date(this.tokenValidTill);
-              if (validTill > new Date()) {
-                return this.token;
-              }
-            }
+      if (!isFromAddAccount) {
+        if (this.token && this.tokenValidTill) {
+          const validTill = new Date(this.tokenValidTill);
+          if (validTill > new Date()) {
+            return this.token;
+          }
+        }
       }
 
       const tokenData: TokenRequest = {
@@ -141,27 +143,26 @@ class DevERPService {
 
       const response = await apiClient.post<TokenResponse>(
         `${this.link}msp_api.aspx/getAuth`,
-        tokenData
+        tokenData,
       );
-
 
       if (String(response.data.success) === '1') {
         this.token = response.data.token || '';
         this.tokenValidTill = response.data.validTill || '';
-        
+
         await AsyncStorage.setItem('erp_token', this.token);
         await AsyncStorage.setItem('erp_token_valid_till', this.tokenValidTill);
-        
+
         return this.token;
       } else {
         throw new Error(response.data.message || 'Failed to get token');
       }
     } catch (error) {
-      console.error("🚀 ~ DevERPService ~ getAuth ~ error:", error);
+      console.error('🚀 ~ DevERPService ~ getAuth ~ error:', error);
       throw error;
     }
   }
- 
+
   async getMenu(): Promise<string> {
     try {
       const netInfo = await NetInfo.fetch();
@@ -172,7 +173,7 @@ class DevERPService {
       if (!this.token || !this.tokenValidTill) {
         const storedToken = await AsyncStorage.getItem('erp_token');
         const storedTokenValidTill = await AsyncStorage.getItem('erp_token_valid_till');
-        
+
         if (storedToken && storedTokenValidTill) {
           const validTill = new Date(storedTokenValidTill);
           if (validTill > new Date()) {
@@ -197,15 +198,17 @@ class DevERPService {
 
       const response = await apiClient.post<MenuResponse>(
         `${this.link}msp_api.aspx/getMenu`,
-        menuData
+        menuData,
       );
 
-
-      if (String(response.data.success) === '0' && response.data.message?.includes('Token Expire')) {
+      if (
+        String(response.data.success) === '0' &&
+        response.data.message?.includes('Token Expire')
+      ) {
         await this.getAuth();
         const retryResponse = await apiClient.post<MenuResponse>(
           `${this.link}/msp_api.aspx/getMenu`,
-          { token: this.token }
+          { token: this.token },
         );
         return JSON.stringify(retryResponse.data);
       } else if (String(response.data.success) === '1') {
@@ -214,7 +217,7 @@ class DevERPService {
         throw new Error(response.data.message || 'Failed to get menu');
       }
     } catch (error) {
-      console.error("🚀 ~ DevERPService ~ getMenu ~ error:", error);
+      console.error('🚀 ~ DevERPService ~ getMenu ~ error:', error);
       throw error;
     }
   }
@@ -229,7 +232,7 @@ class DevERPService {
       if (!this.token || !this.tokenValidTill) {
         const storedToken = await AsyncStorage.getItem('erp_token');
         const storedTokenValidTill = await AsyncStorage.getItem('erp_token_valid_till');
-        
+
         if (storedToken && storedTokenValidTill) {
           const validTill = new Date(storedTokenValidTill);
           if (validTill > new Date()) {
@@ -254,14 +257,17 @@ class DevERPService {
 
       const response = await apiClient.post<DashboardResponse>(
         `${this.link}msp_api.aspx/getDB`,
-        dashboardData
+        dashboardData,
       );
 
-      if (String(response.data.success) === '0' && response.data.message?.includes('Token Expire')) {
+      if (
+        String(response.data.success) === '0' &&
+        response.data.message?.includes('Token Expire')
+      ) {
         await this.getAuth();
         const retryResponse = await apiClient.post<DashboardResponse>(
           `${this.link}msp_api.aspx/getDB`,
-          { token: this.token }
+          { token: this.token },
         );
         return JSON.stringify(retryResponse.data);
       } else if (String(response.data.success) === '1') {
@@ -270,11 +276,11 @@ class DevERPService {
         throw new Error(response.data.message || 'Failed to get dashboard data');
       }
     } catch (error) {
-      console.error("🚀 ~ DevERPService ~ getDashboard ~ error:", error);
+      console.error('🚀 ~ DevERPService ~ getDashboard ~ error:', error);
       throw error;
     }
   }
- 
+
   async getPage(page: string): Promise<string> {
     try {
       const netInfo = await NetInfo.fetch();
@@ -285,7 +291,7 @@ class DevERPService {
       if (!this.token || !this.tokenValidTill) {
         const storedToken = await AsyncStorage.getItem('erp_token');
         const storedTokenValidTill = await AsyncStorage.getItem('erp_token_valid_till');
-        
+
         if (storedToken && storedTokenValidTill) {
           const validTill = new Date(storedTokenValidTill);
           if (validTill > new Date()) {
@@ -311,15 +317,17 @@ class DevERPService {
 
       const response = await apiClient.post<PageResponse>(
         `${this.link}msp_api.aspx/getPage`,
-        pageData
+        pageData,
       );
 
-
-      if (String(response.data.success) === '0' && (response.data as any).message?.includes('Token Expire')) {
+      if (
+        String(response.data.success) === '0' &&
+        (response.data as any).message?.includes('Token Expire')
+      ) {
         await this.getAuth();
         const retryResponse = await apiClient.post<PageResponse>(
           `${this.link}/msp_api.aspx/getPage`,
-          { token: this.token, page: page }
+          { token: this.token, page: page },
         );
         const retryParsed: any = retryResponse.data as any;
         if (typeof retryParsed?.data === 'string' && retryParsed.data) return retryParsed.data;
@@ -334,7 +342,7 @@ class DevERPService {
         throw new Error(response.data.message || 'Failed to get page data');
       }
     } catch (error) {
-      console.error("🚀 ~ DevERPService ~ getPage ~ error:", error);
+      console.error('🚀 ~ DevERPService ~ getPage ~ error:', error);
       throw error;
     }
   }
@@ -349,7 +357,7 @@ class DevERPService {
       if (!this.token || !this.tokenValidTill) {
         const storedToken = await AsyncStorage.getItem('erp_token');
         const storedTokenValidTill = await AsyncStorage.getItem('erp_token_valid_till');
-        
+
         if (storedToken && storedTokenValidTill) {
           const validTill = new Date(storedTokenValidTill);
           if (validTill > new Date()) {
@@ -377,15 +385,14 @@ class DevERPService {
 
       const response = await apiClient.post<ListDataResponse>(
         `${this.link}msp_api.aspx/getListData`,
-        listData
+        listData,
       );
-
 
       if (response.data.success === 0 && response.data.message?.includes('Token Expire')) {
         await this.getAuth();
         const retryResponse = await apiClient.post<ListDataResponse>(
           `${this.link}msp_api.aspx/getListData`,
-          { token: this.token, page: page, fd: fromDate, td: toDate }
+          { token: this.token, page: page, fd: fromDate, td: toDate },
         );
         return retryResponse.data.data || '';
       } else if (response.data.success === 1) {
@@ -394,19 +401,19 @@ class DevERPService {
         throw new Error(response.data.message || 'Failed to get list data');
       }
     } catch (error) {
-      console.error("🚀 ~ DevERPService ~ getListData ~ error:", error);
+      console.error('🚀 ~ DevERPService ~ getListData ~ error:', error);
       throw error;
     }
   }
- 
+
   async initialize(): Promise<void> {
     try {
-      this.link = await AsyncStorage.getItem('erp_link') || '';
-      this.token = await AsyncStorage.getItem('erp_token') || '';
-      this.tokenValidTill = await AsyncStorage.getItem('erp_token_valid_till') || '';
-      this.appid = await AsyncStorage.getItem('erp_appid') || '';
+      this.link = (await AsyncStorage.getItem('erp_link')) || '';
+      this.token = (await AsyncStorage.getItem('erp_token')) || '';
+      this.tokenValidTill = (await AsyncStorage.getItem('erp_token_valid_till')) || '';
+      this.appid = (await AsyncStorage.getItem('erp_appid')) || '';
     } catch (error) {
-      console.error("🚀 ~ DevERPService ~ initialize ~ error:", error);
+      console.error('🚀 ~ DevERPService ~ initialize ~ error:', error);
     }
   }
 
@@ -416,7 +423,7 @@ class DevERPService {
       this.token = '';
       this.tokenValidTill = '';
       this.appid = '';
-      
+
       await AsyncStorage.multiRemove([
         'erp_link',
         'erp_token',
@@ -424,7 +431,7 @@ class DevERPService {
         'erp_appid',
       ]);
     } catch (error) {
-      console.error("🚀 ~ DevERPService ~ clearData ~ error:", error);
+      console.error('🚀 ~ DevERPService ~ clearData ~ error:', error);
     }
   }
 
@@ -432,7 +439,6 @@ class DevERPService {
     this.token = token;
     AsyncStorage.setItem('erp_token', token);
   }
-
 }
 
 export default new DevERPService();

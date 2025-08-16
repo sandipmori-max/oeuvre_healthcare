@@ -1,7 +1,11 @@
-import React, {useEffect} from 'react';
+import React, { useEffect } from 'react';
 
-import {useAppDispatch, useAppSelector} from '../store/hooks';
-import { checkAuthStateThunk, getERPMenuThunk, getERPDashboardThunk } from '../store/slices/auth/thunk';
+import { useAppDispatch, useAppSelector } from '../store/hooks';
+import {
+  checkAuthStateThunk,
+  getERPMenuThunk,
+  getERPDashboardThunk,
+} from '../store/slices/auth/thunk';
 import DevERPService from '../services/api/deverp';
 
 import AuthNavigator from './AuthNavigator';
@@ -11,11 +15,7 @@ import FullViewLoader from '../components/loader/FullViewLoader';
 
 const RootNavigator = () => {
   const dispatch = useAppDispatch();
-  const {
-    isLoading,
-    isAuthenticated, 
-    activeToken
-  } = useAppSelector(state => state.auth);
+  const { isLoading, isAuthenticated, activeToken } = useAppSelector(state => state.auth);
 
   useEffect(() => {
     DevERPService.initialize();
@@ -30,9 +30,7 @@ const RootNavigator = () => {
   }, [isAuthenticated, dispatch, activeToken]);
 
   if (isLoading) {
-    return (
-       <FullViewLoader />
-    );
+    return <FullViewLoader />;
   }
 
   return isAuthenticated ? <StackNavigator /> : <AuthNavigator />;

@@ -8,7 +8,7 @@ export const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F8F9FA',
   },
-  
+
   // Header Section
   header: {
     backgroundColor: '#FFFFFF',
@@ -128,9 +128,8 @@ export const styles = StyleSheet.create({
   },
   dashboardItemData: {
     fontSize: 18,
-    color: '#000',
-    fontWeight: '500',
-    lineHeight: 18,
+    color: 'green',
+    fontWeight: '700',
   },
   urlContainer: {
     marginBottom: 8,
@@ -162,18 +161,17 @@ export const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   footerLink: {
-    color: '#007AFF',
+    color: '#aaacadff',
     fontSize: 12,
     fontWeight: '600',
     marginRight: 4,
   },
   chevron: {
-    color: '#007AFF',
+    color: '#aaacadff',
     fontSize: 18,
     lineHeight: 18,
   },
 
-  // Loading State
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -187,7 +185,6 @@ export const styles = StyleSheet.create({
     fontWeight: '500',
   },
 
-  // Empty State
   emptyContainer: {
     flex: 1,
     justifyContent: 'center',

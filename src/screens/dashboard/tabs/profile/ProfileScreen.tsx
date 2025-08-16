@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
 
 import AccountSwitcher from './components/AccountSwitcher';
@@ -12,11 +12,10 @@ import AddAccountScreen from '../../add_account/AddAccountScreen';
 
 const ProfileScreen = () => {
   const navigation = useNavigation<StackNavigationProp<ProfileStackParamList>>();
-  const {user, accounts} = useAppSelector(state => state?.auth);
+  const { user, accounts } = useAppSelector(state => state?.auth);
   const [showAccountSwitcher, setShowAccountSwitcher] = useState(false);
   const [showAddAccount, setShowAddAccount] = useState(false);
-  
-  
+
   const handleAddAccount = () => {
     setShowAccountSwitcher(false);
     setShowAddAccount(true);
@@ -26,8 +25,6 @@ const ProfileScreen = () => {
 
   return (
     <View style={styles.container}>
-     
-
       <ScrollView
         style={styles.scrollContainer}
         showsVerticalScrollIndicator={false}
@@ -63,10 +60,14 @@ const ProfileScreen = () => {
           <Text style={styles.sectionTitle}>Account Management</Text>
           <TouchableOpacity style={styles.settingCard} onPress={() => setShowAccountSwitcher(true)}>
             <View style={styles.settingHeader}>
-              <View style={styles.settingIcon}><Text style={styles.iconText}>👥</Text></View>
+              <View style={styles.settingIcon}>
+                <Text style={styles.iconText}>👥</Text>
+              </View>
               <View style={styles.settingInfo}>
                 <Text style={styles.settingTitle}>Manage Accounts</Text>
-                <Text style={styles.settingSubtitle}>{accounts?.length} account{accounts?.length !== 1 ? 's' : ''} available</Text>
+                <Text style={styles.settingSubtitle}>
+                  {accounts?.length} account{accounts?.length !== 1 ? 's' : ''} available
+                </Text>
               </View>
               <Text style={styles.arrowIcon}>›</Text>
             </View>
@@ -75,10 +76,14 @@ const ProfileScreen = () => {
           {activeAccount && (
             <View style={styles.settingCard}>
               <View style={styles.settingHeader}>
-                <View style={styles.settingIcon}><Text style={styles.iconText}>🕒</Text></View>
+                <View style={styles.settingIcon}>
+                  <Text style={styles.iconText}>🕒</Text>
+                </View>
                 <View style={styles.settingInfo}>
                   <Text style={styles.settingTitle}>Last Login</Text>
-                  <Text style={styles.settingSubtitle}>{formatDateMonthDateYear(activeAccount?.lastLoginAt)}</Text>
+                  <Text style={styles.settingSubtitle}>
+                    {formatDateMonthDateYear(activeAccount?.lastLoginAt)}
+                  </Text>
                 </View>
               </View>
             </View>
@@ -104,13 +109,9 @@ const ProfileScreen = () => {
         onAddAccount={handleAddAccount}
       />
 
-      <AddAccountScreen
-        visible={showAddAccount}
-        onClose={() => setShowAddAccount(false)}
-      />
+      <AddAccountScreen visible={showAddAccount} onClose={() => setShowAddAccount(false)} />
     </View>
   );
 };
-
 
 export default ProfileScreen;

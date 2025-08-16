@@ -1,8 +1,8 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
   container: { flex: 1 },
-  backBtn: {  marginRight: 8 },
+  backBtn: { marginRight: 8 },
   backIcon: { fontSize: 20, color: '#222' },
   header: {
     flexDirection: 'row',
@@ -30,7 +30,7 @@ export const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 8,
     padding: 16,
-    top: 32
+    top: 32,
   },
   profileRow: {
     flexDirection: 'row',
@@ -38,7 +38,7 @@ export const styles = StyleSheet.create({
     marginBottom: 12,
     bottom: 52,
   },
-    profileAvatar: {
+  profileAvatar: {
     width: 70,
     height: 70,
     borderRadius: 35,
@@ -54,11 +54,11 @@ export const styles = StyleSheet.create({
   imageLabel: { marginTop: 6, fontSize: 12, color: '#666' },
   placeholderAvatar: { backgroundColor: '#e0e0e0' },
   formGroup: {
-    marginBottom: 12 },
+    marginBottom: 12,
+  },
   formRow: { flexDirection: 'row' },
   label: { fontSize: 12, color: '#666', marginBottom: 6 },
   input: {
-    
     backgroundColor: '#fff',
     borderWidth: 1,
     borderColor: '#e0e0e0',
@@ -81,11 +81,11 @@ export const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 8,
   },
-  statusText: { 
-    textAlign:'center',
-    color: '#fff', 
+  statusText: {
+    textAlign: 'center',
+    color: '#fff',
     fontWeight: '600',
-    fontSize: 16
+    fontSize: 16,
   },
   actionsRow: {
     flexDirection: 'row',

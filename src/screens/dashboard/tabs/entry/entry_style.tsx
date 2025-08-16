@@ -1,0 +1,52 @@
+import { StyleSheet } from 'react-native';
+
+export const styles = StyleSheet.create({
+  centered: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  listContent: {
+    paddingVertical: 16,
+    paddingHorizontal: 12,
+  },
+  columnWrapper: {
+    justifyContent: 'space-between',
+  },
+  card: {
+    flex: 1,
+    maxWidth: '48%',
+    borderRadius: 16,
+    paddingVertical: 24,
+    paddingHorizontal: 16,
+    marginBottom: 16,
+    alignItems: 'center',
+  },
+  iconContainer: {
+    marginBottom: 12,
+    width: 56,
+    height: 56,
+    borderRadius: 35,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(107, 104, 104, 0.3)',
+  },
+  iconText: {
+    color: '#fff',
+    fontSize: 24,
+    fontWeight: '700',
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#000',
+    marginBottom: 4,
+    textAlign: 'center',
+  },
+  subtitle: {
+    fontSize: 14,
+    color: 'rgba(75, 73, 73, 0.85)',
+    textAlign: 'center',
+  },
+});
