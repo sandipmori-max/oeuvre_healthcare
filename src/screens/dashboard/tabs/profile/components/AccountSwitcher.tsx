@@ -60,7 +60,6 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
         style={[styles.accountItem, isActive && styles.activeAccount]}
         onPress={async () => {
           if (new Date(item?.user?.tokenValidTill) > new Date()) {
-            console.log('🚀 ~ item:', item);
             await AsyncStorage.setItem('erp_token', item?.user?.token || '');
             await AsyncStorage.setItem('auth_token', item?.user?.token || '');
             DevERPService.setToken(item?.user?.token || '');
@@ -72,13 +71,12 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
           <Image source={{ uri: item?.user?.avatar }} style={styles.avatar} />
           <View style={styles.accountInfo}>
             <Text style={[styles.accountName, isActive && styles.activeText]}>
-              {item?.user?.name}
+              {item?.user?.name.charAt(0).toUpperCase() + item?.user?.name.slice(1)}
             </Text>
             <Text style={[styles.accountEmail, isActive && styles.activeText]}>
               {item?.user?.company_code}
             </Text>
             <Text style={styles.lastLogin}>Last login: {lastLogin}</Text>
-            <Text style={styles.lastLogin}>Last login: {item?.user?.token}</Text>
           </View>
           {isActive && (
             <View style={styles.activeIndicator}>
