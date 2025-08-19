@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "944238529141",
+    "project_id": "deverp-main",
+    "storage_bucket": "deverp-main.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:944238529141:android:12a6f618e39c784910463c",
+        "android_client_info": {
+          "package_name": "com.deverp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBGDItQguYZy-Cz4iEvLahkZPrhqQimsok"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
