@@ -3,7 +3,7 @@ import React, { useEffect, useLayoutEffect, useState } from 'react';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { useAppDispatch } from '../../../store/hooks';
 import { getERPPageThunk } from '../../../store/slices/auth/thunk';
-import { formatHeaderTitle } from '../../../utils/helpers';
+import { findKeyByKeywords, formatHeaderTitle } from '../../../utils/helpers';
 import FullViewLoader from '../../../components/loader/FullViewLoader';
 import NoData from '../../../components/no_data/NoData';
 import { styles } from './page_style';
@@ -20,11 +20,11 @@ const PageScreen = () => {
   const [error, setError] = useState<string | null>(null);
 
   const route = useRoute<RouteProp<PageRouteParams, 'PageScreen'>>();
-  const { item } = route.params;
-  console.log('🚀 ~ PageScreen ~ item:', item);
+  const { item, title } = route.params; 
+  console.log("🚀 ~ PageScreen ~ title:", title)
 
   useLayoutEffect(() => {
-    navigation.setOptions({ title: item?.title || 'Details' });
+    navigation.setOptions({ title: item?.name || 'Details' });
   }, [navigation, item?.title]);
 
   useEffect(() => {
@@ -32,7 +32,7 @@ const PageScreen = () => {
       try {
         setError(null);
         setLoadingPageId(item.id);
-        const raw = await dispatch(getERPPageThunk(item.name)).unwrap();
+        const raw = await dispatch(getERPPageThunk(title)).unwrap();
         const parsed = typeof raw === 'string' ? JSON.parse(raw) : raw;
         const pageControls = Array.isArray(parsed?.pagectl) ? parsed.pagectl : [];
         setControls(pageControls);

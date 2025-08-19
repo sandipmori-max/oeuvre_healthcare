@@ -91,7 +91,7 @@ const EntryTab = () => {
           onPress={() => setShowBookmarksOnly(prev => !prev)}
         >
           <Image
-            source={showBookmarksOnly ? ERP_ICON.All : ERP_ICON.BOOK_MARK_DONE}
+            source={showBookmarksOnly ? ERP_ICON.All : ERP_ICON.BOOK_MARK}
             style={styles.icon}
           />
         </TouchableOpacity>

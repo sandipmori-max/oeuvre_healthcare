@@ -158,7 +158,7 @@ class DevERPService {
         // ✅ Check if erp_accounts table exists
         const tableCheckResult = await db.executeSql(
           `SELECT name FROM sqlite_master WHERE type='table' AND name=?`,
-          ['erp_accounts']
+          ['erp_accounts'],
         );
 
         if (tableCheckResult[0].rows.length > 0) {
@@ -171,10 +171,10 @@ class DevERPService {
               tokenValidTill: this.tokenValidTill,
             };
 
-             await db.executeSql(
-                `UPDATE erp_accounts SET user_json = ? WHERE id = ?`,
-                [JSON.stringify(updatedUser), activeAccount.id]
-              );
+            await db.executeSql(`UPDATE erp_accounts SET user_json = ? WHERE id = ?`, [
+              JSON.stringify(updatedUser),
+              activeAccount.id,
+            ]);
 
             console.log('🟢 Active account updated with new token in SQLite');
           } else {
@@ -183,7 +183,6 @@ class DevERPService {
         } else {
           console.log('⚠️ erp_accounts table does not exist — skipping token update');
         }
-
 
         return this.token;
       } else {
@@ -379,7 +378,12 @@ class DevERPService {
     }
   }
 
-  async getListData(page: string, fromDate: string, toDate: string, param: string): Promise<string> {
+  async getListData(
+    page: string,
+    fromDate: string,
+    toDate: string,
+    param: string,
+  ): Promise<string> {
     try {
       const netInfo = await NetInfo.fetch();
       if (!netInfo.isConnected) {
@@ -420,6 +424,7 @@ class DevERPService {
         `${this.link}msp_api.aspx/getListData`,
         listData,
       );
+      console.log('🚀 ~ DevERPService ~ getListData ~ response:', response);
 
       if (response.data.success === 0 && response.data.message?.includes('Token Expire')) {
         await this.getAuth();
@@ -427,9 +432,18 @@ class DevERPService {
           `${this.link}msp_api.aspx/getListData`,
           { token: this.token, page: page, fd: fromDate, td: toDate },
         );
-        return retryResponse.data.data || '';
+
+        return (
+          JSON.stringify({
+            data: retryResponse?.data?.data,
+            config: retryResponse?.data?.config || [],
+          }) || ''
+        );
       } else if (response.data.success === 1) {
-        return response.data.data || '';
+        return JSON.stringify({
+          data: response.data?.data,
+          config: response.data?.config || [],
+        });
       } else {
         throw new Error(response.data.message || 'Failed to get list data');
       }

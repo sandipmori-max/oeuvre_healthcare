@@ -17,7 +17,12 @@ import { useAppDispatch } from '../../../store/hooks';
 import { getERPListDataThunk } from '../../../store/slices/auth/thunk';
 import { styles } from './list_page_style';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { formatDateToDDMMMYYYY, formatHeaderTitle } from '../../../utils/helpers';
+import {
+  findKeyByKeywords,
+  formatDateToDDMMMYYYY,
+  formatHeaderTitle,
+  formatTimeTo12Hour,
+} from '../../../utils/helpers';
 import FullViewLoader from '../../../components/loader/FullViewLoader';
 import NoData from '../../../components/no_data/NoData';
 import { ListRouteParams } from './types';
@@ -30,9 +35,13 @@ const ListScreen = () => {
 
   const [loadingListId, setLoadingListId] = useState<string | null>(null);
   const [listData, setListData] = useState<any[]>([]);
+  const [configData, setConfigData] = useState<any[]>([]);
+
   const [error, setError] = useState<string | null>(null);
 
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [isFilterVisible, setIsFilterVisible] = useState<boolean>(false);
+
   const [filteredData, setFilteredData] = useState<any[]>([]);
 
   const [fromDate, setFromDate] = useState<string>('');
@@ -46,24 +55,45 @@ const ListScreen = () => {
 
   const route = useRoute<RouteProp<ListRouteParams, 'List'>>();
   const { item } = route.params;
+  console.log('🚀 ~ ListScreen ~ item:', item);
+
+  const pageTitle = item?.title || item?.name || 'List Data';
+  const pageParamsName = item?.name || 'List Data';
+  console.log('🚀 ~ ListScreen ~ pageParamsName:', pageParamsName);
+  const totalAmount = filteredData?.reduce((sum, item) => {
+    const amount = parseFloat(item?.amount) || 0;
+    return sum + amount;
+  }, 0);
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      title: item?.title || 'List Data',
+      title: pageTitle || 'List Data',
       headerRight: () => (
-        <TouchableOpacity
-          onPress={() => {
-            console.log('🚀 ~ onPress:', 'onRefresh');
-
-            onRefresh();
-          }}
-          style={{ marginRight: 16 }}
-        >
-          <Image source={ERP_ICON.REFRESH} style={{ width: 18, height: 18 }} alt="Refresh Icon" />
-        </TouchableOpacity>
+        <>
+          <TouchableOpacity
+            onPress={() => {
+              onRefresh();
+            }}
+            style={{ marginRight: 16 }}
+          >
+            <Image source={ERP_ICON.REFRESH} style={{ width: 18, height: 18 }} alt="Refresh Icon" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              setIsFilterVisible(!isFilterVisible);
+            }}
+            style={{ marginRight: 16 }}
+          >
+            <Image
+              source={isFilterVisible ? ERP_ICON.FILTER_ACTIVE : ERP_ICON.FILTER}
+              style={{ width: 18, height: 18 }}
+              alt="Refresh Icon"
+            />
+          </TouchableOpacity>
+        </>
       ),
     });
-  }, [navigation, item?.title]);
+  }, [navigation, pageTitle, isFilterVisible]);
 
   const formatDateForAPI = (date: Date): string => {
     const day = String(date.getDate()).padStart(2, '0');
@@ -215,6 +245,17 @@ const ListScreen = () => {
     }
     setShowDatePicker(null);
   };
+  
+  const getButtonMeta = (key: string) => {
+    if (!key || !configData?.length) return { label: 'Action', color: '#007BFF' };
+
+    const configItem = configData.find(cfg => cfg.datafield?.toLowerCase() === key.toLowerCase());
+
+    return {
+      label: configItem?.headertext || 'Action',
+      color: configItem?.colorcode || '#007BFF',
+    };
+  };
 
   const fetchListData = useCallback(
     async (fromDateStr: string, toDateStr: string) => {
@@ -230,23 +271,32 @@ const ListScreen = () => {
             param: '',
           }),
         ).unwrap();
+        console.log('🚀 ~ raw:', raw);
 
         const parsed = typeof raw === 'string' ? JSON.parse(raw) : raw;
 
         let dataArray = [];
+        let configArray = [];
+
         if (Array.isArray(parsed)) {
           dataArray = parsed;
+          configArray = [];
         } else if (Array.isArray(parsed?.data)) {
           dataArray = parsed.data;
+          configArray = parsed.config || [];
         } else if (Array.isArray(parsed?.list)) {
           dataArray = parsed.list;
+          configArray = parsed.config || [];
         } else if (parsed && typeof parsed === 'object') {
           const keys = Object.keys(parsed).filter(key => !isNaN(Number(key)));
           if (keys.length > 0) {
             dataArray = keys.map(key => parsed[key]);
+            configArray = parsed.config || [];
           }
         }
+        console.log('🚀 ~ configArray:', configArray);
 
+        setConfigData(configArray);
         setListData(dataArray);
         setFilteredData(dataArray);
       } catch (e: any) {
@@ -270,69 +320,19 @@ const ListScreen = () => {
     }
   }, [fromDate, toDate]);
 
-  // Map status to colors
-  const statusColors: Record<string, string> = {
-    active: '#4CAF50',
-    inactive: '#F44336',
-    pending: '#FF9800',
-    approved: '#2196F3',
-    default: '#888888',
-  };
-
-  const getStatusColor = (status: string) => {
-    if (!status) return statusColors.default;
-    const key = status.toLowerCase();
-    return statusColors[key] || statusColors.default;
-  };
-
-  const findKeyByKeywords = (obj: any, keywords: string[]) => {
-    if (!obj) return null;
-    const lowerKeys = Object.keys(obj).map(k => k.toLowerCase());
-    for (const keyword of keywords) {
-      const found = lowerKeys.find(k => k.includes(keyword.toLowerCase()));
-      if (found) return found;
-    }
-    return null;
-  };
-
-  const SOCIAL_KEYS = ['linkedin', 'facebook', 'twitter', 'instagram', 'github', 'website'];
-
   const RenderCard = ({ item, index }: any) => {
-    const [expanded, setExpanded] = useState(false);
+    if (!item) return null;
+    const name = item['name'] || `Item #${index + 1}`;
+    const subName = item['number'] || `Item #${index + 1}`;
+    const [isRemarksExpanded, setRemarksExpanded] = useState(false);
 
-    const nameKey = findKeyByKeywords(item, ['deptname', 'fullname', 'name']) || 'id';
-    const subNameKey = findKeyByKeywords(item, ['branchname', 'fullname', 'name']) || 'id';
-
-    const statusKey = findKeyByKeywords(item, ['status', 'state', 'flag']);
-    const dateKey = findKeyByKeywords(item, ['date', 'cdt', 'created', 'birthdate']);
-    const remarksKey = findKeyByKeywords(item, ['remark', 'comments', 'note']);
-    const addressKey = findKeyByKeywords(item, ['address', 'location', 'place']);
-    const amountKey = findKeyByKeywords(item, ['amount', 'price', 'cost', 'total']);
-
-    const name = item[nameKey] || `Item #${index + 1}`;
-    const subName = item[subNameKey] || `Item #${index + 1}`;
-
-    const status = statusKey ? item[statusKey] : '';
-    console.log('🚀 ~ RenderCard ~ status:', status);
-    const date = dateKey ? item[dateKey] : '';
-    const remarks = remarksKey ? item[remarksKey] : '';
-    const address = addressKey ? item[addressKey] : '';
-    const amount = amountKey ? item[amountKey] : '';
+    const status = item['status'];
+    const date = item['date'];
+    const remarks = item['remarks'];
+    const address = item['address'];
+    const amount = item['amount'];
 
     const btnKeys = Object.keys(item).filter(key => key.startsWith('btn_'));
-
-    const filteredKeys = Object.keys(item).filter(
-      key =>
-        !key.startsWith('btn_') &&
-        key !== nameKey &&
-        key !== statusKey &&
-        key !== dateKey &&
-        key !== remarksKey &&
-        key !== addressKey &&
-        key !== amountKey &&
-        item[key] !== null &&
-        item[key] !== '',
-    );
 
     const avatarLetter = name
       .split('')
@@ -340,83 +340,6 @@ const ListScreen = () => {
       .slice(0, 2)
       .map(word => word.charAt(0).toUpperCase())
       .join('');
-
-    const renderDetailRow = key => {
-      let value = item[key];
-
-      if (typeof value === 'object' && value !== null) {
-        value = JSON.stringify(value);
-      }
-
-      if (
-        key.toLowerCase().includes('image') &&
-        typeof value === 'string' &&
-        value.startsWith('http')
-      ) {
-        return (
-          <Image
-            key={key}
-            source={{ uri: value }}
-            style={{ width: 100, height: 100, borderRadius: 8, marginBottom: 10 }}
-            resizeMode="cover"
-          />
-        );
-      }
-
-      if (
-        SOCIAL_KEYS.includes(key.toLowerCase()) &&
-        typeof value === 'string' &&
-        value.startsWith('http')
-      ) {
-        return (
-          <Text
-            key={key}
-            style={{ color: '#1e90ff', marginBottom: 8 }}
-            onPress={() => Linking.openURL(value)}
-          >
-            {formatHeaderTitle(key)}: {value}
-          </Text>
-        );
-      }
-
-      return (
-        <View
-          key={key}
-          style={{
-            flexDirection: 'row',
-            marginBottom: 8,
-            alignItems: 'flex-start',
-            justifyContent: 'space-between',
-            borderBottomWidth: 1,
-            borderBottomColor: '#eee',
-            paddingBottom: 8,
-          }}
-        >
-          <Text
-            style={{
-              color: '#5f5d5dff',
-              fontSize: 16,
-              lineHeight: 20,
-              marginRight: 8,
-            }}
-            numberOfLines={1}
-          >
-            {formatHeaderTitle(key)}
-          </Text>
-
-          <Text
-            style={{
-              fontSize: 16,
-              color: '#333',
-              textAlign: 'right',
-              fontWeight: '600',
-            }}
-          >
-            {String(value)}
-          </Text>
-        </View>
-      );
-    };
 
     return (
       <View
@@ -433,6 +356,9 @@ const ListScreen = () => {
         <TouchableOpacity
           activeOpacity={0.8}
           style={{ flexDirection: 'row', alignItems: 'center' }}
+          onPress={async () => {
+            navigation.navigate('Page', { item, title: pageParamsName });
+          }}
         >
           <View
             style={{
@@ -466,98 +392,88 @@ const ListScreen = () => {
             }}
           >
             {!!date && <Text style={{ fontWeight: '600' }}>{formatDateToDDMMMYYYY(date)}</Text>}
-            {!!date && <Text style={{ color: '#9c9696ff' }}>12:00 AM</Text>}
+            {!!date && <Text style={{ color: '#9c9696ff' }}>{formatTimeTo12Hour(date)}</Text>}
           </View>
         </TouchableOpacity>
 
         {/* Metadata Preview */}
         {(remarks || address || amount) && (
           <View style={{ marginTop: 12 }}>
-            {!!remarks && (
-              <Text
-                numberOfLines={2}
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+              <View
                 style={{
-                  color: '#777',
-                  fontStyle: 'italic',
-                  marginBottom: 6,
+                  width: '70%',
                 }}
               >
-                {remarks}
-              </Text>
-            )}
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-              <View style={{ width: '70%' }}>
-                {!!address && (
+                {!!remarks && (
+                  <>
+                    <Text
+                      numberOfLines={isRemarksExpanded ? undefined : 2}
+                      style={{
+                        color: '#777',
+                        fontStyle: 'italic',
+                        marginBottom: 6,
+                      }}
+                    >
+                      {remarks}
+                    </Text>
+                    {remarks.length > 60 && ( 
+                      <TouchableOpacity onPress={() => setRemarksExpanded(prev => !prev)}>
+                        <Text style={{ color: '#007bff', fontSize: 12,  marginBottom: 6, }}>
+                          {isRemarksExpanded ? 'See Less ▲' : 'See More ▼'}
+                        </Text>
+                      </TouchableOpacity>
+                    )}
+                  </>
+                )}
+              </View>
+              <View
+                style={{
+                  width: '30%',
+                  alignItems: 'flex-end',
+                }}
+              >
+                {!!amount && (
                   <Text
-                    numberOfLines={2}
+                    numberOfLines={1}
                     style={{
-                      color: '#444',
+                      textAlign: 'right',
+                      fontSize: 16,
+                      fontWeight: '700',
+                      color: '#28a745',
                     }}
                   >
-                    📍 {address}
+                    ₹ {amount}
                   </Text>
                 )}
               </View>
-              <View style={{ 
-                width: '30%', 
-                justifyContent: 'flex-end', alignItems: 'flex-end' }}>
-                {!!amount && (
-                  <Text
-                  numberOfLines={1}
+            </View>
+            <View>
+              {!!address && (
+                <Text
+                  numberOfLines={2}
                   style={{
-                    textAlign: 'right', fontSize: 16,
-                    fontWeight: '700', color: '#28a745' }}>💰 {amount}</Text>
-                )}
-              </View>
+                    color: '#444',
+                  }}
+                >
+                  📍 {address}
+                </Text>
+              )}
             </View>
           </View>
         )}
 
-        {/* Expandable Details */}
-        {expanded && (
-          <View
-            style={{ marginTop: 14, borderTopWidth: 1, borderTopColor: '#eee', paddingTop: 12 }}
-          >
-            {filteredKeys.length === 0 ? (
-              <Text style={{ fontStyle: 'italic', color: '#999' }}>No extra details</Text>
-            ) : (
-              filteredKeys.map(renderDetailRow)
-            )}
-          </View>
-        )}
-
-        <TouchableOpacity
-          onPress={() => setExpanded(!expanded)}
-          style={{
-            position: 'absolute',
-            right: -16,
-            backgroundColor: '#f0f0f0',
-            borderRadius: 60,
-            paddingHorizontal: 12,
-            paddingVertical: 4,
-            marginTop: -2,
-            alignItems: 'center',
-          }}
-        >
-          <Text
-            style={{ color: '#b1b4b8ff', fontWeight: '600', textAlign: 'center', fontSize: 14 }}
-          >
-            {expanded ? '▲' : '▼'}
-          </Text>
-        </TouchableOpacity>
-
-        {/* Buttons  "01 Jan 2025"  "1/22/2025 12:00:00 AM" */}
         {btnKeys.length > 0 && (
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginTop: 14, gap: 8 }}>
             {btnKeys.map((key, idx) => {
-              const label = item[key] || 'Action';
-              const [, , hex] = key.split('_');
+              const actionValue = item[key];
+              const { label, color } = getButtonMeta(key);
 
               return (
                 <TouchableOpacity
                   key={`${key}-${idx}`}
                   style={{
-                    backgroundColor: `#${hex}`,
+                    backgroundColor: color,
                     paddingHorizontal: 12,
                     paddingVertical: 8,
                     borderRadius: 6,
@@ -565,11 +481,9 @@ const ListScreen = () => {
                     maxWidth: (screenWidth - 64) / 2,
                     alignItems: 'center',
                   }}
-                  onPress={() => Alert.alert(`${label} pressed`)}
+                  onPress={() => Alert.alert(`${label} pressed`, `Value: ${actionValue}`)}
                 >
-                  <Text style={{ color: '#fff', fontWeight: '600', fontSize: 13 }}>
-                    {label.split('_')[0]}
-                  </Text>
+                  <Text style={{ color: '#fff', fontWeight: '600', fontSize: 13 }}>{label}</Text>
                 </TouchableOpacity>
               );
             })}
@@ -581,66 +495,69 @@ const ListScreen = () => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.searchContainer}>
-        <View style={styles.searchInputContainer}>
-          <Text style={styles.searchIcon}>🔍</Text>
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Search in list..."
-            value={searchQuery}
-            onChangeText={handleSearchChange}
-            placeholderTextColor="#6C757D"
-          />
-          {searchQuery.length > 0 && (
-            <TouchableOpacity onPress={clearSearch} style={styles.clearButton}>
-              <Text style={styles.clearButtonText}>✕</Text>
-            </TouchableOpacity>
+      {isFilterVisible && (
+        <View >
+          <View style={styles.searchContainer}>
+            <View style={styles.searchInputContainer}>
+              <Text style={styles.searchIcon}>🔍</Text>
+              <TextInput
+                style={styles.searchInput}
+                placeholder="Search in list..."
+                value={searchQuery}
+                onChangeText={handleSearchChange}
+                placeholderTextColor="#6C757D"
+              />
+              {searchQuery.length > 0 && (
+                <TouchableOpacity onPress={clearSearch} style={styles.clearButton}>
+                  <Text style={styles.clearButtonText}>✕</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          </View>
+
+          <View style={styles.dateContainer}>
+            <View style={styles.dateRow}>
+              <Text style={styles.dateLabel}>From Date:</Text>
+              <TouchableOpacity
+                onPress={() => setShowDatePicker({ type: 'from', show: true })}
+                style={styles.dateButton}
+              >
+                <Text style={styles.dateButtonText}>{fromDate || 'Select Date'}</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.dateRow}>
+              <Text style={styles.dateLabel}>To Date:</Text>
+              <TouchableOpacity
+                onPress={() => setShowDatePicker({ type: 'to', show: true })}
+                style={styles.dateButton}
+              >
+                <Text style={styles.dateButtonText}>{toDate || 'Select Date'}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          {showDatePicker?.show && (
+            <DateTimePicker
+              value={
+                showDatePicker?.type === 'from' && fromDate ? parseCustomDate(fromDate) : new Date()
+              }
+              mode="date"
+              onChange={handleDateChange}
+              minimumDate={
+                showDatePicker?.type === 'from'
+                  ? new Date(new Date().getFullYear(), new Date().getMonth(), 1)
+                  : new Date()
+              }
+              maximumDate={showDatePicker?.type === 'from' ? new Date() : undefined}
+            />
           )}
         </View>
-      </View>
-
-      <View style={styles.dateContainer}>
-        <View style={styles.dateRow}>
-          <Text style={styles.dateLabel}>From Date:</Text>
-          <TouchableOpacity
-            onPress={() => setShowDatePicker({ type: 'from', show: true })}
-            style={styles.dateButton}
-          >
-            <Text style={styles.dateButtonText}>{fromDate || 'Select Date'}</Text>
-          </TouchableOpacity>
-        </View>
-        <View style={styles.dateRow}>
-          <Text style={styles.dateLabel}>To Date:</Text>
-          <TouchableOpacity
-            onPress={() => setShowDatePicker({ type: 'to', show: true })}
-            style={styles.dateButton}
-          >
-            <Text style={styles.dateButtonText}>{toDate || 'Select Date'}</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      {showDatePicker?.show && (
-        <DateTimePicker
-          value={
-            showDatePicker?.type === 'from' && fromDate ? parseCustomDate(fromDate) : new Date()
-          }
-          mode="date"
-          onChange={handleDateChange}
-          minimumDate={
-            showDatePicker?.type === 'from'
-              ? new Date(new Date().getFullYear(), new Date().getMonth(), 1)
-              : new Date()
-          }
-          maximumDate={showDatePicker?.type === 'from' ? new Date() : undefined}
-        />
       )}
 
       {!!error ? (
         <ErrorMessage message={error} />
       ) : (
         <>
-          {' '}
           {loadingListId ? (
             <FullViewLoader />
           ) : (
@@ -666,14 +583,37 @@ const ListScreen = () => {
                     </View>
                   ) : null
                 }
+                ListFooterComponent={
+                  filteredData.length > 0 && totalAmount > 0 ? (
+                    <View
+                      style={{
+                        marginTop: 16,
+                        padding: 16,
+                        borderRadius: 8,
+                        backgroundColor: '#f1f1f1',
+                        borderWidth: 1,
+                        borderColor: '#ddd',
+                        marginBottom: 28
+                      }}
+                    >
+                      <Text style={{ fontSize: 16, fontWeight: '700', color: '#333' }}>
+                        Total Amount
+                      </Text>
+                      <Text
+                        style={{ fontSize: 20, fontWeight: 'bold', color: '#28a745', marginTop: 4 }}
+                      >
+                        ₹ {totalAmount.toFixed(2)}
+                      </Text>
+                    </View>
+                  ) : null
+                }
               />
             </>
           )}
         </>
       )}
-
       <TouchableOpacity style={styles.addButton} onPress={() => Alert.alert('Add button clicked')}>
-        <Text style={styles.addButtonText}>+ New</Text>
+        <Text style={styles.addButtonText}>New</Text>
       </TouchableOpacity>
     </View>
   );
