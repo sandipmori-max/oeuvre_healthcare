@@ -7,6 +7,7 @@ import { Account } from '../../../../../store/slices/auth/type';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { DevERPService } from '../../../../../services/api';
 import CustomAlert from '../../../../../components/alert/CustomAlert';
+import { ERP_ICON } from '../../../../../assets';
 
 interface AccountSwitcherProps {
   visible: boolean;
@@ -64,6 +65,9 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
             await AsyncStorage.setItem('auth_token', item?.user?.token || '');
             DevERPService.setToken(item?.user?.token || '');
             handleSwitchAccount(item?.id);
+          } else {
+            await DevERPService.getAuth(true);
+            handleSwitchAccount(item?.id);
           }
         }}
       >
@@ -102,11 +106,10 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
     >
       <View style={styles.container}>
         <View style={styles.header}>
-          <Text style={styles.title}>Switch Account</Text>
-
           <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-            <Text style={styles.closeButtonText}>✖ Cancel</Text>
+            <Image source={ERP_ICON.BACK} style={styles.back} />
           </TouchableOpacity>
+          <Text style={styles.title}>Switch Account</Text>
         </View>
 
         <FlatList

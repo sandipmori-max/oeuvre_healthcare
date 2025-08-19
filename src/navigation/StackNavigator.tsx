@@ -11,78 +11,73 @@ import PrivacyPolicyScreen from '../screens/dashboard/privacy/PrivacyPolicyScree
 import WebScreen from '../screens/dashboard/web/WebScreen';
 import ListScreen from '../screens/dashboard/list_page/ListScreen';
 import PageScreen from '../screens/dashboard/page/Page';
+import { Image } from 'react-native';
+import { ERP_ICON } from '../assets';
 
 const Stack = createStackNavigator<any>();
 
 const StackNavigator = () => {
+
+  const screenOptions = {
+          headerShown: true,
+          headerBackImage: () => (
+            <Image
+              source={ERP_ICON.BACK}
+              style={{ width: 24, height: 24, marginLeft: 10 }}
+              resizeMode="contain"
+            />
+          ),
+  };
+
   return (
     <Stack.Navigator
       screenOptions={{
         headerShown: false,
-        headerStyle: {
-         },
+        headerStyle: {},
       }}
     >
+      <Stack.Screen name="Drawer" component={DrawerNavigator} />
       <Stack.Screen
-      
-      name="Drawer" component={DrawerNavigator} />
-      <Stack.Screen
-        options={{
-          headerShown: true,
-        }}
+        options={screenOptions}
         name="Settings"
         component={SettingsScreen}
       />
       <Stack.Screen name="Home" component={TabNavigator} />
       <Stack.Screen
-        options={{
-          headerShown: true,
-        }}
+        options={screenOptions}
         name="Attendance"
         component={AttendanceScreen}
       />
       <Stack.Screen
-        options={{
-          headerShown: true,
-        }}
+        options={screenOptions}
         name="Display"
         component={DisplayScreen}
       />
       <Stack.Screen
-        options={{
-          headerShown: true,
-        }}
+        options={screenOptions}
         name="Alert"
         component={AlertScreen}
       />
       <Stack.Screen
-        options={{
-          headerShown: true,
-        }}
+        options={screenOptions}
         name="Privacy Policy"
         component={PrivacyPolicyScreen}
       />
 
       <Stack.Screen
-        options={{
-          headerShown: true,
-        }}
+        options={screenOptions}
         name="Web"
         component={WebScreen}
       />
 
       <Stack.Screen
-        options={{
-          headerShown: true,
-        }}
+        options={screenOptions}
         name="Page"
         component={PageScreen}
       />
 
       <Stack.Screen
-        options={{
-          headerShown: true,
-        }}
+        options={screenOptions}
         name="List"
         component={ListScreen}
       />

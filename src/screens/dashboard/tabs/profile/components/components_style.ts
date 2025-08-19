@@ -8,22 +8,25 @@ export const styles = StyleSheet.create({
   },
   header: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
     padding: 20,
     backgroundColor: ERP_COLOR_CODE.ERP_WHITE,
     borderBottomWidth: 1,
     borderBottomColor: ERP_COLOR_CODE.ERP_BORDER,
   },
+  back:{
+    width: 24,
+    height: 24,
+    tintColor: ERP_COLOR_CODE.ERP_BLACK,
+  },
   title: {
-    fontSize: 20,
+    fontSize: 16,
     fontWeight: 'bold',
     color: '#333',
   },
   closeButton: {
-    paddingHorizontal: 15,
+    paddingHorizontal: 12,
     paddingVertical: 8,
-    backgroundColor: ERP_COLOR_CODE.ERP_CANCEL_BUTTON,
     borderRadius: 8,
   },
   closeButtonText: {

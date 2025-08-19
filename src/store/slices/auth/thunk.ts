@@ -318,11 +318,11 @@ export const getERPPageThunk = createAsyncThunk(
 export const getERPListDataThunk = createAsyncThunk(
   'auth/getERPListData',
   async (
-    { page, fromDate, toDate }: { page: string; fromDate: string; toDate: string },
+    { page, fromDate, toDate, param }: { page: string; fromDate: string; toDate: string , param?: string },
     { rejectWithValue },
   ) => {
     try {
-      const listData = await DevERPService.getListData(page, fromDate, toDate);
+      const listData = await DevERPService.getListData(page, fromDate, toDate, param);
       return listData;
     } catch (error: any) {
       return rejectWithValue(error?.message || 'Failed to get ERP list data');

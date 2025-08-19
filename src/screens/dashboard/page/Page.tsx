@@ -7,6 +7,7 @@ import { formatHeaderTitle } from '../../../utils/helpers';
 import FullViewLoader from '../../../components/loader/FullViewLoader';
 import NoData from '../../../components/no_data/NoData';
 import { styles } from './page_style';
+import ErrorMessage from '../../../components/error/Error';
 
 type PageRouteParams = { PageScreen: { item: any } };
 
@@ -92,7 +93,7 @@ const PageScreen = () => {
   return (
     <View style={styles.container}>
       {!!error ? (
-        <Text style={styles.errorText}>{error}</Text>
+       <ErrorMessage message={error} />
       ) : (
         <>
           {loadingPageId ? (

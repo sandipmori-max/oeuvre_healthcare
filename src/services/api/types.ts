@@ -97,7 +97,8 @@ export interface ListDataRequest {
   token: string;
   page: string;
   fd: string; // from date
-  td: string; // to date
+  td: string; // to date,
+  param?: string; // additional parameter
 }
 
 export interface ListDataResponse {
