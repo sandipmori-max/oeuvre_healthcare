@@ -76,26 +76,29 @@ export const requestCameraAndLocationPermission = async (): Promise<boolean> => 
 };
 
 export function formatDateToDDMMMYYYY(dateStr: string): string {
+  const formatDate = (date: Date): string => {
+    const today = new Date();
+    const isToday =
+      date.getDate() === today.getDate() &&
+      date.getMonth() === today.getMonth() &&
+      date.getFullYear() === today.getFullYear();
+
+    if (isToday) return 'Today';
+
+    const day = String(date.getDate()).padStart(2, '0');
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const month = monthNames[date.getMonth()];
+    const year = date.getFullYear();
+    return `${day} ${month} ${year}`;
+  };
+
   const dmyRegex = /^(\d{1,2}) (\w{3}) (\d{4})$/;
   const dmyMatch = dateStr.match(dmyRegex);
   if (dmyMatch) {
     const [, dayStr, monthStr, yearStr] = dmyMatch;
     const day = parseInt(dayStr, 10);
     const year = parseInt(yearStr, 10);
-    const monthNames = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-    ];
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     const month = monthNames.findIndex(m => m.toLowerCase() === monthStr.toLowerCase());
     if (month >= 0) {
       const date = new Date(year, month, day);
@@ -113,21 +116,10 @@ export function formatDateToDDMMMYYYY(dateStr: string): string {
     day = day.padStart(2, '0');
 
     let h = parseInt(hour, 10);
-    if (ampm.toUpperCase() === 'PM' && h < 12) {
-      h += 12;
-    } else if (ampm.toUpperCase() === 'AM' && h === 12) {
-      h = 0;
-    }
+    if (ampm.toUpperCase() === 'PM' && h < 12) h += 12;
+    if (ampm.toUpperCase() === 'AM' && h === 12) h = 0;
 
-    const date = new Date(
-      parseInt(year, 10),
-      parseInt(month, 10) - 1,
-      parseInt(day, 10),
-      h,
-      parseInt(minute, 10),
-      parseInt(second, 10),
-    );
-
+    const date = new Date(parseInt(year, 10), parseInt(month, 10) - 1, parseInt(day, 10), h, parseInt(minute, 10), parseInt(second, 10));
     if (!isNaN(date.getTime())) {
       return formatDate(date);
     }
@@ -140,6 +132,31 @@ export function formatDateToDDMMMYYYY(dateStr: string): string {
 
   return ''; // invalid date fallback
 }
+
+export function formatTimeTo12Hour(dateStr: string): string {
+  const mdYRegex = /^(\d{1,2})\/(\d{1,2})\/(\d{4}) (\d{1,2}):(\d{2}):(\d{2}) (\w{2})$/;
+  const match = dateStr.match(mdYRegex);
+  if (match) {
+    let [, month, day, year, hour, minute, , ampm] = match;
+    hour = hour.padStart(2, '0');
+    minute = minute.padStart(2, '0');
+    return `${hour}:${minute} ${ampm.toUpperCase()}`;
+  }
+
+  // Fallback: try parsing with Date
+  const fallbackDate = new Date(dateStr);
+  if (!isNaN(fallbackDate.getTime())) {
+    const hours = fallbackDate.getHours();
+    const minutes = fallbackDate.getMinutes();
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    const hour12 = hours % 12 || 12;
+    const paddedMinutes = minutes.toString().padStart(2, '0');
+    return `${hour12}:${paddedMinutes} ${ampm}`;
+  }
+
+  return '';
+}
+
 
 function formatDate(date: Date): string {
   const day = date.getDate().toString().padStart(2, '0');
@@ -161,3 +178,13 @@ function formatDate(date: Date): string {
   const year = date.getFullYear();
   return `${day} ${month} ${year}`;
 }
+
+ export const findKeyByKeywords = (obj: any, keywords: string[]) => {
+    if (!obj) return null;
+    const lowerKeys = Object.keys(obj).map(k => k.toLowerCase());
+    for (const keyword of keywords) {
+      const found = lowerKeys.find(k => k.includes(keyword.toLowerCase()));
+      if (found) return found;
+    }
+    return null;
+  };

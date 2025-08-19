@@ -23,6 +23,10 @@ const BOOK_MARK = require(`${ERP_BASE_URL_ICONS}/bookmark.png`);
 const All = require(`${ERP_BASE_URL_ICONS}/all.png`);
 const GRID = require(`${ERP_BASE_URL_ICONS}/grid.png`);
 const LIST = require(`${ERP_BASE_URL_ICONS}/list.png`);
+const FILTER = require(`${ERP_BASE_URL_ICONS}/filter.png`);
+const FILTER_ACTIVE = require(`${ERP_BASE_URL_ICONS}/filter_active.png`);
+
+
 
 
 const ERROR = require(`${ERP_BASE_URL_GIF}/error.gif`);
@@ -54,6 +58,8 @@ export const ERP_ICON = {
     All,
     GRID,
     LIST,
+    FILTER,
+    FILTER_ACTIVE
 };
 
 export const ERP_GIF = {
