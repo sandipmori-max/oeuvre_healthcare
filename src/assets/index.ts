@@ -18,7 +18,11 @@ const WHITE_ACTIVE_HOME = require(`${ERP_BASE_URL_ICONS}/white_selected_home.png
 const WHITE_HOME = require(`${ERP_BASE_URL_ICONS}/white_home.png`);
 const BACK = require(`${ERP_BASE_URL_ICONS}/back.png`);
 const ERROR_ICON = require(`${ERP_BASE_URL_ICONS}/error.png`);
-
+const BOOK_MARK_DONE = require(`${ERP_BASE_URL_ICONS}/bookmark_done.png`);
+const BOOK_MARK = require(`${ERP_BASE_URL_ICONS}/bookmark.png`);
+const All = require(`${ERP_BASE_URL_ICONS}/all.png`);
+const GRID = require(`${ERP_BASE_URL_ICONS}/grid.png`);
+const LIST = require(`${ERP_BASE_URL_ICONS}/list.png`);
 
 
 const ERROR = require(`${ERP_BASE_URL_GIF}/error.gif`);
@@ -44,7 +48,12 @@ export const ERP_ICON = {
     WHITE_ACTIVE_HOME,
     WHITE_HOME,
     BACK,
-    ERROR_ICON
+    ERROR_ICON,
+    BOOK_MARK_DONE,
+    BOOK_MARK,
+    All,
+    GRID,
+    LIST,
 };
 
 export const ERP_GIF = {

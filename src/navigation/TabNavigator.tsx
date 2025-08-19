@@ -51,9 +51,7 @@ const TabNavigator = () => {
         options={{
           tabBarLabel: t('navigation.home'),
           title: t('navigation.home'),
-          
           headerStyle: {
-            
             backgroundColor: theme === 'dark' ? '#000' : ERP_COLOR_CODE.ERP_ACTIVE_BACKGROUND,
           },
           tabBarLabelStyle: {
@@ -66,7 +64,7 @@ const TabNavigator = () => {
           ),
         }}
       />
-      <Tab.Screen
+     <Tab.Screen
         name="Entry"
         component={EntryTab}
         options={{
@@ -82,6 +80,7 @@ const TabNavigator = () => {
           ),
         }}
       />
+
       <Tab.Screen
         name="Report"
         component={ReportTab}
