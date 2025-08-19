@@ -22,6 +22,7 @@ import FullViewLoader from '../../../components/loader/FullViewLoader';
 import NoData from '../../../components/no_data/NoData';
 import { ListRouteParams } from './types';
 import { ERP_ICON } from '../../../assets';
+import ErrorMessage from '../../../components/error/Error';
 
 const ListScreen = () => {
   const navigation = useNavigation();
@@ -174,6 +175,7 @@ const ListScreen = () => {
     ].indexOf(monthStr);
     return new Date(Number(year), month, Number(day));
   };
+
   const handleDateChange = (event: any, selectedDate?: Date) => {
     if (event.type === 'dismissed' || !selectedDate) {
       setShowDatePicker(null);
@@ -225,6 +227,7 @@ const ListScreen = () => {
             page: item.name,
             fromDate: fromDateStr,
             toDate: toDateStr,
+            param: '',
           }),
         ).unwrap();
 
@@ -281,6 +284,7 @@ const ListScreen = () => {
     const key = status.toLowerCase();
     return statusColors[key] || statusColors.default;
   };
+
   const findKeyByKeywords = (obj: any, keywords: string[]) => {
     if (!obj) return null;
     const lowerKeys = Object.keys(obj).map(k => k.toLowerCase());
@@ -292,7 +296,7 @@ const ListScreen = () => {
   };
 
   const SOCIAL_KEYS = ['linkedin', 'facebook', 'twitter', 'instagram', 'github', 'website'];
-  
+
   const RenderCard = ({ item, index }: any) => {
     const [expanded, setExpanded] = useState(false);
 
@@ -417,7 +421,8 @@ const ListScreen = () => {
     return (
       <View
         style={{
-          backgroundColor: item?.success === '1' ? '#f2f7f0ff' : '#fff',
+          backgroundColor:
+            item?.success === '1' ? '#f2f7f0ff' : status === 'DeActive' ? '#fae7e7ff' : '#fff',
           borderRadius: 8,
           padding: 16,
           marginVertical: 4,
@@ -452,15 +457,16 @@ const ListScreen = () => {
             </Text>
           </View>
 
-          <View style={{
-            alignSelf:'flex-end',
-            alignContent:'flex-end',
-            alignItems:'flex-end',
-            justifyContent:'flex-end',
-
-          }}>
+          <View
+            style={{
+              alignSelf: 'flex-end',
+              alignContent: 'flex-end',
+              alignItems: 'flex-end',
+              justifyContent: 'flex-end',
+            }}
+          >
             {!!date && <Text style={{ fontWeight: '600' }}>{formatDateToDDMMMYYYY(date)}</Text>}
-            {!!date && <Text style={{ color:'#9c9696ff' }}>12:00 AM</Text>}
+            {!!date && <Text style={{ color: '#9c9696ff' }}>12:00 AM</Text>}
           </View>
         </TouchableOpacity>
 
@@ -468,10 +474,42 @@ const ListScreen = () => {
         {(remarks || address || amount) && (
           <View style={{ marginTop: 12 }}>
             {!!remarks && (
-              <Text style={{ color: '#777', fontStyle: 'italic', marginBottom: 6 }}>{remarks}</Text>
+              <Text
+                numberOfLines={2}
+                style={{
+                  color: '#777',
+                  fontStyle: 'italic',
+                  marginBottom: 6,
+                }}
+              >
+                {remarks}
+              </Text>
             )}
-            {!!address && <Text style={{ color: '#444', marginBottom: 6 }}>📍 {address}</Text>}
-            {!!amount && <Text style={{ fontWeight: '700', color: '#28a745' }}>💰 {amount}</Text>}
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+              <View style={{ width: '70%' }}>
+                {!!address && (
+                  <Text
+                    numberOfLines={2}
+                    style={{
+                      color: '#444',
+                    }}
+                  >
+                    📍 {address}
+                  </Text>
+                )}
+              </View>
+              <View style={{ 
+                width: '30%', 
+                justifyContent: 'flex-end', alignItems: 'flex-end' }}>
+                {!!amount && (
+                  <Text
+                  numberOfLines={1}
+                  style={{
+                    textAlign: 'right', fontSize: 16,
+                    fontWeight: '700', color: '#28a745' }}>💰 {amount}</Text>
+                )}
+              </View>
+            </View>
           </View>
         )}
 
@@ -490,17 +528,26 @@ const ListScreen = () => {
 
         <TouchableOpacity
           onPress={() => setExpanded(!expanded)}
-          style={{ marginTop: 12, alignItems: 'center' }}
+          style={{
+            position: 'absolute',
+            right: -16,
+            backgroundColor: '#f0f0f0',
+            borderRadius: 60,
+            paddingHorizontal: 12,
+            paddingVertical: 4,
+            marginTop: -2,
+            alignItems: 'center',
+          }}
         >
           <Text
             style={{ color: '#b1b4b8ff', fontWeight: '600', textAlign: 'center', fontSize: 14 }}
           >
-            {expanded ? 'Hide Details ▲' : 'Show Details ▼'}
+            {expanded ? '▲' : '▼'}
           </Text>
         </TouchableOpacity>
 
         {/* Buttons  "01 Jan 2025"  "1/22/2025 12:00:00 AM" */}
-        {expanded && btnKeys.length > 0 && (
+        {btnKeys.length > 0 && (
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginTop: 14, gap: 8 }}>
             {btnKeys.map((key, idx) => {
               const label = item[key] || 'Action';
@@ -590,7 +637,7 @@ const ListScreen = () => {
       )}
 
       {!!error ? (
-        <Text style={styles.errorText}>{error}</Text>
+        <ErrorMessage message={error} />
       ) : (
         <>
           {' '}

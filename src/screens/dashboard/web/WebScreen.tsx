@@ -65,7 +65,7 @@ const WebScreen = () => {
     console.log('🚀 ~ WebScreen ~ normalizedBase:', normalizedBase);
 
     const separator = fullUrl.includes('?') ? '/' : '?';
-    return `${fullUrl}${separator}token=${token}`;
+    return `${fullUrl}${separator}&token=${token}`;
   }, [baseLink, item?.url, token]);
   console.log('🚀 ~ WebScreen ~ targetUrl:', targetUrl);
 

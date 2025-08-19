@@ -117,10 +117,10 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
     >
       <View style={styles.container}>
         <View style={styles.header}>
-          <Text style={styles.title}>Add Account</Text>
           <TouchableOpacity onPress={handleClose} style={styles.closeButton}>
-            <Text style={styles.closeButtonText}>✖ Cancel</Text>
+            <Image source={ERP_ICON.BACK} style={styles.back} />
           </TouchableOpacity>
+          <Text style={styles.title}>Add Account</Text>
         </View>
 
         <View style={styles.formContainer}>

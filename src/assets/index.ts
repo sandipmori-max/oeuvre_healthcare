@@ -16,6 +16,10 @@ const ACTIVE_PROFILE = require(`${ERP_BASE_URL_ICONS}/active_user.png`);
 const REFRESH = require(`${ERP_BASE_URL_ICONS}/refresh.png`);
 const WHITE_ACTIVE_HOME = require(`${ERP_BASE_URL_ICONS}/white_selected_home.png`);
 const WHITE_HOME = require(`${ERP_BASE_URL_ICONS}/white_home.png`);
+const BACK = require(`${ERP_BASE_URL_ICONS}/back.png`);
+const ERROR_ICON = require(`${ERP_BASE_URL_ICONS}/error.png`);
+
+
 
 const ERROR = require(`${ERP_BASE_URL_GIF}/error.gif`);
 const LOADING = require(`${ERP_BASE_URL_GIF}/loader.gif`);
@@ -38,7 +42,9 @@ export const ERP_ICON = {
     ACTIVE_PROFILE,
     REFRESH,
     WHITE_ACTIVE_HOME,
-    WHITE_HOME
+    WHITE_HOME,
+    BACK,
+    ERROR_ICON
 };
 
 export const ERP_GIF = {
@@ -47,5 +53,5 @@ export const ERP_GIF = {
     SEARCH_LOADER,
     NO_DATA,
     NO_INTERNET,
-    SUCCESS
+    SUCCESS,
 };

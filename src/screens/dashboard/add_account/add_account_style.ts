@@ -6,11 +6,15 @@ export const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: ERP_COLOR_CODE.ERP_BACKGROUND,
   },
+  back:{
+    width: 24,
+    height: 24,
+    tintColor: ERP_COLOR_CODE.ERP_BLACK,
+  },
   header: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 20,
+    paddingHorizontal: 12,
     paddingVertical: 15,
     backgroundColor: ERP_COLOR_CODE.ERP_WHITE,
     borderBottomWidth: 1,
@@ -22,12 +26,11 @@ export const styles = StyleSheet.create({
     shadowRadius: 3,
   },
   title: {
-    fontSize: 22,
+    fontSize: 16,
     fontWeight: '700',
     color: '#222',
   },
   closeButton: {
-    backgroundColor: ERP_COLOR_CODE.ERP_CANCEL_BUTTON,
     paddingVertical: 6,
     paddingHorizontal: 14,
     borderRadius: 6,

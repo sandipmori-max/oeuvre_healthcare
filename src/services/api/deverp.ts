@@ -1,3 +1,4 @@
+import { createAccountsTable, getActiveAccount, getDBConnection } from '../../utils/sqlite';
 import apiClient from './config';
 import {
   DevERPRequest,
@@ -152,6 +153,37 @@ class DevERPService {
 
         await AsyncStorage.setItem('erp_token', this.token);
         await AsyncStorage.setItem('erp_token_valid_till', this.tokenValidTill);
+        const db = await getDBConnection();
+
+        // ✅ Check if erp_accounts table exists
+        const tableCheckResult = await db.executeSql(
+          `SELECT name FROM sqlite_master WHERE type='table' AND name=?`,
+          ['erp_accounts']
+        );
+
+        if (tableCheckResult[0].rows.length > 0) {
+          const activeAccount = await getActiveAccount(db);
+
+          if (activeAccount) {
+            const updatedUser = {
+              ...activeAccount.user,
+              token: this.token,
+              tokenValidTill: this.tokenValidTill,
+            };
+
+             await db.executeSql(
+                `UPDATE erp_accounts SET user_json = ? WHERE id = ?`,
+                [JSON.stringify(updatedUser), activeAccount.id]
+              );
+
+            console.log('🟢 Active account updated with new token in SQLite');
+          } else {
+            console.log('ℹ️ No active account to update');
+          }
+        } else {
+          console.log('⚠️ erp_accounts table does not exist — skipping token update');
+        }
+
 
         return this.token;
       } else {
@@ -347,7 +379,7 @@ class DevERPService {
     }
   }
 
-  async getListData(page: string, fromDate: string, toDate: string): Promise<string> {
+  async getListData(page: string, fromDate: string, toDate: string, param: string): Promise<string> {
     try {
       const netInfo = await NetInfo.fetch();
       if (!netInfo.isConnected) {
@@ -381,6 +413,7 @@ class DevERPService {
         page: page,
         fd: fromDate,
         td: toDate,
+        param: param || '',
       };
 
       const response = await apiClient.post<ListDataResponse>(
