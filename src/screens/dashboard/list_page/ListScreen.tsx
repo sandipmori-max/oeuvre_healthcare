@@ -63,7 +63,7 @@ const ListScreen = () => {
             }}
             style={{ marginRight: 12 }}
           >
-            <Image source={ERP_ICON.REFRESH} style={{ width: 32, height: 38 }} alt="Refresh Icon" />
+            <Image source={ERP_ICON.REFRESH} style={{ width: 28, height: 32 }} alt="Refresh Icon" />
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
@@ -74,7 +74,7 @@ const ListScreen = () => {
             <Image
               resizeMode="contain"
               source={!isTableView ? ERP_ICON.TABLE : ERP_ICON.ROW_LIST}
-              style={{ width: 32, height: !isTableView  ? 31 : 34 }}
+              style={{ width: 26, height: 28 }}
               alt="Refresh Icon"
             />
           </TouchableOpacity>
@@ -96,7 +96,7 @@ const ListScreen = () => {
                   : ERP_ICON.FILTER
               }
               resizeMode="contain"
-              style={{ width: !hasDateField ? 32 : 34, height: !hasDateField ? 32 : 36 }}
+              style={{ width: !hasDateField ? 28 : 30, height: !hasDateField ? 30 : 32 }}
               alt="Refresh Icon"
             />
           </TouchableOpacity>
