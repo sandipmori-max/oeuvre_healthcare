@@ -4,16 +4,19 @@ export const styles = StyleSheet.create({
   header: {
     padding: 20,
     alignItems: 'center',
+    backgroundColor:'#251d50ff',
+    borderTopRightRadius: 48,
+    borderBottomLeftRadius: 48
   },
   profileImage: {
     width: 80,
     height: 80,
     borderRadius: 40,
     marginBottom: 10,
-    backgroundColor: '#000',
+    backgroundColor: '#fff',
   },
   username: {
-    color: '#000',
+    color: '#fff',
     fontSize: 18,
     fontWeight: 'bold',
   },
@@ -44,9 +47,9 @@ export const styles = StyleSheet.create({
     marginVertical: 6,
   },
   activeItemBackground: {
-    backgroundColor: '#e6f0ff',
+    backgroundColor: '#372C78ff',
     borderLeftWidth: 4,
-    borderLeftColor: '#007AFF',
+    borderLeftColor: '#251d50ff',
     borderRadius: 8,
   },
   logoutButton: {
