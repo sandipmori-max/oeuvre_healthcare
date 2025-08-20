@@ -17,16 +17,24 @@ import { ERP_ICON } from '../assets';
 const Stack = createStackNavigator<any>();
 
 const StackNavigator = () => {
-
   const screenOptions = {
-          headerShown: true,
-          headerBackImage: () => (
-            <Image
-              source={ERP_ICON.BACK}
-              style={{ width: 24, height: 24, marginLeft: 10 }}
-              resizeMode="contain"
-            />
-          ),
+    headerShown: true,
+    headerBackImage: () => (
+      <Image
+        source={ERP_ICON.BACK}
+        style={{ width: 24, height: 24, marginLeft: 10, tintColor: 'white' }}
+        resizeMode="contain"
+      />
+    ),
+    headerStyle: {
+      backgroundColor: '#251d50ff',
+    },
+    headerTintColor: '#fff',
+    headerTitleStyle: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      color: '#fff',
+    },
   };
 
   return (
@@ -37,50 +45,18 @@ const StackNavigator = () => {
       }}
     >
       <Stack.Screen name="Drawer" component={DrawerNavigator} />
-      <Stack.Screen
-        options={screenOptions}
-        name="Settings"
-        component={SettingsScreen}
-      />
+      <Stack.Screen options={screenOptions} name="Settings" component={SettingsScreen} />
       <Stack.Screen name="Home" component={TabNavigator} />
-      <Stack.Screen
-        options={screenOptions}
-        name="Attendance"
-        component={AttendanceScreen}
-      />
-      <Stack.Screen
-        options={screenOptions}
-        name="Display"
-        component={DisplayScreen}
-      />
-      <Stack.Screen
-        options={screenOptions}
-        name="Alert"
-        component={AlertScreen}
-      />
-      <Stack.Screen
-        options={screenOptions}
-        name="Privacy Policy"
-        component={PrivacyPolicyScreen}
-      />
+      <Stack.Screen options={screenOptions} name="Attendance" component={AttendanceScreen} />
+      <Stack.Screen options={screenOptions} name="Display" component={DisplayScreen} />
+      <Stack.Screen options={screenOptions} name="Alert" component={AlertScreen} />
+      <Stack.Screen options={screenOptions} name="Privacy Policy" component={PrivacyPolicyScreen} />
 
-      <Stack.Screen
-        options={screenOptions}
-        name="Web"
-        component={WebScreen}
-      />
+      <Stack.Screen options={screenOptions} name="Web" component={WebScreen} />
 
-      <Stack.Screen
-        options={screenOptions}
-        name="Page"
-        component={PageScreen}
-      />
+      <Stack.Screen options={screenOptions} name="Page" component={PageScreen} />
 
-      <Stack.Screen
-        options={screenOptions}
-        name="List"
-        component={ListScreen}
-      />
+      <Stack.Screen options={screenOptions} name="List" component={ListScreen} />
     </Stack.Navigator>
   );
 };
