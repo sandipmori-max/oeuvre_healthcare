@@ -1,18 +1,16 @@
 import React, { useLayoutEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, Image } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
 
 import AccountSwitcher from './components/AccountSwitcher';
 import { styles } from './profile_style';
 import { useNavigation } from '@react-navigation/native';
-import type { StackNavigationProp } from '@react-navigation/stack';
-import { ProfileStackParamList } from '../../../../navigation/types';
 import { useAppSelector } from '../../../../store/hooks';
 import { firstLetterUpperCase, formatDateMonthDateYear } from '../../../../utils/helpers';
 import AddAccountScreen from '../../add_account/AddAccountScreen';
-import { ERP_ICON } from '../../../../assets';
+import ERPIcon from '../../../../components/icon/ERPIcon';
 
 const ProfileTab = () => {
-  const navigation = useNavigation<StackNavigationProp<ProfileStackParamList>>();
+  const navigation = useNavigation<any>();
   const { user, accounts } = useAppSelector(state => state?.auth);
   const [showAccountSwitcher, setShowAccountSwitcher] = useState(false);
   const [showAddAccount, setShowAddAccount] = useState(false);
@@ -28,24 +26,12 @@ const ProfileTab = () => {
     navigation.setOptions({
       headerRight: () => (
         <>
-          <TouchableOpacity onPress={() => {}} style={{ marginRight: 12 }}>
-            <Image
-              source={ERP_ICON.REFRESH}
-              style={{ width: 28, height: 32, tintColor: 'white' }}
-              alt="Refresh Icon"
-            />
-          </TouchableOpacity>
+          <ERPIcon name="refresh" />
         </>
       ),
       headerLeft: () => (
         <>
-          <TouchableOpacity onPress={() => navigation.openDrawer()} style={{ marginLeft: 12 }}>
-            <Image
-              source={ERP_ICON.MENU}
-              style={{ width: 28, height: 32, tintColor: 'white' }}
-              alt="Refresh Icon"
-            />
-          </TouchableOpacity>
+           <ERPIcon extSize={24} isMenu={true} name="menu" onPress={() => navigation.openDrawer()} />
         </>
       ),
     });
