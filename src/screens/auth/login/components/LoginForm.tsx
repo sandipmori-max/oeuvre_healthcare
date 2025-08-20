@@ -10,6 +10,7 @@ import { LoginFormProps } from '../types';
 import useTranslations from '../../../../hooks/useTranslations';
 import ERPTextInput from '../../../../components/input/ERPTextInput';
 import ERPButton from '../../../../components/button/ERPButton';
+import useFcmToken from '../../../../hooks/useFcmToken';
 
 const LoginForm: React.FC<LoginFormProps> = ({
   appId,
@@ -19,6 +20,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
   showAlert,
 }) => {
   const { t } = useTranslations();
+  const { token: fcmToken, permissionGranted } = useFcmToken(); 
 
   const {
     execute: validateCompanyCode,
@@ -33,12 +35,13 @@ const LoginForm: React.FC<LoginFormProps> = ({
     user: '',
     password: '',
     appid: appId,
-    firebaseid: '',
+    firebaseid: fcmToken,
     device: deviceId,
   };
 
   // Submit handler function
   const handleLoginSubmit = async (values: typeof initialFormValues) => {
+    console.log("🚀 ~ handleLoginSubmit ~ values-------------:", values)
     try {
       const companyValidation = await validateCompanyCode(() =>
         DevERPService.validateCompanyCode(values.company_code),
@@ -56,8 +59,8 @@ const LoginForm: React.FC<LoginFormProps> = ({
         DevERPService.loginToERP({
           user: values.user,
           pass: values.password,
-          appid: values.appid,
-          firebaseid: values.firebaseid,
+          appid: appId,
+          firebaseid: fcmToken || '',
         }),
       );
 
