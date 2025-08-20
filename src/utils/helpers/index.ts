@@ -2,7 +2,7 @@ import { Platform } from 'react-native';
 import { ERP_GIF, ERP_ICON } from '../../assets';
 import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 
-export const getBottomTabIcon = (iconName: string, focused: boolean, theme : any) => {
+export const getBottomTabIcon = (iconName: string, focused: boolean, theme: any) => {
   switch (iconName) {
     case 'home':
       return focused ? ERP_ICON.ACTIVE_HOME : ERP_ICON.HOME;
@@ -86,7 +86,20 @@ export function formatDateToDDMMMYYYY(dateStr: string): string {
     if (isToday) return 'Today';
 
     const day = String(date.getDate()).padStart(2, '0');
-    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const monthNames = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
     const month = monthNames[date.getMonth()];
     const year = date.getFullYear();
     return `${day} ${month} ${year}`;
@@ -98,7 +111,20 @@ export function formatDateToDDMMMYYYY(dateStr: string): string {
     const [, dayStr, monthStr, yearStr] = dmyMatch;
     const day = parseInt(dayStr, 10);
     const year = parseInt(yearStr, 10);
-    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const monthNames = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
     const month = monthNames.findIndex(m => m.toLowerCase() === monthStr.toLowerCase());
     if (month >= 0) {
       const date = new Date(year, month, day);
@@ -119,7 +145,14 @@ export function formatDateToDDMMMYYYY(dateStr: string): string {
     if (ampm.toUpperCase() === 'PM' && h < 12) h += 12;
     if (ampm.toUpperCase() === 'AM' && h === 12) h = 0;
 
-    const date = new Date(parseInt(year, 10), parseInt(month, 10) - 1, parseInt(day, 10), h, parseInt(minute, 10), parseInt(second, 10));
+    const date = new Date(
+      parseInt(year, 10),
+      parseInt(month, 10) - 1,
+      parseInt(day, 10),
+      h,
+      parseInt(minute, 10),
+      parseInt(second, 10),
+    );
     if (!isNaN(date.getTime())) {
       return formatDate(date);
     }
@@ -157,10 +190,9 @@ export function formatTimeTo12Hour(dateStr: string): string {
   return '';
 }
 
-
-function formatDate(date: Date): string {
-  const day = date.getDate().toString().padStart(2, '0');
-  const monthNames = [
+export const parseCustomDate = (dateStr: string): Date => {
+  const [day, monthStr, year] = dateStr.split('-');
+  const month = [
     'Jan',
     'Feb',
     'Mar',
@@ -173,18 +205,23 @@ function formatDate(date: Date): string {
     'Oct',
     'Nov',
     'Dec',
-  ];
-  const month = monthNames[date.getMonth()];
-  const year = date.getFullYear();
-  return `${day} ${month} ${year}`;
-}
+  ].indexOf(monthStr);
+  return new Date(Number(year), month, Number(day));
+};
 
- export const findKeyByKeywords = (obj: any, keywords: string[]) => {
-    if (!obj) return null;
-    const lowerKeys = Object.keys(obj).map(k => k.toLowerCase());
-    for (const keyword of keywords) {
-      const found = lowerKeys.find(k => k.includes(keyword.toLowerCase()));
-      if (found) return found;
-    }
-    return null;
-  };
+export const findKeyByKeywords = (obj: any, keywords: string[]) => {
+  if (!obj) return null;
+  const lowerKeys = Object.keys(obj).map(k => k.toLowerCase());
+  for (const keyword of keywords) {
+    const found = lowerKeys.find(k => k.includes(keyword.toLowerCase()));
+    if (found) return found;
+  }
+  return null;
+};
+
+export const formatDateForAPI = (date: Date): string => {
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = date.toLocaleDateString('en-US', { month: 'short' });
+  const year = date.getFullYear();
+  return `${day}-${month}-${year}`;
+};
