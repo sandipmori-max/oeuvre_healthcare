@@ -1,15 +1,4 @@
-import {
-  Text,
-  View,
-  FlatList,
-  Image,
-  TextInput,
-  TouchableOpacity,
-  Alert,
-  ScrollView,
-  Dimensions,
-  Linking,
-} from 'react-native';
+import { Text, View, Image, TextInput, TouchableOpacity, Alert } from 'react-native';
 import React, { useEffect, useLayoutEffect, useState, useCallback, useMemo } from 'react';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 
@@ -17,17 +6,13 @@ import { useAppDispatch } from '../../../store/hooks';
 import { getERPListDataThunk } from '../../../store/slices/auth/thunk';
 import { styles } from './list_page_style';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import {
-  findKeyByKeywords,
-  formatDateToDDMMMYYYY,
-  formatHeaderTitle,
-  formatTimeTo12Hour,
-} from '../../../utils/helpers';
+import { formatDateForAPI, parseCustomDate } from '../../../utils/helpers';
 import FullViewLoader from '../../../components/loader/FullViewLoader';
-import NoData from '../../../components/no_data/NoData';
 import { ListRouteParams } from './types';
 import { ERP_ICON } from '../../../assets';
 import ErrorMessage from '../../../components/error/Error';
+import TableView from './components/TableView';
+import RedableView from './components/RedableView';
 
 const ListScreen = () => {
   const navigation = useNavigation();
@@ -41,6 +26,7 @@ const ListScreen = () => {
 
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [isFilterVisible, setIsFilterVisible] = useState<boolean>(false);
+  const [isTableView, setIsTableView] = useState<boolean>(false);
 
   const [filteredData, setFilteredData] = useState<any[]>([]);
 
@@ -50,20 +36,21 @@ const ListScreen = () => {
     type: 'from' | 'to';
     show: boolean;
   }>(null);
-  const [refreshing, setRefreshing] = useState(false);
-  const screenWidth = Dimensions.get('window').width;
 
   const route = useRoute<RouteProp<ListRouteParams, 'List'>>();
   const { item } = route.params;
-  console.log('🚀 ~ ListScreen ~ item:', item);
 
   const pageTitle = item?.title || item?.name || 'List Data';
   const pageParamsName = item?.name || 'List Data';
-  console.log('🚀 ~ ListScreen ~ pageParamsName:', pageParamsName);
+
   const totalAmount = filteredData?.reduce((sum, item) => {
     const amount = parseFloat(item?.amount) || 0;
     return sum + amount;
   }, 0);
+
+  const hasDateField = configData.some(
+    item => item.datafield && item.datafield.toLowerCase() === 'date',
+  );
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -74,33 +61,49 @@ const ListScreen = () => {
             onPress={() => {
               onRefresh();
             }}
-            style={{ marginRight: 16 }}
+            style={{ marginRight: 12 }}
           >
-            <Image source={ERP_ICON.REFRESH} style={{ width: 18, height: 18 }} alt="Refresh Icon" />
+            <Image source={ERP_ICON.REFRESH} style={{ width: 32, height: 38 }} alt="Refresh Icon" />
           </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              setIsTableView(!isTableView);
+            }}
+            style={{ marginRight: 12 }}
+          >
+            <Image
+              resizeMode="contain"
+              source={!isTableView ? ERP_ICON.TABLE : ERP_ICON.ROW_LIST}
+              style={{ width: 32, height: !isTableView  ? 31 : 34 }}
+              alt="Refresh Icon"
+            />
+          </TouchableOpacity>
+
           <TouchableOpacity
             onPress={() => {
               setIsFilterVisible(!isFilterVisible);
             }}
-            style={{ marginRight: 16 }}
+            style={{ marginRight: 12 }}
           >
             <Image
-              source={isFilterVisible ? ERP_ICON.FILTER_ACTIVE : ERP_ICON.FILTER}
-              style={{ width: 18, height: 18 }}
+              source={
+                !hasDateField
+                  ? isFilterVisible
+                    ? ERP_ICON.SEARCH_ACTIVE
+                    : ERP_ICON.SEARCH
+                  : isFilterVisible
+                  ? ERP_ICON.FILTER_ACTIVE
+                  : ERP_ICON.FILTER
+              }
+              resizeMode="contain"
+              style={{ width: !hasDateField ? 32 : 34, height: !hasDateField ? 32 : 36 }}
               alt="Refresh Icon"
             />
           </TouchableOpacity>
         </>
       ),
     });
-  }, [navigation, pageTitle, isFilterVisible]);
-
-  const formatDateForAPI = (date: Date): string => {
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = date.toLocaleDateString('en-US', { month: 'short' });
-    const year = date.getFullYear();
-    return `${day}-${month}-${year}`;
-  };
+  }, [navigation, pageTitle, isFilterVisible, hasDateField, isTableView]);
 
   const getCurrentMonthRange = useCallback(() => {
     const now = new Date();
@@ -165,15 +168,10 @@ const ListScreen = () => {
   );
 
   const onRefresh = async () => {
-    console.log('🚀 ~ onRefresh ~ onRefresh:', 'onRefresh');
-
     try {
-      setRefreshing(true);
       await fetchListData(fromDate, toDate);
     } catch (e) {
       console.error('Refresh failed', e);
-    } finally {
-      setRefreshing(false);
     }
   };
 
@@ -185,25 +183,6 @@ const ListScreen = () => {
   const clearSearch = () => {
     setSearchQuery('');
     setFilteredData(listData);
-  };
-
-  const parseCustomDate = (dateStr: string): Date => {
-    const [day, monthStr, year] = dateStr.split('-');
-    const month = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-    ].indexOf(monthStr);
-    return new Date(Number(year), month, Number(day));
   };
 
   const handleDateChange = (event: any, selectedDate?: Date) => {
@@ -245,17 +224,6 @@ const ListScreen = () => {
     }
     setShowDatePicker(null);
   };
-  
-  const getButtonMeta = (key: string) => {
-    if (!key || !configData?.length) return { label: 'Action', color: '#007BFF' };
-
-    const configItem = configData.find(cfg => cfg.datafield?.toLowerCase() === key.toLowerCase());
-
-    return {
-      label: configItem?.headertext || 'Action',
-      color: configItem?.colorcode || '#007BFF',
-    };
-  };
 
   const fetchListData = useCallback(
     async (fromDateStr: string, toDateStr: string) => {
@@ -271,10 +239,7 @@ const ListScreen = () => {
             param: '',
           }),
         ).unwrap();
-        console.log('🚀 ~ raw:', raw);
-
         const parsed = typeof raw === 'string' ? JSON.parse(raw) : raw;
-
         let dataArray = [];
         let configArray = [];
 
@@ -294,8 +259,6 @@ const ListScreen = () => {
             configArray = parsed.config || [];
           }
         }
-        console.log('🚀 ~ configArray:', configArray);
-
         setConfigData(configArray);
         setListData(dataArray);
         setFilteredData(dataArray);
@@ -320,183 +283,10 @@ const ListScreen = () => {
     }
   }, [fromDate, toDate]);
 
-  const RenderCard = ({ item, index }: any) => {
-    if (!item) return null;
-    const name = item['name'] || `Item #${index + 1}`;
-    const subName = item['number'] || `Item #${index + 1}`;
-    const [isRemarksExpanded, setRemarksExpanded] = useState(false);
-
-    const status = item['status'];
-    const date = item['date'];
-    const remarks = item['remarks'];
-    const address = item['address'];
-    const amount = item['amount'];
-
-    const btnKeys = Object.keys(item).filter(key => key.startsWith('btn_'));
-
-    const avatarLetter = name
-      .split('')
-      .filter(Boolean)
-      .slice(0, 2)
-      .map(word => word.charAt(0).toUpperCase())
-      .join('');
-
-    return (
-      <View
-        style={{
-          backgroundColor:
-            item?.success === '1' ? '#f2f7f0ff' : status === 'DeActive' ? '#fae7e7ff' : '#fff',
-          borderRadius: 8,
-          padding: 16,
-          marginVertical: 4,
-          borderWidth: 1,
-          borderColor: '#ddd',
-        }}
-      >
-        <TouchableOpacity
-          activeOpacity={0.8}
-          style={{ flexDirection: 'row', alignItems: 'center' }}
-          onPress={async () => {
-            navigation.navigate('Page', { item, title: pageParamsName });
-          }}
-        >
-          <View
-            style={{
-              width: 48,
-              height: 48,
-              borderRadius: 24,
-              backgroundColor: '#87bcf5ff',
-              justifyContent: 'center',
-              alignItems: 'center',
-              marginRight: 12,
-            }}
-          >
-            <Text style={{ color: '#fff', fontWeight: '700', fontSize: 18 }}>{avatarLetter}</Text>
-          </View>
-
-          <View style={{ flex: 1 }}>
-            <Text style={{ fontSize: 16, fontWeight: '700' }} numberOfLines={1}>
-              {name}
-            </Text>
-            <Text style={{ fontSize: 12 }} numberOfLines={1}>
-              {subName}
-            </Text>
-          </View>
-
-          <View
-            style={{
-              alignSelf: 'flex-end',
-              alignContent: 'flex-end',
-              alignItems: 'flex-end',
-              justifyContent: 'flex-end',
-            }}
-          >
-            {!!date && <Text style={{ fontWeight: '600' }}>{formatDateToDDMMMYYYY(date)}</Text>}
-            {!!date && <Text style={{ color: '#9c9696ff' }}>{formatTimeTo12Hour(date)}</Text>}
-          </View>
-        </TouchableOpacity>
-
-        {/* Metadata Preview */}
-        {(remarks || address || amount) && (
-          <View style={{ marginTop: 12 }}>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-              <View
-                style={{
-                  width: '70%',
-                }}
-              >
-                {!!remarks && (
-                  <>
-                    <Text
-                      numberOfLines={isRemarksExpanded ? undefined : 2}
-                      style={{
-                        color: '#777',
-                        fontStyle: 'italic',
-                        marginBottom: 6,
-                      }}
-                    >
-                      {remarks}
-                    </Text>
-                    {remarks.length > 60 && ( 
-                      <TouchableOpacity onPress={() => setRemarksExpanded(prev => !prev)}>
-                        <Text style={{ color: '#007bff', fontSize: 12,  marginBottom: 6, }}>
-                          {isRemarksExpanded ? 'See Less ▲' : 'See More ▼'}
-                        </Text>
-                      </TouchableOpacity>
-                    )}
-                  </>
-                )}
-              </View>
-              <View
-                style={{
-                  width: '30%',
-                  alignItems: 'flex-end',
-                }}
-              >
-                {!!amount && (
-                  <Text
-                    numberOfLines={1}
-                    style={{
-                      textAlign: 'right',
-                      fontSize: 16,
-                      fontWeight: '700',
-                      color: '#28a745',
-                    }}
-                  >
-                    ₹ {amount}
-                  </Text>
-                )}
-              </View>
-            </View>
-            <View>
-              {!!address && (
-                <Text
-                  numberOfLines={2}
-                  style={{
-                    color: '#444',
-                  }}
-                >
-                  📍 {address}
-                </Text>
-              )}
-            </View>
-          </View>
-        )}
-
-        {btnKeys.length > 0 && (
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginTop: 14, gap: 8 }}>
-            {btnKeys.map((key, idx) => {
-              const actionValue = item[key];
-              const { label, color } = getButtonMeta(key);
-
-              return (
-                <TouchableOpacity
-                  key={`${key}-${idx}`}
-                  style={{
-                    backgroundColor: color,
-                    paddingHorizontal: 12,
-                    paddingVertical: 8,
-                    borderRadius: 6,
-                    flexGrow: 1,
-                    maxWidth: (screenWidth - 64) / 2,
-                    alignItems: 'center',
-                  }}
-                  onPress={() => Alert.alert(`${label} pressed`, `Value: ${actionValue}`)}
-                >
-                  <Text style={{ color: '#fff', fontWeight: '600', fontSize: 13 }}>{label}</Text>
-                </TouchableOpacity>
-              );
-            })}
-          </View>
-        )}
-      </View>
-    );
-  };
-
   return (
     <View style={styles.container}>
       {isFilterVisible && (
-        <View >
+        <View>
           <View style={styles.searchContainer}>
             <View style={styles.searchInputContainer}>
               <Text style={styles.searchIcon}>🔍</Text>
@@ -515,26 +305,28 @@ const ListScreen = () => {
             </View>
           </View>
 
-          <View style={styles.dateContainer}>
-            <View style={styles.dateRow}>
-              <Text style={styles.dateLabel}>From Date:</Text>
-              <TouchableOpacity
-                onPress={() => setShowDatePicker({ type: 'from', show: true })}
-                style={styles.dateButton}
-              >
-                <Text style={styles.dateButtonText}>{fromDate || 'Select Date'}</Text>
-              </TouchableOpacity>
+          {hasDateField && (
+            <View style={styles.dateContainer}>
+              <View style={styles.dateRow}>
+                <Text style={styles.dateLabel}>From Date:</Text>
+                <TouchableOpacity
+                  onPress={() => setShowDatePicker({ type: 'from', show: true })}
+                  style={styles.dateButton}
+                >
+                  <Text style={styles.dateButtonText}>{fromDate || 'Select Date'}</Text>
+                </TouchableOpacity>
+              </View>
+              <View style={styles.dateRow}>
+                <Text style={styles.dateLabel}>To Date:</Text>
+                <TouchableOpacity
+                  onPress={() => setShowDatePicker({ type: 'to', show: true })}
+                  style={styles.dateButton}
+                >
+                  <Text style={styles.dateButtonText}>{toDate || 'Select Date'}</Text>
+                </TouchableOpacity>
+              </View>
             </View>
-            <View style={styles.dateRow}>
-              <Text style={styles.dateLabel}>To Date:</Text>
-              <TouchableOpacity
-                onPress={() => setShowDatePicker({ type: 'to', show: true })}
-                style={styles.dateButton}
-              >
-                <Text style={styles.dateButtonText}>{toDate || 'Select Date'}</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
+          )}
 
           {showDatePicker?.show && (
             <DateTimePicker
@@ -562,58 +354,33 @@ const ListScreen = () => {
             <FullViewLoader />
           ) : (
             <>
-              <FlatList
-                data={filteredData}
-                showsHorizontalScrollIndicator={false}
-                showsVerticalScrollIndicator={false}
-                keyExtractor={(item, idx) => String(item?.id || idx)}
-                renderItem={({ item, index }) => <RenderCard item={item} index={index} />}
-                contentContainerStyle={styles.listContent}
-                ListEmptyComponent={
-                  !loadingListId ? (
-                    <View
-                      style={{
-                        width: Dimensions.get('screen').width,
-                        height: Dimensions.get('screen').height / 2.5,
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                      }}
-                    >
-                      <NoData />
-                    </View>
-                  ) : null
-                }
-                ListFooterComponent={
-                  filteredData.length > 0 && totalAmount > 0 ? (
-                    <View
-                      style={{
-                        marginTop: 16,
-                        padding: 16,
-                        borderRadius: 8,
-                        backgroundColor: '#f1f1f1',
-                        borderWidth: 1,
-                        borderColor: '#ddd',
-                        marginBottom: 28
-                      }}
-                    >
-                      <Text style={{ fontSize: 16, fontWeight: '700', color: '#333' }}>
-                        Total Amount
-                      </Text>
-                      <Text
-                        style={{ fontSize: 20, fontWeight: 'bold', color: '#28a745', marginTop: 4 }}
-                      >
-                        ₹ {totalAmount.toFixed(2)}
-                      </Text>
-                    </View>
-                  ) : null
-                }
-              />
+              {isTableView ? (
+                <>
+                  <TableView
+                    configData={configData}
+                    filteredData={filteredData}
+                    loadingListId={loadingListId}
+                    totalAmount={totalAmount}
+                    pageParamsName={pageParamsName}
+                  />
+                </>
+              ) : (
+                <>
+                  <RedableView
+                    configData={configData}
+                    filteredData={filteredData}
+                    loadingListId={loadingListId}
+                    totalAmount={totalAmount}
+                    pageParamsName={pageParamsName}
+                  />
+                </>
+              )}
             </>
           )}
         </>
       )}
       <TouchableOpacity style={styles.addButton} onPress={() => Alert.alert('Add button clicked')}>
-        <Text style={styles.addButtonText}>New</Text>
+        <Text style={styles.addButtonText}>+ New</Text>
       </TouchableOpacity>
     </View>
   );

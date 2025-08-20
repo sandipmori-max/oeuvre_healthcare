@@ -25,9 +25,10 @@ const GRID = require(`${ERP_BASE_URL_ICONS}/grid.png`);
 const LIST = require(`${ERP_BASE_URL_ICONS}/list.png`);
 const FILTER = require(`${ERP_BASE_URL_ICONS}/filter.png`);
 const FILTER_ACTIVE = require(`${ERP_BASE_URL_ICONS}/filter_active.png`);
-
-
-
+const SEARCH = require(`${ERP_BASE_URL_ICONS}/search.png`);
+const SEARCH_ACTIVE = require(`${ERP_BASE_URL_ICONS}/search_active.png`);
+const ROW_LIST = require(`${ERP_BASE_URL_ICONS}/row_list.png`);
+const TABLE = require(`${ERP_BASE_URL_ICONS}/table.png`);
 
 const ERROR = require(`${ERP_BASE_URL_GIF}/error.gif`);
 const LOADING = require(`${ERP_BASE_URL_GIF}/loader.gif`);
@@ -59,7 +60,11 @@ export const ERP_ICON = {
     GRID,
     LIST,
     FILTER,
-    FILTER_ACTIVE
+    FILTER_ACTIVE,
+    SEARCH,
+    SEARCH_ACTIVE,
+    ROW_LIST,
+    TABLE
 };
 
 export const ERP_GIF = {
