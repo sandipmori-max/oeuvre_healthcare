@@ -25,9 +25,9 @@ const DrawerNavigator = () => {
         options={{
           headerShown: true,
           headerStyle: {
-            backgroundColor:  theme === 'dark' ? '#000' : '#fff',  
+            backgroundColor:  theme === 'dark' ? '#000' : '#251d50ff',  
           },
-          headerTintColor: theme === 'dark' ? '#fff' : '#000',
+          headerTintColor:  '#fff',
           title: t('navigation.home')
         }}
         component={TabNavigator}

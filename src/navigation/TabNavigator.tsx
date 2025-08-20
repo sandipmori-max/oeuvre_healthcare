@@ -21,7 +21,7 @@ const TabNavigator = () => {
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: ERP_COLOR_CODE.ERP_BLACK,
+        tabBarActiveTintColor: '#251d50ff',
         tabBarInactiveTintColor: '#8E8E93',
         tabBarStyle: {
           backgroundColor: theme === 'dark' ? ERP_COLOR_CODE.ERP_BLACK : ERP_COLOR_CODE.ERP_WHITE,
