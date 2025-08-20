@@ -29,6 +29,8 @@ const SEARCH = require(`${ERP_BASE_URL_ICONS}/search.png`);
 const SEARCH_ACTIVE = require(`${ERP_BASE_URL_ICONS}/search_active.png`);
 const ROW_LIST = require(`${ERP_BASE_URL_ICONS}/row_list.png`);
 const TABLE = require(`${ERP_BASE_URL_ICONS}/table.png`);
+const MENU = require(`${ERP_BASE_URL_ICONS}/menu.png`);
+
 
 const ERROR = require(`${ERP_BASE_URL_GIF}/error.gif`);
 const LOADING = require(`${ERP_BASE_URL_GIF}/loader.gif`);
@@ -64,7 +66,8 @@ export const ERP_ICON = {
     SEARCH,
     SEARCH_ACTIVE,
     ROW_LIST,
-    TABLE
+    TABLE,
+    MENU,
 };
 
 export const ERP_GIF = {

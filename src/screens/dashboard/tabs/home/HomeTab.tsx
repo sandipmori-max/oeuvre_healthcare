@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
+import React, { useLayoutEffect, useState } from 'react';
+import { View, Text, TouchableOpacity, ActivityIndicator, Image } from 'react-native';
 
 import { styles } from './home_style';
 import { useAppDispatch, useAppSelector } from '../../../../store/hooks';
@@ -7,6 +7,7 @@ import { DashboardItem } from '../../../../store/slices/auth/type';
 import { useNavigation } from '@react-navigation/native';
 import FullViewLoader from '../../../../components/loader/FullViewLoader';
 import NoData from '../../../../components/no_data/NoData';
+import { ERP_ICON } from '../../../../assets';
 
 const HomeScreen = () => {
   const navigation = useNavigation<any>();
@@ -14,7 +15,32 @@ const HomeScreen = () => {
   const [loadingPageId, setLoadingPageId] = useState<string | null>(null);
   const theme = useAppSelector(state => state.theme);
 
-  console.log('RootNavigator rendered with theme:', theme );
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <>
+          <TouchableOpacity onPress={() => {}} style={{ marginRight: 12 }}>
+            <Image
+              source={ERP_ICON.REFRESH}
+              style={{ width: 28, height: 32, tintColor: 'white' }}
+              alt="Refresh Icon"
+            />
+          </TouchableOpacity>
+        </>
+      ),
+      headerLeft: () => (
+        <>
+          <TouchableOpacity onPress={() => navigation.openDrawer()} style={{ marginLeft: 12 }}>
+            <Image
+              source={ERP_ICON.MENU}
+              style={{ width: 28, height: 32, tintColor: 'white' }}
+              alt="Refresh Icon"
+            />
+          </TouchableOpacity>
+        </>
+      ),
+    });
+  }, [navigation]);
 
   const getInitials = (text?: string) => {
     if (!text) return '?';
@@ -60,9 +86,15 @@ const HomeScreen = () => {
                 <Text style={styles.iconText}>{getInitials(item.name)}</Text>
               </View>
               <View style={styles.headerTextWrap}>
-                <Text style={[styles.dashboardItemText, {
-                  color: theme === 'dark' ? '#fff' : '#000',
-                }]} numberOfLines={2}>
+                <Text
+                  style={[
+                    styles.dashboardItemText,
+                    {
+                      color: theme === 'dark' ? '#fff' : '#000',
+                    },
+                  ]}
+                  numberOfLines={2}
+                >
                   {item.title}
                 </Text>
               </View>
@@ -126,7 +158,7 @@ const HomeScreen = () => {
   const renderEmptyState = () => <NoData />;
 
   return (
-    <View style={theme === 'dark' ?  styles.containerDark : styles.container}>
+    <View style={theme === 'dark' ? styles.containerDark : styles.container}>
       {/* Dashboard Section */}
       <View style={styles.dashboardSection}>
         {isDashboardLoading ? (

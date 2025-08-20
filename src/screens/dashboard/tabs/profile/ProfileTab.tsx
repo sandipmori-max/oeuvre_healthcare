@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
+import React, { useLayoutEffect, useState } from 'react';
+import { View, Text, TouchableOpacity, ScrollView, Image } from 'react-native';
 
 import AccountSwitcher from './components/AccountSwitcher';
 import { styles } from './profile_style';
@@ -9,8 +9,9 @@ import { ProfileStackParamList } from '../../../../navigation/types';
 import { useAppSelector } from '../../../../store/hooks';
 import { firstLetterUpperCase, formatDateMonthDateYear } from '../../../../utils/helpers';
 import AddAccountScreen from '../../add_account/AddAccountScreen';
+import { ERP_ICON } from '../../../../assets';
 
-const ProfileScreen = () => {
+const ProfileTab = () => {
   const navigation = useNavigation<StackNavigationProp<ProfileStackParamList>>();
   const { user, accounts } = useAppSelector(state => state?.auth);
   const [showAccountSwitcher, setShowAccountSwitcher] = useState(false);
@@ -23,6 +24,32 @@ const ProfileScreen = () => {
 
   const activeAccount = accounts.find(acc => acc.user.id === user?.id);
 
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <>
+          <TouchableOpacity onPress={() => {}} style={{ marginRight: 12 }}>
+            <Image
+              source={ERP_ICON.REFRESH}
+              style={{ width: 28, height: 32, tintColor: 'white' }}
+              alt="Refresh Icon"
+            />
+          </TouchableOpacity>
+        </>
+      ),
+      headerLeft: () => (
+        <>
+          <TouchableOpacity onPress={() => navigation.openDrawer()} style={{ marginLeft: 12 }}>
+            <Image
+              source={ERP_ICON.MENU}
+              style={{ width: 28, height: 32, tintColor: 'white' }}
+              alt="Refresh Icon"
+            />
+          </TouchableOpacity>
+        </>
+      ),
+    });
+  }, [navigation]);
   return (
     <View style={styles.container}>
       <ScrollView
@@ -114,4 +141,4 @@ const ProfileScreen = () => {
   );
 };
 
-export default ProfileScreen;
+export default ProfileTab;

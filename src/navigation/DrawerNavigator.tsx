@@ -23,7 +23,7 @@ const DrawerNavigator = () => {
       <Drawer.Screen
         name="Home"
         options={{
-          headerShown: true,
+          headerShown: false,
           headerStyle: {
             backgroundColor:  theme === 'dark' ? '#000' : '#251d50ff',  
           },

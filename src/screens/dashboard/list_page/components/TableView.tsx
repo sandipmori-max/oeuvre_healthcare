@@ -159,7 +159,10 @@ const TableView = ({ configData, filteredData, loadingListId, totalAmount, pageP
   };
 
   return (
-    <View>
+    <View style={{
+      
+      flex: 1,
+      }}>
       <FlatList
         data={['']}
         showsVerticalScrollIndicator={false}
