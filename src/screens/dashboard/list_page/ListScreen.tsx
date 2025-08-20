@@ -13,6 +13,7 @@ import { ERP_ICON } from '../../../assets';
 import ErrorMessage from '../../../components/error/Error';
 import TableView from './components/TableView';
 import RedableView from './components/RedableView';
+import ERPIcon from '../../../components/icon/ERPIcon';
 
 const ListScreen = () => {
   const navigation = useNavigation();
@@ -57,51 +58,26 @@ const ListScreen = () => {
       title: pageTitle || 'List Data',
       headerRight: () => (
         <>
-         
-          <TouchableOpacity
+          <ERPIcon
+            name={isTableView ? 'list' : 'apps'}
             onPress={() => {
               setIsTableView(!isTableView);
             }}
-            style={{ marginRight: 12 }}
-          >
-            <Image
-              resizeMode="contain"
-              source={!isTableView ? ERP_ICON.TABLE : ERP_ICON.ROW_LIST}
-              style={{ width: 26, height: 28 ,tintColor:'white' }}
-              alt="Refresh Icon"
-            />
-          </TouchableOpacity>
+          />
 
-          <TouchableOpacity
+          <ERPIcon
+            name={!hasDateField ? 'search' : isFilterVisible ? 'filter-alt' : 'filter-alt'}
             onPress={() => {
               setIsFilterVisible(!isFilterVisible);
             }}
-            style={{ marginRight: 12 }}
-          >
-            <Image
-              source={
-                !hasDateField
-                  ? isFilterVisible
-                    ? ERP_ICON.SEARCH_ACTIVE
-                    : ERP_ICON.SEARCH
-                  : isFilterVisible
-                  ? ERP_ICON.FILTER_ACTIVE
-                  : ERP_ICON.FILTER
-              }
-              resizeMode="contain"
-              style={{ width: !hasDateField ? 28 : 30, height: !hasDateField ? 30 : 32 ,tintColor:'white' }}
-              alt="Refresh Icon"
-            />
-          </TouchableOpacity>
+          />
 
-           <TouchableOpacity
+          <ERPIcon
+            name="refresh"
             onPress={() => {
               onRefresh();
             }}
-            style={{ marginRight: 12 }}
-          >
-            <Image source={ERP_ICON.REFRESH} style={{ width: 28, height: 32 ,tintColor:'white'}} alt="Refresh Icon" />
-          </TouchableOpacity>
+          />
         </>
       ),
     });

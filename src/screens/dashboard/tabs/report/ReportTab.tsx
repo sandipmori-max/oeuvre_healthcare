@@ -14,6 +14,7 @@ import NoData from '../../../../components/no_data/NoData';
 import FullViewLoader from '../../../../components/loader/FullViewLoader';
 import { styles } from './report_style';
 import { ERP_ICON } from '../../../../assets';
+import ERPIcon from '../../../../components/icon/ERPIcon';
 
 const accentColors = ['#dbe0f5ff', '#c8f3edff', '#faf1e0ff', '#f0e1e1ff', '#f2e3f8ff', '#e0f3edff'];
 
@@ -36,51 +37,21 @@ const ReportTab = () => {
     navigation.setOptions({
       headerRight: () => (
         <>
-          <>
-            <TouchableOpacity
-              onPress={() => setIsHorizontal(prev => !prev)}
-              style={{ marginRight: 12 }}
-            >
-              <Image
-                source={isHorizontal ? ERP_ICON.GRID : ERP_ICON.LIST}
-                resizeMode="contain"
-                style={{ width: 30, height: 29, tintColor: 'white' }}
-                alt="Refresh Icon"
-              />
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => setShowBookmarksOnly(prev => !prev)}
-              style={{ marginRight: 12 }}
-            >
-              <Image
-                source={showBookmarksOnly ? ERP_ICON.All : ERP_ICON.BOOK_MARK}
-                style={{ width: 28, height: 30, tintColor: 'white' }}
-                alt="Refresh Icon"
-              />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => {}} style={{ marginRight: 12 }}>
-              <Image
-                source={ERP_ICON.REFRESH}
-                style={{ width: 28, height: 32, tintColor: 'white' }}
-                alt="Refresh Icon"
-              />
-            </TouchableOpacity>
-          </>
+          <ERPIcon name= {isHorizontal ? 'list' : 'apps'} onPress={() => setIsHorizontal(prev => !prev)} />
+
+          <ERPIcon name={showBookmarksOnly ? 'star' : 'allout'} onPress={() => setShowBookmarksOnly(prev => !prev)} />
+
+          <ERPIcon name="refresh" />
         </>
       ),
       headerLeft: () => (
         <>
-          <TouchableOpacity onPress={() => navigation.openDrawer()} style={{ marginLeft: 12 }}>
-            <Image
-              source={ERP_ICON.MENU}
-              style={{ width: 28, height: 32, tintColor: 'white' }}
-              alt="Refresh Icon"
-            />
-          </TouchableOpacity>
+           <ERPIcon extSize={24} isMenu={true} name="menu" onPress={() => navigation.openDrawer()} />
         </>
       ),
     });
   }, [navigation, showBookmarksOnly, isHorizontal]);
+  
   const renderItem = ({ item, index }: any) => {
     const backgroundColor = accentColors[index % accentColors.length];
 

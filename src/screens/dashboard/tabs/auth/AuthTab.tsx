@@ -2,33 +2,21 @@ import { Image, Text, TouchableOpacity, View } from 'react-native';
 import React, { useLayoutEffect } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { ERP_ICON } from '../../../../assets';
+import ERPIcon from '../../../../components/icon/ERPIcon';
 
 const AuthTab = () => {
-    const navigation = useNavigation<any>();
-  
+  const navigation = useNavigation<any>();
 
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
         <>
-          <TouchableOpacity onPress={() => {}} style={{ marginRight: 12 }}>
-            <Image
-              source={ERP_ICON.REFRESH}
-              style={{ width: 28, height: 32, tintColor: 'white' }}
-              alt="Refresh Icon"
-            />
-          </TouchableOpacity>
+         <ERPIcon name="refresh" />
         </>
       ),
       headerLeft: () => (
         <>
-          <TouchableOpacity onPress={() => navigation.openDrawer()} style={{ marginLeft: 12 }}>
-            <Image
-              source={ERP_ICON.MENU}
-              style={{ width: 28, height: 32, tintColor: 'white' }}
-              alt="Refresh Icon"
-            />
-          </TouchableOpacity>
+           <ERPIcon extSize={24} isMenu={true} name="menu" onPress={() => navigation.openDrawer()} />
         </>
       ),
     });

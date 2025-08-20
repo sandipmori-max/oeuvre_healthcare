@@ -2,12 +2,12 @@ import React, { useLayoutEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, ActivityIndicator, Image } from 'react-native';
 
 import { styles } from './home_style';
-import { useAppDispatch, useAppSelector } from '../../../../store/hooks';
+import { useAppSelector } from '../../../../store/hooks';
 import { DashboardItem } from '../../../../store/slices/auth/type';
 import { useNavigation } from '@react-navigation/native';
 import FullViewLoader from '../../../../components/loader/FullViewLoader';
 import NoData from '../../../../components/no_data/NoData';
-import { ERP_ICON } from '../../../../assets';
+import ERPIcon from '../../../../components/icon/ERPIcon';
 
 const HomeScreen = () => {
   const navigation = useNavigation<any>();
@@ -19,24 +19,12 @@ const HomeScreen = () => {
     navigation.setOptions({
       headerRight: () => (
         <>
-          <TouchableOpacity onPress={() => {}} style={{ marginRight: 12 }}>
-            <Image
-              source={ERP_ICON.REFRESH}
-              style={{ width: 28, height: 32, tintColor: 'white' }}
-              alt="Refresh Icon"
-            />
-          </TouchableOpacity>
+          <ERPIcon name="refresh" />
         </>
       ),
       headerLeft: () => (
         <>
-          <TouchableOpacity onPress={() => navigation.openDrawer()} style={{ marginLeft: 12 }}>
-            <Image
-              source={ERP_ICON.MENU}
-              style={{ width: 28, height: 32, tintColor: 'white' }}
-              alt="Refresh Icon"
-            />
-          </TouchableOpacity>
+          <ERPIcon extSize={24} isMenu={true} name="menu" onPress={() => navigation.openDrawer()} />
         </>
       ),
     });
