@@ -202,7 +202,7 @@ const RedableView = ({
   };
 
   return (
-    <View>
+    <View style={{flex:1}}>
       <FlatList
         data={filteredData}
         showsHorizontalScrollIndicator={false}

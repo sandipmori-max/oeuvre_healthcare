@@ -18,7 +18,8 @@ import { ERP_ICON } from '../../../../assets';
 const accentColors = ['#dbe0f5ff', '#c8f3edff', '#faf1e0ff', '#f0e1e1ff', '#f2e3f8ff', '#e0f3edff'];
 
 const EntryTab = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<any>();
+
   const { menu, isMenuLoading } = useAppSelector(state => state.auth);
   const allList = menu?.filter(item => item?.isReport === false) ?? [];
 
@@ -31,6 +32,55 @@ const EntryTab = () => {
   const toggleBookmark = (id: string) => {
     setBookmarks(prev => ({ ...prev, [id]: !prev[id] }));
   };
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <>
+         
+          <TouchableOpacity
+            onPress={() => setIsHorizontal(prev => !prev)}
+            style={{ marginRight: 12 }}
+          >
+            <Image
+              source={isHorizontal ? ERP_ICON.GRID : ERP_ICON.LIST}
+              resizeMode="contain"
+              style={{ width: 30, height: 29, tintColor: 'white' }}
+              alt="Refresh Icon"
+            />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => setShowBookmarksOnly(prev => !prev)}
+            style={{ marginRight: 12 }}
+          >
+            <Image
+              source={showBookmarksOnly ? ERP_ICON.All : ERP_ICON.BOOK_MARK}
+              style={{ width: 28, height: 30, tintColor: 'white' }}
+              alt="Refresh Icon"
+            />
+          </TouchableOpacity>
+           <TouchableOpacity onPress={() => {}} style={{ marginRight: 12 }}>
+            <Image
+              source={ERP_ICON.REFRESH}
+              style={{ width: 28, height: 32, tintColor: 'white' }}
+              alt="Refresh Icon"
+            />
+          </TouchableOpacity>
+        </>
+      ),
+      headerLeft: () => (
+        <>
+          <TouchableOpacity onPress={() => navigation.openDrawer()} style={{ marginLeft: 12 }}>
+            <Image
+              source={ERP_ICON.MENU}
+              style={{ width: 28, height: 32, tintColor: 'white' }}
+              alt="Refresh Icon"
+            />
+          </TouchableOpacity>
+        </>
+      ),
+    });
+  }, [navigation, showBookmarksOnly, isHorizontal]);
 
   const renderItem = ({ item, index }: any) => {
     const backgroundColor = accentColors[index % accentColors.length];
@@ -81,22 +131,6 @@ const EntryTab = () => {
 
   return (
     <>
-      <View style={localStyles.header}>
-        <TouchableOpacity style={localStyles.button} onPress={() => setIsHorizontal(prev => !prev)}>
-          <Image source={isHorizontal ? ERP_ICON.GRID : ERP_ICON.LIST} style={styles.icon} />
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={localStyles.button}
-          onPress={() => setShowBookmarksOnly(prev => !prev)}
-        >
-          <Image
-            source={showBookmarksOnly ? ERP_ICON.All : ERP_ICON.BOOK_MARK}
-            style={styles.icon}
-          />
-        </TouchableOpacity>
-      </View>
-
       <FlatList
         key={`${isHorizontal}-${showBookmarksOnly}`}
         data={list}

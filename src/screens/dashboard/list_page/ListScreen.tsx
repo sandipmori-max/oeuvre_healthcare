@@ -57,14 +57,7 @@ const ListScreen = () => {
       title: pageTitle || 'List Data',
       headerRight: () => (
         <>
-          <TouchableOpacity
-            onPress={() => {
-              onRefresh();
-            }}
-            style={{ marginRight: 12 }}
-          >
-            <Image source={ERP_ICON.REFRESH} style={{ width: 28, height: 32 ,tintColor:'white'}} alt="Refresh Icon" />
-          </TouchableOpacity>
+         
           <TouchableOpacity
             onPress={() => {
               setIsTableView(!isTableView);
@@ -99,6 +92,15 @@ const ListScreen = () => {
               style={{ width: !hasDateField ? 28 : 30, height: !hasDateField ? 30 : 32 ,tintColor:'white' }}
               alt="Refresh Icon"
             />
+          </TouchableOpacity>
+
+           <TouchableOpacity
+            onPress={() => {
+              onRefresh();
+            }}
+            style={{ marginRight: 12 }}
+          >
+            <Image source={ERP_ICON.REFRESH} style={{ width: 28, height: 32 ,tintColor:'white'}} alt="Refresh Icon" />
           </TouchableOpacity>
         </>
       ),

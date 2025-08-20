@@ -17,6 +17,8 @@ export const styles = StyleSheet.create({
     width: 24,
     height: 24,
     resizeMode: 'contain',
+    borderRadius: 12,
+    overflow:'hidden'
   },
   card: {
     flex: 1,
