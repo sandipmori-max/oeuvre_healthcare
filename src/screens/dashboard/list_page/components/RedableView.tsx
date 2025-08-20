@@ -1,9 +1,10 @@
-import { View, Text, TouchableOpacity, Alert, Dimensions, FlatList } from 'react-native';
+import { View, Text, TouchableOpacity, Alert, Dimensions, FlatList, Image } from 'react-native';
 import React, { useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { formatDateToDDMMMYYYY, formatTimeTo12Hour } from '../../../../utils/helpers';
 import { styles } from '../list_page_style';
 import NoData from '../../../../components/no_data/NoData';
+import { ERP_ICON } from '../../../../assets';
 
 const RedableView = ({
   configData,
@@ -69,13 +70,14 @@ const RedableView = ({
               width: 48,
               height: 48,
               borderRadius: 24,
-              backgroundColor: '#87bcf5ff',
+              backgroundColor: '#251d50ff',
               justifyContent: 'center',
               alignItems: 'center',
               marginRight: 12,
             }}
           >
-            <Text style={{ color: '#fff', fontWeight: '700', fontSize: 18 }}>{avatarLetter}</Text>
+            {/* <Text style={{ color: '#fff', fontWeight: '400', fontSize: 22 }}>{avatarLetter}</Text> */}
+            <Image source={ERP_ICON.APP_LOGO} style={styles.profileImage} />
           </View>
 
           <View style={{ flex: 1 }}>

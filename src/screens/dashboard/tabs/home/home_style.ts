@@ -9,10 +9,22 @@ export const styles = StyleSheet.create({
     backgroundColor: '#F8F9FA',
   },
   containerDark: {
-      flex: 1,
-      backgroundColor: '#000',
-    },
-  // Header Section
+    flex: 1,
+    backgroundColor: '#000',
+  },
+  chartContainer: {
+    padding: 16,
+    backgroundColor: '#fff',
+    justifyContent:'center',
+    alignContent:'center',
+    alignItems:'center'
+  },
+  chartTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 12,
+    color: '#333',
+  },
   header: {
     backgroundColor: '#FFFFFF',
     paddingHorizontal: 20,
@@ -131,7 +143,6 @@ export const styles = StyleSheet.create({
   },
   dashboardItemData: {
     fontSize: 18,
-    color: 'green',
     fontWeight: '700',
   },
   urlContainer: {

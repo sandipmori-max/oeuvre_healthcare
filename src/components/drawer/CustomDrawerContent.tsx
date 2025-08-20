@@ -46,17 +46,16 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
 
                 ]}>{item.icon}</Text>
                 <Text style={[styles.itemLabel, isActive && styles.activeText , {
-                  color: theme === 'dark' ? isActive ? '#000' : '#fff' : '#000',
+                  color:  isActive ? '#fff' : '#000',
                 }]}>{item.label}</Text>
               </View>
             </TouchableOpacity>
           );
         })}
       </View>
-
-      <TouchableOpacity style={styles.logoutButton} onPress={() => {}}>
+      <View style={styles.logoutButton} >
         <Text style={styles.logoutText}>DevERP</Text>
-      </TouchableOpacity>
+      </View>
     </DrawerContentScrollView>
   );
 };

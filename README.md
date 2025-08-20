@@ -2,7 +2,7 @@
 
 // Multiple build creation with different Name + icon + package name
 
- 
+// ./gradlew generateCodegenArtifactsFromSchema - android build 
 // cmd - gradlew assemble[BRAND_NAME]Release
 
 // How to used - .env.clientA and .env.cientB ??

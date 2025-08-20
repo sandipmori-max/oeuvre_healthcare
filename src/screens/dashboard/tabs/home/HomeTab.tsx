@@ -8,7 +8,7 @@ import { useNavigation } from '@react-navigation/native';
 import FullViewLoader from '../../../../components/loader/FullViewLoader';
 import NoData from '../../../../components/no_data/NoData';
 import ERPIcon from '../../../../components/icon/ERPIcon';
-
+import { BarChart, PieChart } from 'react-native-gifted-charts';
 const HomeScreen = () => {
   const navigation = useNavigation<any>();
   const { dashboard, isDashboardLoading } = useAppSelector(state => state.auth);
@@ -38,6 +38,13 @@ const HomeScreen = () => {
   };
 
   const accentColors = ['#4C6FFF', '#00C2A8', '#FFB020', '#FF6B6B', '#9B59B6', '#20C997'];
+  const pieChartData = dashboard
+    .filter(item => !isNaN(Number(item.data))) // filter numeric data only
+    .map((item, index) => ({
+      value: Number(item.data),
+      color: accentColors[index % accentColors.length],
+      text: item.title?.split(' ')[0] || `Item ${index + 1}`,
+    }));
 
   const renderDashboardItem = (item: DashboardItem, index: number) => (
     <TouchableOpacity
@@ -147,7 +154,61 @@ const HomeScreen = () => {
 
   return (
     <View style={theme === 'dark' ? styles.containerDark : styles.container}>
-      {/* Dashboard Section */}
+      {dashboard.length > 0 && (
+        <View style={styles.chartContainer}>
+          <Text style={styles.chartTitle}>Overview</Text>
+          <PieChart
+            data={pieChartData}
+            donut
+            showText
+            radius={90}
+            textSize={14}
+            innerRadius={50}
+            textColor="#333"
+            showValuesAsLabels
+            labelPosition="outside"
+            centerLabelComponent={() => (
+              <Text style={{ fontSize: 16, fontWeight: 'bold' }}>
+                Total: {pieChartData.reduce((sum, item) => sum + item.value, 0)}
+              </Text>
+            )}
+          />
+        </View>
+      )}
+      <View
+        style={{
+          flexDirection: 'row',
+          flexWrap: 'wrap',
+          justifyContent: 'center',
+          marginTop: 16,
+        }}
+      >
+        {pieChartData.map((item, idx) => (
+          <View
+            key={idx}
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              marginHorizontal: 8,
+              marginBottom: 8,
+            }}
+          >
+            <View
+              style={{
+                width: 16,
+                height: 16,
+                borderRadius: 8,
+                backgroundColor: item.color,
+                marginRight: 6,
+              }}
+            />
+            <Text style={{ fontSize: 14, color: '#444' }}>
+              {item.text}: {item.value}
+            </Text>
+          </View>
+        ))}
+      </View>
+
       <View style={styles.dashboardSection}>
         {isDashboardLoading ? (
           renderLoadingState()
