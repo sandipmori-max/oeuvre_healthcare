@@ -7,22 +7,25 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, { useLayoutEffect, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
-import { useAppSelector } from '../../../../store/hooks';
+import { useAppDispatch, useAppSelector } from '../../../../store/hooks';
 import NoData from '../../../../components/no_data/NoData';
 import FullViewLoader from '../../../../components/loader/FullViewLoader';
 import { styles } from './entry_style';
 import { ERP_ICON } from '../../../../assets';
 import ERPIcon from '../../../../components/icon/ERPIcon';
+import { getERPDashboardThunk } from '../../../../store/slices/auth/thunk';
 
 const accentColors = ['#dbe0f5ff', '#c8f3edff', '#faf1e0ff', '#f0e1e1ff', '#f2e3f8ff', '#e0f3edff'];
 
 const EntryTab = () => {
   const navigation = useNavigation<any>();
-
+  const dispatch = useAppDispatch();
+  const { isLoading, isAuthenticated, activeToken } = useAppSelector(state => state.auth);
   const { menu, isMenuLoading } = useAppSelector(state => state.auth);
   const allList = menu?.filter(item => item?.isReport === false) ?? [];
+  const [isRefresh, setIsRefresh] = useState<boolean>(false);
 
   const [isHorizontal, setIsHorizontal] = useState(false);
   const [bookmarks, setBookmarks] = useState<{ [key: string]: boolean }>({});
@@ -38,24 +41,40 @@ const EntryTab = () => {
     navigation.setOptions({
       headerRight: () => (
         <>
-          <ERPIcon name= {isHorizontal ? 'list' : 'apps'} onPress={() => setIsHorizontal(prev => !prev)} />
+          <ERPIcon
+            name={isHorizontal ? 'list' : 'apps'}
+            onPress={() => setIsHorizontal(prev => !prev)}
+          />
 
-          <ERPIcon name={showBookmarksOnly ? 'star' : 'allout'} onPress={() => setShowBookmarksOnly(prev => !prev)} />
+          <ERPIcon
+            name={showBookmarksOnly ? 'star' : 'allout'}
+            onPress={() => setShowBookmarksOnly(prev => !prev)}
+          />
 
-          <ERPIcon name="refresh" />
+          <ERPIcon
+            name="refresh"
+            onPress={() => {
+              setIsRefresh(!isRefresh);
+            }}
+          />
         </>
       ),
       headerLeft: () => (
         <>
-           <ERPIcon extSize={24} isMenu={true} name="menu" onPress={() => navigation.openDrawer()} />
+          <ERPIcon extSize={24} isMenu={true} name="menu" onPress={() => navigation.openDrawer()} />
         </>
       ),
     });
   }, [navigation, showBookmarksOnly, isHorizontal]);
-
+  
+  useEffect(() => {
+    if (isAuthenticated) {
+      dispatch(getERPDashboardThunk());
+    }
+  }, [isAuthenticated, dispatch, activeToken, isRefresh]);
   const renderItem = ({ item, index }: any) => {
     const backgroundColor = accentColors[index % accentColors.length];
-    console.log("🚀 ~ renderItem ~ backgroundColor:", bookmarks[item.id])
+    console.log('🚀 ~ renderItem ~ backgroundColor:', bookmarks[item.id]);
 
     return (
       <TouchableOpacity
@@ -64,14 +83,14 @@ const EntryTab = () => {
         onPress={() => navigation.navigate('Web', { item })}
       >
         <TouchableOpacity
-                 onPress={() => toggleBookmark(item.id)}
-                 style={{ position: 'absolute', top: 0, right: 0, zIndex: 1 }}
-               >
-                 <Image
-                   source={bookmarks[item.id] ? ERP_ICON.BOOK_MARK_DONE : ERP_ICON.BOOK_MARK}
-                   style={styles.icon}
-                 />
-               </TouchableOpacity>
+          onPress={() => toggleBookmark(item.id)}
+          style={{ position: 'absolute', top: 0, right: 0, zIndex: 1 }}
+        >
+          <Image
+            source={bookmarks[item.id] ? ERP_ICON.BOOK_MARK_DONE : ERP_ICON.BOOK_MARK}
+            style={styles.icon}
+          />
+        </TouchableOpacity>
 
         <View style={[styles.iconContainer, { backgroundColor: 'rgba(243, 239, 239, 0.42)' }]}>
           <Text style={styles.iconText}>

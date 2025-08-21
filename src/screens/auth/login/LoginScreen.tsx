@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   ScrollView,
@@ -21,9 +21,19 @@ const LoginScreen = ({ navigation, route }: any) => {
   const { t } = useTranslations();
   const dispatch = useAppDispatch();
   const { isLoading } = useAppSelector(state => state.auth);
+ const [deviceId, setDeviceId] = useState<string>('');
 
+  useEffect(() => {
+    const fetchDeviceName = async () => {
+      const name = await DeviceInfo.getDeviceName();
+      console.log('Device Name:', name);
+      setDeviceId(name);
+    };
+
+    fetchDeviceName();
+  }, []);
   const appId = DeviceInfo.getBundleId();
-  const deviceId = DeviceInfo.getDeviceId();
+  console.log("🚀 ~ LoginScreen ~ deviceId:", deviceId)
   const isAddingAccount = route?.params?.isAddingAccount || false;
 
   const [alertVisible, setAlertVisible] = useState(false);

@@ -1,25 +1,38 @@
-import React, { useLayoutEffect, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, ActivityIndicator, Image } from 'react-native';
 
 import { styles } from './home_style';
-import { useAppSelector } from '../../../../store/hooks';
+import { useAppDispatch, useAppSelector } from '../../../../store/hooks';
 import { DashboardItem } from '../../../../store/slices/auth/type';
 import { useNavigation } from '@react-navigation/native';
 import FullViewLoader from '../../../../components/loader/FullViewLoader';
 import NoData from '../../../../components/no_data/NoData';
 import ERPIcon from '../../../../components/icon/ERPIcon';
 import { BarChart, PieChart } from 'react-native-gifted-charts';
-const HomeScreen = () => {
+import { getERPDashboardThunk, getERPMenuThunk } from '../../../../store/slices/auth/thunk';
+ const HomeScreen = () => {
   const navigation = useNavigation<any>();
+  const dispatch = useAppDispatch();
+  const { isLoading, isAuthenticated, activeToken } = useAppSelector(state => state.auth);
+
   const { dashboard, isDashboardLoading } = useAppSelector(state => state.auth);
   const [loadingPageId, setLoadingPageId] = useState<string | null>(null);
-  const theme = useAppSelector(state => state.theme);
+  const [isRefresh, setIsRefresh] = useState<boolean>(false);
+
+  
+
+  const theme = useAppSelector(state => state.theme); 
 
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
         <>
-          <ERPIcon name="refresh" />
+          <ERPIcon
+            name="refresh"
+            onPress={() => {
+              setIsRefresh(!isRefresh);
+            }}
+          />
         </>
       ),
       headerLeft: () => (
@@ -28,7 +41,13 @@ const HomeScreen = () => {
         </>
       ),
     });
-  }, [navigation]);
+  }, [navigation, isRefresh]);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      dispatch(getERPDashboardThunk());
+    }
+  }, [isAuthenticated, dispatch, activeToken, isRefresh]);
 
   const getInitials = (text?: string) => {
     if (!text) return '?';
@@ -154,70 +173,76 @@ const HomeScreen = () => {
 
   return (
     <View style={theme === 'dark' ? styles.containerDark : styles.container}>
-      {dashboard.length > 0 && (
-        <View style={styles.chartContainer}>
-          <Text style={styles.chartTitle}>Overview</Text>
-          <PieChart
-            data={pieChartData}
-            donut
-            showText
-            radius={90}
-            textSize={14}
-            innerRadius={50}
-            textColor="#333"
-            showValuesAsLabels
-            labelPosition="outside"
-            centerLabelComponent={() => (
-              <Text style={{ fontSize: 16, fontWeight: 'bold' }}>
-                Total: {pieChartData.reduce((sum, item) => sum + item.value, 0)}
-              </Text>
-            )}
-          />
-        </View>
-      )}
-      <View
-        style={{
-          flexDirection: 'row',
-          flexWrap: 'wrap',
-          justifyContent: 'center',
-          marginTop: 16,
-        }}
-      >
-        {pieChartData.map((item, idx) => (
+      {isDashboardLoading ? (
+        <>{renderLoadingState()}</>
+      ) : (
+        <>
+          {' '}
+          {dashboard.length > 0 && (
+            <View style={styles.chartContainer}>
+              <Text style={styles.chartTitle}>Overview</Text>
+              <PieChart
+                data={pieChartData}
+                donut
+                showText
+                radius={90}
+                textSize={14}
+                innerRadius={50}
+                textColor="#333"
+                showValuesAsLabels
+                labelPosition="outside"
+                centerLabelComponent={() => (
+                  <Text style={{ fontSize: 16, fontWeight: 'bold' }}>
+                    Total: {pieChartData.reduce((sum, item) => sum + item.value, 0)}
+                  </Text>
+                )}
+              />
+            </View>
+          )}
           <View
-            key={idx}
             style={{
               flexDirection: 'row',
-              alignItems: 'center',
-              marginHorizontal: 8,
-              marginBottom: 8,
+              flexWrap: 'wrap',
+              justifyContent: 'center',
+              marginTop: 16,
             }}
           >
-            <View
-              style={{
-                width: 16,
-                height: 16,
-                borderRadius: 8,
-                backgroundColor: item.color,
-                marginRight: 6,
-              }}
-            />
-            <Text style={{ fontSize: 14, color: '#444' }}>
-              {item.text}: {item.value}
-            </Text>
+            {pieChartData.map((item, idx) => (
+              <View
+                key={idx}
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  marginHorizontal: 8,
+                  marginBottom: 8,
+                }}
+              >
+                <View
+                  style={{
+                    width: 16,
+                    height: 16,
+                    borderRadius: 8,
+                    backgroundColor: item.color,
+                    marginRight: 6,
+                  }}
+                />
+                <Text style={{ fontSize: 14, color: '#444' }}>
+                  {item.text}: {item.value}
+                </Text>
+              </View>
+            ))}
           </View>
-        ))}
-      </View>
-
-      <View style={styles.dashboardSection}>
-        {isDashboardLoading ? (
-          renderLoadingState()
-        ) : dashboard.length > 0 ? (
-          <View style={styles.dashboardGrid}>{dashboard.map(renderDashboardItem)}</View>
-        ) : (
-          renderEmptyState()
-        )}
-      </View>
+          <View style={styles.dashboardSection}>
+            {isDashboardLoading ? (
+              renderLoadingState()
+            ) : dashboard.length > 0 ? (
+              <View style={styles.dashboardGrid}>{dashboard.map(renderDashboardItem)}</View>
+            ) : (
+              renderEmptyState()
+            )}
+          </View>{' '}
+        </>
+      )}
     </View>
   );
 };
