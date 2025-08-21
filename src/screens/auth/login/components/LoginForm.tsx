@@ -11,6 +11,7 @@ import useTranslations from '../../../../hooks/useTranslations';
 import ERPTextInput from '../../../../components/input/ERPTextInput';
 import ERPButton from '../../../../components/button/ERPButton';
 import useFcmToken from '../../../../hooks/useFcmToken';
+import { getMessaging } from '@react-native-firebase/messaging';
 
 const LoginForm: React.FC<LoginFormProps> = ({
   appId,
@@ -54,13 +55,18 @@ const LoginForm: React.FC<LoginFormProps> = ({
         // });
         return;
       }
+  const currentFcmToken = fcmToken || await getMessaging().getToken();
+  console.log("🚀 ~ handleLoginSubmit ~ currentFcmToken:", currentFcmToken)
+    DevERPService.setAppId(appId)
 
-      const loginResult = await loginWithERP(() =>
+    DevERPService.setDevice(deviceId)
+
+  const loginResult = await loginWithERP(() =>
         DevERPService.loginToERP({
           user: values.user,
           pass: values.password,
           appid: appId,
-          firebaseid: fcmToken || '',
+          firebaseid: currentFcmToken || '',
         }),
       );
 

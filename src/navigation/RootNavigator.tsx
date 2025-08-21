@@ -15,20 +15,14 @@ import FullViewLoader from '../components/loader/FullViewLoader';
 
 const RootNavigator = () => {
   const dispatch = useAppDispatch();
-  const { isLoading, isAuthenticated, activeToken } = useAppSelector(state => state.auth);
+  const { isLoading, isAuthenticated } = useAppSelector(state => state.auth);
  
   useEffect(() => {
     DevERPService.initialize();
     dispatch(checkAuthStateThunk());
   }, [dispatch]);
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      dispatch(getERPMenuThunk());
-      dispatch(getERPDashboardThunk());
-    }
-  }, [isAuthenticated, dispatch, activeToken]);
-
+ 
   if (isLoading) {
     return <FullViewLoader />;
   }

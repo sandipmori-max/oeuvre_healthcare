@@ -94,8 +94,6 @@ class DevERPService {
         throw new Error('No ERP link available. Please validate company code first.');
       }
 
-      this.appid = credentials.appid;
-      this.device = 'mobile';
 
       const loginData: LoginRequest = {
         user: credentials.user,
@@ -485,6 +483,14 @@ class DevERPService {
   setToken(token: string) {
     this.token = token;
     AsyncStorage.setItem('erp_token', token);
+  }
+
+   setDevice(device: string) {
+    this.device = device;
+  }
+
+  setAppId(appId: string) {
+    this.appid = appId;
   }
 }
 
