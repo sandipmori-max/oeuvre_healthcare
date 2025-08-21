@@ -59,7 +59,7 @@ export const retryApiCall = async <T>(
 
       if (attempt < maxRetries) {
         console.log(
-          `API call failed, retrying in ${delay}ms... (attempt ${attempt}/${maxRetries})`,
+          `API call failed , retrying in ${delay}ms... (attempt ${attempt}/${maxRetries})`,
         );
         await new Promise(resolve => setTimeout(resolve, delay));
         delay *= 2;
