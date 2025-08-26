@@ -7,9 +7,10 @@ import {
   TouchableOpacity,
   Text,
 } from 'react-native';
+import DeviceInfo from 'react-native-device-info';
+
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { loginUserThunk } from '../../../store/slices/auth/thunk';
-import DeviceInfo from 'react-native-device-info';
 import CustomAlert from '../../../components/alert/CustomAlert';
 import useTranslations from '../../../hooks/useTranslations';
 import { styles } from './login_style';
@@ -18,9 +19,18 @@ import LoginForm from './components/LoginForm';
 
 const LoginScreen = ({ navigation, route }: any) => {
   const { t } = useTranslations();
+
   const dispatch = useAppDispatch();
+
   const { isLoading } = useAppSelector(state => state.auth);
- const [deviceId, setDeviceId] = useState<string>('');
+
+  const [deviceId, setDeviceId] = useState<string>('');
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertConfig, setAlertConfig] = useState({
+    title: '',
+    message: '',
+    type: 'info' as 'error' | 'success' | 'info',
+  });
 
   useEffect(() => {
     const fetchDeviceName = async () => {
@@ -31,14 +41,8 @@ const LoginScreen = ({ navigation, route }: any) => {
 
     fetchDeviceName();
   }, []);
-  const isAddingAccount = route?.params?.isAddingAccount || false;
 
-  const [alertVisible, setAlertVisible] = useState(false);
-  const [alertConfig, setAlertConfig] = useState({
-    title: '',
-    message: '',
-    type: 'info' as 'error' | 'success' | 'info',
-  });
+  const isAddingAccount = route?.params?.isAddingAccount || false;
 
   const handlePersistAfterLogin = async (
     company_code: string,

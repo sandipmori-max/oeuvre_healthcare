@@ -396,7 +396,6 @@ const styles = StyleSheet.create({
 });
 
 const List = ({ selectedMonth, showFilter }: any) => {
-  console.log('🚀 ~ List ~ showFilter:', showFilter);
   const [activeFilter, setActiveFilter] = useState('all');
 
   const parseDateTime = (dateTimeStr: string) => {

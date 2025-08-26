@@ -1,5 +1,6 @@
 import React from 'react';
 import { createDrawerNavigator } from '@react-navigation/drawer';
+
 import AttendanceScreen from '../screens/dashboard/attendance/AttendanceScreen';
 import DisplayScreen from '../screens/dashboard/display/DisplayScreen';
 import AlertScreen from '../screens/dashboard/alert/AlertScreen';
@@ -14,8 +15,8 @@ const Drawer = createDrawerNavigator();
 
 const DrawerNavigator = () => {
   const { t } = useTranslations();
-      const theme = useAppSelector(state => state.theme);
-  
+  const theme = useAppSelector(state => state.theme);
+
   return (
     <Drawer.Navigator
       initialRouteName="Home"
@@ -26,17 +27,16 @@ const DrawerNavigator = () => {
         options={{
           headerShown: false,
           headerStyle: {
-            backgroundColor:  theme === 'dark' ? '#000' : ERP_COLOR_CODE.ERP_APP_COLOR,  
+            backgroundColor: theme === 'dark' ? '#000' : ERP_COLOR_CODE.ERP_APP_COLOR,
           },
-          headerTintColor:  '#fff',
-          title: t('navigation.home')
+          headerTintColor: '#fff',
+          title: t('navigation.home'),
         }}
         component={TabNavigator}
       />
       <Drawer.Screen
         name="Attendance"
         component={AttendanceScreen}
-        
         options={{ title: t('navigation.attendance') }}
       />
       <Drawer.Screen

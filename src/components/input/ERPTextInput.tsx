@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity } from 'react-native';
-import { ERPTextInputProps } from '../types';
-import { styles } from '../../screens/auth/login/login_style';
+import { ERPTextInputProps } from './type';
+import { styles } from './input_style';
 import MaterialIcons from '@react-native-vector-icons/material-icons';
 
 const ERPTextInput: React.FC<ERPTextInputProps> = ({
@@ -24,7 +24,8 @@ const ERPTextInput: React.FC<ERPTextInputProps> = ({
   return (
     <View style={[styles.inputContainer, containerStyle]}>
       {label ? <Text style={[styles.inputLabel, labelStyle]}>{label}</Text> : null}
-      <View style={{ position: 'relative', justifyContent: 'center' }}>
+
+      <View style={styles.inputWrapper}>
         <TextInput
           style={[
             styles.input,
@@ -34,26 +35,30 @@ const ERPTextInput: React.FC<ERPTextInputProps> = ({
           secureTextEntry={secureTextEntry && !showPassword}
           {...rest}
         />
+
         {showToggle && secureTextEntry && (
           <TouchableOpacity
             onPress={() => setShowPassword(s => !s)}
-            style={{
-              position: 'absolute',
-              right: 8,
-              top: 0,
-              height: '100%',
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}
+            style={styles.toggleButton}
             accessibilityLabel={showPassword ? 'Hide password' : 'Show password'}
           >
-            <MaterialIcons name={showPassword ? 'visibility-off' : 'visibility'} color={'#000'} size={20} />
+            <MaterialIcons
+              name={showPassword ? 'visibility-off' : 'visibility'}
+              color={'#000'}
+              size={20}
+            />
           </TouchableOpacity>
         )}
+
         {icon}
       </View>
-      {helperText && !error && <Text style={[styles.helperText, helperStyle]}>{helperText}</Text>}
-      {touched && !!error && <Text style={[styles.errorText, errorStyle]}>{error}</Text>}
+
+      {helperText && !error && (
+        <Text style={[styles.helperText, helperStyle]}>{helperText}</Text>
+      )}
+      {touched && !!error && (
+        <Text style={[styles.errorText, errorStyle]}>{error}</Text>
+      )}
     </View>
   );
 };

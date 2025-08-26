@@ -1,4 +1,5 @@
 import React from 'react';
+import { Image } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 
 import SettingsScreen from '../screens/dashboard/settings/SettingsScreen';
@@ -11,7 +12,6 @@ import PrivacyPolicyScreen from '../screens/dashboard/privacy/PrivacyPolicyScree
 import WebScreen from '../screens/dashboard/web/WebScreen';
 import ListScreen from '../screens/dashboard/list_page/ListScreen';
 import PageScreen from '../screens/dashboard/page/Page';
-import { Image } from 'react-native';
 import { ERP_ICON } from '../assets';
 import { ERP_COLOR_CODE } from '../utils/constants';
 
@@ -52,11 +52,8 @@ const StackNavigator = () => {
       <Stack.Screen options={screenOptions} name="Display" component={DisplayScreen} />
       <Stack.Screen options={screenOptions} name="Alert" component={AlertScreen} />
       <Stack.Screen options={screenOptions} name="Privacy Policy" component={PrivacyPolicyScreen} />
-
       <Stack.Screen options={screenOptions} name="Web" component={WebScreen} />
-
       <Stack.Screen options={screenOptions} name="Page" component={PageScreen} />
-
       <Stack.Screen options={screenOptions} name="List" component={ListScreen} />
     </Stack.Navigator>
   );

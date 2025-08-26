@@ -1,6 +1,7 @@
 import React from 'react';
-import { View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
+import { View, Text } from 'react-native';
 import { Formik } from 'formik';
+import { getMessaging } from '@react-native-firebase/messaging';
 
 import { erp_login_validation_schema } from '../../../../utils/validations/login_validations';
 import { styles } from '../login_style';
@@ -11,7 +12,6 @@ import useTranslations from '../../../../hooks/useTranslations';
 import ERPTextInput from '../../../../components/input/ERPTextInput';
 import ERPButton from '../../../../components/button/ERPButton';
 import useFcmToken from '../../../../hooks/useFcmToken';
-import { getMessaging } from '@react-native-firebase/messaging';
 import { generateGUID } from '../../../../utils/helpers';
 
 const LoginForm: React.FC<LoginFormProps> = ({
@@ -21,13 +21,14 @@ const LoginForm: React.FC<LoginFormProps> = ({
   showAlert,
 }) => {
   const { t } = useTranslations();
-  const { token: fcmToken, permissionGranted } = useFcmToken();
+  const { token: fcmToken } = useFcmToken();
 
   const {
     execute: validateCompanyCode,
     loading: validationLoading,
     error: validationError,
   } = useApi();
+
   const { execute: loginWithERP, loading: erpLoginLoading, error: erpLoginError } = useApi();
 
   const initialFormValues = {
@@ -39,20 +40,14 @@ const LoginForm: React.FC<LoginFormProps> = ({
   };
 
   const handleLoginSubmit = async (values: typeof initialFormValues) => {
-    console.log('🚀 ~ handleLoginSubmit ~ values-------------:', values);
     try {
       const companyValidation = await validateCompanyCode(() =>
         DevERPService.validateCompanyCode(values.company_code),
       );
       if (!companyValidation?.isValid) {
-        // showAlert({
-        //   title: t('auth.error'),
-        //   message: companyValidation?.message || t('auth.invalidCompanyCode'),
-        //   type: 'error',
-        // });
         return;
       }
-      const currentFcmToken =  fcmToken || await getMessaging().getToken();
+      const currentFcmToken = fcmToken || (await getMessaging().getToken());
       const appId = generateGUID();
       DevERPService.setAppId(generateGUID());
       DevERPService.setDevice(deviceId);
@@ -78,8 +73,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
           type: 'error',
         });
       }
-    } catch (e) {
-    }
+    } catch (e) {}
   };
 
   return (
