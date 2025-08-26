@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity } from 'react-native';
 import { ERPTextInputProps } from '../types';
 import { styles } from '../../screens/auth/login/login_style';
+import MaterialIcons from '@react-native-vector-icons/material-icons';
 
 const ERPTextInput: React.FC<ERPTextInputProps> = ({
   label,
@@ -46,7 +47,7 @@ const ERPTextInput: React.FC<ERPTextInputProps> = ({
             }}
             accessibilityLabel={showPassword ? 'Hide password' : 'Show password'}
           >
-            <Text style={{ fontSize: 18 }}>{showPassword ? '🚫' : '👁️'}</Text>
+            <MaterialIcons name={showPassword ? 'visibility-off' : 'visibility'} color={'#000'} size={20} />
           </TouchableOpacity>
         )}
         {icon}

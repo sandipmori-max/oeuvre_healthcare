@@ -1,4 +1,3 @@
-// themeSlice.ts
 import { createSlice } from '@reduxjs/toolkit';
 import { Appearance } from 'react-native';
 

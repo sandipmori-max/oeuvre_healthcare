@@ -13,6 +13,7 @@ import ListScreen from '../screens/dashboard/list_page/ListScreen';
 import PageScreen from '../screens/dashboard/page/Page';
 import { Image } from 'react-native';
 import { ERP_ICON } from '../assets';
+import { ERP_COLOR_CODE } from '../utils/constants';
 
 const Stack = createStackNavigator<any>();
 
@@ -27,7 +28,7 @@ const StackNavigator = () => {
       />
     ),
     headerStyle: {
-      backgroundColor: '#251d50ff',
+      backgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR,
     },
     headerTintColor: '#fff',
     headerTitleStyle: {

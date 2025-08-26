@@ -15,6 +15,7 @@ import CustomAlert from '../../../components/alert/CustomAlert';
 import useTranslations from '../../../hooks/useTranslations';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { toggleTheme } from '../../../store/slices/theme/themeSlice';
+import MaterialIcons from '@react-native-vector-icons/material-icons';
 
 interface SettingItem {
   id: string;
@@ -55,7 +56,7 @@ const SettingsScreen = () => {
         id: '1',
         title: t('settings.pushNotifications'),
         subtitle: t('settings.receiveAlerts'),
-        icon: '🔔',
+        icon: 'notifications-active',
         type: 'toggle',
         value: true,
       },
@@ -63,7 +64,7 @@ const SettingsScreen = () => {
         id: '2',
         title: t('settings.emailNotifications'),
         subtitle: t('settings.getEmailUpdates'),
-        icon: '📧',
+        icon: 'mail',
         type: 'toggle',
         value: false,
       },
@@ -71,7 +72,7 @@ const SettingsScreen = () => {
         id: '3',
         title: t('settings.darkMode'),
         subtitle: t('settings.switchDarkTheme'),
-        icon: '🌙',
+        icon: 'dark-mode',
         type: 'toggle',
         value: false,
       },
@@ -79,7 +80,7 @@ const SettingsScreen = () => {
         id: '4',
         title: t('settings.biometricAuth'),
         subtitle: t('settings.useBiometric'),
-        icon: '👆',
+        icon: 'fingerprint',
         type: 'toggle',
         value: true,
       },
@@ -87,7 +88,7 @@ const SettingsScreen = () => {
         id: '5',
         title: t('settings.twoFactorAuth'),
         subtitle: t('settings.extraSecurityLayer'),
-        icon: '🔐',
+        icon: 'lock-person',
         type: 'navigate',
         action: '2FA',
       },
@@ -95,7 +96,7 @@ const SettingsScreen = () => {
         id: '6',
         title: t('settings.changePassword'),
         subtitle: t('settings.updatePassword'),
-        icon: '🔑',
+        icon: 'key',
         type: 'navigate',
         action: 'ChangePassword',
       },
@@ -103,7 +104,7 @@ const SettingsScreen = () => {
         id: '7',
         title: t('settings.privacySettings'),
         subtitle: t('settings.managePrivacy'),
-        icon: '🛡️',
+        icon: 'security',
         type: 'navigate',
         action: 'Privacy',
       },
@@ -111,7 +112,7 @@ const SettingsScreen = () => {
         id: '8',
         title: t('settings.dataStorage'),
         subtitle: t('settings.manageDataUsage'),
-        icon: '💾',
+        icon: 'storage',
         type: 'navigate',
         action: 'Storage',
       },
@@ -119,7 +120,7 @@ const SettingsScreen = () => {
         id: '9',
         title: t('settings.language'),
         subtitle: getCurrentLanguage(),
-        icon: '🌐',
+        icon: 'language',
         type: 'navigate',
         action: 'Language',
       },
@@ -127,7 +128,7 @@ const SettingsScreen = () => {
         id: '10',
         title: t('settings.aboutApp'),
         subtitle: `${t('common.version')} 1.0.0`,
-        icon: 'ℹ️',
+        icon: 'info',
         type: 'navigate',
         action: 'About',
       },
@@ -135,7 +136,7 @@ const SettingsScreen = () => {
         id: '11',
         title: t('settings.helpSupport'),
         subtitle: t('settings.getHelp'),
-        icon: '❓',
+        icon: 'help',
         type: 'navigate',
         action: 'Support',
       },
@@ -143,7 +144,7 @@ const SettingsScreen = () => {
         id: '12',
         title: t('settings.logout'),
         subtitle: t('settings.signOut'),
-        icon: '🚪',
+        icon: 'logout',
         type: 'action',
         action: 'Logout',
       },
@@ -197,7 +198,6 @@ const SettingsScreen = () => {
     setCurrentLanguage(languageCode);
     setLanguageModalVisible(false);
 
-    // Show confirmation alert
     setAlertConfig({
       title: t('language.languageChanged'),
       message: t('language.languageChangedMessage'),
@@ -214,7 +214,7 @@ const SettingsScreen = () => {
     >
       <View style={styles.settingHeader}>
         <View style={styles.settingIcon}>
-          <Text style={styles.iconText}>{item.icon}</Text>
+                <MaterialIcons name={item?.icon} color={'#000'} size={22} />
         </View>
         <View style={styles.settingInfo}>
           <Text style={styles.settingTitle}>{item.title}</Text>
@@ -270,7 +270,7 @@ const SettingsScreen = () => {
           <Text style={styles.sectionTitle}>{t('settings.notifications')}</Text>
           <FlatList
             data={settings.filter(
-              item => item.id === '1' || item.id === '2', // Push and Email notifications
+              item => item.id === '1' || item.id === '2',
             )}
             renderItem={renderSettingItem}
             keyExtractor={item => item.id}
@@ -281,7 +281,7 @@ const SettingsScreen = () => {
         <View style={styles.sectionContainer}>
           <Text style={styles.sectionTitle}>{t('settings.appearance')}</Text>
           <FlatList
-            data={settings.filter(item => item.id === '3')} // Dark Mode
+            data={settings.filter(item => item.id === '3')}
             renderItem={renderSettingItem}
             keyExtractor={item => item.id}
             scrollEnabled={false}
@@ -293,10 +293,10 @@ const SettingsScreen = () => {
           <FlatList
             data={settings.filter(
               item =>
-                item.id === '4' || // Biometric Authentication
-                item.id === '5' || // Two-Factor Authentication
-                item.id === '6' || // Change Password
-                item.id === '7', // Privacy Settings
+                item.id === '4' ||  
+                item.id === '5' || 
+                item.id === '6' || 
+                item.id === '7',
             )}
             renderItem={renderSettingItem}
             keyExtractor={item => item.id}
@@ -309,10 +309,10 @@ const SettingsScreen = () => {
           <FlatList
             data={settings.filter(
               item =>
-                item.id === '8' || // Data & Storage
-                item.id === '9' || // Language
-                item.id === '10' || // About App
-                item.id === '11', // Help & Support
+                item.id === '8' || 
+                item.id === '9' ||  
+                item.id === '10' || 
+                item.id === '11',  
             )}
             renderItem={renderSettingItem}
             keyExtractor={item => item.id}
@@ -323,18 +323,17 @@ const SettingsScreen = () => {
         <View style={styles.sectionContainer}>
           <Text style={styles.sectionTitle}>{t('settings.account')}</Text>
           <FlatList
-            data={settings.filter(item => item.id === '12')} // Logout
+            data={settings.filter(item => item.id === '12')} 
             renderItem={renderSettingItem}
             keyExtractor={item => item.id}
             scrollEnabled={false}
           />
         </View>
 
-        {/* Bottom spacing for better scroll experience */}
+       
         <View style={styles.bottomSpacing} />
       </ScrollView>
-
-      {/* Language Selection Modal */}
+ 
       <Modal
         visible={languageModalVisible}
         transparent

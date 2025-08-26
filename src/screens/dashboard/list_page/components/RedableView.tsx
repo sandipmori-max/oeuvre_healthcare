@@ -1,10 +1,13 @@
 import { View, Text, TouchableOpacity, Alert, Dimensions, FlatList, Image } from 'react-native';
 import React, { useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
+
 import { formatDateToDDMMMYYYY, formatTimeTo12Hour } from '../../../../utils/helpers';
 import { styles } from '../list_page_style';
 import NoData from '../../../../components/no_data/NoData';
 import { ERP_ICON } from '../../../../assets';
+import CustomAlert from '../../../../components/alert/CustomAlert';
+import { ERP_COLOR_CODE } from '../../../../utils/constants';
 
 const RedableView = ({
   configData,
@@ -24,6 +27,14 @@ const RedableView = ({
       color: configItem?.colorcode || '#007BFF',
     };
   };
+
+  const [alertVisible, setAlertVisible] = useState(false);
+
+  const [alertConfig, setAlertConfig] = useState({
+    title: '',
+    message: '',
+    type: 'info' as 'error' | 'success' | 'info',
+  });
 
   const RenderCard = ({ item, index }: any) => {
     if (!item) return null;
@@ -49,20 +60,45 @@ const RedableView = ({
     return (
       <View
         style={{
-          backgroundColor:
-            item?.success === '1' ? '#f2f7f0ff' : status === 'DeActive' ? '#fae7e7ff' : '#fff',
+          backgroundColor: '#fff',
           borderRadius: 8,
-          padding: 16,
+          paddingHorizontal: 16,
+          paddingBottom: 16,
           marginVertical: 4,
+          paddingTop: status ? 0 : 16,
           borderWidth: 1,
           borderColor: '#ddd',
         }}
       >
+        { status && (
+          <View
+            style={{
+              width: '100%',
+              alignContent: 'center',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+          >
+            <View
+              style={{
+                borderBottomRightRadius: 10,
+                borderBottomLeftRadius: 10,
+                paddingHorizontal: 12,
+                backgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR,
+                paddingVertical: 2,
+                opacity: 0.6,
+              }}
+            >
+              <Text style={{ fontWeight: '600', color: '#fff' }}>{status}</Text>
+            </View>
+          </View>
+        )}
+
         <TouchableOpacity
           activeOpacity={0.8}
           style={{ flexDirection: 'row', alignItems: 'center' }}
           onPress={async () => {
-            navigation.navigate('Page', { item, title: pageParamsName });
+            navigation.navigate('Page', { item, title: pageParamsName, id: index + 1 });
           }}
         >
           <View
@@ -70,7 +106,7 @@ const RedableView = ({
               width: 48,
               height: 48,
               borderRadius: 24,
-              backgroundColor: '#251d50ff',
+              backgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR,
               justifyContent: 'center',
               alignItems: 'center',
               marginRight: 12,
@@ -82,7 +118,7 @@ const RedableView = ({
 
           <View style={{ flex: 1 }}>
             <Text style={{ fontSize: 16, fontWeight: '700' }} numberOfLines={1}>
-              {name}
+              {name} 
             </Text>
             <Text style={{ fontSize: 12 }} numberOfLines={1}>
               {subName}
@@ -174,24 +210,39 @@ const RedableView = ({
         </TouchableOpacity>
 
         {btnKeys.length > 0 && (
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginTop: 14, gap: 8 }}>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginTop: 14, gap: 1 }}>
             {btnKeys.map((key, idx) => {
               const actionValue = item[key];
               const { label, color } = getButtonMeta(key);
-
+              const authUser = item['authuser'];
+              console.log('🚀 ~ authUs̥er:', authUser);
               return (
                 <TouchableOpacity
                   key={`${key}-${idx}`}
                   style={{
-                    backgroundColor: color,
-                    paddingHorizontal: 12,
+                    backgroundColor: authUser ? 'gray' : color,
+                    paddingHorizontal: 6,
                     paddingVertical: 8,
                     borderRadius: 6,
                     flexGrow: 1,
                     maxWidth: (screenWidth - 64) / 2,
                     alignItems: 'center',
                   }}
-                  onPress={() => Alert.alert(`${label} pressed`, `Value: ${actionValue}`)}
+                  onPress={() => {
+                    if (authUser) {
+                      return;
+                    }
+                    if (actionValue.includes('API')) {
+                      setAlertConfig({
+                        title: label,
+                        message: `Are you sure you want to ${label.toLowerCase()} ?`,
+                        type: 'info',
+                      });
+                      setAlertVisible(true);
+                    } else {
+                      Alert.alert(`${label} pressed`, `Value: ${actionValue}`);
+                    }
+                  }}
                 >
                   <Text style={{ color: '#fff', fontWeight: '600', fontSize: 13 }}>{label}</Text>
                 </TouchableOpacity>
@@ -204,7 +255,7 @@ const RedableView = ({
   };
 
   return (
-    <View style={{flex:1}}>
+    <View style={{ flex: 1 }}>
       <FlatList
         data={filteredData}
         showsHorizontalScrollIndicator={false}
@@ -253,6 +304,15 @@ const RedableView = ({
             </View>
           ) : null
         }
+      />
+      <CustomAlert
+        visible={alertVisible}
+        title={alertConfig.title}
+        message={alertConfig.message}
+        type={alertConfig.type}
+        onClose={() => setAlertVisible(false)}
+        onCancel={() => setAlertVisible(false)}
+        onDone={() => {}}
       />
     </View>
   );

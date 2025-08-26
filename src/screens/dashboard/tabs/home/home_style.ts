@@ -1,7 +1,7 @@
 import { StyleSheet, Dimensions } from 'react-native';
 
 const { width } = Dimensions.get('window');
-const itemWidth = (width - 48) / 2; // 2 columns with margins
+const itemWidth = (width - 48) / 2;  
 
 export const styles = StyleSheet.create({
   container: {
@@ -14,16 +14,16 @@ export const styles = StyleSheet.create({
   },
   chartContainer: {
     padding: 16,
-    backgroundColor: '#fff',
-    justifyContent:'center',
-    alignContent:'center',
-    alignItems:'center'
+    justifyContent: 'center',
+    alignContent: 'center',
+    alignItems: 'center',
+   
   },
   chartTitle: {
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 12,
-    color: '#333',
+    color: '#000',
   },
   header: {
     backgroundColor: '#FFFFFF',
@@ -49,14 +49,12 @@ export const styles = StyleSheet.create({
     fontWeight: '400',
   },
 
-  // Dashboard Section
   dashboardSection: {
     flex: 1,
     paddingHorizontal: 16,
     paddingTop: 20,
   },
 
-  // Grid Layout
   dashboardGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',

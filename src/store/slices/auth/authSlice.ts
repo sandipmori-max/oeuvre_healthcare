@@ -10,7 +10,6 @@ import {
   getERPDashboardThunk,
 } from './thunk';
 
-// Initial state
 const initialState: AuthState = {
   user: null,
   accounts: [],
@@ -25,7 +24,6 @@ const initialState: AuthState = {
   activeToken: null,
 };
 
-// Auth slice
 const authSlice = createSlice({
   name: 'auth',
   initialState,
@@ -64,7 +62,6 @@ const authSlice = createSlice({
   extraReducers: builder => {
     builder
 
-      // Check auth state
       .addCase(checkAuthStateThunk.pending, state => {
         state.isLoading = true;
       })
@@ -86,7 +83,6 @@ const authSlice = createSlice({
         state.error = action?.payload as string;
       })
 
-      // Login user
       .addCase(loginUserThunk.pending, state => {
         state.isLoading = true;
         state.error = null;
@@ -115,7 +111,6 @@ const authSlice = createSlice({
         state.error = action.payload as string;
       })
 
-      // Switch account
       .addCase(switchAccountThunk.pending, state => {
         state.isLoading = true;
       })
@@ -124,7 +119,6 @@ const authSlice = createSlice({
         state.user = action?.payload?.user;
         state.activeAccountId = action?.payload?.accountId;
         state.accounts = action?.payload?.accounts;
-        console.log('🚀 ~ action-------->:', action?.payload?.user);
         state.activeToken = action?.payload?.user?.token || null;
 
         state.error = null;
@@ -134,7 +128,6 @@ const authSlice = createSlice({
         state.error = action?.payload as string;
       })
 
-      // Remove account
       .addCase(removeAccountThunk.pending, state => {
         state.isLoading = true;
       })
@@ -152,7 +145,6 @@ const authSlice = createSlice({
         state.error = action?.payload as string;
       })
 
-      // Logout user
       .addCase(logoutUserThunk.fulfilled, state => {
         state.isLoading = false;
         state.user = null;
@@ -169,58 +161,35 @@ const authSlice = createSlice({
         state.error = action?.payload as string;
       })
 
-      // Get ERP Menu
       .addCase(getERPMenuThunk.pending, state => {
         state.isMenuLoading = true;
       })
       .addCase(getERPMenuThunk.fulfilled, (state, action) => {
         state.isMenuLoading = false;
-        console.log('🚀 ~ getERPMenuThunk.fulfilled ~ action.payload:', action.payload);
-        console.log('🚀 ~ action.payload type:', typeof action.payload);
 
-        // Parse the menu data from the API response structure
         try {
           let menuData;
           if (typeof action.payload === 'string') {
-            // If it's a string, try to parse it
-            console.log('🚀 ~ Parsing string payload...');
             menuData = JSON.parse(action.payload);
           } else {
-            // If it's already an object, use it directly
-            console.log('🚀 ~ Using object payload directly...');
             menuData = action.payload;
           }
 
-          console.log('🚀 ~ parsed menuData:', menuData);
-
-          // Extract menus from the response
           let menus = [];
           if (menuData) {
             if (menuData.success === 1 && menuData.menus) {
-              // Direct access to menus array
-              console.log('🚀 ~ Direct access to menus:', menuData.menus.length);
               menus = menuData.menus;
             } else if (menuData.d) {
-              // Parse the inner d property which contains the actual menu data
               try {
-                console.log('🚀 ~ Attempting to parse inner d property...');
                 const innerData = JSON.parse(menuData.d);
-                console.log('🚀 ~ innerData:', innerData);
                 if (innerData?.success === 1 && innerData?.menus) {
                   menus = innerData.menus;
-                  console.log('🚀 ~ Successfully extracted menus from d property:', menus.length);
                 }
               } catch (innerParseError) {
                 console.error('Error parsing inner d property:', innerParseError);
-                console.log('Raw d property value:', menuData.d);
               }
             }
           }
-
-          console.log('🚀 ~ extracted menus:', menus);
-          console.log('🚀 ~ menus length:', menus.length);
-
-          // Convert the API menu structure to our MenuItem interface
           state.menu = menus.map((menu: any, index: number) => ({
             id: menu.Link || `menu_${index}`,
             name: menu.Name || '',
@@ -230,12 +199,7 @@ const authSlice = createSlice({
             title: menu.Title || '',
             isReport: menu.IsReport === '1',
           }));
-
-          console.log('🚀 ~ final state.menu:', state.menu);
         } catch (error) {
-          console.error('Error parsing menu data:', error);
-          console.log('Raw menu payload:', action.payload);
-          console.log('Raw menu payload type:', typeof action.payload);
           state.menu = [];
         }
       })
@@ -244,13 +208,11 @@ const authSlice = createSlice({
         state.error = action.payload as string;
       })
 
-      // Get ERP Dashboard
       .addCase(getERPDashboardThunk.pending, state => {
         state.isDashboardLoading = true;
       })
       .addCase(getERPDashboardThunk.fulfilled, (state, action) => {
         state.isDashboardLoading = false;
-        console.log('🚀 ~ getERPDashboardThunk.fulfilled ~ action.payload:', action.payload);
 
         try {
           let dashboardData;
@@ -260,51 +222,30 @@ const authSlice = createSlice({
             dashboardData = action.payload;
           }
 
-          console.log('🚀 ~ parsed dashboardData:', dashboardData);
-
           let dashboardItems = [];
 
-          // Handle the nested structure: data.d contains the stringified JSON
           if (dashboardData.data && dashboardData.data.d) {
             try {
-              console.log('🚀 ~ Attempting to parse data.d property...');
               const innerData = JSON.parse(dashboardData.data.d);
-              console.log('🚀 ~ innerData from data.d:', innerData);
               if (innerData?.success === 1 && innerData?.dbs) {
                 dashboardItems = innerData.dbs;
-                console.log(
-                  '🚀 ~ Successfully extracted dbs from data.d property:',
-                  dashboardItems.length,
-                );
               }
             } catch (innerParseError) {
               console.error('Error parsing data.d property:', innerParseError);
-              console.log('Raw data.d value:', dashboardData.data.d);
             }
           } else if (dashboardData.success === 1 && dashboardData.dbs) {
-            // Direct access to dbs array (fallback)
-            console.log('🚀 ~ Direct access to dbs:', dashboardData.dbs.length);
             dashboardItems = dashboardData.dbs;
           } else if (dashboardData.d) {
-            // Parse the inner d property (another fallback)
             try {
               const innerData = JSON.parse(dashboardData.d);
-              console.log('🚀 ~ innerData from d:', innerData);
               if (innerData?.success === 1 && innerData?.dbs) {
                 dashboardItems = innerData.dbs;
-                console.log(
-                  '🚀 ~ Successfully extracted dbs from d property:',
-                  dashboardItems.length,
-                );
               }
             } catch (innerParseError) {
               console.error('Error parsing inner d property:', innerParseError);
             }
           }
 
-          console.log('🚀 ~ extracted dashboardItems:', dashboardItems);
-
-          // Convert to DashboardItem interface
           state.dashboard = dashboardItems.map((item: any, index: number) => ({
             id: item.Link || `dashboard_${index}`,
             name: item.Name || '',
@@ -313,12 +254,8 @@ const authSlice = createSlice({
             title: item.Title || '',
             isReport: item.IsReport === '1' || item.IsReport === '2',
           }));
-
-          console.log('🚀 ~ final state.dashboard:', state.dashboard);
         } catch (error) {
           console.error('Error parsing dashboard data:', error);
-          console.log('Raw dashboard payload:', action.payload);
-          console.log('Raw dashboard payload type:', typeof action.payload);
           state.dashboard = [];
         }
       })

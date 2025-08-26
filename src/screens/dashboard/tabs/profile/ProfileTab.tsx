@@ -8,6 +8,7 @@ import { useAppSelector } from '../../../../store/hooks';
 import { firstLetterUpperCase, formatDateMonthDateYear } from '../../../../utils/helpers';
 import AddAccountScreen from '../../add_account/AddAccountScreen';
 import ERPIcon from '../../../../components/icon/ERPIcon';
+import MaterialIcons from '@react-native-vector-icons/material-icons';
 
 const ProfileTab = () => {
   const navigation = useNavigation<any>();
@@ -26,12 +27,18 @@ const ProfileTab = () => {
     navigation.setOptions({
       headerRight: () => (
         <>
+          <ERPIcon
+            name="add"
+            onPress={() => {
+              handleAddAccount();
+            }}
+          />
           <ERPIcon name="refresh" />
         </>
       ),
       headerLeft: () => (
         <>
-           <ERPIcon extSize={24} isMenu={true} name="menu" onPress={() => navigation.openDrawer()} />
+          <ERPIcon extSize={24} isMenu={true} name="menu" onPress={() => navigation.openDrawer()} />
         </>
       ),
     });
@@ -48,7 +55,7 @@ const ProfileTab = () => {
           <View style={styles.profileCard}>
             <View style={styles.profileHeader}>
               <View style={styles.profileAvatar}>
-                <Text style={{ fontSize: 32 }}>👤</Text>
+                <MaterialIcons name={'person'} color={'#000'} size={40} />
               </View>
               <View style={styles.profileInfo}>
                 <Text style={styles.profileName}>{firstLetterUpperCase(user?.name)}</Text>
@@ -62,7 +69,7 @@ const ProfileTab = () => {
                 onPress={() => navigation.navigate('Settings')}
                 activeOpacity={0.8}
               >
-                <Text style={styles.switchButtonText}>⚙️</Text>
+                <MaterialIcons name={'settings'} color={'#000'} size={28} />
               </TouchableOpacity>
             </View>
           </View>
@@ -74,7 +81,7 @@ const ProfileTab = () => {
           <TouchableOpacity style={styles.settingCard} onPress={() => setShowAccountSwitcher(true)}>
             <View style={styles.settingHeader}>
               <View style={styles.settingIcon}>
-                <Text style={styles.iconText}>👥</Text>
+                <MaterialIcons name={'group'} color={'#000'} size={22} />
               </View>
               <View style={styles.settingInfo}>
                 <Text style={styles.settingTitle}>Manage Accounts</Text>
@@ -90,7 +97,7 @@ const ProfileTab = () => {
             <View style={styles.settingCard}>
               <View style={styles.settingHeader}>
                 <View style={styles.settingIcon}>
-                  <Text style={styles.iconText}>🕒</Text>
+                  <MaterialIcons name={'access-time'} color={'#000'} size={22} />
                 </View>
                 <View style={styles.settingInfo}>
                   <Text style={styles.settingTitle}>Last Login</Text>
@@ -105,16 +112,6 @@ const ProfileTab = () => {
 
         <View style={styles.bottomSpacing} />
       </ScrollView>
-
-      <View style={styles.actionsSection}>
-        <TouchableOpacity
-          style={styles.addAccountButton}
-          onPress={handleAddAccount}
-          activeOpacity={0.8}
-        >
-          <Text style={styles.addAccountButtonText}>+ Add Another Account</Text>
-        </TouchableOpacity>
-      </View>
 
       <AccountSwitcher
         visible={showAccountSwitcher}

@@ -94,7 +94,7 @@ const TableView = ({ configData, filteredData, loadingListId, totalAmount, pageP
           {Object.values(rows).map((colItems, colIndex) => (
             <View key={`row-col-${colIndex}`} style={{ flexDirection: 'column', marginRight: 1 }}>
               {colItems
-                .filter(key => !key.startsWith('btn_')) // <-- filter out keys starting with "btn_"
+                .filter(key => !key.startsWith('btn_'))
                 .map(key => {
                   let value = item[key];
                   if (typeof value === 'object' && value !== null) {
@@ -131,13 +131,15 @@ const TableView = ({ configData, filteredData, loadingListId, totalAmount, pageP
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginTop: 14, gap: 8 }}>
               {btnKeys.map((key, idx) => {
                 const actionValue = item[key];
+                const authUser = item['authuser']
+                console.log("🚀 ~ authUs̥er:", authUser)
                 const { label, color } = getButtonMeta(key);
 
                 return (
                   <TouchableOpacity
                     key={`${key}-${idx}`}
                     style={{
-                      backgroundColor: color,
+                      backgroundColor: authUser ? 'gray' : color,
                       paddingHorizontal: 12,
                       paddingVertical: 8,
                       borderRadius: 6,

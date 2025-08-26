@@ -22,7 +22,7 @@ const TabNavigator = () => {
     <Tab.Navigator
       screenOptions={{
         headerShown: true,
-        tabBarActiveTintColor: '#251d50ff',
+        tabBarActiveTintColor: ERP_COLOR_CODE.ERP_APP_COLOR,
         tabBarInactiveTintColor: '#8E8E93',
         tabBarStyle: {
           backgroundColor: theme === 'dark' ? ERP_COLOR_CODE.ERP_BLACK : ERP_COLOR_CODE.ERP_WHITE,
@@ -37,7 +37,7 @@ const TabNavigator = () => {
           fontWeight: '500',
         },
         headerStyle: {
-          backgroundColor:'#251d50ff',
+          backgroundColor:ERP_COLOR_CODE.ERP_APP_COLOR,
         },
         headerTintColor:  'white',
         headerTitleStyle: {
@@ -53,7 +53,7 @@ const TabNavigator = () => {
           tabBarLabel: t('navigation.home'),
           title: t('navigation.home'),
           headerStyle: {
-            backgroundColor: '#251d50ff',
+            backgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR,
           },
           tabBarLabelStyle: {
             fontSize: 12,

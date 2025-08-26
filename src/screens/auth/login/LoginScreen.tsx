@@ -9,7 +9,6 @@ import {
 } from 'react-native';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { loginUserThunk } from '../../../store/slices/auth/thunk';
-import KeyboardAwareWrapper from '../../../components/KeyboardAwareWrapper';
 import DeviceInfo from 'react-native-device-info';
 import CustomAlert from '../../../components/alert/CustomAlert';
 import useTranslations from '../../../hooks/useTranslations';
@@ -32,8 +31,6 @@ const LoginScreen = ({ navigation, route }: any) => {
 
     fetchDeviceName();
   }, []);
-  const appId = DeviceInfo.getBundleId();
-  console.log("🚀 ~ LoginScreen ~ deviceId:", deviceId)
   const isAddingAccount = route?.params?.isAddingAccount || false;
 
   const [alertVisible, setAlertVisible] = useState(false);
@@ -66,7 +63,6 @@ const LoginScreen = ({ navigation, route }: any) => {
         <View style={styles.formContainer}>
           <LoginHeader isAddingAccount={isAddingAccount} t={t} />
           <LoginForm
-            appId={appId}
             deviceId={deviceId}
             isAddingAccount={isAddingAccount}
             isLoading={isLoading}

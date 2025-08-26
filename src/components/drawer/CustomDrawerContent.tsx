@@ -3,23 +3,31 @@ import { View, Text, Image, TouchableOpacity } from 'react-native';
 import { DrawerContentComponentProps, DrawerContentScrollView } from '@react-navigation/drawer';
 import { useNavigation } from '@react-navigation/native';
 
-import { ERP_ICON } from '../../assets';
 import { useAppSelector } from '../../store/hooks';
 import { firstLetterUpperCase } from '../../utils/helpers';
 import { ERP_DRAWER_LIST } from '../../constants';
 import { styles } from './drawer_style';
+import MaterialIcons from '@react-native-vector-icons/material-icons';
 
 const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
   const navigation = useNavigation();
   const { user } = useAppSelector(state => state?.auth);
   const currentRoute = props.state.routeNames[props.state.index];
-    const theme = useAppSelector(state => state.theme);
-  
+  const theme = useAppSelector(state => state.theme);
+
   return (
-    <DrawerContentScrollView {...props} contentContainerStyle={{ flex: 1, backgroundColor: theme === 'dark' ? 'black': 'white' }}>
+    <DrawerContentScrollView
+      {...props}
+      contentContainerStyle={{ flex: 1, backgroundColor: theme === 'dark' ? 'black' : 'white' }}
+    >
       <View style={styles.header}>
-        <Image source={ERP_ICON.APP_LOGO} style={styles.profileImage} />
+        <Image
+          source={{ uri: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=600' }}
+          style={styles.profileImage}
+        />
         <Text style={styles.username}>{firstLetterUpperCase(user?.name || '')}</Text>
+        <Text style={styles.userPhone}>+91 987654321</Text>
+
       </View>
 
       <View style={styles.menuContainer}>
@@ -41,20 +49,25 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
               }}
             >
               <View style={styles.itemRow}>
-                <Text style={[styles.itemIcon, isActive && styles.activeText,
-                  
-
-                ]}>{item.icon}</Text>
-                <Text style={[styles.itemLabel, isActive && styles.activeText , {
-                  color:  isActive ? '#fff' : '#000',
-                }]}>{item.label}</Text>
+                <MaterialIcons name={`${item.icon}`} color={isActive ? '#fff' : '#000'} size={20} />
+                <Text
+                  style={[
+                    styles.itemLabel,
+                    isActive && styles.activeText,
+                    {
+                      color: isActive ? '#fff' : '#000',
+                    },
+                  ]}
+                >
+                  {item.label}
+                </Text>
               </View>
             </TouchableOpacity>
           );
         })}
       </View>
-      <View style={styles.logoutButton} >
-        <Text style={styles.logoutText}>DevERP</Text>
+      <View style={styles.logoutButton}>
+        <Text style={styles.logoutText}>DevERP Mobile app</Text>
       </View>
     </DrawerContentScrollView>
   );

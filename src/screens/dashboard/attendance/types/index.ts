@@ -1,7 +1,6 @@
 export interface User {
   id: string;
   name: string;
-  email: string;
   phone: string;
   image: string;
   status: 'checkin' | 'checkout';
@@ -20,4 +19,5 @@ export interface AttendanceFormValues {
   longitude: string;
   remark: string;
   dateTime: string;
+  imageBase64: string;
 }

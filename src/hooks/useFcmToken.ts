@@ -47,7 +47,6 @@ const requestUserPermission = async (): Promise<boolean> => {
     return enabled;
   }
 
-  // Android - Always return true
   return true;
 };
 

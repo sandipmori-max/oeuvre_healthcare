@@ -1,5 +1,4 @@
 export interface LoginFormProps {
-  appId: string;
   deviceId: string;
   isAddingAccount: boolean;
   isLoading: boolean;

@@ -10,18 +10,16 @@ import NoData from '../../../../components/no_data/NoData';
 import ERPIcon from '../../../../components/icon/ERPIcon';
 import { BarChart, PieChart } from 'react-native-gifted-charts';
 import { getERPDashboardThunk, getERPMenuThunk } from '../../../../store/slices/auth/thunk';
- const HomeScreen = () => {
+const HomeScreen = () => {
   const navigation = useNavigation<any>();
   const dispatch = useAppDispatch();
-  const { isLoading, isAuthenticated, activeToken } = useAppSelector(state => state.auth);
+  const { isLoading, isAuthenticated, activeToken } = useAppSelector(state => state.auth); 
 
   const { dashboard, isDashboardLoading } = useAppSelector(state => state.auth);
   const [loadingPageId, setLoadingPageId] = useState<string | null>(null);
   const [isRefresh, setIsRefresh] = useState<boolean>(false);
 
-  
-
-  const theme = useAppSelector(state => state.theme); 
+  const theme = useAppSelector(state => state.theme);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -58,7 +56,7 @@ import { getERPDashboardThunk, getERPMenuThunk } from '../../../../store/slices/
 
   const accentColors = ['#4C6FFF', '#00C2A8', '#FFB020', '#FF6B6B', '#9B59B6', '#20C997'];
   const pieChartData = dashboard
-    .filter(item => !isNaN(Number(item.data))) // filter numeric data only
+    .filter(item => !isNaN(Number(item.data)))
     .map((item, index) => ({
       value: Number(item.data),
       color: accentColors[index % accentColors.length],
@@ -88,7 +86,6 @@ import { getERPDashboardThunk, getERPMenuThunk } from '../../../../store/slices/
         }}
       >
         <View style={styles.dashboardItemContent}>
-          {/* Header with icon, name and badge */}
           <View style={styles.dashboardItemHeader}>
             <View style={styles.dashboardItemTopRow}>
               <View
@@ -179,30 +176,31 @@ import { getERPDashboardThunk, getERPMenuThunk } from '../../../../store/slices/
         <>
           {' '}
           {dashboard.length > 0 && (
+           <View style={{
+            borderColor: '#000',
+            borderBottomWidth: 1,
+            flexDirection:'row', justifyContent:'center', alignContent:'center', alignItems:'center'}}>
             <View style={styles.chartContainer}>
-              <Text style={styles.chartTitle}>Overview</Text>
               <PieChart
                 data={pieChartData}
                 donut
-                showText
                 radius={90}
                 textSize={14}
                 innerRadius={50}
-                textColor="#333"
+                textColor="#000"
                 showValuesAsLabels
                 labelPosition="outside"
+                innerCircleColor="#fff"
                 centerLabelComponent={() => (
-                  <Text style={{ fontSize: 16, fontWeight: 'bold' }}>
-                    Total: {pieChartData.reduce((sum, item) => sum + item.value, 0)}
+                  <Text style={{ textAlign:'center', fontSize: 16, fontWeight: 'bold', color:'#000' }}>
+                    Total{`\n ${pieChartData.reduce((sum, item) => sum + item.value, 0)}`}
                   </Text>
                 )}
               />
+             
             </View>
-          )}
-          <View
-            style={{
-              flexDirection: 'row',
-              flexWrap: 'wrap',
+             <View
+            style={{ 
               justifyContent: 'center',
               marginTop: 16,
             }}
@@ -232,6 +230,9 @@ import { getERPDashboardThunk, getERPMenuThunk } from '../../../../store/slices/
               </View>
             ))}
           </View>
+           </View>
+          )}
+          
           <View style={styles.dashboardSection}>
             {isDashboardLoading ? (
               renderLoadingState()

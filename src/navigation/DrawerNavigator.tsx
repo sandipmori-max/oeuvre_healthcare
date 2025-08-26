@@ -8,6 +8,7 @@ import TabNavigator from './TabNavigator';
 import CustomDrawerContent from '../components/drawer/CustomDrawerContent';
 import useTranslations from '../hooks/useTranslations';
 import { useAppSelector } from '../store/hooks';
+import { ERP_COLOR_CODE } from '../utils/constants';
 
 const Drawer = createDrawerNavigator();
 
@@ -25,7 +26,7 @@ const DrawerNavigator = () => {
         options={{
           headerShown: false,
           headerStyle: {
-            backgroundColor:  theme === 'dark' ? '#000' : '#251d50ff',  
+            backgroundColor:  theme === 'dark' ? '#000' : ERP_COLOR_CODE.ERP_APP_COLOR,  
           },
           headerTintColor:  '#fff',
           title: t('navigation.home')

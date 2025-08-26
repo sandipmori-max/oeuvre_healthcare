@@ -9,20 +9,20 @@ export const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 20,
-    backgroundColor: ERP_COLOR_CODE.ERP_WHITE,
+    padding: 12,
+    backgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR,
     borderBottomWidth: 1,
     borderBottomColor: ERP_COLOR_CODE.ERP_BORDER,
   },
   back:{
     width: 24,
     height: 24,
-    tintColor: ERP_COLOR_CODE.ERP_BLACK,
+    tintColor: '#fff',
   },
   title: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#fff',
   },
   closeButton: {
     paddingHorizontal: 12,
@@ -46,8 +46,8 @@ export const styles = StyleSheet.create({
     borderColor: 'transparent',
   },
   activeAccount: {
-    borderColor: ERP_COLOR_CODE.ERP_ACTIVE_BUTTON,
-    backgroundColor: ERP_COLOR_CODE.ERP_ACTIVE_BACKGROUND,
+    borderColor: ERP_COLOR_CODE.ERP_APP_COLOR,
+    backgroundColor: '#fff'
   },
   accountContent: {
     flexDirection: 'row',
@@ -81,7 +81,7 @@ export const styles = StyleSheet.create({
     color: ERP_COLOR_CODE.ERP_ACTIVE_BUTTON,
   },
   activeIndicator: {
-    backgroundColor: ERP_COLOR_CODE.ERP_ACTIVE_BUTTON,
+    backgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR,
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 24,
@@ -110,7 +110,7 @@ export const styles = StyleSheet.create({
   addAccountButton: {
     margin: 20,
     padding: 15,
-    backgroundColor: ERP_COLOR_CODE.ERP_ACTIVE_BUTTON,
+    backgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR,
     borderRadius: 12,
     alignItems: 'center',
   },
