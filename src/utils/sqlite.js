@@ -39,7 +39,6 @@ export const createAccountsTable = async db => {
     await db.executeSql(ERP_QUERY_ACCOUNTS_TABLE_CREATE);
     await db.executeSql(ERP_QUERY_META_TABLE_CREATE);
 
-    // Debug: Check table structure
     try {
       const tableInfo = await db.executeSql(`PRAGMA table_info(${ERP_TABLE.ERP_ACCOUNTS})`);
       console.log('🔍 Table structure:', tableInfo[0].rows);
@@ -95,7 +94,6 @@ export const updateAccountActive = async (db, accountId) => {
     );
     console.log('🔍 updateAccountActive completed successfully');
 
-    // Debug: Check what was actually updated
     const checkResult = await db.executeSql(
       `SELECT lastLoginAt FROM ${ERP_TABLE.ERP_ACCOUNTS} WHERE id = ?`,
       [accountId],
@@ -118,7 +116,6 @@ export const getAccounts = async db => {
     console.log('🔍 getAccounts called');
     const results = await db.executeSql(`SELECT * FROM ${ERP_TABLE.ERP_ACCOUNTS}`);
 
-    // Debug: Check raw database contents
     await debugDatabaseContents(db);
 
     const accounts = [];
@@ -215,7 +212,6 @@ export const clearAccounts = async db => {
   }
 };
 
-// Debug function to check database contents
 export const debugDatabaseContents = async db => {
   try {
     console.log('🔍 Debug: Checking database contents...');

@@ -37,7 +37,7 @@ const ReportTab = () => {
     navigation.setOptions({
       headerRight: () => (
         <>
-          <ERPIcon name= {isHorizontal ? 'list' : 'apps'} onPress={() => setIsHorizontal(prev => !prev)} />
+          <ERPIcon name= {!isHorizontal ? 'list' : 'apps'} onPress={() => setIsHorizontal(prev => !prev)} />
 
           <ERPIcon name={showBookmarksOnly ? 'star' : 'allout'} onPress={() => setShowBookmarksOnly(prev => !prev)} />
 

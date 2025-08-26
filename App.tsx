@@ -12,6 +12,8 @@ import CustomAlert from './src/components/alert/CustomAlert';
 import { TranslationProvider } from './src/components/TranslationProvider';
 
 import './src/i18n';
+import { StatusBar } from 'react-native';
+import { ERP_COLOR_CODE } from './src/utils/constants';
 
 const App = () => {
   const isConnected = useNetworkStatus();
@@ -67,6 +69,7 @@ const App = () => {
     <TranslationProvider>
       <Provider store={store}>
         <NavigationContainer>
+          <StatusBar backgroundColor={ERP_COLOR_CODE.ERP_APP_COLOR}/>
           <RootNavigator />
         </NavigationContainer>
         <CustomAlert

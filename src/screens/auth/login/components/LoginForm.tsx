@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
 import { Formik } from 'formik';
 
 import { erp_login_validation_schema } from '../../../../utils/validations/login_validations';
@@ -12,16 +12,16 @@ import ERPTextInput from '../../../../components/input/ERPTextInput';
 import ERPButton from '../../../../components/button/ERPButton';
 import useFcmToken from '../../../../hooks/useFcmToken';
 import { getMessaging } from '@react-native-firebase/messaging';
+import { generateGUID } from '../../../../utils/helpers';
 
 const LoginForm: React.FC<LoginFormProps> = ({
-  appId,
   deviceId,
   isLoading,
   onLoginSuccess,
   showAlert,
 }) => {
   const { t } = useTranslations();
-  const { token: fcmToken, permissionGranted } = useFcmToken(); 
+  const { token: fcmToken, permissionGranted } = useFcmToken();
 
   const {
     execute: validateCompanyCode,
@@ -30,19 +30,16 @@ const LoginForm: React.FC<LoginFormProps> = ({
   } = useApi();
   const { execute: loginWithERP, loading: erpLoginLoading, error: erpLoginError } = useApi();
 
-  // Initial form values
   const initialFormValues = {
     company_code: '',
     user: '',
     password: '',
-    appid: appId,
     firebaseid: fcmToken,
     device: deviceId,
   };
 
-  // Submit handler function
   const handleLoginSubmit = async (values: typeof initialFormValues) => {
-    console.log("🚀 ~ handleLoginSubmit ~ values-------------:", values)
+    console.log('🚀 ~ handleLoginSubmit ~ values-------------:', values);
     try {
       const companyValidation = await validateCompanyCode(() =>
         DevERPService.validateCompanyCode(values.company_code),
@@ -55,13 +52,12 @@ const LoginForm: React.FC<LoginFormProps> = ({
         // });
         return;
       }
-  const currentFcmToken = fcmToken || await getMessaging().getToken();
-  console.log("🚀 ~ handleLoginSubmit ~ currentFcmToken:", currentFcmToken)
-    DevERPService.setAppId(appId)
+      const currentFcmToken =  fcmToken || await getMessaging().getToken();
+      const appId = generateGUID();
+      DevERPService.setAppId(generateGUID());
+      DevERPService.setDevice(deviceId);
 
-    DevERPService.setDevice(deviceId)
-
-  const loginResult = await loginWithERP(() =>
+      const loginResult = await loginWithERP(() =>
         DevERPService.loginToERP({
           user: values.user,
           pass: values.password,
@@ -69,7 +65,6 @@ const LoginForm: React.FC<LoginFormProps> = ({
           firebaseid: currentFcmToken || '',
         }),
       );
-
       if (loginResult?.success === 1) {
         await DevERPService.getAuth();
         await onLoginSuccess(values.company_code, values.password, {
@@ -83,7 +78,8 @@ const LoginForm: React.FC<LoginFormProps> = ({
           type: 'error',
         });
       }
-    } catch (e) {}
+    } catch (e) {
+    }
   };
 
   return (

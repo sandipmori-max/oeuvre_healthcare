@@ -47,7 +47,6 @@ const CustomAlert: React.FC<CustomAlertProps> = ({
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
       <View style={styles.overlay}>
         <View style={[styles.bottomSheet, alertStyles.container]}>
-          {/* Header */}
           <View style={styles.header}>
             <Text style={alertStyles.title}>{title}</Text>
             <TouchableOpacity onPress={onClose} style={styles.closeIcon}>
@@ -55,14 +54,12 @@ const CustomAlert: React.FC<CustomAlertProps> = ({
             </TouchableOpacity>
           </View>
 
-          {/* GIF */}
           <FastImage
             source={gifSource}
             style={styles.gif}
             resizeMode={FastImage.resizeMode.contain}
           />
 
-          {/* Message */}
           <Text style={alertStyles.message}>{message}</Text>
 
           {(onDone || onCancel) && (

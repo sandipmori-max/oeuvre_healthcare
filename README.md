@@ -2,7 +2,10 @@
 
 // Multiple build creation with different Name + icon + package name
 
-// ./gradlew generateCodegenArtifactsFromSchema - android build 
+// --- android build ----
+// gradlew clean
+// gradlew generateCodegenArtifactsFromSchema 
+// gradlew app:assembleRelease 
 // cmd - gradlew assemble[BRAND_NAME]Release
 
 // How to used - .env.clientA and .env.cientB ??
@@ -121,3 +124,17 @@ HomeScreen empty view load - issue
 eslint
 git
 git pre hooks
+
+
+-- Field of form leave managements 
+-- Employee name - disabled 
+-- Date - user can selected start date and end date - datepicker i already added npm 
+-- Drop-down - Leave type : CL , SL, Paid, unpaid
+-- Leave - half day : first half , second half
+        if leave half day : also need to add start and end time : here working hour : 8:30 compalusary 
+-- Note 
+-- Attachment - optional : user can select - pdf and image 
+        image by gallery or camera option
+-- Leave date wise
+-- Leave type wise
+-- 

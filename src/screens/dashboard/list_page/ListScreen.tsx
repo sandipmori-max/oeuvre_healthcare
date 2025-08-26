@@ -1,4 +1,4 @@
-import { Text, View, Image, TextInput, TouchableOpacity, Alert } from 'react-native';
+import { Text, View, TextInput, TouchableOpacity, Alert } from 'react-native';
 import React, { useEffect, useLayoutEffect, useState, useCallback, useMemo } from 'react';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 
@@ -9,7 +9,6 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { formatDateForAPI, parseCustomDate } from '../../../utils/helpers';
 import FullViewLoader from '../../../components/loader/FullViewLoader';
 import { ListRouteParams } from './types';
-import { ERP_ICON } from '../../../assets';
 import ErrorMessage from '../../../components/error/Error';
 import TableView from './components/TableView';
 import RedableView from './components/RedableView';
@@ -175,11 +174,6 @@ const ListScreen = () => {
       const today = new Date();
       today.setHours(23, 59, 59, 999);
 
-      if (selectedDate > today) {
-        Alert.alert('Invalid Date', 'Cannot select future dates.', [{ text: 'OK' }]);
-        setShowDatePicker(null);
-        return;
-      }
       if (fromDate) {
         const fromDateObj = new Date(fromDate.split('-').reverse().join('-'));
         if (selectedDate < fromDateObj) {

@@ -71,15 +71,13 @@ export const styles = StyleSheet.create({
     marginBottom: 15,
   },
   loginButton: {
-    backgroundColor: ERP_COLOR_CODE.ERP_ACTIVE_BUTTON,
+    backgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR,
     padding: 16,
     borderRadius: 10,
     marginBottom: 20,
     shadowColor: ERP_COLOR_CODE.ERP_ACTIVE_BUTTON,
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.6,
-    shadowRadius: 6,
-    elevation: 6,
     marginTop: 12,
   },
   errorButton: {

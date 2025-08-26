@@ -37,3 +37,8 @@ export interface ERPTextInputProps extends TextInputProps {
   errorStyle?: StyleProp<TextStyle>;
   helperStyle?: StyleProp<TextStyle>;
 }
+
+export interface ErrorMessageProps {
+  message: string;
+  visible?: boolean;
+}

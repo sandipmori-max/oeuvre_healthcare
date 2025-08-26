@@ -1,4 +1,3 @@
-// User interface
 export interface User {
   id: string;
   name: string;
@@ -9,7 +8,6 @@ export interface User {
   tokenValidTill?: string;
 }
 
-// Account interface for storing multiple accounts
 export interface Account {
   id: string;
   user: User;
@@ -17,7 +15,6 @@ export interface Account {
   lastLoginAt: string;
 }
 
-// Menu interface
 export interface MenuItem {
   id: string;
   name: string;
@@ -28,7 +25,6 @@ export interface MenuItem {
   isReport?: boolean;
 }
 
-// Dashboard interface
 export interface DashboardItem {
   id: string;
   name: string;
@@ -38,7 +34,6 @@ export interface DashboardItem {
   isReport: boolean;
 }
 
-// Auth state interface
 export interface AuthState {
   user: User | null;
   accounts: Account[];

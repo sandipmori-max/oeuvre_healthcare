@@ -12,7 +12,6 @@ import {
 import { Account, User } from './type';
 import { DevERPService } from '../../../services/api';
 
-// Async thunks
 export const checkAuthStateThunk = createAsyncThunk(
   'auth/checkAuthState',
   async (_, { rejectWithValue }) => {
@@ -22,13 +21,11 @@ export const checkAuthStateThunk = createAsyncThunk(
       const accounts = await getAccounts(db);
       const activeAccount = await getActiveAccount(db);
 
-      // Check if we have a valid token for the active account
       if (activeAccount?.user?.token) {
         const tokenValidTill = activeAccount.user.tokenValidTill;
         if (tokenValidTill) {
           const validTill = new Date(tokenValidTill);
           if (validTill > new Date()) {
-            // Token is still valid, user is authenticated
             return {
               accounts,
               activeAccountId: activeAccount.id,
@@ -38,7 +35,6 @@ export const checkAuthStateThunk = createAsyncThunk(
         }
       }
 
-      // No valid token found, user needs to login again
       return {
         accounts,
         activeAccountId: null,
@@ -71,29 +67,20 @@ export const loginUserThunk = createAsyncThunk(
     },
     { rejectWithValue },
   ) => {
-    try {
-      // This thunk only handles database operations and local storage
-      // The ERP login and token fetch is already done in LoginScreen
-
-      // Get authentication token that was already fetched in LoginScreen
+    try { 
       const token = isAddingAccount ? newToken : await AsyncStorage.getItem('erp_token');
-      console.log('🚀 ~ token:', token);
       const tokenValidTill = isAddingAccount
         ? newvalidTill
         : await AsyncStorage.getItem('erp_token_valid_till');
-      console.log('🚀 ~ tokenValidTill:', tokenValidTill);
 
       if (!token) {
         return rejectWithValue('No authentication token found. Please login again.');
       }
 
-      console.log('🚀 ~ token:------------', token);
 
-      // Store tokens in AsyncStorage for consistency
       await AsyncStorage.setItem('auth_token', token);
       await AsyncStorage.setItem('erp_appid', company_code);
 
-      // Create user object from ERP data
       const erpUser: User = {
         id: `user_${Date.now()}`,
         name: user_credentials?.name || user_credentials?.user || company_code.toUpperCase(),
@@ -131,7 +118,6 @@ export const loginUserThunk = createAsyncThunk(
         lastLoginAt: new Date().toISOString(),
       };
 
-      // Set all other accounts inactive
       for (const acc of currentAccounts ?? []) {
         await insertAccount(db, { ...acc, isActive: false });
       }
@@ -166,13 +152,11 @@ export const switchAccountThunk = createAsyncThunk(
         return rejectWithValue('Account not found');
       }
 
-      // Check if the target account has a valid token
       if (targetAccount?.user?.token) {
         const tokenValidTill = targetAccount.user.tokenValidTill;
         if (tokenValidTill) {
           const validTill = new Date(tokenValidTill);
           if (validTill > new Date()) {
-            // Token is still valid, can switch to this account
             return {
               user: targetAccount.user,
               accountId,
@@ -182,7 +166,6 @@ export const switchAccountThunk = createAsyncThunk(
         }
       }
 
-      // Token expired or not found, need to login again
       return rejectWithValue('Account token expired. Please login again.');
     } catch (error) {
       console.error('Error switching account:', error);
@@ -202,7 +185,6 @@ export const removeAccountThunk = createAsyncThunk(
       let newActiveAccountId = null;
       let newActiveAccount = null;
       if (updatedAccounts && updatedAccounts?.length > 0) {
-        // If the removed account was active, set the first account as active
         const wasActive = !updatedAccounts.some(acc => acc.isActive);
         if (wasActive) {
           await updateAccountActive(db, updatedAccounts[0].id);
@@ -273,16 +255,12 @@ export const getERPMenuThunk = createAsyncThunk(
       const response = await DevERPService.getMenu();
       console.log('🚀 ~ getERPMenuThunk ~ raw response:', response);
 
-      // The API can return either a string (JSON) or an object
       if (response && typeof response === 'string') {
-        console.log('🚀 ~ getERPMenuThunk ~ response is string, length:', response.length);
-        return response; // Return the string directly, let the slice handle parsing
+        return response; 
       } else if (response && typeof response === 'object') {
-        console.log('🚀 ~ getERPMenuThunk ~ response is object, returning directly');
-        return response; // Return the object directly
+        return response;  
       }
 
-      console.log('🚀 ~ getERPMenuThunk ~ response is invalid:', typeof response);
       return rejectWithValue('Invalid menu response format');
     } catch (error: any) {
       console.error('🚀 ~ getERPMenuThunk ~ error:', error);
@@ -303,17 +281,24 @@ export const getERPDashboardThunk = createAsyncThunk(
   },
 );
 
-export const getERPPageThunk = createAsyncThunk(
-  'auth/getERPPage',
-  async (page: string, { rejectWithValue }) => {
+
+export const getERPPageThunk = createAsyncThunk<
+  any,
+  { page: string; id: string },
+  { rejectValue: string }
+>(
+  "auth/getERPPage",
+  async ({ page, id }, { rejectWithValue }) => {
     try {
-      const pageData = await DevERPService.getPage(page);
+      const pageData = await DevERPService.getPage(page, id);
       return pageData;
     } catch (error: any) {
-      return rejectWithValue(error?.message || 'Failed to get ERP page data');
+      return rejectWithValue(error?.message || "Failed to get ERP page data");
     }
-  },
+  }
 );
+
+
 
 export const getERPListDataThunk = createAsyncThunk(
   'auth/getERPListData',

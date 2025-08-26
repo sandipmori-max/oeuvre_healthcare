@@ -1,4 +1,4 @@
-import { StyleSheet } from 'react-native';
+import { Dimensions, StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
   container: { flex: 1 },
@@ -20,6 +20,12 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#fff',
   },
+  recordPunchTime: {
+    fontSize: 14,
+    color: '#555555ff',
+    marginTop: 2,
+  },
+
   loaderText: {
     marginTop: 16,
     fontSize: 16,
@@ -100,9 +106,78 @@ export const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(0,0,0,0.2)',
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 10,
+   },
+  listSection: {
+    paddingHorizontal: 16,
+    marginTop: 32,
   },
+
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 12,
+  },
+
+  recordCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 10,
+    elevation: 1,
+  },
+
+  recordAvatar: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+  },
+
+  recordName: {
+    fontSize: 15,
+    fontWeight: 'bold',
+    color: '#222',
+  },
+
+  recordEmail: {
+    fontSize: 12,
+    color: '#666',
+    marginTop: 2,
+  },
+
+  recordDateTime: {
+    fontSize: 12,
+    color: '#000',
+    marginTop: 2,
+  },
+
+  statusBadge: (status: 'checkin' | 'checkout') => ({
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 6,
+    backgroundColor: status === 'checkin' ? '#28a745' : '#dc3545',
+    alignSelf: 'flex-start',
+  }),
+
+  statusBadgeText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: '600',
+    textTransform: 'capitalize',
+  },
+  sectionHeader: {
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    backgroundColor: '#696969ff',
+    fontWeight: 'bold',
+    fontSize: 16,
+    color: '#fff',
+    marginBottom: 10,
+  },
+  
 });

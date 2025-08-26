@@ -163,7 +163,7 @@ export function formatDateToDDMMMYYYY(dateStr: string): string {
     return formatDate(fallbackDate);
   }
 
-  return ''; // invalid date fallback
+  return '';
 }
 
 export function formatTimeTo12Hour(dateStr: string): string {
@@ -176,7 +176,6 @@ export function formatTimeTo12Hour(dateStr: string): string {
     return `${hour}:${minute} ${ampm.toUpperCase()}`;
   }
 
-  // Fallback: try parsing with Date
   const fallbackDate = new Date(dateStr);
   if (!isNaN(fallbackDate.getTime())) {
     const hours = fallbackDate.getHours();
@@ -225,3 +224,11 @@ export const formatDateForAPI = (date: Date): string => {
   const year = date.getFullYear();
   return `${day}-${month}-${year}`;
 };
+
+export const generateGUID = () => {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+    const r = (Math.random() * 16) | 0;
+    const v = c === 'x' ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+}

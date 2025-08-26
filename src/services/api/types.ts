@@ -1,4 +1,3 @@
-// Common API types
 export interface PaginationParams {
   page?: number;
   limit?: number;
@@ -16,7 +15,6 @@ export interface PaginatedResponse<T> {
   };
 }
 
-// DevERP API specific types
 export interface DevERPRequest {
   code: string;
 }
@@ -28,7 +26,6 @@ export interface DevERPResponse {
   message?: string;
 }
 
-// Login related types
 export interface LoginRequest {
   user: string;
   pass: string;
@@ -43,7 +40,6 @@ export interface LoginResponse {
   data?: any;
 }
 
-// Token related types
 export interface TokenRequest {
   appid: string;
   device: string;
@@ -56,7 +52,6 @@ export interface TokenResponse {
   message?: string;
 }
 
-// Menu related types
 export interface MenuRequest {
   token: string;
 }
@@ -67,7 +62,6 @@ export interface MenuResponse {
   message?: string;
 }
 
-// Dashboard data types
 export interface DashboardRequest {
   token: string;
 }
@@ -80,10 +74,10 @@ export interface DashboardResponse {
   message?: string;
 }
 
-// Page data types
 export interface PageRequest {
   token: string;
   page: string;
+  id: string;
 }
 
 export interface PageResponse {
@@ -92,13 +86,12 @@ export interface PageResponse {
   message?: string;
 }
 
-// List data types
 export interface ListDataRequest {
   token: string;
   page: string;
-  fd: string; // from date
-  td: string; // to date,
-  param?: string; // additional parameter
+  fd: string; 
+  td: string;  
+  param?: string; 
 }
 
 export interface ListDataResponse {
@@ -107,7 +100,6 @@ export interface ListDataResponse {
   message?: string;
 }
 
-// Auth related types
 export interface AuthRequest {
   company_code: string;
   password: string;
@@ -142,7 +134,6 @@ export interface LogoutRequest {
   refreshToken: string;
 }
 
-// User related types
 export interface UserProfile {
   id: string;
   name: string;
@@ -162,7 +153,6 @@ export interface UpdateProfileRequest {
   avatar?: string;
 }
 
-// Company related types
 export interface CompanyInfo {
   id: string;
   name: string;
@@ -174,7 +164,6 @@ export interface CompanyInfo {
   website?: string;
 }
 
-// Attendance related types
 export interface AttendanceRecord {
   id: string;
   userId: string;
@@ -202,7 +191,6 @@ export interface CheckOutRequest {
   address?: string;
 }
 
-// Report related types
 export interface AttendanceReport {
   userId: string;
   month: number;
@@ -215,7 +203,6 @@ export interface AttendanceReport {
   averageHours: number;
 }
 
-// Settings related types
 export interface AppSettings {
   notifications: {
     attendance: boolean;
@@ -230,7 +217,6 @@ export interface AppSettings {
   language: string;
 }
 
-// Error types
 export interface ApiErrorResponse {
   success: 0;
   message: string;
@@ -239,7 +225,6 @@ export interface ApiErrorResponse {
   data?: any;
 }
 
-// Success response wrapper
 export interface ApiSuccessResponse<T> {
   success: 1;
   data: T;
@@ -247,5 +232,17 @@ export interface ApiSuccessResponse<T> {
   statusCode: number;
 }
 
-// Generic API response
 export type ApiResponse<T> = ApiSuccessResponse<T> | ApiErrorResponse;
+
+export interface AttendanceRequest {
+  token: string;
+  page: string;
+  data: string; 
+}
+
+export interface AttendanceResponse {
+  success: number;
+  message?: string;
+  data?: any;
+}
+

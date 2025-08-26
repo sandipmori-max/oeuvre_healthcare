@@ -137,7 +137,6 @@ export const useApiCall = <T = any>(apiCall: () => Promise<T>, options: UseApiOp
   };
 };
 
-// Hook for API calls with automatic execution
 export const useApiWithAutoCall = <T = any>(
   apiCall: () => Promise<T>,
   dependencies: any[] = [],
@@ -149,7 +148,6 @@ export const useApiWithAutoCall = <T = any>(
     return api.execute(apiCall);
   }, [api, apiCall]);
 
-  // Auto-execute when dependencies change
   React.useEffect(() => {
     call();
   }, dependencies);

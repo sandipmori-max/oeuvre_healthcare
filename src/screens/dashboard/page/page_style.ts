@@ -1,170 +1,61 @@
 import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingHorizontal: 16,
-    paddingTop: 16,
-    backgroundColor: '#F8F9FA',
+  label: { fontWeight: '600', marginBottom: 4 },
+  input: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 6,
+    padding: 10,
   },
-  tableHeaderRow: {
-    backgroundColor: '#eee',
+  pickerBox: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 6,
+    padding: 10,
+    backgroundColor: '#f9f9f9',
   },
-  tableHeaderCell: {
-    fontWeight: 'bold',
-    padding: 8,
-    borderRightWidth: 1,
-    borderRightColor: '#ccc',
-    textAlign: 'center',
-  },
-  tableCell: {
-    padding: 8,
-    borderRightWidth: 1,
-    borderRightColor: '#ccc',
-    textAlign: 'center',
-  },
-  emptyText: {
-    marginTop: 20,
-    textAlign: 'center',
-    color: '#888',
-  },
-  tableRow: {
-    flexDirection: 'row',
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
-    alignItems: 'center',
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#1A1A1A',
-  },
-  headerSubtitle: {
-    fontSize: 14,
-    color: '#6C757D',
-    marginTop: 2,
-    marginBottom: 12,
-  },
-  loadingWrap: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 8,
-    alignContent: 'center',
-    justifyContent: 'center',
-  },
-  loadingText: {
-    marginLeft: 8,
-    color: '#6C757D',
-  },
-  errorText: {
-    color: '#D9534F',
-    marginBottom: 8,
-  },
-  listContent: {
-    paddingBottom: 24,
-  },
-  card: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 12,
-    marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 2,
-  },
-  titleWrap: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-  },
-  leadIcon: {
-    width: 36,
-    height: 36,
+ 
+  center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  
+  textInput: {
+    borderWidth: 1,
+    borderColor: '#ccc',
     borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 10,
+    padding: 10,
+    backgroundColor: '#fff',
   },
-  leadIconText: {
-    color: '#FFFFFF',
-    fontWeight: '700',
-    fontSize: 12,
-  },
-  cardHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 6,
-  },
-  cardTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#1A1A1A',
-    flex: 1,
-    marginRight: 8,
-  },
-  cardSubtitle: {
-    fontSize: 12,
-    color: '#6C757D',
-  },
-  tooltipText: {
+  
+  dropdownCard: {
     marginTop: 4,
-    fontSize: 12,
-    color: '#6C757D',
-  },
-  chipsRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flexWrap: 'wrap',
-    marginTop: 8,
-  },
-  chip: {
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
-    backgroundColor: '#E9ECEF',
-    marginRight: 8,
-    marginBottom: 6,
-  },
-  chipText: {
-    fontSize: 11,
-    fontWeight: '600',
-  },
-  chipMuted: {
-    backgroundColor: '#F1F3F5',
-  },
-  chipMutedText: {
-    color: '#868E96',
-  },
-  chipWarn: {
-    backgroundColor: '#FFF4E6',
-  },
-  chipWarnText: {
-    color: '#D9480F',
-  },
-  badge: {
-    backgroundColor: '#FFE8E8',
-    paddingHorizontal: 8,
-    paddingVertical: 2,
     borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    backgroundColor: '#fff',
+    overflow: 'hidden',
+    elevation: 3,
   },
-  badgeText: {
-    color: '#D9534F',
-    fontSize: 11,
-    fontWeight: '700',
-    textTransform: 'uppercase',
+  option: {
+    padding: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
   },
-  badgeRequired: {
-    backgroundColor: '#FFE9EC',
+  disabledBox: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 10,
+    padding: 12,
+    backgroundColor: '#f1f1f1',
   },
-  badgeTextRequired: {
-    color: '#C92A2A',
-  },
-  metaText: {
-    marginTop: 6,
-    fontSize: 12,
-    color: '#6C757D',
+  dateBox: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 10,
+    padding: 12,
+    backgroundColor: '#fff',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignContent: 'center',
+    alignItems: 'center',
   },
 });

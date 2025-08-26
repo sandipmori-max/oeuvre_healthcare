@@ -1,12 +1,13 @@
 import { StyleSheet } from 'react-native';
+import { ERP_COLOR_CODE } from '../../utils/constants';
 
 export const styles = StyleSheet.create({
   header: {
     padding: 20,
     alignItems: 'center',
-    backgroundColor:'#251d50ff',
+    backgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR,
     borderTopRightRadius: 48,
-    borderBottomLeftRadius: 48
+    borderBottomLeftRadius: 48,
   },
   profileImage: {
     width: 80,
@@ -14,11 +15,16 @@ export const styles = StyleSheet.create({
     borderRadius: 40,
     marginBottom: 10,
     backgroundColor: '#fff',
+    borderWidth: 2,
+    borderColor: '#fff'
   },
   username: {
     color: '#fff',
     fontSize: 18,
     fontWeight: 'bold',
+  },
+  userPhone: {
+    color: '#fff',
   },
   menuContainer: {
     flex: 1,
@@ -34,6 +40,7 @@ export const styles = StyleSheet.create({
     marginRight: 10,
   },
   itemLabel: {
+    marginLeft: 12,
     fontSize: 16,
     fontWeight: '500',
   },
@@ -47,17 +54,21 @@ export const styles = StyleSheet.create({
     marginVertical: 6,
   },
   activeItemBackground: {
-    backgroundColor: '#372C78ff',
+    backgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR,
     borderLeftWidth: 4,
-    borderLeftColor: '#251d50ff',
+    borderLeftColor: '#350352ff',
     borderRadius: 8,
   },
   logoutButton: {
-    padding: 20,
+    paddingHorizontal: 20,
+    paddingVertical: 4,
     borderTopWidth: 1,
-    borderColor: '#ccc',
+    borderColor: ERP_COLOR_CODE.ERP_APP_COLOR,
+    alignContent: 'center',
+    alignItems: 'center',
   },
   logoutText: {
     fontWeight: 'bold',
+    color: ERP_COLOR_CODE.ERP_APP_COLOR,
   },
 });

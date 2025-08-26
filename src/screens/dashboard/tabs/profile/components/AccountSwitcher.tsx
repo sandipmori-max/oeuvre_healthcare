@@ -72,7 +72,7 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
         }}
       >
         <View style={styles.accountContent}>
-          <Image source={{ uri: item?.user?.avatar }} style={styles.avatar} />
+          <Image source={{ uri: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=600' }} style={styles.avatar} />
           <View style={styles.accountInfo}>
             <Text style={[styles.accountName, isActive && styles.activeText]}>
               {item?.user?.name.charAt(0).toUpperCase() + item?.user?.name.slice(1)}

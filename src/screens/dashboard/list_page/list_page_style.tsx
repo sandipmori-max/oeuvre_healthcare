@@ -1,4 +1,5 @@
 import { StyleSheet } from 'react-native';
+import { ERP_COLOR_CODE } from '../../../utils/constants';
 
 export const styles = StyleSheet.create({
   container: {
@@ -19,8 +20,8 @@ export const styles = StyleSheet.create({
     padding: 16,
     marginVertical: 8,
     marginHorizontal: 16,
-    elevation: 3, // shadow on android
-    shadowColor: '#000', // shadow on ios
+    elevation: 3, 
+    shadowColor: '#000',
     shadowOpacity: 0.1,
     shadowRadius: 10,
   },
@@ -220,7 +221,6 @@ export const styles = StyleSheet.create({
     color: '#888',
   },
 
-  // Search styles
   searchContainer: {
     marginBottom: 16,
   },
@@ -228,14 +228,11 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#FFFFFF',
-    borderRadius: 12,
+    borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 2,
+    borderWidth: 1,
+    borderColor: '#ccc'
   },
   searchIcon: {
     fontSize: 16,
@@ -257,15 +254,16 @@ export const styles = StyleSheet.create({
     color: '#6C757D',
     fontWeight: '600',
   },
-  // Date picker styles
   dateContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 4,
+    
   },
   dateRow: {
     flex: 1,
     marginRight: 8,
+    
   },
   dateLabel: {
     fontSize: 14,
@@ -279,7 +277,7 @@ export const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#E9ECEF',
+    borderColor: '#ccc',
     alignItems: 'center',
   },
   dateButtonText: {
@@ -287,7 +285,6 @@ export const styles = StyleSheet.create({
     color: '#1A1A1A',
     fontWeight: '500',
   },
-  // Date picker modal styles
   datePickerModal: {
     position: 'absolute',
     top: 0,
@@ -486,7 +483,7 @@ export const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 32,
     right: 18,
-    backgroundColor: '#000',
+    backgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR,
     paddingHorizontal: 18,
     paddingVertical: 12,
     borderRadius: 8,

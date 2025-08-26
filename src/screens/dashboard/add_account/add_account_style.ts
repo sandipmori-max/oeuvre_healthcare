@@ -9,14 +9,13 @@ export const styles = StyleSheet.create({
   back:{
     width: 24,
     height: 24,
-    tintColor: ERP_COLOR_CODE.ERP_BLACK,
+    tintColor: '#fff',
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 12,
-    paddingVertical: 15,
-    backgroundColor: ERP_COLOR_CODE.ERP_WHITE,
+    padding: 12,
+    backgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR,
     borderBottomWidth: 1,
     borderBottomColor: '#e0e0e0',
     elevation: 4,
@@ -26,9 +25,9 @@ export const styles = StyleSheet.create({
     shadowRadius: 3,
   },
   title: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '700',
-    color: '#222',
+    color: '#fff',
   },
   closeButton: {
     paddingVertical: 6,
@@ -73,7 +72,7 @@ export const styles = StyleSheet.create({
     marginTop: 4,
   },
   addButton: {
-    backgroundColor: ERP_COLOR_CODE.ERP_ACTIVE_BUTTON,
+    backgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR,
     paddingVertical: 15,
     borderRadius: 10,
     alignItems: 'center',

@@ -15,7 +15,7 @@ import FullViewLoader from '../../../../components/loader/FullViewLoader';
 import { styles } from './entry_style';
 import { ERP_ICON } from '../../../../assets';
 import ERPIcon from '../../../../components/icon/ERPIcon';
-import { getERPDashboardThunk } from '../../../../store/slices/auth/thunk';
+import { getERPDashboardThunk, getERPMenuThunk } from '../../../../store/slices/auth/thunk';
 
 const accentColors = ['#dbe0f5ff', '#c8f3edff', '#faf1e0ff', '#f0e1e1ff', '#f2e3f8ff', '#e0f3edff'];
 
@@ -42,7 +42,7 @@ const EntryTab = () => {
       headerRight: () => (
         <>
           <ERPIcon
-            name={isHorizontal ? 'list' : 'apps'}
+            name={!isHorizontal ? 'list' : 'apps'}
             onPress={() => setIsHorizontal(prev => !prev)}
           />
 
@@ -65,11 +65,11 @@ const EntryTab = () => {
         </>
       ),
     });
-  }, [navigation, showBookmarksOnly, isHorizontal]);
+  }, [navigation, showBookmarksOnly, isHorizontal, isRefresh]);
   
   useEffect(() => {
     if (isAuthenticated) {
-      dispatch(getERPDashboardThunk());
+      dispatch(getERPMenuThunk());
     }
   }, [isAuthenticated, dispatch, activeToken, isRefresh]);
   const renderItem = ({ item, index }: any) => {
