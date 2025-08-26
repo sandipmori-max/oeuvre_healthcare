@@ -1,22 +1,21 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
-import TabIcon from '../components/TabIcon';
 import { ERP_COLOR_CODE } from '../utils/constants';
 import EntryTab from '../screens/dashboard/tabs/entry/EntryTab';
 import ReportTab from '../screens/dashboard/tabs/report/ReportTab';
-import ProfileNavigator from './ProfileStack';
 import HomeScreen from '../screens/dashboard/tabs/home/HomeTab';
 import AuthTab from '../screens/dashboard/tabs/auth/AuthTab';
 import useTranslations from '../hooks/useTranslations';
 import { useAppSelector } from '../store/hooks';
 import ProfileTab from '../screens/dashboard/tabs/profile/ProfileTab';
+import TabIcon from '../components/tab_icon/TabIcon';
 
 const Tab = createBottomTabNavigator();
 
 const TabNavigator = () => {
   const theme = useAppSelector(state => state.theme);
-  
+
   const { t } = useTranslations();
   return (
     <Tab.Navigator
@@ -37,9 +36,9 @@ const TabNavigator = () => {
           fontWeight: '500',
         },
         headerStyle: {
-          backgroundColor:ERP_COLOR_CODE.ERP_APP_COLOR,
+          backgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR,
         },
-        headerTintColor:  'white',
+        headerTintColor: 'white',
         headerTitleStyle: {
           fontWeight: 'bold',
         },
@@ -48,7 +47,6 @@ const TabNavigator = () => {
       <Tab.Screen
         name="Home"
         component={HomeScreen}
-        
         options={{
           tabBarLabel: t('navigation.home'),
           title: t('navigation.home'),
@@ -65,7 +63,7 @@ const TabNavigator = () => {
           ),
         }}
       />
-     <Tab.Screen
+      <Tab.Screen
         name="Entry"
         component={EntryTab}
         options={{

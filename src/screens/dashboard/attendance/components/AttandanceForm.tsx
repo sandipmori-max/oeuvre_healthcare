@@ -1,12 +1,13 @@
 import { View, Text, Image, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native';
 import React, { useState } from 'react';
-import { AttendanceFormValues, User, UserLocation } from '../types';
-import { requestCameraAndLocationPermission } from '../../../../utils/helpers';
-import Geolocation from '@react-native-community/geolocation';
-import { launchCamera } from 'react-native-image-picker';
-import useTranslations from '../../../../hooks/useTranslations';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
+import Geolocation from '@react-native-community/geolocation';
+import { launchCamera } from 'react-native-image-picker';
+
+import { AttendanceFormValues, User, UserLocation } from '../types';
+import { requestCameraAndLocationPermission } from '../../../../utils/helpers';
+import useTranslations from '../../../../hooks/useTranslations';
 import { styles } from '../attandance_style';
 import CustomAlert from '../../../../components/alert/CustomAlert';
 import { useAppDispatch, useAppSelector } from '../../../../store/hooks';
@@ -23,14 +24,15 @@ const dummyUser: User = {
 
 const AttandanceForm = () => {
   const { t } = useTranslations();
-  const dispatch = useAppDispatch();
-  const { user } = useAppSelector(state => state?.auth);
 
+  const dispatch = useAppDispatch();
+  
+  const { user } = useAppSelector(state => state?.auth);
   const { loading, error, response } = useAppSelector(state => state.attendance);
+
   const [users, setUser] = useState<User>(dummyUser);
   const [statusImage, setStatusImage] = useState<string | null>(null);
   const [userLocation, setUserLocation] = useState<UserLocation | null>(null);
-
   const [locationLoading, setLocationLoading] = useState(false);
   const [alertVisible, setAlertVisible] = useState(false);
   const [alertConfig, setAlertConfig] = useState({

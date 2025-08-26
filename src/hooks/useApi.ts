@@ -1,19 +1,6 @@
 import React, { useState, useCallback, useRef } from 'react';
 import { getErrorMessage, retryApiCall } from '../services/api/utils';
-
-interface UseApiState<T> {
-  data: T | null;
-  loading: boolean;
-  error: string | null;
-}
-
-interface UseApiOptions {
-  retryCount?: number;
-  retryDelay?: number;
-  onSuccess?: (data: any) => void;
-  onError?: (error: any) => void;
-  initialData?: any;
-}
+import { UseApiOptions, UseApiState } from './type';
 
 export const useApi = <T = any>(options: UseApiOptions = {}) => {
   const { retryCount = 3, retryDelay = 1000, onSuccess, onError, initialData = null } = options;

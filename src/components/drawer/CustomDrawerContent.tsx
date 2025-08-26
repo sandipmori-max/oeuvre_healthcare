@@ -2,18 +2,20 @@ import React from 'react';
 import { View, Text, Image, TouchableOpacity } from 'react-native';
 import { DrawerContentComponentProps, DrawerContentScrollView } from '@react-navigation/drawer';
 import { useNavigation } from '@react-navigation/native';
+import MaterialIcons from '@react-native-vector-icons/material-icons';
 
 import { useAppSelector } from '../../store/hooks';
 import { firstLetterUpperCase } from '../../utils/helpers';
 import { ERP_DRAWER_LIST } from '../../constants';
 import { styles } from './drawer_style';
-import MaterialIcons from '@react-native-vector-icons/material-icons';
 
 const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
   const navigation = useNavigation();
+
   const { user } = useAppSelector(state => state?.auth);
-  const currentRoute = props.state.routeNames[props.state.index];
   const theme = useAppSelector(state => state.theme);
+
+  const currentRoute = props.state.routeNames[props.state.index];
 
   return (
     <DrawerContentScrollView
@@ -27,7 +29,6 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
         />
         <Text style={styles.username}>{firstLetterUpperCase(user?.name || '')}</Text>
         <Text style={styles.userPhone}>+91 987654321</Text>
-
       </View>
 
       <View style={styles.menuContainer}>

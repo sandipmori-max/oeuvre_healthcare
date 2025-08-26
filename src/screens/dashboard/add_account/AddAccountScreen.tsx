@@ -20,17 +20,20 @@ import { AddAccountScreenProps } from './type';
 import { ERP_ICON } from '../../../assets';
 import { DevERPService } from '../../../services/api';
 import { useApi } from '../../../hooks/useApi';
-import DeviceInfo from 'react-native-device-info';
 import CustomAlert from '../../../components/alert/CustomAlert';
+import { generateGUID } from '../../../utils/helpers';
 
 const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose }) => {
-  const dispatch = useAppDispatch();
-  const { isLoading } = useAppSelector(state => state?.auth);
-  const { execute: validateCompanyCode, execute: loginWithERP } = useApi();
-  const { accounts, activeAccountId } = useAppSelector(state => state.auth);
 
-  const appId = DeviceInfo.getBundleId();
-  const deviceId = DeviceInfo.getDeviceId();
+  const dispatch = useAppDispatch();
+  
+  const { isLoading } = useAppSelector(state => state?.auth);
+  
+  const { execute: validateCompanyCode, execute: loginWithERP } = useApi();
+  
+  const { accounts } = useAppSelector(state => state.auth);
+
+  const appId = generateGUID();
 
   const [alertVisible, setAlertVisible] = useState(false);
   const [alertConfig, setAlertConfig] = useState({

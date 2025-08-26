@@ -1,6 +1,7 @@
 import { Platform } from 'react-native';
 import { ERP_GIF, ERP_ICON } from '../../assets';
 import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
+import moment from 'moment';
 
 export const getBottomTabIcon = (iconName: string, focused: boolean, theme: any) => {
   switch (iconName) {
@@ -232,3 +233,10 @@ export const generateGUID = () => {
     return v.toString(16);
   });
 }
+
+export const formatDate = dateStr => {
+  const date = moment(dateStr);
+  if (moment().isSame(date, 'day')) return 'Today';
+  if (moment().subtract(1, 'day').isSame(date, 'day')) return 'Yesterday';
+  return date.format('MMM DD, YYYY');
+};

@@ -1,29 +1,26 @@
 import { TouchableOpacity } from 'react-native';
 import React from 'react';
 import { MaterialIcons } from '@react-native-vector-icons/material-icons';
+import { ERPIconProps } from './type';
+import { baseStyle } from './icon_style';
 
-const ERPIcon = ({ name, isMenu, onPress, extStyle, extSize = 20, color='#fff' }: any) => {
+const ERPIcon: React.FC<ERPIconProps> = ({
+  name,
+  isMenu = false,
+  onPress,
+  extStyle,
+  extSize = 20,
+  color = '#fff',
+}) => {
   return (
     <TouchableOpacity
       onPress={onPress}
-      style={[
-        extStyle,
-        {
-          height: 32,
-          width: 32,
-          borderWidth: isMenu ? 0 : 1,
-          borderColor: color,
-          justifyContent:'center',
-          alignContent:'center',
-          alignItems:'center',
-          marginHorizontal: 8,
-          borderRadius: 4
-        },
-       ]}
+      style={[baseStyle(color, isMenu), extStyle]}
     >
       <MaterialIcons name={name} color={color} size={extSize} />
     </TouchableOpacity>
   );
 };
+
 
 export default ERPIcon;

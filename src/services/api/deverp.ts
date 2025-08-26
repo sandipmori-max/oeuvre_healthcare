@@ -57,7 +57,6 @@ class DevERPService {
   }> {
     try {
       const response = await this.getAppLink(code);
-      console.log('🚀 ~ DevERPService ~ validateCompanyCode ~ response:', response);
       if (response.success === 1) {
         return {
           isValid: true,

@@ -5,29 +5,7 @@ import FastImage from 'react-native-fast-image';
 import { CustomAlertProps } from '../types';
 import { getGifSource } from '../../utils/helpers';
 import { styles } from './custom_alert_style';
-
-const getAlertStyles = (type: string) => {
-  switch (type) {
-    case 'error':
-      return {
-        container: styles.errorContainer,
-        title: styles.errorTitle,
-        message: styles.errorMessage,
-      };
-    case 'success':
-      return {
-        container: styles.successContainer,
-        title: styles.successTitle,
-        message: styles.successMessage,
-      };
-    default:
-      return {
-        container: styles.infoContainer,
-        title: styles.infoTitle,
-        message: styles.infoMessage,
-      };
-  }
-};
+import { getAlertStyles } from './helper';
 
 const CustomAlert: React.FC<CustomAlertProps> = ({
   visible,
