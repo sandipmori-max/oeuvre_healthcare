@@ -58,7 +58,7 @@ export const styles = StyleSheet.create({
     color: '#333',
   },
   errorText: {
-    color: 'red',
+    color: ERP_COLOR_CODE.ERP_ERROR,
     fontSize: 13,
     marginTop: 5,
   },

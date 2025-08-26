@@ -19,6 +19,7 @@ import ErrorMessage from '../../../components/error/Error';
 import MaterialIcons from '@react-native-vector-icons/material-icons';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import ERPIcon from '../../../components/icon/ERPIcon';
+import { ERP_COLOR_CODE } from '../../../utils/constants';
 
 type PageRouteParams = { PageScreen: { item: any } };
 
@@ -70,7 +71,11 @@ const CustomPicker = ({ label, selectedValue, onValueChange, options, item }: an
 
   return (
     <View style={{ marginBottom: 16 }}>
-      <Text style={styles.label}>{label}</Text>
+      <View style={{ flexDirection: 'row' }}>
+        <Text style={styles.label}>{label}</Text>
+        {item?.tooltip !== label && <Text> - ( {item?.tooltip} ) </Text>}
+        {item?.mandatory === '1' && <Text style={{ color: ERP_COLOR_CODE.ERP_ERROR }}>*</Text>}
+      </View>
       <TouchableOpacity
         style={[styles.pickerBox]}
         onPress={() => setOpen(!open)}
@@ -240,6 +245,7 @@ const PageScreen = () => {
       setLoadingPageId(id);
 
       const parsed = await dispatch(getERPPageThunk({ page: title, id })).unwrap();
+      console.log('🚀 ~ fetchPageData ~ parsed:', parsed);
 
       const pageControls = Array.isArray(parsed?.pagectl) ? parsed.pagectl : [];
       setControls(pageControls);
@@ -276,7 +282,7 @@ const PageScreen = () => {
           <View style={{ flexDirection: 'row' }}>
             <Text style={styles.label}>{item.fieldtitle}</Text>
             {item?.fieldtitle !== item?.tooltip && <Text> - ( {item.tooltip} )</Text>}
-            {item?.mandatory === '1' && <Text style={{ color: 'red' }}>*</Text>}
+            {item?.mandatory === '1' && <Text style={{ color: ERP_COLOR_CODE.ERP_ERROR }}>*</Text>}
           </View>
           <View style={styles.disabledBox}>
             <Text style={{ color: '#555' }}>{value || '-'}</Text>
@@ -296,7 +302,9 @@ const PageScreen = () => {
             item={item}
           />
           {errors[item.field] && (
-            <Text style={{ color: 'red', marginTop: 4 }}>{errors[item.field]}</Text>
+            <Text style={{ color: ERP_COLOR_CODE.ERP_ERROR, marginTop: 4 }}>
+              {errors[item.field]}
+            </Text>
           )}
         </View>
       );
@@ -308,10 +316,13 @@ const PageScreen = () => {
           <View style={{ flexDirection: 'row' }}>
             <Text style={styles.label}>{item.fieldtitle}</Text>
             {item?.fieldtitle !== item?.tooltip && <Text> - ( {item.tooltip} )</Text>}
-            {item?.mandatory === '1' && <Text style={{ color: 'red' }}>*</Text>}
+            {item?.mandatory === '1' && <Text style={{ color: ERP_COLOR_CODE.ERP_ERROR }}>*</Text>}
           </View>
           <TouchableOpacity
-            style={[styles.dateBox, errors[item.field] && { borderColor: 'red' }]}
+            style={[
+              styles.dateBox,
+              errors[item.field] && { borderColor: ERP_COLOR_CODE.ERP_ERROR },
+            ]}
             onPress={() => showDatePicker(item.field)}
           >
             <Text style={{ color: value ? '#000' : '#888' }}>
@@ -320,7 +331,9 @@ const PageScreen = () => {
             <MaterialIcons name="event" size={20} color="#555" />
           </TouchableOpacity>
           {errors[item.field] && (
-            <Text style={{ color: 'red', marginTop: 4 }}>{errors[item.field]}</Text>
+            <Text style={{ color: ERP_COLOR_CODE.ERP_ERROR, marginTop: 4 }}>
+              {errors[item.field]}
+            </Text>
           )}
         </View>
       );
@@ -331,16 +344,21 @@ const PageScreen = () => {
         <View style={{ flexDirection: 'row' }}>
           <Text style={styles.label}>{item.fieldtitle}</Text>
           {item?.fieldtitle !== item?.tooltip && <Text> - ( {item.tooltip} )</Text>}
-          {item?.mandatory === '1' && <Text style={{ color: 'red' }}>*</Text>}
+          {item?.mandatory === '1' && <Text style={{ color: ERP_COLOR_CODE.ERP_ERROR }}>*</Text>}
         </View>
         <TextInput
-          style={[styles.textInput, errors[item.field] && { borderColor: 'red' }]}
+          style={[
+            styles.textInput,
+            errors[item.field] && { borderColor: ERP_COLOR_CODE.ERP_ERROR },
+          ]}
           value={value}
           onChangeText={setValue}
           placeholder="Enter value"
         />
         {errors[item.field] && (
-          <Text style={{ color: 'red', marginTop: 4 }}>{errors[item.field]}</Text>
+          <Text style={{ color: ERP_COLOR_CODE.ERP_ERROR, marginTop: 4 }}>
+            {errors[item.field]}
+          </Text>
         )}
       </View>
     );
@@ -509,7 +527,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   errorText: {
-    color: 'red',
+    color: ERP_COLOR_CODE.ERP_ERROR,
     marginBottom: 6,
   },
   closeBtn: {

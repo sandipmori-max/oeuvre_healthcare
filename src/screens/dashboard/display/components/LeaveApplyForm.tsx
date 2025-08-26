@@ -315,7 +315,7 @@ const LeaveApplyForm = () => {
                           }}
                           style={{ marginLeft: 10 }}
                         >
-                          <Text style={{ color: 'red' }}>✕</Text>
+                          <Text style={{ color: ERP_COLOR_CODE.ERP_ERROR }}>✕</Text>
                         </TouchableOpacity>
                       </View>
                     ))

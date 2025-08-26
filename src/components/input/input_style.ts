@@ -1,4 +1,5 @@
 import { StyleSheet } from 'react-native';
+import { ERP_COLOR_CODE } from '../../utils/constants';
 
 export const styles = StyleSheet.create({
   inputContainer: {
@@ -38,7 +39,7 @@ export const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: 12,
-    color: 'red',
+    color: ERP_COLOR_CODE.ERP_ERROR,
     marginTop: 4,
   },
 });

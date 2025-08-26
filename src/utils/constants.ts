@@ -13,6 +13,7 @@ export const ERP_COLOR_CODE = {
   ERP_BLACK: '#000000',
   ERP_BORDER: '#e0e0e0',
   ERP_ACTIVE_BACKGROUND: '#f0f8ff',
+  ERP_ERROR: "#9d261d"
 };
 
 export const ERP_SCREEN_NAME = {
