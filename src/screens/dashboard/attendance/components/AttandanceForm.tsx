@@ -175,7 +175,7 @@ const AttandanceForm = () => {
         })}
         onSubmit={values => {
           console.log("🚀 ~ values:", values)
-          dispatch(markAttendanceThunk({ page: 'puncin', rawData: values }))
+          dispatch(markAttendanceThunk({ rawData: values , type: false}))
             .unwrap()
             .then(res => {
               console.log('✅ API Success:', res);

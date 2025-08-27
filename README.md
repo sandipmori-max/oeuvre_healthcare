@@ -13,26 +13,6 @@
 // How to run - clientA and clientB app ??
 // gradlew installClientADebug -Pbrand=[BRAND_NAME]
 
-//Redux
-//Axios
-//Sequre store
-//Local
-
-// Theme
-// Color code
-//
-
-// DB viewer
-// Email
-// Sqlite3
-// UI
-
-// code format
-// eslint
-
-// Icon
-// Git
-// Multi-lang
 
 MOBILE APP - API DETAILS 
 
@@ -107,22 +87,49 @@ curl --location 'https://payroll.deverp.net/devws/msp_api.aspx/getListData' \
 }'
 
 
-Icon
-Firebase json file
+[ Attandanced - punch in]
 
-Code controller
+curl --location 'https://payroll.deverp.net/devws/msp_api.aspx/punhin' \
+--header 'Content-Type: application/json' \
+--header 'Cookie: ASP.NET_SessionId=scsvjmlmyltbdc0aial10axa' \
+--data '{
+  "token": "51b35f3b6af242898bfc397607aad328",
+  "page": "punhin",
+  "data": "{\"ID\":\"51b35f3b6af242898bfc397607aad328\", \"EmployeeId\":\"51b35f3b6af242898bfc397607aad328\",\"InDate\":\"\",\"InImage\":\"\",\"InRemarks\":\"\",\"InLocation\":{\"lat\":\"\",\"long\":\"\"},\"CUID\":\"51b35f3b6af242898bfc397607aad328\"}"
+}
+'
 
-get Page and get page list - api integration
-multi-lang supprot
-gif added 
-Custom alert / loader 
+[ Attandanced - punch out]
 
-App icon
+curl --location 'https://payroll.deverp.net/devws/msp_api.aspx/punhout' \
+--header 'Content-Type: application/json' \
+--header 'Cookie: ASP.NET_SessionId=scsvjmlmyltbdc0aial10axa; ASP.NET_SessionId=scsvjmlmyltbdc0aial10axa' \
+--data '{
+  "token": "51b35f3b6af242898bfc397607aad328",
+  "page": "punhout",
+  "data": "{\"ID\":\"51b35f3b6af242898bfc397607aad328\", \"EmployeeId\":\"51b35f3b6af242898bfc397607aad328\",\"OutDate\":\"\",\"OutImage\":\"\",\"OutRemarks\":\"\",\"OutLocation\":{\"lat\":\"\",\"long\":\"\"},\"CUID\":\"51b35f3b6af242898bfc397607aad328\"}"
+}
+'
 
-HomeScreen empty view load - issue
+[ get Drop-down ]
 
-eslint
-git
-git pre hooks
+curl --location 'https://payroll.deverp.net/devws/msp_api.aspx/getDDL' \
+--header 'Content-Type: application/json' \
+--header 'Cookie: ASP.NET_SessionId=scsvjmlmyltbdc0aial10axa' \
+--data '{
+     "token": "51b35f3b6af242898bfc397607aad328",
+     "dtlId":"",
+     "ddlWhere":""
+}'
 
+[ get Ajax ]
+
+curl --location 'https://payroll.deverp.net/devws/msp_api.aspx/getAjax' \
+--header 'Content-Type: application/json' \
+--header 'Cookie: ASP.NET_SessionId=scsvjmlmyltbdc0aial10axa; ASP.NET_SessionId=scsvjmlmyltbdc0aial10axa' \
+--data '{
+     "token": "51b35f3b6af242898bfc397607aad328",
+     "dtlId":"",
+     "ddlWhere":""
+}'
 
