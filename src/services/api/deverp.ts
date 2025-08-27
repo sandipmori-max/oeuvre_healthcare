@@ -1,8 +1,7 @@
 import { generateGUID } from '../../utils/helpers';
-import {  getActiveAccount, getDBConnection } from '../../utils/sqlite';
+import { getActiveAccount, getDBConnection } from '../../utils/sqlite';
 import apiClient from './config';
 import {
-  DevERPRequest,
   DevERPResponse,
   LoginRequest,
   LoginResponse,
@@ -11,7 +10,7 @@ import {
   MenuRequest,
   MenuResponse,
   DashboardRequest,
-  DashboardResponse, 
+  DashboardResponse,
   ListDataRequest,
   ListDataResponse,
   AttendanceResponse,
@@ -103,7 +102,7 @@ class DevERPService {
         firebaseid: credentials.firebaseid || '',
         device: this.device,
       };
-      console.log("🚀 ~ DevERPService ~ loginToERP ~ loginData:", loginData)
+      console.log('🚀 ~ DevERPService ~ loginToERP ~ loginData:', loginData);
 
       const response = await apiClient.post<LoginResponse>(
         `${this.link}msp_api.aspx/setAppID`,
@@ -142,13 +141,13 @@ class DevERPService {
         appid: this.appid,
         device: this.device,
       };
-      console.log("🚀 ~ DevERPService ~ getAuth ~ tokenData:", tokenData)
+      console.log('🚀 ~ DevERPService ~ getAuth ~ tokenData:', tokenData);
 
       const response = await apiClient.post<TokenResponse>(
         `${this.link}msp_api.aspx/getAuth`,
         tokenData,
       );
-      console.log("🚀 ~ DevERPService ~ getAuth ~ response:", response)
+      console.log('🚀 ~ DevERPService ~ getAuth ~ response:', response);
 
       if (String(response.data.success) === '1') {
         this.token = response.data.token || '';
@@ -458,7 +457,7 @@ class DevERPService {
     }
   }
 
-  async markAttendance(page: string, rawData: any): Promise<AttendanceResponse> {
+  async markAttendance( rawData: any, isPunchIn: boolean): Promise<AttendanceResponse> {
     try {
       const netInfo = await NetInfo.fetch();
       if (!netInfo.isConnected) {
@@ -473,38 +472,37 @@ class DevERPService {
           await this.getAuth();
         }
       }
-      const params = {
-        ...rawData,
-        dtlid: '',
-        id: '',
-        seqno: '',
-        field: '',
-        fieldtitle: '',
-        title: '',
-        text: '',
-        dtext: '',
-        defaultvalue: '',
-        tooltip: '',
-        size: '',
-        ctltype: '',
-        ddl: '',
-        ddlfield: '',
-        ddlwhere: '',
-        ajax: '',
-        visible: '',
-        refcol: '',
-        mandatory: '',
-        disabled: '',
+
+      const paramPunchIn = {
+        Id: this.token,
+        EmployeeId: this.token,
+        InDate: rawData.dateTime,
+        InImage: rawData.imageBase64,
+        InRemarks: rawData?.remark || '',
+        InLocation: { lat: rawData?.latitude, long: rawData?.longitude },
+        CUID: this.token,
       };
+
+      const paramPunchOut = {
+        Id: this.token,
+        EmployeeId: this.token,
+        OutDate: rawData.dateTime,
+        OutImage: rawData.imageBase64,
+        OutRemarks: rawData?.remark || '',
+        OutLocation: { lat: rawData?.latitude, long: rawData?.longitude },
+        CUID: this.token,
+      };
+
+      const pageType = isPunchIn === true ? "punchin": "punchout"
       const payload: AttendanceRequest = {
         token: this.token,
-        page: page,
-        data: JSON.stringify(params),
+        page: pageType,
+        data: JSON.stringify( isPunchIn === true ? paramPunchIn : paramPunchOut ),
       };
       console.log('🚀 ~ DevERPService ~ markAttendance ~ payload:', payload);
 
       const response = await apiClient.post<AttendanceResponse>(
-        `${this.link}msp_api.aspx/${page}`,
+        `${this.link}msp_api.aspx/${pageType}`,
         payload,
       );
 
@@ -513,7 +511,7 @@ class DevERPService {
       } else if (response.data.success === 0 && response.data.message?.includes('Token Expire')) {
         await this.getAuth();
         const retryResponse = await apiClient.post<AttendanceResponse>(
-          `${this.link}msp_api.aspx/${page}`,
+          `${this.link}msp_api.aspx/${pageType}`,
           { ...payload, token: this.token },
         );
         return retryResponse.data;
