@@ -174,7 +174,6 @@ const AttandanceForm = () => {
           imageBase64: Yup.string().required('Image required'),
         })}
         onSubmit={values => {
-          console.log("🚀 ~ values:", values)
           dispatch(markAttendanceThunk({ rawData: values , type: false}))
             .unwrap()
             .then(res => {

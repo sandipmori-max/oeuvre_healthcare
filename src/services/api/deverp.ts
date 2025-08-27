@@ -457,7 +457,7 @@ class DevERPService {
     }
   }
 
-  async markAttendance( rawData: any, isPunchIn: boolean): Promise<AttendanceResponse> {
+  async markAttendance(rawData: any, isPunchIn: boolean): Promise<AttendanceResponse> {
     try {
       const netInfo = await NetInfo.fetch();
       if (!netInfo.isConnected) {
@@ -493,11 +493,11 @@ class DevERPService {
         CUID: this.token,
       };
 
-      const pageType = isPunchIn === true ? "punchin": "punchout"
+      const pageType = isPunchIn === true ? 'punchin' : 'punchout';
       const payload: AttendanceRequest = {
         token: this.token,
         page: pageType,
-        data: JSON.stringify( isPunchIn === true ? paramPunchIn : paramPunchOut ),
+        data: JSON.stringify(isPunchIn === true ? paramPunchIn : paramPunchOut),
       };
       console.log('🚀 ~ DevERPService ~ markAttendance ~ payload:', payload);
 
@@ -520,6 +520,92 @@ class DevERPService {
       }
     } catch (error) {
       console.error('🚀 ~ DevERPService ~ markAttendance ~ error:', error);
+      throw error;
+    }
+  }
+
+  async getDDL(dtlid: string, ddlwhere: string): Promise<any> {
+    try {
+      const netInfo = await NetInfo.fetch();
+      if (!netInfo.isConnected) {
+        throw new Error('No internet connection');
+      }
+
+      if (!this.token || !this.tokenValidTill) {
+        await this.getAuth();
+      } else {
+        const validTill = new Date(this.tokenValidTill);
+        if (validTill <= new Date()) {
+          await this.getAuth();
+        }
+      }
+
+      const payload = {
+        token: this.token,
+        dtlid,
+        ddlwhere,
+      };
+      console.log('🚀 ~ DevERPService ~ getDDL ~ payload:', payload);
+
+      const response = await apiClient.post<any>(`${this.link}msp_api.aspx/getDDL`, payload);
+
+      if (response.data.success === 1) {
+        return response.data;
+      } else if (response.data.success === 0 && response.data.message?.includes('Token Expire')) {
+        await this.getAuth();
+        const retryResponse = await apiClient.post<any>(`${this.link}msp_api.aspx/getDDL`, {
+          ...payload,
+          token: this.token,
+        });
+        return retryResponse.data;
+      } else {
+        throw new Error(response.data.message || 'Failed to fetch dropdown data');
+      }
+    } catch (error) {
+      console.error('🚀 ~ DevERPService ~ getDDL ~ error:', error);
+      throw error;
+    }
+  }
+
+  async getAjax(dtlid: string, ddlwhere: string): Promise<any> {
+    try {
+      const netInfo = await NetInfo.fetch();
+      if (!netInfo.isConnected) {
+        throw new Error('No internet connection');
+      }
+
+      if (!this.token || !this.tokenValidTill) {
+        await this.getAuth();
+      } else {
+        const validTill = new Date(this.tokenValidTill);
+        if (validTill <= new Date()) {
+          await this.getAuth();
+        }
+      }
+
+      const payload = {
+        token: this.token,
+        dtlid,
+        ddlwhere,
+      };
+      console.log('🚀 ~ DevERPService ~ getAjax ~ payload:', payload);
+
+      const response = await apiClient.post<any>(`${this.link}msp_api.aspx/getAjax`, payload);
+
+      if (response.data.success === 1) {
+        return response.data;
+      } else if (response.data.success === 0 && response.data.message?.includes('Token Expire')) {
+        await this.getAuth();
+        const retryResponse = await apiClient.post<any>(`${this.link}msp_api.aspx/getAjax`, {
+          ...payload,
+          token: this.token,
+        });
+        return retryResponse.data;
+      } else {
+        throw new Error(response.data.message || 'Failed to fetch ajax data');
+      }
+    } catch (error) {
+      console.error('🚀 ~ DevERPService ~ getAjax ~ error:', error);
       throw error;
     }
   }

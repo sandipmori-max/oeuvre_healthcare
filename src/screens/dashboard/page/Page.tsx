@@ -1,3 +1,6 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable react-native/no-inline-styles */
+/* eslint-disable react/no-unstable-nested-components */
 import {
   StyleSheet,
   Text,
@@ -11,7 +14,7 @@ import {
 } from 'react-native';
 import React, { useEffect, useLayoutEffect, useState } from 'react';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
-import { useAppDispatch } from '../../../store/hooks';
+import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { getERPPageThunk } from '../../../store/slices/auth/thunk';
 import FullViewLoader from '../../../components/loader/FullViewLoader';
 import NoData from '../../../components/no_data/NoData';
@@ -20,6 +23,8 @@ import MaterialIcons from '@react-native-vector-icons/material-icons';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import ERPIcon from '../../../components/icon/ERPIcon';
 import { ERP_COLOR_CODE } from '../../../utils/constants';
+import { getDDLThunk } from '../../../store/slices/dropdown/thunk';
+import { getAjaxThunk } from '../../../store/slices/ajax/thunk';
 
 type PageRouteParams = { PageScreen: { item: any } };
 
@@ -68,6 +73,12 @@ const ErrorModal = ({
 
 const CustomPicker = ({ label, selectedValue, onValueChange, options, item }: any) => {
   const [open, setOpen] = useState(false);
+  const dispatch = useAppDispatch();
+
+    const { ajxLoader :loading, ajaxError: error, ajaxResponse : response } = useAppSelector(state => state.ajax);
+    const { loading, error, response } = useAppSelector(state => state.dropdown);
+
+
 
   return (
     <View style={{ marginBottom: 16 }}>
@@ -78,7 +89,14 @@ const CustomPicker = ({ label, selectedValue, onValueChange, options, item }: an
       </View>
       <TouchableOpacity
         style={[styles.pickerBox]}
-        onPress={() => setOpen(!open)}
+        onPress={() => {
+          if (item?.ajax === '1') {
+            dispatch(getAjaxThunk({ dtlid: item?.dtlid , ddlwhere: item?.ddlwhere }));
+          } else {
+            dispatch(getDDLThunk({ dtlid:  item?.dtlid , ddlwhere: item?.ddlwhere  }));
+          }
+          setOpen(!open);
+        }}
         activeOpacity={0.7}
       >
         <Text style={{ color: selectedValue ? '#000' : '#888', flex: 1 }}>
