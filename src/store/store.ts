@@ -4,6 +4,7 @@ import themeReducer from './slices/theme/themeSlice';
 import attendanceReducer from './slices/attandance/attendanceSlice';
 import dropdownReducer from './slices/dropdown/dropdownSlice';
 import ajaxReducer from './slices/ajax/ajaxSlice';
+import pageReducer from './slices/page/pageSlice';
 
 export const store = configureStore({
   reducer: {
@@ -12,6 +13,7 @@ export const store = configureStore({
     attendance: attendanceReducer,
     dropdown: dropdownReducer,
     ajax: ajaxReducer,
+    page: pageReducer,
   },
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({

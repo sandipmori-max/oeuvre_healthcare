@@ -25,6 +25,9 @@ import ERPIcon from '../../../components/icon/ERPIcon';
 import { ERP_COLOR_CODE } from '../../../utils/constants';
 import { getDDLThunk } from '../../../store/slices/dropdown/thunk';
 import { getAjaxThunk } from '../../../store/slices/ajax/thunk';
+import { resetAjaxState } from '../../../store/slices/ajax/ajaxSlice';
+import { resetDropdownState } from '../../../store/slices/dropdown/dropdownSlice';
+import { savePageThunk } from '../../../store/slices/page/thunk';
 
 type PageRouteParams = { PageScreen: { item: any } };
 
@@ -75,10 +78,22 @@ const CustomPicker = ({ label, selectedValue, onValueChange, options, item }: an
   const [open, setOpen] = useState(false);
   const dispatch = useAppDispatch();
 
-    const { ajxLoader :loading, ajaxError: error, ajaxResponse : response } = useAppSelector(state => state.ajax);
-    const { loading, error, response } = useAppSelector(state => state.dropdown);
-
-
+  const {
+    loading: ajxLoader,
+    error: ajaxError,
+    response: ajaxResponse,
+  } = useAppSelector(state => state.ajax);
+  console.log('🚀 ~ CustomPicker ~ ajaxResponse:', ajaxResponse);
+  console.log('🚀 ~ CustomPicker ~ ajaxError:', ajaxError);
+  console.log('🚀 ~ CustomPicker ~ ajxLoader:', ajxLoader);
+  const {
+    loading: dropDownLoader,
+    error: dropDownError,
+    response: dropDownResponse,
+  } = useAppSelector(state => state.dropdown);
+  console.log('🚀 ~ CustomPicker ~ dropDownResponse:', dropDownResponse);
+  console.log('🚀 ~ CustomPicker ~ dropDownError:', dropDownError);
+  console.log('🚀 ~ CustomPicker ~ dropDownLoader:', dropDownLoader);
 
   return (
     <View style={{ marginBottom: 16 }}>
@@ -91,9 +106,11 @@ const CustomPicker = ({ label, selectedValue, onValueChange, options, item }: an
         style={[styles.pickerBox]}
         onPress={() => {
           if (item?.ajax === '1') {
-            dispatch(getAjaxThunk({ dtlid: item?.dtlid , ddlwhere: item?.ddlwhere }));
+            dispatch(resetAjaxState());
+            dispatch(getAjaxThunk({ dtlid: item?.dtlid, ddlwhere: item?.ddlwhere }));
           } else {
-            dispatch(getDDLThunk({ dtlid:  item?.dtlid , ddlwhere: item?.ddlwhere  }));
+            dispatch(resetDropdownState());
+            dispatch(getDDLThunk({ dtlid: item?.dtlid, ddlwhere: item?.ddlwhere }));
           }
           setOpen(!open);
         }}
@@ -158,7 +175,10 @@ const CustomPicker = ({ label, selectedValue, onValueChange, options, item }: an
 const PageScreen = () => {
   const navigation = useNavigation();
   const dispatch = useAppDispatch();
-
+  const { loading, error: errorPage, response } = useAppSelector(state => state.page);
+  console.log('🚀 ~ PageScreen ~ response:', response);
+  console.log('🚀 ~ PageScreen ~ errorPage:', errorPage);
+  console.log('🚀 ~ PageScreen ~ loading:', loading);
   const [loadingPageId, setLoadingPageId] = useState<string | null>(null);
   const [controls, setControls] = useState<any[]>([]);
   const [errorsList, setErrorsList] = useState<string[]>([]);
@@ -219,7 +239,15 @@ const PageScreen = () => {
                     submitValues[f.field] = formValues[f.field];
                   }
                 });
-                console.log('✅ Final Submit Payload:', submitValues);
+                dispatch(
+                  savePageThunk({
+                    page: title,
+                    id: id,
+                    data: {
+                      ...submitValues
+                    },
+                  }),
+                );
               } else {
                 console.log('❌ Validation failed');
               }
