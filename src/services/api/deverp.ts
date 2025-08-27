@@ -523,6 +523,50 @@ class DevERPService {
       throw error;
     }
   }
+  async savePage(page: string, id: string, rawData: any): Promise<any> {
+    try {
+      const netInfo = await NetInfo.fetch();
+      if (!netInfo.isConnected) {
+        throw new Error('No internet connection');
+      }
+
+      if (!this.token || !this.tokenValidTill) {
+        await this.getAuth();
+      } else {
+        const validTill = new Date(this.tokenValidTill);
+        if (validTill <= new Date()) {
+          await this.getAuth();
+        }
+      }
+
+      const payload = {
+        token: this.token,
+        page: page,
+        id: id,
+        data: JSON.stringify(rawData),
+      };
+
+      console.log('🚀 ~ DevERPService ~ savePage ~ payload:', payload);
+
+      const response = await apiClient.post<any>(`${this.link}msp_api.aspx/${page}`, payload);
+
+      if (response.data.success === 1) {
+        return response.data;
+      } else if (response.data.success === 0 && response.data.message?.includes('Token Expire')) {
+        await this.getAuth();
+        const retryResponse = await apiClient.post<any>(`${this.link}msp_api.aspx/savepage`, {
+          ...payload,
+          token: this.token,
+        });
+        return retryResponse.data;
+      } else {
+        throw new Error(response.data.message || 'Failed to save page');
+      }
+    } catch (error) {
+      console.error('🚀 ~ DevERPService ~ savePage ~ error:', error);
+      throw error;
+    }
+  }
 
   async getDDL(dtlid: string, ddlwhere: string): Promise<any> {
     try {
