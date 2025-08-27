@@ -1,4 +1,5 @@
 import { StyleSheet } from 'react-native';
+import { ERP_COLOR_CODE } from '../../../utils/constants';
 
 export const styles = StyleSheet.create({
   label: { fontWeight: '600', marginBottom: 4 },
@@ -58,4 +59,88 @@ export const styles = StyleSheet.create({
     alignContent: 'center',
     alignItems: 'center',
   },
+    label: {
+      fontSize: 14,
+      color: '#333',
+      marginBottom: 6,
+      fontWeight: '600',
+    },
+    textInput: {
+      borderWidth: 1,
+      borderColor: '#ccc',
+      borderRadius: 10,
+      padding: 10,
+      backgroundColor: '#fff',
+    },
+    pickerBox: {
+      borderWidth: 1,
+      borderColor: '#ccc',
+      borderRadius: 10,
+      padding: 12,
+      backgroundColor: '#fff',
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignContent: 'center',
+      alignItems: 'center',
+    },
+    dropdownCard: {
+      marginTop: 4,
+      borderRadius: 10,
+      borderWidth: 1,
+      borderColor: '#ccc',
+      backgroundColor: '#fff',
+      overflow: 'hidden',
+      elevation: 3,
+    },
+    option: {
+      padding: 12,
+      borderBottomWidth: 1,
+      borderBottomColor: '#eee',
+    },
+    disabledBox: {
+      borderWidth: 1,
+      borderColor: '#ccc',
+      borderRadius: 10,
+      padding: 12,
+      backgroundColor: '#f1f1f1',
+    },
+    dateBox: {
+      borderWidth: 1,
+      borderColor: '#ccc',
+      borderRadius: 10,
+      padding: 12,
+      backgroundColor: '#fff',
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignContent: 'center',
+      alignItems: 'center',
+    },
+    overlay: {
+      flex: 1,
+      justifyContent: 'flex-end',
+      backgroundColor: 'rgba(0,0,0,0.4)',
+    },
+    bottomSheet: {
+      backgroundColor: 'white',
+      padding: 16,
+      borderTopLeftRadius: 20,
+      borderTopRightRadius: 20,
+      maxHeight: '50%',
+      marginVertical: 4,
+    },
+    title: {
+      fontSize: 16,
+      fontWeight: '600',
+    },
+    errorText: {
+      color: ERP_COLOR_CODE.ERP_ERROR,
+      marginBottom: 6,
+    },
+    closeBtn: {
+      marginTop: 16,
+      backgroundColor: 'black',
+      padding: 12,
+      borderRadius: 8,
+      alignItems: 'center',
+    },
 });
