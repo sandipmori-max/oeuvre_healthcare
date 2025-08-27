@@ -46,6 +46,7 @@ const apiClient: AxiosInstance = axios.create({
 
 apiClient.interceptors.request.use(
   async (config: AxiosRequestConfig) => {
+    console.log("🚀 ~ config:", config)
     const state = await NetInfo.fetch();
     if (!state.isConnected) {
       return Promise.reject({
