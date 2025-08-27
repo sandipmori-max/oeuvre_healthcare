@@ -244,7 +244,7 @@ const PageScreen = () => {
                     page: title,
                     id: id,
                     data: {
-                      ...submitValues
+                      ...submitValues,
                     },
                   }),
                 );
@@ -315,12 +315,49 @@ const PageScreen = () => {
   const renderItem = ({ item }: { item: any }) => {
     const value = formValues[item.field] || '';
     const setValue = (val: string) => {
-      console.log('value updated of ', [item?.failed], 'and value is', val);
       setFormValues(prev => ({ ...prev, [item.field]: val }));
       setErrors(prev => ({ ...prev, [item.field]: '' }));
     };
 
-    if (item?.visible === '1' || item?.ctltype === 'IMAGE') return null;
+    if (item?.visible === '1') return null;
+    if (item.field === 'IMAGE') {
+      return (
+        <View
+          style={{
+            width: '100%',
+            alignContent: 'center',
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginVertical: 4,
+          }}
+        >
+          <Image
+            key={item.field}
+            source={{
+              uri: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=600',
+            }}
+            style={{ borderWidth: 1, width: 100, height: 100, borderRadius: 80 }}
+          />
+          <View
+            style={{
+              height: 36,
+              width: 36,
+              borderRadius: 36,
+              backgroundColor: '#fff',
+              position: 'absolute',
+              bottom: 0,
+              justifyContent: 'center',
+              alignContent: 'center',
+              alignItems: 'center',
+              left: Dimensions.get('screen').width / 2,
+              borderWidth: 1,
+            }}
+          >
+            <MaterialIcons name={'edit'} color={'#000'} size={20} />
+          </View>
+        </View>
+      );
+    }
 
     if (item.disabled === '1') {
       return (
@@ -419,63 +456,11 @@ const PageScreen = () => {
       ) : controls.length > 0 ? (
         <>
           <FlatList
-            data={['']}
             showsVerticalScrollIndicator={false}
-            renderItem={() => {
-              return (
-                <>
-                  {controls.map(field => {
-                    if (field.ctltype === 'IMAGE' || field.ctltype === 'PHOTO') {
-                      return (
-                        <View
-                          style={{
-                            width: '100%',
-                            alignContent: 'center',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            marginVertical: 4,
-                          }}
-                        >
-                          <Image
-                            key={field.field}
-                            source={{
-                              uri: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=600',
-                            }}
-                            style={{ borderWidth: 1, width: 100, height: 100, borderRadius: 80 }}
-                          />
-                          <View
-                            style={{
-                              height: 36,
-                              width: 36,
-                              borderRadius: 36,
-                              backgroundColor: '#fff',
-                              position: 'absolute',
-                              bottom: 0,
-                              justifyContent: 'center',
-                              alignContent: 'center',
-                              alignItems: 'center',
-                              left: Dimensions.get('screen').width / 2,
-                              borderWidth: 1,
-                            }}
-                          >
-                            <MaterialIcons name={'edit'} color={'#000'} size={20} />
-                          </View>
-                        </View>
-                      );
-                    }
-                    return null;
-                  })}
-
-                  <FlatList
-                    showsVerticalScrollIndicator={false}
-                    data={controls}
-                    keyExtractor={(item, index) => item.dtlid || index.toString()}
-                    renderItem={renderItem}
-                    contentContainerStyle={{ paddingBottom: 50 }}
-                  />
-                </>
-              );
-            }}
+            data={controls}
+            keyExtractor={(item, index) => item.dtlid || index.toString()}
+            renderItem={renderItem}
+            contentContainerStyle={{ paddingBottom: 50 }}
           />
         </>
       ) : (
