@@ -63,7 +63,7 @@ const LoginScreen = ({ navigation, route }: any) => {
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.container}>
         <View style={styles.formContainer}>
           <LoginHeader isAddingAccount={isAddingAccount} t={t} />
           <LoginForm
