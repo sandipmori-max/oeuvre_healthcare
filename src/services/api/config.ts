@@ -17,10 +17,7 @@ const ENV = {
   },
 };
 
-const getEnvVars = () => {
-  return ENV.development;  
-};
-
+const getEnvVars = () => ENV.development;
 const { BASE_URL, TIMEOUT } = getEnvVars();
 
 export interface ApiResponse<T = any> {
@@ -44,9 +41,43 @@ const apiClient: AxiosInstance = axios.create({
   },
 });
 
+// ✅ Helper: keep unwrapping strings until clean
+function unwrapString(value: any): any {
+  if (typeof value !== "string") return value;
+
+  let current = value;
+  while (true) {
+    try {
+      // Try to parse again
+      const parsed = JSON.parse(current);
+      if (typeof parsed === "string") {
+        current = parsed; // still string → keep unwrapping
+      } else {
+        return parsed; // reached final JSON value (object/array/number/etc.)
+      }
+    } catch {
+      return current; // not parseable anymore → return clean string
+    }
+  }
+}
+
+// ✅ Helper: recursively clean an object
+function deepClean(obj: any): any {
+  if (Array.isArray(obj)) {
+    return obj.map(deepClean);
+  } else if (obj !== null && typeof obj === "object") {
+    const cleaned: any = {};
+    for (const key in obj) {
+      cleaned[key] = deepClean(obj[key]);
+    }
+    return cleaned;
+  } else {
+    return unwrapString(obj);
+  }
+}
+
 apiClient.interceptors.request.use(
   async (config: AxiosRequestConfig) => {
-    console.log("🚀 ~ config:", config)
     const state = await NetInfo.fetch();
     if (!state.isConnected) {
       return Promise.reject({
@@ -67,53 +98,71 @@ apiClient.interceptors.request.use(
   },
   (error) => Promise.reject(error)
 );
-
 apiClient.interceptors.response.use(
   (response: AxiosResponse<ApiResponse>) => {
-    if (response.data && response.data.d) {
-      try {
+    try {
+      if (response.data && response.data.d) {
         let raw = response.data.d;
 
-        let clean = raw
-          .replace(/,,/g, ",")  
-          .replace(/,(\s*[}\]])/g, "$1");  
+        // STEP 1: parse outer JSON string
+        let parsedData = JSON.parse(raw);
 
-        const parsedData = JSON.parse(clean);
+        // STEP 2: recursively clean double-escaped values
+        function clean(obj: any): any {
+          if (typeof obj === "string") {
+            // Detect strings like "\"A\"" → convert to "A"
+            if (/^".*"$/.test(obj)) {
+              try {
+                return JSON.parse(obj); 
+              } catch {
+                return obj;
+              }
+            }
+            return obj;
+          } else if (Array.isArray(obj)) {
+            return obj.map(clean);
+          } else if (typeof obj === "object" && obj !== null) {
+            const fixed: any = {};
+            for (const key in obj) {
+              fixed[key] = clean(obj[key]);
+            }
+            return fixed;
+          }
+          return obj;
+        }
 
-        if (String(parsedData.success) === "1") {
+        const cleanedData = clean(parsedData);
+
+        if (String(cleanedData.success) === "1") {
           return {
             ...response,
-            data: parsedData,
+            data: cleanedData,
           };
         } else {
-          const error: ApiError = {
-            message: parsedData.message || "API request failed",
+          return Promise.reject({
+            message: cleanedData.message || "API request failed",
             statusCode: response.status,
-            data: parsedData,
-          };
-          return Promise.reject(error);
+            data: cleanedData,
+          });
         }
-      } catch (parseError) {
-        console.error("❌ Failed to parse API response:", parseError);
-        const error: ApiError = {
-          message: "Invalid response format",
-          statusCode: response.status,
-          data: response.data,
-        };
-        return Promise.reject(error);
       }
+      return response;
+    } catch (err) {
+      console.error("❌ Failed to parse API response:", err);
+      return Promise.reject({
+        message: "Invalid response format",
+        statusCode: response.status,
+        data: response.data,
+      });
     }
-
-    return response;
   },
   (error) => {
     if (error.response) {
-      const err: ApiError = {
+      return Promise.reject({
         message: error.response.data?.message || "API error occurred",
         statusCode: error.response.status,
         data: error.response.data,
-      };
-      return Promise.reject(err);
+      });
     } else if (error.request) {
       return Promise.reject({
         message: "No response from server",
@@ -127,5 +176,6 @@ apiClient.interceptors.response.use(
     }
   }
 );
+
 
 export default apiClient;
