@@ -1,3 +1,4 @@
+
 import { View, Text, TouchableOpacity, Alert, Dimensions, FlatList, Image } from 'react-native';
 import React, { useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
@@ -65,34 +66,12 @@ const RedableView = ({
           paddingHorizontal: 16,
           paddingBottom: 16,
           marginVertical: 4,
-          paddingTop: status ? 0 : 16,
+          paddingTop: 16,
           borderWidth: 1,
           borderColor: '#ddd',
         }}
       >
-        { status && (
-          <View
-            style={{
-              width: '100%',
-              alignContent: 'center',
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}
-          >
-            <View
-              style={{
-                borderBottomRightRadius: 10,
-                borderBottomLeftRadius: 10,
-                paddingHorizontal: 12,
-                backgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR,
-                paddingVertical: 2,
-                opacity: 0.6,
-              }}
-            >
-              <Text style={{ fontWeight: '600', color: '#fff' }}>{status}</Text>
-            </View>
-          </View>
-        )}
+        
 
         <TouchableOpacity
           activeOpacity={0.8}
@@ -133,8 +112,9 @@ const RedableView = ({
               justifyContent: 'flex-end',
             }}
           >
-            {!!date && <Text style={{ fontWeight: '600' }}>{formatDateToDDMMMYYYY(date)}</Text>}
-            {!!date && <Text style={{ color: '#9c9696ff' }}>{formatTimeTo12Hour(date)}</Text>}
+              <Text style={{ fontWeight: '600', color: '#000' }}>{status}</Text>
+            {!!date && <Text style={{ fontWeight: '600', color: '#ccc' }}>{formatDateToDDMMMYYYY(date)}</Text>}
+            
           </View>
         </TouchableOpacity>
         <TouchableOpacity

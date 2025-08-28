@@ -41,27 +41,25 @@ const apiClient: AxiosInstance = axios.create({
   },
 });
 
-// ✅ Helper: keep unwrapping strings until clean
 function unwrapString(value: any): any {
   if (typeof value !== "string") return value;
 
   let current = value;
   while (true) {
     try {
-      // Try to parse again
+      
       const parsed = JSON.parse(current);
       if (typeof parsed === "string") {
-        current = parsed; // still string → keep unwrapping
+        current = parsed;
       } else {
-        return parsed; // reached final JSON value (object/array/number/etc.)
+        return parsed;
       }
     } catch {
-      return current; // not parseable anymore → return clean string
+      return current;
     }
   }
 }
 
-// ✅ Helper: recursively clean an object
 function deepClean(obj: any): any {
   if (Array.isArray(obj)) {
     return obj.map(deepClean);
@@ -104,34 +102,23 @@ apiClient.interceptors.response.use(
       if (response.data && response.data.d) {
         let raw = response.data.d;
 
-        // STEP 1: parse outer JSON string
-        let parsedData = JSON.parse(raw);
+        let parsedData: any;
 
-        // STEP 2: recursively clean double-escaped values
-        function clean(obj: any): any {
-          if (typeof obj === "string") {
-            // Detect strings like "\"A\"" → convert to "A"
-            if (/^".*"$/.test(obj)) {
-              try {
-                return JSON.parse(obj); 
-              } catch {
-                return obj;
-              }
-            }
-            return obj;
-          } else if (Array.isArray(obj)) {
-            return obj.map(clean);
-          } else if (typeof obj === "object" && obj !== null) {
-            const fixed: any = {};
-            for (const key in obj) {
-              fixed[key] = clean(obj[key]);
-            }
-            return fixed;
+        try {
+          parsedData = JSON.parse(raw);
+        } catch {
+          if (typeof raw === "string" && raw.includes(",")) {
+            const [successPart, ...msgParts] = raw.split(",");
+            parsedData = {
+              success: successPart.trim(),
+              message: msgParts.join(",").trim(),
+            };
+          } else {
+            parsedData = { message: raw };
           }
-          return obj;
         }
 
-        const cleanedData = clean(parsedData);
+        const cleanedData = deepClean(parsedData);
 
         if (String(cleanedData.success) === "1") {
           return {
@@ -176,6 +163,7 @@ apiClient.interceptors.response.use(
     }
   }
 );
+
 
 
 export default apiClient;

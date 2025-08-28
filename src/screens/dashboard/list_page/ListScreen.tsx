@@ -1,6 +1,6 @@
 import { Text, View, TextInput, TouchableOpacity, Alert } from 'react-native';
 import React, { useEffect, useLayoutEffect, useState, useCallback, useMemo } from 'react';
-import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
+import { RouteProp, useFocusEffect, useNavigation, useRoute } from '@react-navigation/native';
 
 import { useAppDispatch } from '../../../store/hooks';
 import { getERPListDataThunk } from '../../../store/slices/auth/thunk';
@@ -255,6 +255,13 @@ const ListScreen = () => {
     }
   }, [fromDate, toDate]);
 
+  useFocusEffect(
+    useCallback(() => {
+      const { fromDate: initialFromDate, toDate: initialToDate } = getCurrentMonthRange();
+      fetchListData(initialFromDate, initialToDate);
+      return () => {};
+    }, [getCurrentMonthRange, fetchListData]),
+  );
   return (
     <View style={styles.container}>
       {isFilterVisible && (
