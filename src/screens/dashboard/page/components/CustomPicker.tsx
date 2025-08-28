@@ -1,45 +1,41 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { useAppDispatch, useAppSelector } from '../../../../store/hooks';
+import { useAppDispatch } from '../../../../store/hooks';
 import { styles } from '../page_style';
 import { ERP_COLOR_CODE } from '../../../../utils/constants';
-import { resetAjaxState } from '../../../../store/slices/ajax/ajaxSlice';
 import { getAjaxThunk } from '../../../../store/slices/ajax/thunk';
-import { resetDropdownState } from '../../../../store/slices/dropdown/dropdownSlice';
 import { getDDLThunk } from '../../../../store/slices/dropdown/thunk';
 import MaterialIcons from '@react-native-vector-icons/material-icons';
 
-const CustomPicker = ({ label, selectedValue, onValueChange, item, errors }: any) => {
+const CustomPicker = ({ label, selectedValue, onValueChange, item, errors , dtext}: any) => {
   const [open, setOpen] = useState(false);
+  const [options, setOptions] = useState<any[]>([]);
   const dispatch = useAppDispatch();
 
-  const { response: ajaxResponse } = useAppSelector(state => state.ajax);
-  const { response: dropDownResponse } = useAppSelector(state => state.dropdown);
+  const [selectedOption, setSelectedOption] = useState('');
+
+
+  useEffect(() =>{
+    setSelectedOption(dtext)
+  },[dtext])
 
   const isAjax = String(item?.ajax) === '1';
 
-  const handleOpen = useCallback(() => {
-    if (isAjax) {
-      dispatch(resetAjaxState());
-      dispatch(getAjaxThunk({ dtlid: item?.dtlid, where: item?.ddlwhere }));
-    } else {
-      dispatch(resetDropdownState());
-      dispatch(getDDLThunk({ dtlid: item?.dtlid, where: item?.ddlwhere }));
+  const handleOpen = useCallback(async () => {
+    try {
+      if (isAjax) {
+        const res = await dispatch(getAjaxThunk({ dtlid: item?.dtlid, where: item?.ddlwhere })).unwrap();
+        setOptions(res?.data ?? []);
+      } else {
+        const res = await dispatch(getDDLThunk({ dtlid: item?.dtlid, where: item?.ddlwhere })).unwrap();
+        setOptions(res?.data ?? []);
+      }
+      setOpen(o => !o);
+    } catch (e) {
+      setOptions([]);
     }
-    setOpen(o => !o);
   }, [dispatch, isAjax, item?.dtlid, item?.ddlwhere]);
-
-  const listData = useMemo(
-    () => (isAjax ? ajaxResponse?.data ?? [] : dropDownResponse?.data ?? []),
-    [isAjax, ajaxResponse?.data, dropDownResponse?.data],
-  );
-
-  const selectedOption = useMemo(
-    () => listData.find((opt: any) => String(opt.value) === String(selectedValue)),
-    [listData, selectedValue],
-  );
-
-  const displayLabel = selectedOption?.name || '';
+ 
 
   return (
     <View style={{ marginBottom: 16 }}>
@@ -51,7 +47,7 @@ const CustomPicker = ({ label, selectedValue, onValueChange, item, errors }: any
 
       <TouchableOpacity style={[styles.pickerBox]} onPress={handleOpen} activeOpacity={0.7}>
         <Text style={{ color: selectedOption ? '#000' : '#888', flex: 1 }}>
-          {displayLabel || 'Select...'}
+          {selectedOption || 'Select...'}
         </Text>
         <MaterialIcons name={open ? 'arrow-drop-up' : 'arrow-drop-down'} size={24} color="#555" />
       </TouchableOpacity>
@@ -66,14 +62,16 @@ const CustomPicker = ({ label, selectedValue, onValueChange, item, errors }: any
               placeholderTextColor="#888"
             />
           )}
-          {listData.length > 0 ? (
-            listData.map((opt: any, i: number) => (
+          {options.length > 0 ? (
+            options.map((opt: any, i: number) => (
               <TouchableOpacity
                 key={i}
                 style={styles.option}
                 onPress={() => {
                   onValueChange(opt.value);
                   setOpen(false);
+                      setSelectedOption(opt?.name)
+
                 }}
               >
                 <Text>{opt?.deptname || opt?.name || opt?.text || opt?.label}</Text>
@@ -95,10 +93,13 @@ const CustomPicker = ({ label, selectedValue, onValueChange, item, errors }: any
       )}
 
       {errors[item.field] && (
-        <Text style={{ color: ERP_COLOR_CODE.ERP_ERROR, marginTop: 4 }}>{errors[item.field]}</Text>
+        <Text style={{ color: ERP_COLOR_CODE.ERP_ERROR, marginTop: 4 }}>
+          {errors[item.field]}
+        </Text>
       )}
     </View>
   );
 };
+
 
 export default React.memo(CustomPicker);

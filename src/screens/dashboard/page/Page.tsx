@@ -1,7 +1,9 @@
-import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
-import { Text, View, FlatList } from 'react-native';
+/* eslint-disable react/no-unstable-nested-components */
+/* eslint-disable react-native/no-inline-styles */
+import React, { useCallback, useEffect, useLayoutEffect, useState } from 'react';
+import { Text, View, FlatList, StyleSheet } from 'react-native';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
-import { useAppDispatch, useAppSelector } from '../../../store/hooks';
+import { useAppDispatch } from '../../../store/hooks';
 import { getERPPageThunk } from '../../../store/slices/auth/thunk';
 import { savePageThunk } from '../../../store/slices/page/thunk';
 import FullViewLoader from '../../../components/loader/FullViewLoader';
@@ -15,14 +17,13 @@ import Media from './components/Media';
 import Disabled from './components/Disabled';
 import Date from './components/Date';
 import Input from './components/Input';
+import CustomAlert from '../../../components/alert/CustomAlert';
 
 type PageRouteParams = { PageScreen: { item: any } };
 
 const PageScreen = () => {
   const navigation = useNavigation();
   const dispatch = useAppDispatch();
-
-  const { response } = useAppSelector(state => state.page);
 
   const [loadingPageId, setLoadingPageId] = useState<string | null>(null);
   const [controls, setControls] = useState<any[]>([]);
@@ -34,11 +35,19 @@ const PageScreen = () => {
   const [datePickerVisible, setDatePickerVisible] = useState(false);
   const [activeDateField, setActiveDateField] = useState<string | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [goBack, setGoBack] = useState(false);
+  const [loader, setLoader] = useState(false);
+
+  const [alertConfig, setAlertConfig] = useState({
+    title: '',
+    message: '',
+    type: 'info' as 'error' | 'success' | 'info',
+  });
 
   const route = useRoute<RouteProp<PageRouteParams, 'PageScreen'>>();
   const { item, title, id }: any = route.params;
 
-  /** ✅ validateForm memoized */
   const validateForm = useCallback(() => {
     const validationErrors: Record<string, string> = {};
     const errorMessages: string[] = [];
@@ -57,13 +66,13 @@ const PageScreen = () => {
     return errorMessages.length === 0;
   }, [controls, formValues]);
 
-  /** ✅ header buttons don’t re-render unnecessarily */
   useLayoutEffect(() => {
     navigation.setOptions({
       headerTitle: () => (
         <Text
           numberOfLines={1}
-          style={{ maxWidth: 180, fontSize: 18, fontWeight: '700', color: '#fff' }}>
+          style={{ maxWidth: 180, fontSize: 18, fontWeight: '700', color: '#fff' }}
+        >
           {item?.name || 'Details'}
         </Text>
       ),
@@ -71,16 +80,42 @@ const PageScreen = () => {
         <>
           <ERPIcon
             name="save-as"
-            onPress={() => {
+            onPress={async () => {
               if (validateForm()) {
                 const submitValues: Record<string, any> = {};
                 controls.forEach(f => {
                   if (f.refcol !== '1') submitValues[f.field] = formValues[f.field];
                 });
-                dispatch(savePageThunk({ page: title, id, data: { ...submitValues } }));
+
+                try {
+                  setLoader(true);
+                  await dispatch(
+                    savePageThunk({ page: title, id, data: { ...submitValues } }),
+                  ).unwrap();
+                  setLoader(false);
+                  fetchPageData();
+                  setAlertConfig({
+                    title: 'Record saved',
+                    message: `Record saved successfully!`,
+                    type: 'success',
+                  });
+                  setAlertVisible(true);
+                  setGoBack(true);
+                } catch (err: any) {
+                  setLoader(false);
+
+                  setAlertConfig({
+                    title: 'Record saved',
+                    message: `Record not saved!`,
+                    type: 'error',
+                  });
+                  setAlertVisible(true);
+                  setGoBack(false);
+                }
               }
             }}
           />
+
           <ERPIcon
             name="refresh"
             onPress={() => {
@@ -92,19 +127,44 @@ const PageScreen = () => {
         </>
       ),
     });
-  }, [navigation, item?.name, id, controls, formValues, validateForm]);
+  }, [
+    navigation,
+    item?.name,
+    id,
+    controls,
+    formValues,
+    validateForm,
+    goBack,
+    alertVisible,
+    loader,
+  ]);
 
-  /** ✅ fetchPageData memoized */
   const fetchPageData = useCallback(async () => {
     try {
       setError(null);
       setLoadingPageId(id);
+
       const parsed = await dispatch(getERPPageThunk({ page: title, id })).unwrap();
       const pageControls = Array.isArray(parsed?.pagectl) ? parsed.pagectl : [];
-      setControls(pageControls);
-      const initVals: any = {};
-      pageControls.forEach(c => (initVals[c.field] = c.text || ''));
-      setFormValues(initVals);
+
+      const normalizedControls = pageControls.map(c => ({
+        ...c,
+        disabled: String(c.disabled ?? '0'),
+        visible: String(c.visible ?? '1'),
+        mandatory: String(c.mandatory ?? '0'),
+      }));
+
+      setControls(normalizedControls);
+
+      setFormValues(prev => {
+        const merged: any = { ...prev };
+        normalizedControls.forEach(c => {
+          if (merged[c.field] === undefined) {
+            merged[c.field] = c.text ?? '';
+          }
+        });
+        return merged;
+      });
     } catch (e: any) {
       setError(e?.message || 'Failed to load page');
     } finally {
@@ -116,37 +176,38 @@ const PageScreen = () => {
     fetchPageData();
   }, [fetchPageData]);
 
-  /** ✅ stable renderItem using useCallback */
   const renderItem = useCallback(
     ({ item }: { item: any }) => {
-      const value = formValues[item.field] || '';
+      const value = formValues[item?.field] || formValues[item?.text] || '';
       const setValue = (val: string) => {
-        setFormValues(prev => ({ ...prev, [item.field]: val }));
-        setErrors(prev => ({ ...prev, [item.field]: '' }));
+        setFormValues(prev => ({ ...prev, [item?.field]: val }));
+        setErrors(prev => ({ ...prev, [item?.field]: '' }));
       };
 
       if (item?.visible === '1') return null;
-      if (item.ctltype === 'IMAGE') return <Media item={item} />;
-      if (item.disabled === '1') return <Disabled item={item} value={value} />;
-      if (item.ddl && item.ddl !== '')
+      if (item?.ctltype === 'IMAGE') return <Media item={item} />;
+      if (item?.disabled === '1') return <Disabled item={item} value={value} />;
+      if (item?.ddl && item?.ddl !== '')
         return (
           <CustomPicker
-            label={item.fieldtitle}
+            label={item?.fieldtitle}
             selectedValue={value}
+            dtext={item?.dtext || item?.text || ''}
             onValueChange={setValue}
-            options={item.options || []}
+            options={item?.options || []}
             item={item}
             errors={errors}
           />
         );
-      if (item.ctltype === 'DATE')
+      if (item?.ctltype === 'DATE'){
         return <Date item={item} errors={errors} value={value} showDatePicker={showDatePicker} />;
+      }
+        
       return <Input item={item} errors={errors} value={value} setValue={setValue} />;
     },
-    [formValues, errors]
+    [formValues, errors],
   );
 
-  /** date picker helpers */
   const showDatePicker = (field: string) => {
     setActiveDateField(field);
     setDatePickerVisible(true);
@@ -169,20 +230,57 @@ const PageScreen = () => {
       ) : !!error ? (
         <ErrorMessage message={error} />
       ) : controls.length > 0 ? (
-        <FlatList
-          showsVerticalScrollIndicator={false}
-          data={controls}
-          keyExtractor={(it, idx) => it.dtlid || idx.toString()}
-          renderItem={renderItem}
-          contentContainerStyle={{ paddingBottom: 50 }}
-          removeClippedSubviews
-        />
+        <>
+          <FlatList
+            showsVerticalScrollIndicator={false}
+            data={controls}
+            keyExtractor={(it, idx) => it?.dtlid || idx?.toString()}
+            renderItem={renderItem}
+            contentContainerStyle={{ paddingBottom: 50 }}
+            removeClippedSubviews
+          />
+
+          {loader && (
+            <View
+              style={{
+                ...StyleSheet.absoluteFillObject,
+                backgroundColor: 'rgba(0,0,0,0.3)',
+                justifyContent: 'center',
+                alignItems: 'center',
+                zIndex: 999,
+              }}
+            >
+              <FullViewLoader />
+            </View>
+          )}
+        </>
       ) : (
         <NoData />
       )}
 
-      <ErrorModal visible={showErrorModal} errors={errorsList} onClose={() => setShowErrorModal(false)} />
-      <DateTimePickerModal isVisible={datePickerVisible} mode="date" onConfirm={handleConfirm} onCancel={hideDatePicker} />
+      <ErrorModal
+        visible={showErrorModal}
+        errors={errorsList}
+        onClose={() => setShowErrorModal(false)}
+      />
+      <DateTimePickerModal
+        isVisible={datePickerVisible}
+        mode="date"
+        onConfirm={handleConfirm}
+        onCancel={hideDatePicker}
+      />
+      <CustomAlert
+        visible={alertVisible}
+        title={alertConfig.title}
+        message={alertConfig.message}
+        type={alertConfig.type}
+        onClose={() => {
+          setAlertVisible(false);
+          if (goBack) {
+            navigation.goBack();
+          }
+        }}
+      />
     </View>
   );
 };

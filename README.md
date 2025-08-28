@@ -125,11 +125,12 @@ curl --location 'https://payroll.deverp.net/devws/msp_api.aspx/getDDL' \
 
 curl --location 'https://payroll.deverp.net/devws/msp_api.aspx/getAjax' \
 --header 'Content-Type: application/json' \
---header 'Cookie: ASP.NET_SessionId=scsvjmlmyltbdc0aial10axa' \
+--header 'Cookie: ASP.NET_SessionId=scsvjmlmyltbdc0aial10axa; ASP.NET_SessionId=1tczjeqjqrgqtwjnq22yovtd' \
 --data '{
      "token": "8c4aaf0e74fd4338943162b3876b2c7d",
-     "dtlid":"1081",
-     "where":"PropTypeName=~Gender~"
+     "dtlid":"1103",
+     "where":"1=1",
+     "search": ""
 }'
 
 [ save page ]
@@ -144,4 +145,53 @@ curl --location 'https://payroll.deverp.net/devws/msp_api.aspx/savePage' \
 }'
 
 
-- air93292
+[ Delete ] 
+
+curl --location 'https://payroll.deverp.net/devws/msp_api.aspx/pageDelete' \
+--header 'Content-Type: application/json' \
+--header 'Cookie: ASP.NET_SessionId=1tczjeqjqrgqtwjnq22yovtd' \
+--data '{
+     "token": "8c4aaf0e74fd4338943162b3876b2c7d",
+     "id":"00100",
+     "remark":"1=1",
+     "page": "EmployeeMaster"
+}'
+
+[ Auth ]
+
+curl --location 'https://payroll.deverp.net/devws/msp_api.aspx/pageAuth' \
+--header 'Content-Type: application/json' \
+--header 'Cookie: ASP.NET_SessionId=1tczjeqjqrgqtwjnq22yovtd' \
+--data '{
+     "token": "8c4aaf0e74fd4338943162b3876b2c7d",
+     "id":"00100",
+     "remarks":"1=1",
+     "page": "EmployeeMaster"
+}'
+
+
+[ DeAuth ]
+
+curl --location 'https://payroll.deverp.net/devws/msp_api.aspx/pageDeAuth' \
+--header 'Content-Type: application/json' \
+--header 'Cookie: ASP.NET_SessionId=1tczjeqjqrgqtwjnq22yovtd' \
+--data '{
+     "token": "8c4aaf0e74fd4338943162b3876b2c7d",
+     "id":"00100",
+     "remarks":"1=1",
+     "page": "EmployeeMaster"
+}'
+
+
+[ Cancel ]
+
+curl --location 'https://payroll.deverp.net/devws/msp_api.aspx/pageCancel' \
+--header 'Content-Type: application/json' \
+--header 'Cookie: ASP.NET_SessionId=1tczjeqjqrgqtwjnq22yovtd' \
+--data '{
+     "token": "8c4aaf0e74fd4338943162b3876b2c7d",
+     "id":"00100",
+     "remarks":"1=1",
+     "page": "EmployeeMaster"
+}'
+
