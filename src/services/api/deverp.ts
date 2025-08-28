@@ -193,15 +193,15 @@ class DevERPService {
   }
 
   savePage(page: string, id: string, rawData: any) {
-    return this.apiCall<any>(`msp_api.aspx/${page}`, { token: this.token, page, id, data: JSON.stringify(rawData) });
+    return this.apiCall<any>(`msp_api.aspx/savePage`, { token: this.token, page, data: JSON.stringify(rawData) });
   }
 
-  getDDL(dtlid: string, ddlwhere: string) {
-    return this.apiCall<any>('msp_api.aspx/getDDL', { token: this.token, dtlid, ddlwhere });
+  getDDL(dtlid: string, where: string) {
+    return this.apiCall<any>('msp_api.aspx/getDDL', { token: this.token, dtlid, where });
   }
 
-  getAjax(dtlid: string, ddlwhere: string) {
-    return this.apiCall<any>('msp_api.aspx/getAjax', { token: this.token, dtlid, ddlwhere });
+  getAjax(dtlid: string, where: string) {
+    return this.apiCall<any>('msp_api.aspx/getAjax', { token: this.token, dtlid, where });
   }
 
   async initialize() {

@@ -115,22 +115,33 @@ curl --location 'https://payroll.deverp.net/devws/msp_api.aspx/punhout' \
 
 curl --location 'https://payroll.deverp.net/devws/msp_api.aspx/getDDL' \
 --header 'Content-Type: application/json' \
---header 'Cookie: ASP.NET_SessionId=scsvjmlmyltbdc0aial10axa' \
 --data '{
-     "token": "51b35f3b6af242898bfc397607aad328",
-     "dtlId":"",
-     "ddlWhere":""
+     "token": "8c4aaf0e74fd4338943162b3876b2c7d",
+     "dtlid":"1081",
+     "where": "PropTypeName=~Gender~"
 }'
 
 [ get Ajax ]
 
 curl --location 'https://payroll.deverp.net/devws/msp_api.aspx/getAjax' \
 --header 'Content-Type: application/json' \
---header 'Cookie: ASP.NET_SessionId=scsvjmlmyltbdc0aial10axa; ASP.NET_SessionId=scsvjmlmyltbdc0aial10axa' \
+--header 'Cookie: ASP.NET_SessionId=scsvjmlmyltbdc0aial10axa' \
 --data '{
-     "token": "51b35f3b6af242898bfc397607aad328",
-     "dtlId":"",
-     "ddlWhere":""
+     "token": "8c4aaf0e74fd4338943162b3876b2c7d",
+     "dtlid":"1081",
+     "where":"PropTypeName=~Gender~"
 }'
+
+[ save page ]
+
+curl --location 'https://payroll.deverp.net/devws/msp_api.aspx/savePage' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "data": 
+"{\"EMPID\":\"1\",\"EMPCode\":\"00001\",\"CardNo\":\"\",\"BranchID\":\"1\",\"DepartmentID\":\"2\",\"DesignationID\":\"1\",\"JoinDate\":\"1/1/2025 12:00:00 AM\",\"Title\":\"Mr\",\"FirstName\":\"Satishvvbnnnnhn\",\"MiddleName\":\"Kalpeshbhai\",\"LastName\":\"Prajapati\",\"BirthDate\":\"1/1/1980 12:00:00 AM\",\"Gender\":\"M\",\"Religion\":\"Hindu\",\"BloodGroup\":\"AB-\",\"MobileNo\":\"87410256394\",\"MobileNo2\":\"\",\"PhoneNo\":\"9905012345\",\"EmailID\":\"satishk@gmail.com\",\"EmailID2\":\"satish@gmail.com\",\"EmergencyContactNo\":\"0533123456\",\"WebSite\":\"https://dev.com\",\"Disabilities\":\"51\",\"DisabilitiesRemarks\":\"\",\"LinkedIn\":\"satish.linkedin\",\"Facebook\":\"satish80\",\"Twitter\":\"satish1980\",\"Instagram\":\"satish80\",\"GitHub\":\"satishgit80\",\"CurrentAddress\":\"Bodak-dev, Near AMTS Stand, Ahmedabad\",\"CurrentCityID\":\"48428\",\"CurrentDistrict\":\"AHMEDABAD\",\"CurrentState\":\"GUJARAT\",\"CurrentCountry\":\"INDIA\",\"CurrentPin\":\"380054\",\"Address\":\"Bodak-dev, Near AMTS Stand, Ahmedabad\",\"CityID\":\"48428\",\"District\":\"AHMEDABAD\",\"State\":\"GUJARAT\",\"Country\":\"INDIA\",\"Pin\":\"380054\",\"AdharNo\":\"854172653987\",\"PANNo\":\"HGTUG5417H\",\"BankName\":\"HDFC Bank\",\"ACNo\":\"87456125367\",\"IFSCCode\":\"HDFC102310\",\"NameInBankAccount\":\"SATISH KALPESHBHAI PRAJAPATI\",\"PFNo\":\"PFSATISH\",\"ESINo\":\"ESICSATISH\",\"GratutityFormNo\":\"GT123456\",\"Status\":\"A\",\"ResignDate\":\"\",\"ResignReason\":\"\",\"Remarks\":\"\",\"LastDate\":\"\",\"UserID\":\"0\",\"CUID\":\"1\",\"Image\":\"d_logo.png\",\"CDT\":\"1/18/2025 12:00:00 AM\",\"MUID\":\"6\",\"MDT\":\"27-Aug-2025 13:22:37\"}",
+ "page": "EmployeeMaster",
+"token": "8c4aaf0e74fd4338943162b3876b2c7d"
+}'
+
 
 - air93292

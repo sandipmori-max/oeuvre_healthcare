@@ -85,11 +85,13 @@ const PageScreen = () => {
             onPress={() => {
               if (validateForm()) {
                 const submitValues: Record<string, any> = {};
+                console.log("🚀 ~ submitValues:----------", submitValues)
                 controls.forEach(f => {
                   if (f.refcol !== '1') {
                     submitValues[f.field] = formValues[f.field];
                   }
                 });
+                console.log("🚀 ~ controls:", controls)
                 dispatch(
                   savePageThunk({
                     page: title,

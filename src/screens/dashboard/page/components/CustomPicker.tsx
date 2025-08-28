@@ -10,20 +10,37 @@ import { getDDLThunk } from '../../../../store/slices/dropdown/thunk';
 import MaterialIcons from '@react-native-vector-icons/material-icons';
 
 const CustomPicker = ({ label, selectedValue, onValueChange, options, item, errors }: any) => {
+  console.log("🚀 ~ CustomPicker ~ selectedValue:", selectedValue)
   const [open, setOpen] = useState(false);
   const dispatch = useAppDispatch();
 
-  const {
-    loading: ajxLoader,
-    error: ajaxError,
-    response: ajaxResponse,
-  } = useAppSelector(state => state.ajax);
+  const { loading: ajxLoader, response: ajaxResponse } = useAppSelector(state => state.ajax);
+  const { loading: dropDownLoader, response: dropDownResponse } = useAppSelector(state => state.dropdown);
 
-  const {
-    loading: dropDownLoader,
-    error: dropDownError,
-    response: dropDownResponse,
-  } = useAppSelector(state => state.dropdown);
+  const isAjax = String(item?.ajax) === '1'; // ✅ normalize check
+
+  const handleOpen = () => {
+    if (isAjax) {
+      dispatch(resetAjaxState());
+      dispatch(getAjaxThunk({ dtlid: item?.dtlid, where: item?.ddlwhere }));
+    } else {
+      dispatch(resetDropdownState());
+      dispatch(getDDLThunk({ dtlid: item?.dtlid, where: item?.ddlwhere }));
+    }
+    setOpen(!open);
+  };
+
+  const listData = isAjax ? ajaxResponse?.data ?? [] : dropDownResponse?.data ?? [];
+
+  const selectedOption = listData.find((opt: any) => String(opt.value) === String(selectedValue));
+  console.log("🚀 ~ CustomPicker ~ selectedOption:", selectedOption)
+
+  const displayLabel =
+    selectedOption?.deptname ||
+    selectedOption?.name ||
+    selectedOption?.text ||
+    selectedOption?.label ||
+    '';
 
   return (
     <View style={{ marginBottom: 16 }}>
@@ -32,69 +49,50 @@ const CustomPicker = ({ label, selectedValue, onValueChange, options, item, erro
         {item?.tooltip !== label && <Text> - ( {item?.tooltip} ) </Text>}
         {item?.mandatory === '1' && <Text style={{ color: ERP_COLOR_CODE.ERP_ERROR }}>*</Text>}
       </View>
-      <TouchableOpacity
-        style={[styles.pickerBox]}
-        onPress={() => {
-          if (item?.ajax === '1') {
-            dispatch(resetAjaxState());
-            dispatch(getAjaxThunk({ dtlid: item?.dtlid, ddlwhere: item?.ddlwhere }));
-          } else {
-            dispatch(resetDropdownState());
-            dispatch(getDDLThunk({ dtlid: item?.dtlid, ddlwhere: item?.ddlwhere }));
-          }
-          setOpen(!open);
-        }}
-        activeOpacity={0.7}
-      >
-        <Text style={{ color: selectedValue ? '#000' : '#888', flex: 1 }}>
-          {selectedValue || 'Select...'}
+
+      <TouchableOpacity style={[styles.pickerBox]} onPress={handleOpen} activeOpacity={0.7}>
+        <Text style={{ color: selectedOption ? '#000' : '#888', flex: 1 }}>
+          {displayLabel || 'Select...'}
         </Text>
         <MaterialIcons name={open ? 'arrow-drop-up' : 'arrow-drop-down'} size={24} color="#555" />
       </TouchableOpacity>
 
       {open && (
         <View style={styles.dropdownCard}>
-          {item?.ajax === '1' && (
-            <>
-              <TextInput
-                style={[styles.textInput, { margin: 4 }]}
-                value={''}
-                onChangeText={e => {}}
-                keyboardType={item.ctltype === 'NUMERIC' ? 'numeric' : 'default'}
-                placeholder="Search here....."
-                placeholderTextColor="#888"
-              />
-            </>
+          {isAjax && (
+            <TextInput
+              style={[styles.textInput, { margin: 4 }]}
+              onChangeText={e => {}}
+              keyboardType={item.ctltype === 'NUMERIC' ? 'numeric' : 'default'}
+              placeholder="Search here..."
+              placeholderTextColor="#888"
+            />
           )}
-          {options.length > 0 ? (
-            <>
-              {options.map((opt: any, i: number) => (
-                <TouchableOpacity
-                  key={i}
-                  style={styles.option}
-                  onPress={() => {
-                    onValueChange(opt.value);
-                    setOpen(false);
-                  }}
-                >
-                  <Text>{opt.label}</Text>
-                </TouchableOpacity>
-              ))}
-            </>
-          ) : (
-            <>
-              <View
-                style={{
-                  marginVertical: 12,
-                  justifyContent: 'center',
-                  alignContent: 'center',
-                  alignItems: 'center',
-                  height: 100,
+
+          {listData.length > 0 ? (
+            listData.map((opt: any, i: number) => (
+              <TouchableOpacity
+                key={i}
+                style={styles.option}
+                onPress={() => {
+                  onValueChange(opt.value);
+                  setOpen(false);
                 }}
               >
-                <Text>No data</Text>
-              </View>
-            </>
+                <Text>{opt?.deptname || opt?.name || opt?.text || opt?.label}</Text>
+              </TouchableOpacity>
+            ))
+          ) : (
+            <View
+              style={{
+                marginVertical: 12,
+                justifyContent: 'center',
+                alignItems: 'center',
+                height: 100,
+              }}
+            >
+              <Text>No data</Text>
+            </View>
           )}
         </View>
       )}
