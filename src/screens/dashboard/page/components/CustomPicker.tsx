@@ -1,6 +1,6 @@
-import { useState } from 'react';
-import { useAppDispatch, useAppSelector } from '../../../../store/hooks';
+import React, { useCallback, useMemo, useState } from 'react';
 import { Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { useAppDispatch, useAppSelector } from '../../../../store/hooks';
 import { styles } from '../page_style';
 import { ERP_COLOR_CODE } from '../../../../utils/constants';
 import { resetAjaxState } from '../../../../store/slices/ajax/ajaxSlice';
@@ -9,17 +9,16 @@ import { resetDropdownState } from '../../../../store/slices/dropdown/dropdownSl
 import { getDDLThunk } from '../../../../store/slices/dropdown/thunk';
 import MaterialIcons from '@react-native-vector-icons/material-icons';
 
-const CustomPicker = ({ label, selectedValue, onValueChange, options, item, errors }: any) => {
-  console.log("🚀 ~ CustomPicker ~ selectedValue:", selectedValue)
+const CustomPicker = ({ label, selectedValue, onValueChange, item, errors }: any) => {
   const [open, setOpen] = useState(false);
   const dispatch = useAppDispatch();
 
-  const { loading: ajxLoader, response: ajaxResponse } = useAppSelector(state => state.ajax);
-  const { loading: dropDownLoader, response: dropDownResponse } = useAppSelector(state => state.dropdown);
+  const { response: ajaxResponse } = useAppSelector(state => state.ajax);
+  const { response: dropDownResponse } = useAppSelector(state => state.dropdown);
 
-  const isAjax = String(item?.ajax) === '1'; // ✅ normalize check
+  const isAjax = String(item?.ajax) === '1';
 
-  const handleOpen = () => {
+  const handleOpen = useCallback(() => {
     if (isAjax) {
       dispatch(resetAjaxState());
       dispatch(getAjaxThunk({ dtlid: item?.dtlid, where: item?.ddlwhere }));
@@ -27,20 +26,20 @@ const CustomPicker = ({ label, selectedValue, onValueChange, options, item, erro
       dispatch(resetDropdownState());
       dispatch(getDDLThunk({ dtlid: item?.dtlid, where: item?.ddlwhere }));
     }
-    setOpen(!open);
-  };
+    setOpen(o => !o);
+  }, [dispatch, isAjax, item?.dtlid, item?.ddlwhere]);
 
-  const listData = isAjax ? ajaxResponse?.data ?? [] : dropDownResponse?.data ?? [];
+  const listData = useMemo(
+    () => (isAjax ? ajaxResponse?.data ?? [] : dropDownResponse?.data ?? []),
+    [isAjax, ajaxResponse?.data, dropDownResponse?.data],
+  );
 
-  const selectedOption = listData.find((opt: any) => String(opt.value) === String(selectedValue));
-  console.log("🚀 ~ CustomPicker ~ selectedOption:", selectedOption)
+  const selectedOption = useMemo(
+    () => listData.find((opt: any) => String(opt.value) === String(selectedValue)),
+    [listData, selectedValue],
+  );
 
-  const displayLabel =
-    selectedOption?.deptname ||
-    selectedOption?.name ||
-    selectedOption?.text ||
-    selectedOption?.label ||
-    '';
+  const displayLabel = selectedOption?.name || '';
 
   return (
     <View style={{ marginBottom: 16 }}>
@@ -62,13 +61,11 @@ const CustomPicker = ({ label, selectedValue, onValueChange, options, item, erro
           {isAjax && (
             <TextInput
               style={[styles.textInput, { margin: 4 }]}
-              onChangeText={e => {}}
               keyboardType={item.ctltype === 'NUMERIC' ? 'numeric' : 'default'}
               placeholder="Search here..."
               placeholderTextColor="#888"
             />
           )}
-
           {listData.length > 0 ? (
             listData.map((opt: any, i: number) => (
               <TouchableOpacity
@@ -104,4 +101,4 @@ const CustomPicker = ({ label, selectedValue, onValueChange, options, item, erro
   );
 };
 
-export default CustomPicker;
+export default React.memo(CustomPicker);
