@@ -48,8 +48,10 @@ const LoginScreen = ({ navigation, route }: any) => {
     company_code: string,
     password: string,
     user_credentials: { user: string; name?: string },
+    response: any,
   ) => {
-    dispatch(loginUserThunk({ company_code, password, isAddingAccount, user_credentials }));
+    console.log("🚀 ~ handlePersistAfterLogin ~ response:---------", response)
+    dispatch(loginUserThunk({ company_code, password, isAddingAccount, user_credentials , response}));
   };
 
   const showAlert = (config: {

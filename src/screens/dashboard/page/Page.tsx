@@ -9,16 +9,17 @@ import { savePageThunk } from '../../../store/slices/page/thunk';
 import FullViewLoader from '../../../components/loader/FullViewLoader';
 import NoData from '../../../components/no_data/NoData';
 import ErrorMessage from '../../../components/error/Error';
-import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import ERPIcon from '../../../components/icon/ERPIcon';
 import ErrorModal from './components/ErrorModal';
 import CustomPicker from './components/CustomPicker';
 import Media from './components/Media';
 import Disabled from './components/Disabled';
-import Date from './components/Date';
 import Input from './components/Input';
 import CustomAlert from '../../../components/alert/CustomAlert';
 import AjaxPicker from './components/AjaxPicker';
+import DateTimePicker from 'react-native-modal-datetime-picker';
+import { parseCustomDate, parseCustomDatePage } from '../../../utils/helpers';
+import DateRow from './components/Date';
 
 type PageRouteParams = { PageScreen: { item: any } };
 
@@ -33,8 +34,13 @@ const PageScreen = () => {
 
   const [error, setError] = useState<string | null>(null);
   const [formValues, setFormValues] = useState<any>({});
+  console.log('🚀 ~ PageScreen ~ formValues:', formValues);
   const [datePickerVisible, setDatePickerVisible] = useState(false);
   const [activeDateField, setActiveDateField] = useState<string | null>(null);
+  const [activeDate, setActiveDate] = useState<string | null>(null);
+  console.log('🚀 ~ PageScreen ~ activeDate:', activeDate);
+
+  console.log('🚀 ~ PageScreen ~ activeDateField:', activeDateField);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [alertVisible, setAlertVisible] = useState(false);
   const [goBack, setGoBack] = useState(false);
@@ -179,19 +185,30 @@ const PageScreen = () => {
 
   const renderItem = useCallback(
     ({ item }: { item: any }) => {
-      console.log("🚀 ~ item:", item)
       const value = formValues[item?.field] || formValues[item?.text] || '';
-      const setValue = (val: string) => {
-        setFormValues(prev => ({ ...prev, [item?.field]: val }));
+      const setValue = (val: any) => {
+        console.log('🚀 ~ setValue ~ val:', val);
+        setFormValues(prev => {
+          console.log('🚀 ~ setValue ~ prev:', prev);
+
+          if (typeof val === 'object' && val !== null) {
+            console.log('🚀 ~ setValue ~ prev: if part', val);
+
+            return { ...prev, ...val };
+          } else {
+            console.log('🚀 ~ setValue ~ prev: else part', [item?.field]);
+
+            return { ...prev, [item?.field]: val };
+          }
+        });
         setErrors(prev => ({ ...prev, [item?.field]: '' }));
       };
 
       if (item?.visible === '1') return null;
       if (item?.ctltype === 'IMAGE') return <Media item={item} />;
       if (item?.disabled === '1') return <Disabled item={item} value={value} />;
-      if (item?.ddl && item?.ddl !== '' && item?.ajax === 0)
-       {
-         return (
+      if (item?.ddl && item?.ddl !== '' && item?.ajax === 0) {
+        return (
           <CustomPicker
             label={item?.fieldtitle}
             selectedValue={value}
@@ -202,8 +219,8 @@ const PageScreen = () => {
             errors={errors}
           />
         );
-       }
-      if (item?.ddl && item?.ddl !== '' && item?.ajax === 1){
+      }
+      if (item?.ddl && item?.ddl !== '' && item?.ajax === 1) {
         return (
           <AjaxPicker
             label={item?.fieldtitle}
@@ -213,21 +230,25 @@ const PageScreen = () => {
             options={item?.options || []}
             item={item}
             errors={errors}
+            formValues={formValues}
           />
         );
       }
-        
-      if (item?.ctltype === 'DATE'){
-        return <Date item={item} errors={errors} value={value} showDatePicker={showDatePicker} />;
+
+      if (item?.ctltype === 'DATE') {
+        return (
+          <DateRow item={item} errors={errors} value={value} showDatePicker={showDatePicker} />
+        );
       }
-        
+
       return <Input item={item} errors={errors} value={value} setValue={setValue} />;
     },
     [formValues, errors],
   );
 
-  const showDatePicker = (field: string) => {
+  const showDatePicker = (field: string, date: any) => {
     setActiveDateField(field);
+    setActiveDate(date);
     setDatePickerVisible(true);
   };
   const hideDatePicker = () => {
@@ -281,12 +302,14 @@ const PageScreen = () => {
         errors={errorsList}
         onClose={() => setShowErrorModal(false)}
       />
-      <DateTimePickerModal
+      <DateTimePicker
         isVisible={datePickerVisible}
         mode="date"
+        date={activeDate ? parseCustomDatePage(activeDate) : new Date()}
         onConfirm={handleConfirm}
         onCancel={hideDatePicker}
       />
+
       <CustomAlert
         visible={alertVisible}
         title={alertConfig.title}

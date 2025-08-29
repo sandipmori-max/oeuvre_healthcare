@@ -46,40 +46,39 @@ class DevERPService {
   }
 
   private async apiCall<T>(endpoint: string, payload: any): Promise<T> {
-   try {
-    console.log("🚀 ~ DevERPService ~ apiCall ~ payload--------------------:", payload)
-    await this.checkNetwork();
-    await this.ensureAuthToken();
+    try {
+      console.log('🚀 ~ DevERPService ~ apiCall ~ payload--------------------:', payload);
+      await this.checkNetwork();
+      await this.ensureAuthToken();
 
-    const response = await apiClient.post<T>(`${this.link}${endpoint}`, payload);
-    console.log("🚀 ~ DevERPService ~ apiCall ~ response:", response)
+      const response = await apiClient.post<T>(`${this.link}${endpoint}`, payload);
+      console.log('🚀 ~ DevERPService ~ apiCall ~ response:', response);
 
-    if (
-      (response as any).data?.success === 0 &&
-      (response as any).data?.message?.includes('Token Expire')
-    ) {
-      await this.ensureAuthToken(true);
-      const retryResponse = await apiClient.post<T>(`${this.link}${endpoint}`, {
-        ...payload,
-        token: this.token,
-      });
-      return retryResponse.data;
+      if (
+        (response as any).data?.success === 0 &&
+        (response as any).data?.message?.includes('Token Expire')
+      ) {
+        await this.ensureAuthToken(true);
+        const retryResponse = await apiClient.post<T>(`${this.link}${endpoint}`, {
+          ...payload,
+          token: this.token,
+        });
+        return retryResponse.data;
+      }
+
+      return response.data;
+    } catch (error) {
+      console.log('🚀 ~ DevERPService ~ apiCall ~ error:', error);
+      throw error;
     }
-
-    return response.data;
-   } catch (error) {
-    console.log("🚀 ~ DevERPService ~ apiCall ~ error:", error)
-    
-   }
   }
 
   async getAppLink(code: string): Promise<DevERPResponse> {
     await this.checkNetwork();
 
-    const response = await apiClient.post<DevERPResponse>(
-      `${this.baseUrl}/appcode.aspx/getLink`,
-      { code }
-    );
+    const response = await apiClient.post<DevERPResponse>(`${this.baseUrl}/appcode.aspx/getLink`, {
+      code,
+    });
 
     if (response.data.success === 1 && response.data.link) {
       if (response.data.link.startsWith('https://')) {
@@ -94,14 +93,23 @@ class DevERPService {
     try {
       const response = await this.getAppLink(code);
       return response.success === 1
-        ? { isValid: true, appName: response.name, appUrl: response.link, message: 'Company code validated successfully' }
+        ? {
+            isValid: true,
+            appName: response.name,
+            appUrl: response.link,
+            message: 'Company code validated successfully',
+          }
         : { isValid: false, message: 'Invalid company code' };
     } catch {
       return { isValid: false, message: 'Failed to validate company code' };
     }
   }
 
-  async loginToERP(credentials: { user: string; pass: string; firebaseid?: string }): Promise<LoginResponse> {
+  async loginToERP(credentials: {
+    user: string;
+    pass: string;
+    firebaseid?: string;
+  }): Promise<LoginResponse> {
     await this.checkNetwork();
 
     this.link = (await AsyncStorage.getItem('erp_link')) || this.link;
@@ -115,7 +123,11 @@ class DevERPService {
       device: this.device,
     };
 
-    const response = await apiClient.post<LoginResponse>(`${this.link}msp_api.aspx/setAppID`, loginData);
+    const response = await apiClient.post<LoginResponse>(
+      `${this.link}msp_api.aspx/setAppID`,
+      loginData,
+    );
+    console.log('🚀 ~ DevERPService ~ loginToERP ~ response:', response);
     return response.data;
   }
 
@@ -123,9 +135,13 @@ class DevERPService {
     await this.checkNetwork();
 
     const tokenData: TokenRequest = { appid: this.appid, device: this.device };
-    const response = await apiClient.post<TokenResponse>(`${this.link}msp_api.aspx/getAuth`, tokenData);
+    const response = await apiClient.post<TokenResponse>(
+      `${this.link}msp_api.aspx/getAuth`,
+      tokenData,
+    );
 
-    if (String(response.data.success) !== '1') throw new Error(response.data.message || 'Failed to get token');
+    if (String(response.data.success) !== '1')
+      throw new Error(response.data.message || 'Failed to get token');
 
     this.token = response.data.token || '';
     this.tokenValidTill = response.data.validTill || '';
@@ -138,12 +154,16 @@ class DevERPService {
       const db = await getDBConnection();
       const tableCheckResult = await db.executeSql(
         `SELECT name FROM sqlite_master WHERE type='table' AND name=?`,
-        ['erp_accounts']
+        ['erp_accounts'],
       );
       if (tableCheckResult[0].rows.length > 0) {
         const activeAccount = await getActiveAccount(db);
         if (activeAccount) {
-          const updatedUser = { ...activeAccount.user, token: this.token, tokenValidTill: this.tokenValidTill };
+          const updatedUser = {
+            ...activeAccount.user,
+            token: this.token,
+            tokenValidTill: this.tokenValidTill,
+          };
           await db.executeSql(`UPDATE erp_accounts SET user_json = ? WHERE id = ?`, [
             JSON.stringify(updatedUser),
             activeAccount.id,
@@ -158,11 +178,15 @@ class DevERPService {
   }
 
   getMenu() {
-    return this.apiCall<MenuResponse>('msp_api.aspx/getMenu', { token: this.token }).then(res => JSON.stringify(res));
+    return this.apiCall<MenuResponse>('msp_api.aspx/getMenu', { token: this.token }).then(res =>
+      JSON.stringify(res),
+    );
   }
 
   getDashboard() {
-    return this.apiCall<DashboardResponse>('msp_api.aspx/getDB', { token: this.token }).then(res => JSON.stringify(res));
+    return this.apiCall<DashboardResponse>('msp_api.aspx/getDB', { token: this.token }).then(res =>
+      JSON.stringify(res),
+    );
   }
 
   getPage(page: string, id: string) {
@@ -170,30 +194,50 @@ class DevERPService {
   }
 
   getListData(page: string, fd: string, td: string, param: string) {
-    return this.apiCall<ListDataResponse>('msp_api.aspx/getListData', { token: this.token, page, fd, td, param })
-      .then(res => JSON.stringify({ data: res.data, config: res.config || [] }));
+    return this.apiCall<ListDataResponse>('msp_api.aspx/getListData', {
+      token: this.token,
+      page,
+      fd,
+      td,
+      param,
+    }).then(res => JSON.stringify({ data: res.data, config: res.config || [] }));
   }
 
-  markAttendance(rawData: any, isPunchIn: boolean) {
+  markAttendance(rawData: any, isPunchIn: boolean, user: any) {
     const pageType = isPunchIn ? 'punchin' : 'punchout';
-    const punchData = {
-      Id: this.token,
-      EmployeeId: this.token,
-      Date: rawData.dateTime,
-      Image: rawData.imageBase64,
-      Remarks: rawData?.remark || '',
-      Location: { lat: rawData?.latitude, long: rawData?.longitude },
-      CUID: this.token,
+    const punchOutData = {
+      ID: user.id,
+      EmployeeId: user.id,
+      OutImage: rawData.imageBase64,
+      OutRemarks: rawData?.remark || '',
+      OutLocation: `${rawData?.latitude},${rawData?.longitude}`,
     };
-    return this.apiCall<AttendanceResponse>(`msp_api.aspx/${pageType}`, {
+
+    const punchData = {
+      ID: '0',
+      EmployeeId: user.id.toString(),
+      InImage: rawData.imageBase64,
+      InRemarks: rawData?.remark || '',
+      InLocation: `${rawData?.latitude.toString()},${rawData?.longitude.toString()}`,
+    };
+    console.log(
+      '🚀 ~ DevERPService ~ markAttendance ~ punchData:',
+      JSON.stringify(isPunchIn ? punchData : punchOutData),
+    );
+
+    return this.apiCall<AttendanceResponse>(`msp_api.aspx/pageSave`, {
       token: this.token,
       page: pageType,
-      data: JSON.stringify(punchData),
+      data: JSON.stringify(isPunchIn ? punchData : punchOutData),
     });
   }
 
   savePage(page: string, id: string, rawData: any) {
-    return this.apiCall<any>(`msp_api.aspx/savePage`, { token: this.token, page, data: JSON.stringify(rawData) });
+    return this.apiCall<any>(`msp_api.aspx/savePage`, {
+      token: this.token,
+      page,
+      data: JSON.stringify(rawData),
+    });
   }
 
   getDDL(dtlid: string, where: string) {
@@ -223,8 +267,12 @@ class DevERPService {
     this.token = token;
     AsyncStorage.setItem('erp_token', token);
   }
-  setDevice(device: string) { this.device = device; }
-  setAppId(appId: string) { this.appid = appId; }
+  setDevice(device: string) {
+    this.device = device;
+  }
+  setAppId(appId: string) {
+    this.appid = appId;
+  }
 }
 
 export default new DevERPService();

@@ -125,13 +125,13 @@ curl --location 'https://payroll.deverp.net/devws/msp_api.aspx/getDDL' \
 
 curl --location 'https://payroll.deverp.net/devws/msp_api.aspx/getAjax' \
 --header 'Content-Type: application/json' \
---header 'Cookie: ASP.NET_SessionId=scsvjmlmyltbdc0aial10axa; ASP.NET_SessionId=1tczjeqjqrgqtwjnq22yovtd' \
+--header 'Cookie: ASP.NET_SessionId=scsvjmlmyltbdc0aial10axa; ASP.NET_SessionId=yuhpy41xwsqjq2olhay4i3c0' \
 --data '{
-     "token": "8c4aaf0e74fd4338943162b3876b2c7d",
-     "dtlid":"1103",
-     "where":"1=1",
-     "search": ""
-}'
+     "token": "d78134973d9b4697a2b3d5b8b2e87510",
+     "dtlid":"1072",
+     "where":"Status=~A~",
+     "search": "dadfdfdfdd"
+ }'
 
 [ save page ]
 

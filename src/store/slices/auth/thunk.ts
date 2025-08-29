@@ -57,6 +57,7 @@ export const loginUserThunk = createAsyncThunk(
       password,
       isAddingAccount = false,
       user_credentials,
+      response,
     }: {
       company_code: string;
       password: string;
@@ -64,9 +65,11 @@ export const loginUserThunk = createAsyncThunk(
       newToken?: string;
       newvalidTill?: string;
       user_credentials?: { user: string; name?: string };
+      response,
     },
     { rejectWithValue },
   ) => {
+      console.log("🚀 ~ response:*-*-*-*-*-*-*-", response)
     try { 
       const token = isAddingAccount ? newToken : await AsyncStorage.getItem('erp_token');
       const tokenValidTill = isAddingAccount
@@ -82,7 +85,7 @@ export const loginUserThunk = createAsyncThunk(
       await AsyncStorage.setItem('erp_appid', company_code);
 
       const erpUser: User = {
-        id: `user_${Date.now()}`,
+        id: response?.userid,
         name: user_credentials?.name || user_credentials?.user || company_code.toUpperCase(),
         company_code: company_code,
         avatar: `https://ui-avatars.com/api/?name=${(
@@ -93,6 +96,11 @@ export const loginUserThunk = createAsyncThunk(
         accountType: 'erp',
         token: token,
         tokenValidTill: tokenValidTill,
+        fullname: response?.fullname,
+        mobileno: response?.mobileno,
+        roleid: response?.roleid,
+        rolename: response?.rolename,
+        username: response?.username
       };
 
       const db = await getDBConnection();

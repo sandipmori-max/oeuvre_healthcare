@@ -16,7 +16,7 @@ const Input = ({item, errors, value, setValue}: any) => {
             styles.textInput,
             errors[item.field] && { borderColor: ERP_COLOR_CODE.ERP_ERROR },
           ]}
-          value={value}
+          value={value.toString() || item?.text.toString() || item?.dtext.toString()}
           onChangeText={setValue}
           placeholder="Enter value"
         />
