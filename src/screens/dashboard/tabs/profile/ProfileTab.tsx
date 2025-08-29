@@ -13,6 +13,7 @@ import MaterialIcons from '@react-native-vector-icons/material-icons';
 const ProfileTab = () => {
   const navigation = useNavigation<any>();
   const { user, accounts } = useAppSelector(state => state?.auth);
+  console.log("🚀 ~ ProfileTab ~ user:", user)
   const [showAccountSwitcher, setShowAccountSwitcher] = useState(false);
   const [showAddAccount, setShowAddAccount] = useState(false);
 

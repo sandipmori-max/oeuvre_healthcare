@@ -60,12 +60,19 @@ const LoginForm: React.FC<LoginFormProps> = ({
           firebaseid: currentFcmToken || '',
         }),
       );
+      console.log("🚀 ~ handleLoginSubmit ~ loginResult:--------", loginResult)
       if (loginResult?.success === 1) {
         await DevERPService.getAuth();
-        await onLoginSuccess(values.company_code, values.password, {
+        await onLoginSuccess(
+          values.company_code,
+          values.password, 
+          {
           user: values.user,
           name: values.user,
-        });
+          },
+          loginResult
+    
+      );
       } else {
         showAlert({
           title: t('auth.error'),

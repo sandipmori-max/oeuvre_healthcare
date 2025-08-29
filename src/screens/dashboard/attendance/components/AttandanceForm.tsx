@@ -26,8 +26,9 @@ const AttandanceForm = () => {
   const { t } = useTranslations();
 
   const dispatch = useAppDispatch();
-  
+
   const { user } = useAppSelector(state => state?.auth);
+  console.log('🚀 ~ ProfileTab ~ user:--------', user);
   const { loading, error, response } = useAppSelector(state => state.attendance);
 
   const [users, setUser] = useState<User>(dummyUser);
@@ -60,10 +61,10 @@ const AttandanceForm = () => {
         }
 
         const photoUri = response.assets?.[0]?.uri;
-        console.log("🚀 ~ openCamera ~ photoUri:", photoUri)
+        console.log('🚀 ~ openCamera ~ photoUri:', photoUri);
         const asset = response.assets?.[0];
         if (!photoUri) return;
-        console.log("🚀 ~ openCamera ~ photoUri:", photoUri)
+        console.log('🚀 ~ openCamera ~ photoUri:', photoUri);
 
         setFieldValue(
           'status',
@@ -71,7 +72,7 @@ const AttandanceForm = () => {
         );
 
         if (asset?.base64) {
-          setFieldValue("imageBase64", `data:${asset.type};base64,${asset.base64}`);
+          setFieldValue('imageBase64', `data:${asset.type};base64,${asset.base64}`);
         }
         setStatusImage(photoUri);
 
@@ -89,6 +90,7 @@ const AttandanceForm = () => {
     if (locationLoading) return;
 
     const hasPermission = await requestCameraAndLocationPermission();
+    console.log('🚀 ~ handleStatusToggle ~ hasPermission:', hasPermission);
     if (!hasPermission) {
       setAlertConfig({
         title: t('errors.permissionRequired'),
@@ -104,45 +106,31 @@ const AttandanceForm = () => {
     let attempts = 0;
     const getLocationWithRetry = () => {
       let watchId: number | null = null;
+      console.log('🚀 ~ getLocationWithRetry ~ watchId:', watchId);
 
-      watchId = Geolocation.watchPosition(
+      Geolocation.getCurrentPosition(
         position => {
-          if (watchId !== null) {
-            Geolocation.clearWatch(watchId);
-          }
-
           const { latitude, longitude } = position.coords;
           setUserLocation({ latitude, longitude });
           setFieldValue('latitude', String(latitude));
           setFieldValue('longitude', String(longitude));
           setLocationLoading(false);
-
           openCamera(setFieldValue, handleSubmit);
         },
         error => {
-          if (watchId !== null) {
-            Geolocation.clearWatch(watchId);
-          }
-
-          attempts += 1;
-          if (attempts < 3) {
-            console.log(`⏳ Retrying location fetch... attempt ${attempts}`);
-            setTimeout(() => getLocationWithRetry(), 2000 * attempts);
-          } else {
-            setLocationLoading(false);
-            setAlertConfig({
-              title: t('errors.locationError'),
-              message: error.message || 'Unable to fetch location',
-              type: 'error',
-            });
-            setAlertVisible(true);
-          }
+          console.error('Location error', error);
+          setAlertConfig({
+            title: t('errors.locationError'),
+            message: error.message || 'Unable to fetch location',
+            type: 'error',
+          });
+          setAlertVisible(true);
+          setLocationLoading(false);
         },
         {
-          enableHighAccuracy: true,
-          timeout: 60000,
-          maximumAge: 0,
-          distanceFilter: 0,
+          enableHighAccuracy: false,
+          timeout: 15000,
+          maximumAge: 10000,
         },
       );
     };
@@ -174,7 +162,7 @@ const AttandanceForm = () => {
           imageBase64: Yup.string().required('Image required'),
         })}
         onSubmit={values => {
-          dispatch(markAttendanceThunk({ rawData: values , type: false}))
+          dispatch(markAttendanceThunk({ rawData: values, type: true, user }))
             .unwrap()
             .then(res => {
               console.log('✅ API Success:', res);
@@ -269,7 +257,8 @@ const AttandanceForm = () => {
                   style={[
                     styles.statusBtn,
                     {
-                      backgroundColor: users.status === 'checkin' ? ERP_COLOR_CODE.ERP_APP_COLOR : '#dc3545',
+                      backgroundColor:
+                        users.status === 'checkin' ? ERP_COLOR_CODE.ERP_APP_COLOR : '#dc3545',
                     },
                     locationLoading && { opacity: 0.5 },
                   ]}
@@ -277,7 +266,9 @@ const AttandanceForm = () => {
                   disabled={locationLoading}
                 >
                   <Text style={styles.statusText}>
-                    {users.status === 'checkin' ? t('attendance.checkOut') : t('attendance.checkIn')}
+                    {users.status === 'checkin'
+                      ? t('attendance.checkOut')
+                      : t('attendance.checkIn')}
                   </Text>
                 </TouchableOpacity>
               </View>

@@ -7,7 +7,6 @@ import { getDDLThunk } from '../../../../store/slices/dropdown/thunk';
 import MaterialIcons from '@react-native-vector-icons/material-icons';
 
 const CustomPicker = ({ label, selectedValue, onValueChange, item, errors, dtext }: any) => {
-  console.log('🚀 ~ CustomPicker------- ~ item:', item);
   const [open, setOpen] = useState(false);
   const [options, setOptions] = useState<any[]>([]);
   const dispatch = useAppDispatch();
