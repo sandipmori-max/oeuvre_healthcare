@@ -200,8 +200,8 @@ class DevERPService {
     return this.apiCall<any>('msp_api.aspx/getDDL', { token: this.token, dtlid, where });
   }
 
-  getAjax(dtlid: string, where: string) {
-    return this.apiCall<any>('msp_api.aspx/getAjax', { token: this.token, dtlid, where });
+  getAjax(dtlid: string, where: string, search: string) {
+    return this.apiCall<any>('msp_api.aspx/getAjax', { token: this.token, dtlid, where, search });
   }
 
   async initialize() {

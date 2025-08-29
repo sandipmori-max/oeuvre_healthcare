@@ -18,6 +18,7 @@ import Disabled from './components/Disabled';
 import Date from './components/Date';
 import Input from './components/Input';
 import CustomAlert from '../../../components/alert/CustomAlert';
+import AjaxPicker from './components/AjaxPicker';
 
 type PageRouteParams = { PageScreen: { item: any } };
 
@@ -178,6 +179,7 @@ const PageScreen = () => {
 
   const renderItem = useCallback(
     ({ item }: { item: any }) => {
+      console.log("🚀 ~ item:", item)
       const value = formValues[item?.field] || formValues[item?.text] || '';
       const setValue = (val: string) => {
         setFormValues(prev => ({ ...prev, [item?.field]: val }));
@@ -187,8 +189,9 @@ const PageScreen = () => {
       if (item?.visible === '1') return null;
       if (item?.ctltype === 'IMAGE') return <Media item={item} />;
       if (item?.disabled === '1') return <Disabled item={item} value={value} />;
-      if (item?.ddl && item?.ddl !== '')
-        return (
+      if (item?.ddl && item?.ddl !== '' && item?.ajax === 0)
+       {
+         return (
           <CustomPicker
             label={item?.fieldtitle}
             selectedValue={value}
@@ -199,6 +202,21 @@ const PageScreen = () => {
             errors={errors}
           />
         );
+       }
+      if (item?.ddl && item?.ddl !== '' && item?.ajax === 1){
+        return (
+          <AjaxPicker
+            label={item?.fieldtitle}
+            selectedValue={value}
+            dtext={item?.dtext || item?.text || ''}
+            onValueChange={setValue}
+            options={item?.options || []}
+            item={item}
+            errors={errors}
+          />
+        );
+      }
+        
       if (item?.ctltype === 'DATE'){
         return <Date item={item} errors={errors} value={value} showDatePicker={showDatePicker} />;
       }
