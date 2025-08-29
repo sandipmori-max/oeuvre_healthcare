@@ -18,7 +18,7 @@ import Input from './components/Input';
 import CustomAlert from '../../../components/alert/CustomAlert';
 import AjaxPicker from './components/AjaxPicker';
 import DateTimePicker from 'react-native-modal-datetime-picker';
-import { parseCustomDate, parseCustomDatePage } from '../../../utils/helpers';
+import {   parseCustomDatePage } from '../../../utils/helpers';
 import DateRow from './components/Date';
 
 type PageRouteParams = { PageScreen: { item: any } };
@@ -34,13 +34,11 @@ const PageScreen = () => {
 
   const [error, setError] = useState<string | null>(null);
   const [formValues, setFormValues] = useState<any>({});
-  console.log('🚀 ~ PageScreen ~ formValues:', formValues);
+  console.log("🚀 ~ PageScreen ~ formValues:", formValues)
   const [datePickerVisible, setDatePickerVisible] = useState(false);
   const [activeDateField, setActiveDateField] = useState<string | null>(null);
   const [activeDate, setActiveDate] = useState<string | null>(null);
-  console.log('🚀 ~ PageScreen ~ activeDate:', activeDate);
 
-  console.log('🚀 ~ PageScreen ~ activeDateField:', activeDateField);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [alertVisible, setAlertVisible] = useState(false);
   const [goBack, setGoBack] = useState(false);
@@ -183,9 +181,18 @@ const PageScreen = () => {
     fetchPageData();
   }, [fetchPageData]);
 
+ const handleAttachment = (base64: string, val: any) => {
+
+  setFormValues(prev => {
+    if (typeof val === 'object' && val !== null && val.field) {
+      return { ...prev, [val.field]: base64 };
+    }
+    return { ...prev, 'image': base64 };
+  });
+};
+
   const renderItem = useCallback(
     ({ item }: { item: any }) => {
-      const value = formValues[item?.field] || formValues[item?.text] || '';
       const setValue = (val: any) => {
         console.log('🚀 ~ setValue ~ val:', val);
         setFormValues(prev => {
@@ -203,9 +210,10 @@ const PageScreen = () => {
         });
         setErrors(prev => ({ ...prev, [item?.field]: '' }));
       };
+      const value = formValues[item?.field] || formValues[item?.text] || '';
 
       if (item?.visible === '1') return null;
-      if (item?.ctltype === 'IMAGE') return <Media item={item} />;
+      if (item?.ctltype === 'IMAGE') return <Media item={item} handleAttachment={handleAttachment}/>;
       if (item?.disabled === '1') return <Disabled item={item} value={value} />;
       if (item?.ddl && item?.ddl !== '' && item?.ajax === 0) {
         return (

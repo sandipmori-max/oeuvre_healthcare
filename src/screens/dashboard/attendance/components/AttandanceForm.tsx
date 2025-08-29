@@ -51,7 +51,6 @@ const AttandanceForm = () => {
         mediaType: 'photo',
         cameraType: 'back',
         quality: 0.7,
-        saveToPhotos: true,
         includeBase64: true,
       },
       response => {

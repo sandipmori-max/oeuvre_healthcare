@@ -5,11 +5,13 @@ import { styles } from '../page_style';
 import { ERP_COLOR_CODE } from '../../../../utils/constants';
 import { getDDLThunk } from '../../../../store/slices/dropdown/thunk';
 import MaterialIcons from '@react-native-vector-icons/material-icons';
+import FullViewLoader from '../../../../components/loader/FullViewLoader';
 
 const CustomPicker = ({ label, selectedValue, onValueChange, item, errors, dtext }: any) => {
   const [open, setOpen] = useState(false);
   const [options, setOptions] = useState<any[]>([]);
   const dispatch = useAppDispatch();
+  const [loader, setLoader] = useState(false);
 
   const [selectedOption, setSelectedOption] = useState('');
 
@@ -19,13 +21,16 @@ const CustomPicker = ({ label, selectedValue, onValueChange, item, errors, dtext
 
   const handleOpen = useCallback(async () => {
     try {
+      setLoader(true);
       const res = await dispatch(
         getDDLThunk({ dtlid: item?.dtlid, where: item?.ddlwhere }),
       ).unwrap();
       setOptions(res?.data ?? []);
       setOpen(o => !o);
+      setLoader(false)
     } catch (e) {
       setOptions([]);
+      setLoader(false)
     }
   }, [dispatch, item?.dtlid, item?.ddlwhere]);
 
@@ -46,7 +51,8 @@ const CustomPicker = ({ label, selectedValue, onValueChange, item, errors, dtext
 
       {open && (
         <View style={styles.dropdownCard}>
-          {options.length > 0 ? (
+          {
+            loader ? <> <FullViewLoader /></> : <>  {options.length > 0 ? (
             options.map((opt: any, i: number) => (
               <TouchableOpacity
                 key={i}
@@ -71,7 +77,9 @@ const CustomPicker = ({ label, selectedValue, onValueChange, item, errors, dtext
             >
               <Text>No data</Text>
             </View>
-          )}
+          )}</>
+          }
+        
         </View>
       )}
 
