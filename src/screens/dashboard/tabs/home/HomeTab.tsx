@@ -1,10 +1,10 @@
-import React, { useEffect, useLayoutEffect, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, ActivityIndicator, Image } from 'react-native';
 
 import { styles } from './home_style';
 import { useAppDispatch, useAppSelector } from '../../../../store/hooks';
 import { DashboardItem } from '../../../../store/slices/auth/type';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import FullViewLoader from '../../../../components/loader/FullViewLoader';
 import NoData from '../../../../components/no_data/NoData';
 import ERPIcon from '../../../../components/icon/ERPIcon';
@@ -13,7 +13,7 @@ import { getERPDashboardThunk, getERPMenuThunk } from '../../../../store/slices/
 const HomeScreen = () => {
   const navigation = useNavigation<any>();
   const dispatch = useAppDispatch();
-  const { isLoading, isAuthenticated, activeToken } = useAppSelector(state => state.auth); 
+  const { isLoading, isAuthenticated, activeToken } = useAppSelector(state => state.auth);
 
   const { dashboard, isDashboardLoading } = useAppSelector(state => state.auth);
   const [loadingPageId, setLoadingPageId] = useState<string | null>(null);
@@ -46,6 +46,15 @@ const HomeScreen = () => {
       dispatch(getERPDashboardThunk());
     }
   }, [isAuthenticated, dispatch, activeToken, isRefresh]);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (isAuthenticated) {
+        dispatch(getERPDashboardThunk());
+      }
+      return () => {};
+    }, [isAuthenticated, dispatch]),
+  );
 
   const getInitials = (text?: string) => {
     if (!text) return '?';
@@ -176,63 +185,74 @@ const HomeScreen = () => {
         <>
           {' '}
           {dashboard.length > 0 && (
-           <View style={{
-            borderColor: '#000',
-            borderBottomWidth: 1,
-            flexDirection:'row', justifyContent:'center', alignContent:'center', alignItems:'center'}}>
-            <View style={styles.chartContainer}>
-              <PieChart
-                data={pieChartData}
-                donut
-                radius={90}
-                textSize={14}
-                innerRadius={50}
-                textColor="#000"
-                showValuesAsLabels
-                labelPosition="outside"
-                innerCircleColor="#fff"
-                centerLabelComponent={() => (
-                  <Text style={{ textAlign:'center', fontSize: 16, fontWeight: 'bold', color:'#000' }}>
-                    Total{`\n ${pieChartData.reduce((sum, item) => sum + item.value, 0)}`}
-                  </Text>
-                )}
-              />
-             
-            </View>
-             <View
-            style={{ 
-              justifyContent: 'center',
-              marginTop: 16,
-            }}
-          >
-            {pieChartData.map((item, idx) => (
+            <View
+              style={{
+                borderColor: '#000',
+                borderBottomWidth: 1,
+                flexDirection: 'row',
+                justifyContent: 'center',
+                alignContent: 'center',
+                alignItems: 'center',
+              }}
+            >
+              <View style={styles.chartContainer}>
+                <PieChart
+                  data={pieChartData}
+                  donut
+                  radius={90}
+                  textSize={14}
+                  innerRadius={50}
+                  textColor="#000"
+                  showValuesAsLabels
+                  labelPosition="outside"
+                  innerCircleColor="#fff"
+                  centerLabelComponent={() => (
+                    <Text
+                      style={{
+                        textAlign: 'center',
+                        fontSize: 16,
+                        fontWeight: 'bold',
+                        color: '#000',
+                      }}
+                    >
+                      Total{`\n ${pieChartData.reduce((sum, item) => sum + item.value, 0)}`}
+                    </Text>
+                  )}
+                />
+              </View>
               <View
-                key={idx}
                 style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  marginHorizontal: 8,
-                  marginBottom: 8,
+                  justifyContent: 'center',
+                  marginTop: 16,
                 }}
               >
-                <View
-                  style={{
-                    width: 16,
-                    height: 16,
-                    borderRadius: 8,
-                    backgroundColor: item.color,
-                    marginRight: 6,
-                  }}
-                />
-                <Text style={{ fontSize: 14, color: '#444' }}>
-                  {item.text}: {item.value}
-                </Text>
+                {pieChartData.map((item, idx) => (
+                  <View
+                    key={idx}
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      marginHorizontal: 8,
+                      marginBottom: 8,
+                    }}
+                  >
+                    <View
+                      style={{
+                        width: 16,
+                        height: 16,
+                        borderRadius: 8,
+                        backgroundColor: item.color,
+                        marginRight: 6,
+                      }}
+                    />
+                    <Text style={{ fontSize: 14, color: '#444' }}>
+                      {item.text}: {item.value}
+                    </Text>
+                  </View>
+                ))}
               </View>
-            ))}
-          </View>
-           </View>
+            </View>
           )}
-          
           <View style={styles.dashboardSection}>
             {isDashboardLoading ? (
               renderLoadingState()

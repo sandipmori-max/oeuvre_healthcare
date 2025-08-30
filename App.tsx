@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { Provider } from 'react-redux';
 import DeviceInfo from 'react-native-device-info';
+import { StatusBar } from 'react-native';
 
 import { store } from './src/store/store';
 import RootNavigator from './src/navigation/RootNavigator';
@@ -12,7 +13,6 @@ import CustomAlert from './src/components/alert/CustomAlert';
 import { TranslationProvider } from './src/components/TranslationProvider';
 
 import './src/i18n';
-import { StatusBar } from 'react-native';
 import { ERP_COLOR_CODE } from './src/utils/constants';
 
 const App = () => {
@@ -46,7 +46,6 @@ const App = () => {
       return;
     }
 
-    // Handle location changes after initial state
     if (enabled !== locationEnabled) {
       setAlertConfig({
         title: 'Location Status',
@@ -62,13 +61,11 @@ const App = () => {
     setLocationEnabled(enabled);
   };
 
-  // Run immediately on mount
   checkLocation();
 
   const interval = setInterval(checkLocation, 1000);
   return () => clearInterval(interval);
 }, [locationEnabled]);
-
 
   if (!isConnected) {
     return (

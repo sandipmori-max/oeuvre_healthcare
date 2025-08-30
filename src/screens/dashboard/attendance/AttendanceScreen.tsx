@@ -3,11 +3,11 @@ import { View, Platform } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useNavigation } from '@react-navigation/native';
 
-import { styles } from './attandance_style';
+import { styles } from './attendance_style';
 import FullViewLoader from '../../../components/loader/FullViewLoader';
 import ERPIcon from '../../../components/icon/ERPIcon';
 import List from './components/List';
-import AttandanceForm from './components/AttandanceForm';
+import AttendanceForm from './components/AttendanceForm';
 
 const AttendanceScreen = () => {
   const navigation = useNavigation<any>();
@@ -16,6 +16,7 @@ const AttendanceScreen = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [showPicker, setShowPicker] = useState(false);
   const [showFilter, setShowFilter] = useState(false);
+  const [blockAction, setBlockAction] = useState(false);
 
   const formattedMonth = `${selectedDate.getFullYear()}-${(selectedDate.getMonth() + 1)
     .toString()
@@ -35,14 +36,18 @@ const AttendanceScreen = () => {
           <ERPIcon
             name={!isListVisible ? 'list' : 'post-add'}
             onPress={() => {
+             if(!blockAction){
               setIsListVisible(!isListVisible);
+             }
             }}
           />
           {isListVisible && (
             <ERPIcon
               name="filter-alt"
               onPress={() => {
-                setShowFilter(!showFilter);
+              if(!blockAction){
+                 setShowFilter(!showFilter);
+              }
               }}
             />
           )}
@@ -50,7 +55,9 @@ const AttendanceScreen = () => {
             <ERPIcon
               name="date-range"
               onPress={() => {
+               if(!blockAction){
                 setShowPicker(!showPicker);
+               }
               }}
             />
           )}
@@ -58,7 +65,7 @@ const AttendanceScreen = () => {
         </>
       ),
     });
-  }, [navigation, isListVisible, showPicker, showFilter]);
+  }, [navigation, isListVisible, showPicker, showFilter, blockAction]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -87,8 +94,10 @@ const AttendanceScreen = () => {
               )}
             </View>
           ) : (
-            <View style={{ padding: 16 }}>
-              <AttandanceForm />
+            <View  style={{ flex:1, justifyContent:'center', alignContent:'center', alignItems:'center', width: '100%',}}>
+              <AttendanceForm
+              setBlockAction={setBlockAction}
+              />
             </View>
           )}
         </>

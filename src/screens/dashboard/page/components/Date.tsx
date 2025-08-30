@@ -3,10 +3,9 @@ import React from 'react';
 import { styles } from '../page_style';
 import { ERP_COLOR_CODE } from '../../../../utils/constants';
 import MaterialIcons from '@react-native-vector-icons/material-icons';
-import { formatDatePage } from '../../../../utils/helpers';
+import { formatDateHr } from '../../../../utils/helpers';
 
 const DateRow = ({ item, errors, value, showDatePicker }: any) => {
-  console.log("🚀 ~ Date ~ item:", value)
   return (
     <View style={{ marginBottom: 16 }}>
       <View style={{ flexDirection: 'row' }}>
@@ -20,7 +19,7 @@ const DateRow = ({ item, errors, value, showDatePicker }: any) => {
       >
         <Text style={{ color: value ? '#000' : '#888' }}>
           {
-            formatDatePage(value)
+            formatDateHr(value, false)
           }
         </Text>
         <MaterialIcons name="event" size={20} color="#555" />

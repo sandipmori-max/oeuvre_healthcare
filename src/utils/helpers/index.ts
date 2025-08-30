@@ -211,18 +211,20 @@ export const parseCustomDate = (dateStr: string): Date => {
 export const parseCustomDatePage = (dateStr: string): Date => {
   if (!dateStr) return new Date();
 
-   if (!isNaN(Date.parse(dateStr))) {
+  if (!isNaN(Date.parse(dateStr))) {
     return new Date(dateStr);
   }
 
-   const [datePart, timePart, ampm] = dateStr.split(" ");
-  const [month, day, year] = datePart.split("/").map(Number);
+  const [datePart, timePart, ampm] = dateStr.split(' ');
+  const [month, day, year] = datePart.split('/').map(Number);
 
-  let hours = 0, minutes = 0, seconds = 0;
+  let hours = 0,
+    minutes = 0,
+    seconds = 0;
   if (timePart) {
-    const [h, m, s] = timePart.split(":").map(Number);
+    const [h, m, s] = timePart.split(':').map(Number);
     hours = h % 12;
-    if (ampm?.toUpperCase() === "PM") hours += 12;
+    if (ampm?.toUpperCase() === 'PM') hours += 12;
     minutes = m;
     seconds = s;
   }
@@ -231,24 +233,23 @@ export const parseCustomDatePage = (dateStr: string): Date => {
 };
 
 export const formatDatePage = (dateStr: string): string => {
-  if (!dateStr) return "";
+  if (!dateStr) return '';
 
   let date: Date;
 
-  // Case 1: already ISO string
   if (!isNaN(Date.parse(dateStr))) {
     date = new Date(dateStr);
-  } 
-  // Case 2: "9/25/2025 12:00:00 AM"
-  else {
-    const [datePart, timePart, ampm] = dateStr.split(" ");
-    const [month, day, year] = datePart.split("/").map(Number);
+  } else {
+    const [datePart, timePart, ampm] = dateStr.split(' ');
+    const [month, day, year] = datePart.split('/').map(Number);
 
-    let hours = 0, minutes = 0, seconds = 0;
+    let hours = 0,
+      minutes = 0,
+      seconds = 0;
     if (timePart) {
-      const [h, m, s] = timePart.split(":").map(Number);
+      const [h, m, s] = timePart.split(':').map(Number);
       hours = h % 12;
-      if (ampm?.toUpperCase() === "PM") hours += 12;
+      if (ampm?.toUpperCase() === 'PM') hours += 12;
       minutes = m;
       seconds = s;
     }
@@ -256,14 +257,12 @@ export const formatDatePage = (dateStr: string): string => {
     date = new Date(year, month - 1, day, hours, minutes, seconds);
   }
 
-  // Output as DD-MM-YYYY
-  const dd = String(date.getDate()).padStart(2, "0");
-  const mm = String(date.getMonth() + 1).padStart(2, "0");
+  const dd = String(date.getDate()).padStart(2, '0');
+  const mm = String(date.getMonth() + 1).padStart(2, '0');
   const yyyy = date.getFullYear();
 
   return `${dd}-${mm}-${yyyy}`;
 };
-
 
 export const findKeyByKeywords = (obj: any, keywords: string[]) => {
   if (!obj) return null;
@@ -288,7 +287,7 @@ export const generateGUID = () => {
     const v = c === 'x' ? r : (r & 0x3) | 0x8;
     return v.toString(16);
   });
-}
+};
 
 export const formatDate = dateStr => {
   const date = moment(dateStr);
@@ -296,3 +295,42 @@ export const formatDate = dateStr => {
   if (moment().subtract(1, 'day').isSame(date, 'day')) return 'Yesterday';
   return date.format('MMM DD, YYYY');
 };
+export function formatDateHr(input, isFullDate) {
+  const normalized = input.replace(" ", "T"); 
+  const date = new Date(normalized);
+
+  if (isNaN(date.getTime())) {
+    const [mdy, time, ampm] = input.split(" ");
+    const [m, d, y] = mdy.split("/").map(Number);
+    let [hh, mm, ss] = time.split(":").map(Number);
+
+    if (ampm === "PM" && hh < 12) hh += 12;
+    if (ampm === "AM" && hh === 12) hh = 0;
+
+    return buildFormatted(new Date(y, m - 1, d, hh, mm, ss));
+  }
+
+  return buildFormatted(date, isFullDate);
+}
+
+function buildFormatted(date, isFullDate) {
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", 
+                  "Jul", "Aug", "Sept", "Oct", "Nov", "Dec"];
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = months[date.getMonth()];
+  const year = date.getFullYear();
+
+  let hours = date.getHours() || 12; // 0 → 12
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  const seconds = String(date.getSeconds()).padStart(2, "0");
+  if(isFullDate){
+  return `${day}-${month}-${year} ${hours}:${minutes}:${seconds}`;
+
+  }else{
+  return `${day}-${month}-${year}`;
+
+  }
+
+}
+ 
+

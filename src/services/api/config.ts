@@ -120,7 +120,7 @@ apiClient.interceptors.response.use(
 
         const cleanedData = deepClean(parsedData);
 
-        if (String(cleanedData.success) === "1") {
+        if (String(cleanedData.success) !== "0") {
           return {
             ...response,
             data: cleanedData,

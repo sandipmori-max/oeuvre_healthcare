@@ -1,5 +1,5 @@
-import { View, Text, TouchableOpacity, Dimensions, FlatList, Image } from 'react-native';
 import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, Dimensions, FlatList, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 import { formatDateToDDMMMYYYY } from '../../../../utils/helpers';
