@@ -205,7 +205,7 @@ const PageScreen = () => {
           } else {
             console.log('🚀 ~ setValue ~ prev: else part', [item?.field]);
 
-            return { ...prev, [item?.field]: val };
+            return { ...prev,   val };
           }
         });
         setErrors(prev => ({ ...prev, [item?.field]: '' }));

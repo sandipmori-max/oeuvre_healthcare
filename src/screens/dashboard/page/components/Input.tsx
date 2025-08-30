@@ -16,6 +16,7 @@ const Input = ({item, errors, value, setValue}: any) => {
             styles.textInput,
             errors[item.field] && { borderColor: ERP_COLOR_CODE.ERP_ERROR },
           ]}
+          keyboardType={item?.ctltype === 'NUMERIC' ? 'number-pad' : 'default'}
           value={value.toString()}
           onChangeText={setValue}
           placeholder="Enter value"

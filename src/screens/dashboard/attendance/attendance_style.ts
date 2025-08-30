@@ -36,7 +36,7 @@ export const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 8,
     padding: 16,
-    top: 32,
+    
   },
   profileRow: {
     flexDirection: 'row',
@@ -100,15 +100,7 @@ export const styles = StyleSheet.create({
     marginTop: 6,
   },
   locationText: { fontSize: 12, color: '#666', marginTop: 6 },
-  loaderOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 10,
+  loaderOverlay: { 
    },
   listSection: {
     paddingHorizontal: 16,

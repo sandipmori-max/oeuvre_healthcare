@@ -47,7 +47,7 @@ class DevERPService {
 
   private async apiCall<T>(endpoint: string, payload: any): Promise<T> {
     try {
-      console.log('🚀 ~ DevERPService ~ apiCall ~ payload--------------------:', payload);
+      console.log('🚀 ~ DevERPService ~ apiCall ~ payload--------------------:', `${this.link}${endpoint}`);
       await this.checkNetwork();
       await this.ensureAuthToken();
 
@@ -207,26 +207,26 @@ class DevERPService {
   markAttendance(rawData: any, isPunchIn: boolean, user: any) {
     const pageType = isPunchIn ? 'punchin' : 'punchout';
     const punchOutData = {
-      ID: user.id,
-      EmployeeId: user.id,
-      OutImage: rawData.imageBase64,
-      OutRemarks: rawData?.remark || '',
-      OutLocation: `${rawData?.latitude},${rawData?.longitude}`,
+      id: user.id,
+      employeeid: user.id,
+      outimage: rawData.imageBase64,
+      outremarks: rawData?.remark || '',
+      outlocation: `${rawData?.latitude},${rawData?.longitude}`,
     };
 
     const punchData = {
-      ID: '0',
-      EmployeeId: user.id.toString(),
-      InImage: rawData.imageBase64,
-      InRemarks: rawData?.remark || '',
-      InLocation: `${rawData?.latitude.toString()},${rawData?.longitude.toString()}`,
+      id: '0',
+      employeeid: user.id.toString(),
+      inimage: rawData.imageBase64,
+      inremarks: rawData?.remark || '',
+      inlocation: `${rawData?.latitude.toString()},${rawData?.longitude.toString()}`,
     };
     console.log(
       '🚀 ~ DevERPService ~ markAttendance ~ punchData:',
       JSON.stringify(isPunchIn ? punchData : punchOutData),
     );
 
-    return this.apiCall<AttendanceResponse>(`msp_api.aspx/pageSave`, {
+    return this.apiCall<AttendanceResponse>(`msp_api.aspx/savePage`, {
       token: this.token,
       page: pageType,
       data: JSON.stringify(isPunchIn ? punchData : punchOutData),
@@ -286,3 +286,5 @@ class DevERPService {
 }
 
 export default new DevERPService();
+// https://payroll.deverp.net/devws/msp_api.aspx/savePage
+// https://payroll.deverp.net/devws/msp_api.aspx/pageSave

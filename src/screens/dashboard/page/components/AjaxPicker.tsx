@@ -71,7 +71,7 @@ const AjaxPicker = ({
 
   const handleSelect = (opt: any) => {
     console.log('🚀 ~ handleSelect ~ opt:', opt);
-    if (item?.ddl) {
+    if (item?.ddlfield) {
       console.log('🚀 ~ handleSelect ~ fields--------:', item.ddlfield.split(','));
 
       const ddlParts = item.ddlfield.split(',');
@@ -88,10 +88,10 @@ const AjaxPicker = ({
 
         onValueChange(mappedValues);
       } else {
-        onValueChange(opt?.value);
+        onValueChange(opt);
       }
     } else {
-      onValueChange(opt?.value);
+      onValueChange(opt);
     }
 
     setSelectedOption(opt?.deptname || opt?.name || opt?.text || opt?.label || '');
@@ -184,7 +184,7 @@ const AjaxPicker = ({
                                 fontWeight: key === label.toLowerCase() ? '700' : '400'
                               }}
                             >
-                              {String(value)}
+                            {String(value)}
                             </Text>
                           );
                         })}
