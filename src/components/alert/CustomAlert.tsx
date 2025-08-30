@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, Modal } from 'react-native';
+import { View, Text, TouchableOpacity, Modal, ActivityIndicator } from 'react-native';
 import FastImage from 'react-native-fast-image';
 
 import { CustomAlertProps } from '../types';
@@ -20,6 +20,8 @@ const CustomAlert: React.FC<CustomAlertProps> = ({
   doneText = 'Done',
   cancelText = 'Cancel',
   isFromButtonList = false,
+  actionLoader,
+  color
 }) => {
   const alertStyles = getAlertStyles(type);
   const gifSource = getGifSource(type);
@@ -45,12 +47,11 @@ const CustomAlert: React.FC<CustomAlertProps> = ({
   };
 
   useEffect(() => {
-  if (visible) {
-    setRemarks('');
-    setError('');
-  }
-}, [visible]);
-
+    if (visible) {
+      setRemarks('');
+      setError('');
+    }
+  }, [visible]);
 
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
@@ -71,7 +72,14 @@ const CustomAlert: React.FC<CustomAlertProps> = ({
           )}
           {isFromButtonList ? (
             <View style={{ width: '100%' }}>
-              <Text style={alertStyles.message}>{message}</Text>
+              <Text
+                style={[
+                  alertStyles.message,
+                  { textAlign: 'left', fontSize: 18, fontWeight: '800' },
+                ]}
+              >
+                {message}
+              </Text>
 
               <ERPTextInput
                 label={'Remarks'}
@@ -80,8 +88,8 @@ const CustomAlert: React.FC<CustomAlertProps> = ({
                 autoCapitalize="none"
                 onChangeText={handleChangedRemarks}
                 value={remarks}
-                labelStyle={styles.inputLabel}
-                inputStyle={styles.input}
+                labelStyle={[styles.inputLabel, { fontWeight: '400' }]}
+                inputStyle={[styles.input]}
               />
               {error ? <Text style={{ color: ERP_COLOR_CODE.ERP_ERROR }}>{error}</Text> : null}
             </View>
@@ -107,16 +115,29 @@ const CustomAlert: React.FC<CustomAlertProps> = ({
                 </TouchableOpacity>
               )}
               {onDone && (
-                <TouchableOpacity
-                  style={styles.button}
-                  onPress={() => {
-                    setRemarks('');
-                    setError('');
-                    handleDonePress();
-                  }}
-                >
-                  <Text style={styles.buttonText}>{doneText}</Text>
-                </TouchableOpacity>
+                <>
+                  {actionLoader ? (
+                    <>
+                      <TouchableOpacity style={styles.buttonCancel}>
+                        <ActivityIndicator size={'small'} color={'#000'} />
+                      </TouchableOpacity>
+                    </>
+                  ) : (
+                    <>
+                      {' '}
+                      <TouchableOpacity
+                        style={[styles.button, {backgroundColor: color}]}
+                        onPress={() => {
+                          setRemarks('');
+                          setError('');
+                          handleDonePress();
+                        }}
+                      >
+                        <Text style={styles.buttonText}>{doneText}</Text>
+                      </TouchableOpacity>{' '}
+                    </>
+                  )}
+                </>
               )}
             </View>
           )}

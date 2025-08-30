@@ -114,7 +114,7 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 10,
     borderRadius: 6,
-  },
+  }, 
   buttonCancel: {
     backgroundColor: '#d0dce9ff',
     paddingHorizontal: 16,

@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, Alert, Dimensions, FlatList, Image } from 'react-native';
+import { View, Text, TouchableOpacity, Dimensions, FlatList, Image } from 'react-native';
 import React, { useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 
@@ -6,7 +6,6 @@ import { formatDateToDDMMMYYYY } from '../../../../utils/helpers';
 import { styles } from '../list_page_style';
 import NoData from '../../../../components/no_data/NoData';
 import { ERP_ICON } from '../../../../assets';
-import CustomAlert from '../../../../components/alert/CustomAlert';
 import { ERP_COLOR_CODE } from '../../../../utils/constants';
 
 const ReadableView = ({
@@ -29,7 +28,6 @@ const ReadableView = ({
       color: configItem?.colorcode || '#007BFF',
     };
   };
-
 
   const RenderCard = ({ item, index }: any) => {
     if (!item) return null;
@@ -204,8 +202,7 @@ const ReadableView = ({
                       return;
                     }
 
-                    handleActionButtonPressed(actionValue, label);
-                   
+                    handleActionButtonPressed(actionValue, label, color);
                   }}
                 >
                   <Text style={{ color: '#fff', fontWeight: '600', fontSize: 13 }}>{label}</Text>
@@ -269,7 +266,6 @@ const ReadableView = ({
           ) : null
         }
       />
-     
     </View>
   );
 };

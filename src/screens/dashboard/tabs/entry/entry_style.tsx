@@ -13,12 +13,12 @@ export const styles = StyleSheet.create({
   columnWrapper: {
     justifyContent: 'space-between',
   },
-  icon:{
+  icon: {
     width: 24,
     height: 24,
     resizeMode: 'contain',
     borderRadius: 12,
-    overflow:'hidden'
+    overflow: 'hidden',
   },
   card: {
     flex: 1,
@@ -39,7 +39,8 @@ export const styles = StyleSheet.create({
     borderColor: 'rgba(107, 104, 104, 0.3)',
   },
   iconText: {
-    color: '#fff',
+    color: '#000',
+    opacity: 0.5,
     fontSize: 24,
     fontWeight: '700',
   },
