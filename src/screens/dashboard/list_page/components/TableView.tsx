@@ -144,7 +144,6 @@ const TableView = ({
               {btnKeys.map((key, idx) => {
                 const actionValue = item[key];
                 const authUser = item['authuser'];
-                console.log('🚀 ~ authUs̥er:', authUser);
                 const { label, color } = getButtonMeta(key);
 
                 return (

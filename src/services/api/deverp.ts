@@ -122,6 +122,7 @@ class DevERPService {
       firebaseid: credentials.firebaseid || '',
       device: this.device,
     };
+    console.log("🚀 ~ DevERPService ~ loginToERP ~ loginData---------:", loginData)
 
     const response = await apiClient.post<LoginResponse>(
       `${this.link}msp_api.aspx/setAppID`,

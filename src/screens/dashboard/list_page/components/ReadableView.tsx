@@ -184,7 +184,6 @@ const ReadableView = ({
               const actionValue = item[key];
               const { label, color } = getButtonMeta(key);
               const authUser = item['authuser'];
-              console.log('🚀 ~ authUs̥er:', authUser);
               return (
                 <TouchableOpacity
                   key={`${key}-${idx}`}

@@ -21,7 +21,7 @@ const CustomAlert: React.FC<CustomAlertProps> = ({
   cancelText = 'Cancel',
   isFromButtonList = false,
   actionLoader,
-  color
+  color='#000'
 }) => {
   const alertStyles = getAlertStyles(type);
   const gifSource = getGifSource(type);
