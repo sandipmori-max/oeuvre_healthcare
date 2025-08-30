@@ -1,12 +1,20 @@
-import { View, Text, TouchableOpacity, Dimensions, Alert, FlatList } from 'react-native';
+import { View, Text, TouchableOpacity, Dimensions, FlatList } from 'react-native';
 import React from 'react';
 import { styles } from '../list_page_style';
 import { formatHeaderTitle } from '../../../../utils/helpers';
 import NoData from '../../../../components/no_data/NoData';
+import { useNavigation } from '@react-navigation/native';
 
-const TableView = ({ configData, filteredData, loadingListId, totalAmount, pageParamsName }: any) => {
+const TableView = ({
+  configData,
+  filteredData,
+  loadingListId,
+  totalAmount,
+  pageParamsName,
+  handleActionButtonPressed,
+}: any) => {
   const screenWidth = Dimensions.get('window').width;
-
+  const navigation = useNavigation();
   const getButtonMeta = (key: string) => {
     if (!key || !configData?.length) return { label: 'Action', color: '#007BFF' };
     const configItem = configData.find(cfg => cfg.datafield?.toLowerCase() === key.toLowerCase());
@@ -86,7 +94,11 @@ const TableView = ({ configData, filteredData, loadingListId, totalAmount, pageP
     const btnKeys = Object.keys(item).filter(key => key.startsWith('btn_'));
 
     return (
-      <>
+      <TouchableOpacity
+        onPress={async () => {
+          navigation.navigate('Page', { item, title: pageParamsName, id: index + 1 });
+        }}
+      >
         {' '}
         <View
           style={[styles.tableRow, { backgroundColor: rowBackgroundColor, flexDirection: 'row' }]}
@@ -131,8 +143,8 @@ const TableView = ({ configData, filteredData, loadingListId, totalAmount, pageP
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginTop: 14, gap: 8 }}>
               {btnKeys.map((key, idx) => {
                 const actionValue = item[key];
-                const authUser = item['authuser']
-                console.log("🚀 ~ authUs̥er:", authUser)
+                const authUser = item['authuser'];
+                console.log('🚀 ~ authUs̥er:', authUser);
                 const { label, color } = getButtonMeta(key);
 
                 return (
@@ -147,7 +159,9 @@ const TableView = ({ configData, filteredData, loadingListId, totalAmount, pageP
                       maxWidth: (screenWidth - 64) / 2,
                       alignItems: 'center',
                     }}
-                    onPress={() => Alert.alert(`${label} pressed`, `Value: ${actionValue}`)}
+                    onPress={() => {
+                      handleActionButtonPressed(actionValue, label, color);
+                    }}
                   >
                     <Text style={{ color: '#fff', fontWeight: '600', fontSize: 13 }}>{label}</Text>
                   </TouchableOpacity>
@@ -156,15 +170,16 @@ const TableView = ({ configData, filteredData, loadingListId, totalAmount, pageP
             </View>
           )}
         </View>
-      </>
+      </TouchableOpacity>
     );
   };
 
   return (
-    <View style={{
-      
-      flex: 1,
-      }}>
+    <View
+      style={{
+        flex: 1,
+      }}
+    >
       <FlatList
         data={['']}
         showsVerticalScrollIndicator={false}

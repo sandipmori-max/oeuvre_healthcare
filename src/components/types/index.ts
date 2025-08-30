@@ -15,7 +15,9 @@ export interface CustomAlertProps {
   onCancel?: () => void;
   doneText?: string;
   cancelText?: string;
-  isFromButtonList?: boolean
+  isFromButtonList?: boolean,
+  actionLoader: any,
+  color?: string;
 }
 
 export type DrawerItemConfig = {

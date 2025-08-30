@@ -17,7 +17,7 @@ export const savePageThunk = createAsyncThunk<
 export const handlePageActionThunk = createAsyncThunk<
   any,
   {
-    action: 'pageAuth' | 'pageDeAuth' | 'pageDelete' | 'pageCancel';
+    action: string;
     id: string;
     remarks: string;
     page: string;

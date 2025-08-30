@@ -14,11 +14,16 @@ import TableView from './components/TableView';
 import ReadableView from './components/ReadableView';
 import ERPIcon from '../../../components/icon/ERPIcon';
 import CustomAlert from '../../../components/alert/CustomAlert';
+import { handlePageActionThunk } from '../../../store/slices/page/thunk';
 
 const ListScreen = () => {
   const navigation = useNavigation();
   const dispatch = useAppDispatch();
-const { loading: actionLoader, error: actionError, response: actionResponse } = useAppSelector(state => state.page);
+  const {
+    loading: actionLoader,
+    error: actionError,
+    response: actionResponse,
+  } = useAppSelector(state => state.page);
 
   const [loadingListId, setLoadingListId] = useState<string | null>(null);
   const [listData, setListData] = useState<any[]>([]);
@@ -37,9 +42,9 @@ const { loading: actionLoader, error: actionError, response: actionResponse } = 
     title: '',
     message: '',
     type: 'info' as 'error' | 'success' | 'info',
-    actionValue: ''
+    actionValue: '',
+    color: '#000'
   });
-
 
   const [fromDate, setFromDate] = useState<string>('');
   const [toDate, setToDate] = useState<string>('');
@@ -278,14 +283,15 @@ const { loading: actionLoader, error: actionError, response: actionResponse } = 
     navigation.navigate('Page', { item, title: page });
   };
 
-  const handleActionButtonPressed = (actionValue, label) => {
-    console.log("🚀 ~ handleActionButtonPressed ~ actionValue:", actionValue)
+  const handleActionButtonPressed = (actionValue, label, color) => {
+    console.log('🚀 ~ handleActionButtonPressed ~ actionValue:', actionValue);
     setAlertConfig({
-        title: label,
-        message: `Are you sure you want to ${label.toLowerCase()} ?`,
-        type: 'info',
-        actionValue: actionValue
-      });
+      title: label,
+      message: `Are you sure you want to ${label.toLowerCase()} ?`,
+      type: 'info',
+      actionValue: actionValue,
+      color: color
+    });
     setAlertVisible(true);
   };
   return (
@@ -368,6 +374,7 @@ const { loading: actionLoader, error: actionError, response: actionResponse } = 
                     totalAmount={totalAmount}
                     pageParamsName={pageParamsName}
                     handleItemPressed={handleItemPressed}
+                    handleActionButtonPressed={handleActionButtonPressed}
                   />
                 </>
               ) : (
@@ -398,9 +405,31 @@ const { loading: actionLoader, error: actionError, response: actionResponse } = 
         type={alertConfig.type}
         onClose={() => setAlertVisible(false)}
         onCancel={() => setAlertVisible(false)}
-        onDone={(remarks) => {
-          console.log("🚀 ~ remarks:", remarks, alertConfig.actionValue)
+        actionLoader={actionLoader}
+        doneText={alertConfig.title}
+        color={alertConfig.color}
+        onDone={async remark => {
+          console.log('🚀 ~ async ~ remark:', alertConfig?.actionValue);
+          try {
+            const str = alertConfig?.actionValue;
+            const [page, id] = str.split('/');
+            const type = `page${alertConfig.title}`;
+            console.log(type);
+            const res = await dispatch(
+              handlePageActionThunk({
+                action: type,
+                id: id,
+                remarks: remark,
+                page: page,
+              }),
+            ).unwrap();
 
+            console.log('✅ Success:', res);
+            setAlertVisible(false);
+            onRefresh();
+          } catch (err) {
+            console.error('❌ Failed:', err);
+          }
         }}
         isFromButtonList={true}
       />

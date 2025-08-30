@@ -80,8 +80,7 @@ const WebScreen = () => {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar
-        barStyle="dark-content"
-        backgroundColor={ERP_COLOR_CODE.ERP_WHITE || '#FFFFFF'}
+        backgroundColor={ERP_COLOR_CODE.ERP_APP_COLOR}
         translucent={false}
       />
       <WebView
