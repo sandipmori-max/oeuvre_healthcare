@@ -1,5 +1,6 @@
+// slice.ts
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { savePageThunk } from './thunk';
+import { savePageThunk, handlePageActionThunk } from './thunk';
 
 interface PageState {
   loading: boolean;
@@ -35,6 +36,20 @@ const pageSlice = createSlice({
         state.response = action.payload;
       })
       .addCase(savePageThunk.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+
+      .addCase(handlePageActionThunk.pending, state => {
+        state.loading = true;
+        state.error = null;
+        state.response = null;
+      })
+      .addCase(handlePageActionThunk.fulfilled, (state, action: PayloadAction<any>) => {
+        state.loading = false;
+        state.response = action.payload;
+      })
+      .addCase(handlePageActionThunk.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       });

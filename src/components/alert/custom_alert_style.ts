@@ -6,6 +6,23 @@ export const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'flex-end',
   },
+    inputContainer: {
+    marginBottom: 16,
+  },
+   inputLabel: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#333',
+  },
+    input: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    fontSize: 16,
+    color: '#000',
+  },
   bottomSheet: {
     backgroundColor: '#fff',
     borderTopLeftRadius: 20,

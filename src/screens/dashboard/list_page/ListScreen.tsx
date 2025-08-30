@@ -2,7 +2,7 @@ import { Text, View, TextInput, TouchableOpacity, Alert } from 'react-native';
 import React, { useEffect, useLayoutEffect, useState, useCallback, useMemo } from 'react';
 import { RouteProp, useFocusEffect, useNavigation, useRoute } from '@react-navigation/native';
 
-import { useAppDispatch } from '../../../store/hooks';
+import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { getERPListDataThunk } from '../../../store/slices/auth/thunk';
 import { styles } from './list_page_style';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -11,12 +11,14 @@ import FullViewLoader from '../../../components/loader/FullViewLoader';
 import { ListRouteParams } from './types';
 import ErrorMessage from '../../../components/error/Error';
 import TableView from './components/TableView';
-import RedableView from './components/RedableView';
+import ReadableView from './components/ReadableView';
 import ERPIcon from '../../../components/icon/ERPIcon';
+import CustomAlert from '../../../components/alert/CustomAlert';
 
 const ListScreen = () => {
   const navigation = useNavigation();
   const dispatch = useAppDispatch();
+const { loading: actionLoader, error: actionError, response: actionResponse } = useAppSelector(state => state.page);
 
   const [loadingListId, setLoadingListId] = useState<string | null>(null);
   const [listData, setListData] = useState<any[]>([]);
@@ -29,6 +31,15 @@ const ListScreen = () => {
   const [isTableView, setIsTableView] = useState<boolean>(false);
 
   const [filteredData, setFilteredData] = useState<any[]>([]);
+  const [alertVisible, setAlertVisible] = useState(false);
+
+  const [alertConfig, setAlertConfig] = useState({
+    title: '',
+    message: '',
+    type: 'info' as 'error' | 'success' | 'info',
+    actionValue: ''
+  });
+
 
   const [fromDate, setFromDate] = useState<string>('');
   const [toDate, setToDate] = useState<string>('');
@@ -262,6 +273,21 @@ const ListScreen = () => {
       return () => {};
     }, [getCurrentMonthRange, fetchListData]),
   );
+
+  const handleItemPressed = (item, page) => {
+    navigation.navigate('Page', { item, title: page });
+  };
+
+  const handleActionButtonPressed = (actionValue, label) => {
+    console.log("🚀 ~ handleActionButtonPressed ~ actionValue:", actionValue)
+    setAlertConfig({
+        title: label,
+        message: `Are you sure you want to ${label.toLowerCase()} ?`,
+        type: 'info',
+        actionValue: actionValue
+      });
+    setAlertVisible(true);
+  };
   return (
     <View style={styles.container}>
       {isFilterVisible && (
@@ -341,16 +367,19 @@ const ListScreen = () => {
                     loadingListId={loadingListId}
                     totalAmount={totalAmount}
                     pageParamsName={pageParamsName}
+                    handleItemPressed={handleItemPressed}
                   />
                 </>
               ) : (
                 <>
-                  <RedableView
+                  <ReadableView
                     configData={configData}
                     filteredData={filteredData}
                     loadingListId={loadingListId}
                     totalAmount={totalAmount}
                     pageParamsName={pageParamsName}
+                    handleItemPressed={handleItemPressed}
+                    handleActionButtonPressed={handleActionButtonPressed}
                   />
                 </>
               )}
@@ -361,6 +390,20 @@ const ListScreen = () => {
       <TouchableOpacity style={styles.addButton} onPress={() => Alert.alert('Add button clicked')}>
         <Text style={styles.addButtonText}>+ New</Text>
       </TouchableOpacity>
+
+      <CustomAlert
+        visible={alertVisible}
+        title={alertConfig.title}
+        message={alertConfig.message}
+        type={alertConfig.type}
+        onClose={() => setAlertVisible(false)}
+        onCancel={() => setAlertVisible(false)}
+        onDone={(remarks) => {
+          console.log("🚀 ~ remarks:", remarks, alertConfig.actionValue)
+
+        }}
+        isFromButtonList={true}
+      />
     </View>
   );
 };

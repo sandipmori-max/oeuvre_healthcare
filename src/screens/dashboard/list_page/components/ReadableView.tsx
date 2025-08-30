@@ -1,21 +1,22 @@
-
 import { View, Text, TouchableOpacity, Alert, Dimensions, FlatList, Image } from 'react-native';
 import React, { useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 
-import { formatDateToDDMMMYYYY, formatTimeTo12Hour } from '../../../../utils/helpers';
+import { formatDateToDDMMMYYYY } from '../../../../utils/helpers';
 import { styles } from '../list_page_style';
 import NoData from '../../../../components/no_data/NoData';
 import { ERP_ICON } from '../../../../assets';
 import CustomAlert from '../../../../components/alert/CustomAlert';
 import { ERP_COLOR_CODE } from '../../../../utils/constants';
 
-const RedableView = ({
+const ReadableView = ({
   configData,
   filteredData,
   loadingListId,
   totalAmount,
   pageParamsName,
+  handleItemPressed,
+  handleActionButtonPressed,
 }: any) => {
   const navigation = useNavigation();
   const screenWidth = Dimensions.get('window').width;
@@ -29,13 +30,6 @@ const RedableView = ({
     };
   };
 
-  const [alertVisible, setAlertVisible] = useState(false);
-
-  const [alertConfig, setAlertConfig] = useState({
-    title: '',
-    message: '',
-    type: 'info' as 'error' | 'success' | 'info',
-  });
 
   const RenderCard = ({ item, index }: any) => {
     if (!item) return null;
@@ -71,8 +65,6 @@ const RedableView = ({
           borderColor: '#ddd',
         }}
       >
-        
-
         <TouchableOpacity
           activeOpacity={0.8}
           style={{ flexDirection: 'row', alignItems: 'center' }}
@@ -97,7 +89,7 @@ const RedableView = ({
 
           <View style={{ flex: 1 }}>
             <Text style={{ fontSize: 16, fontWeight: '700' }} numberOfLines={1}>
-              {name} 
+              {name}
             </Text>
             <Text style={{ fontSize: 12 }} numberOfLines={1}>
               {subName}
@@ -112,16 +104,15 @@ const RedableView = ({
               justifyContent: 'flex-end',
             }}
           >
-              <Text style={{ fontWeight: '600', color: '#000' }}>{status}</Text>
-            {!!date && <Text style={{ fontWeight: '600', color: '#ccc' }}>{formatDateToDDMMMYYYY(date)}</Text>}
-            
+            <Text style={{ fontWeight: '600', color: '#000' }}>{status}</Text>
+            {!!date && (
+              <Text style={{ fontWeight: '600', color: '#ccc' }}>
+                {formatDateToDDMMMYYYY(date)}
+              </Text>
+            )}
           </View>
         </TouchableOpacity>
-        <TouchableOpacity
-          onPress={async () => {
-            navigation.navigate('Page', { item, title: pageParamsName });
-          }}
-        >
+        <TouchableOpacity onPress={async () => handleItemPressed(item, pageParamsName)}>
           {(remarks || address || amount) && (
             <View style={{ marginTop: 12 }}>
               <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
@@ -212,16 +203,9 @@ const RedableView = ({
                     if (authUser) {
                       return;
                     }
-                    if (actionValue.includes('API')) {
-                      setAlertConfig({
-                        title: label,
-                        message: `Are you sure you want to ${label.toLowerCase()} ?`,
-                        type: 'info',
-                      });
-                      setAlertVisible(true);
-                    } else {
-                      Alert.alert(`${label} pressed`, `Value: ${actionValue}`);
-                    }
+
+                    handleActionButtonPressed(actionValue, label);
+                   
                   }}
                 >
                   <Text style={{ color: '#fff', fontWeight: '600', fontSize: 13 }}>{label}</Text>
@@ -285,17 +269,9 @@ const RedableView = ({
           ) : null
         }
       />
-      <CustomAlert
-        visible={alertVisible}
-        title={alertConfig.title}
-        message={alertConfig.message}
-        type={alertConfig.type}
-        onClose={() => setAlertVisible(false)}
-        onCancel={() => setAlertVisible(false)}
-        onDone={() => {}}
-      />
+     
     </View>
   );
 };
 
-export default RedableView;
+export default ReadableView;

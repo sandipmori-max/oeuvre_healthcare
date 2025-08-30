@@ -248,6 +248,20 @@ class DevERPService {
     return this.apiCall<any>('msp_api.aspx/getAjax', { token: this.token, dtlid, where, search });
   }
 
+  async handlePageAction(
+    action: 'pageAuth' | 'pageDeAuth' | 'pageDelete' | 'pageCancel',
+    id: string,
+    remarks: string,
+    page: string,
+  ) {
+    return this.apiCall<any>(`msp_api.aspx/${action}`, {
+      token: this.token,
+      id,
+      remarks,
+      page,
+    });
+  }
+
   async initialize() {
     this.link = (await AsyncStorage.getItem('erp_link')) || '';
     this.token = (await AsyncStorage.getItem('erp_token')) || '';
