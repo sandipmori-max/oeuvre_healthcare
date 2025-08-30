@@ -147,7 +147,7 @@ const AttendanceForm = ({setBlockAction}: any) => {
           imageBase64: Yup.string().required('Image required'),
         })}
         onSubmit={values => {
-          dispatch(markAttendanceThunk({ rawData: values, type: true, user }))
+          dispatch(markAttendanceThunk({ rawData: values, type: false, user }))
             .unwrap()
             .then(res => {
               console.log('✅ API Success:', res);
@@ -180,7 +180,7 @@ const AttendanceForm = ({setBlockAction}: any) => {
             <View style={styles.profileRow}>
               <View style={styles.imageCol}>
                 {user?.image ? (
-                  <Image source={{ uri: user.image }} style={styles.profileAvatar} />
+                  <Image source={{ uri: user?.image }} style={styles.profileAvatar} />
                 ) : (
                   <View
                     style={[

@@ -80,7 +80,6 @@ export const loginUserThunk = createAsyncThunk(
         return rejectWithValue('No authentication token found. Please login again.');
       }
 
-
       await AsyncStorage.setItem('auth_token', token);
       await AsyncStorage.setItem('erp_appid', company_code);
 

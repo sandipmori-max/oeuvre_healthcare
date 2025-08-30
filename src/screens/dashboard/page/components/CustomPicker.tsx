@@ -42,7 +42,9 @@ const CustomPicker = ({ label, selectedValue, onValueChange, item, errors, dtext
         {item?.mandatory === '1' && <Text style={{ color: ERP_COLOR_CODE.ERP_ERROR }}>*</Text>}
       </View>
 
-      <TouchableOpacity style={[styles.pickerBox]} onPress={handleOpen} activeOpacity={0.7}>
+      <TouchableOpacity style={[styles.pickerBox]} onPress={()=>{
+        handleOpen()
+      }} activeOpacity={0.7}>
         <Text style={{ color: selectedOption ? '#000' : '#888', flex: 1 }}>
           {selectedOption || 'Select...'}
         </Text>

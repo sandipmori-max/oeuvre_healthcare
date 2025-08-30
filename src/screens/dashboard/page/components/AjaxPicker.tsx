@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   Text,
   TextInput,
@@ -6,7 +6,6 @@ import {
   View,
   Modal,
   ScrollView,
-  ActivityIndicator,
 } from 'react-native';
 import { useAppDispatch } from '../../../../store/hooks';
 import { styles } from '../page_style';
@@ -17,17 +16,14 @@ import FullViewLoader from '../../../../components/loader/FullViewLoader';
 
 const AjaxPicker = ({
   label,
-  selectedValue,
   onValueChange,
   item,
   errors,
   dtext,
   formValues,
 }: any) => {
-  console.log('🚀 ~ AjaxPicker *-*-*-*-*-*-*-*-~ item:', item);
   const [open, setOpen] = useState(false);
   const [options, setOptions] = useState<any[]>([]);
-  console.log('🚀 ~ AjaxPicker ~ options*-*-*-*-*-*-*--*-*------:', options);
   const [loader, setLoader] = useState(false);
   const dispatch = useAppDispatch();
   const [selectedOption, setSelectedOption] = useState('');
@@ -70,21 +66,15 @@ const AjaxPicker = ({
   };
 
   const handleSelect = (opt: any) => {
-    console.log('🚀 ~ handleSelect ~ opt:', opt);
     if (item?.ddlfield) {
-      console.log('🚀 ~ handleSelect ~ fields--------:', item.ddlfield.split(','));
 
       const ddlParts = item.ddlfield.split(',');
       if (ddlParts.length > 1) {
         const mappedValues: Record<string, any> = {};
         ddlParts.forEach(f => {
-          console.log('🚀 ~ handleSelect ~ f:', f);
           const key = f.toLowerCase();
-          console.log('🚀 ~ handleSelect ~ key:', key);
-          console.log('🚀 ~ handleSelect ~ key:', mappedValues[key], '---------', opt[f]);
           mappedValues[key] = opt[key];
         });
-        console.log('🚀 ~ handleSelect ~ mappedValues:-------', mappedValues);
 
         onValueChange(mappedValues);
       } else {
