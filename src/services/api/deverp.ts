@@ -286,5 +286,3 @@ class DevERPService {
 }
 
 export default new DevERPService();
-// https://payroll.deverp.net/devws/msp_api.aspx/savePage
-// https://payroll.deverp.net/devws/msp_api.aspx/pageSave

@@ -296,11 +296,11 @@ export const formatDate = dateStr => {
   return date.format('MMM DD, YYYY');
 };
 export function formatDateHr(input, isFullDate) {
-  const normalized = input.replace(" ", "T"); 
+  const normalized = input?.replace(" ", "T"); 
   const date = new Date(normalized);
 
   if (isNaN(date.getTime())) {
-    const [mdy, time, ampm] = input.split(" ");
+    const [mdy, time, ampm] = input?.split(" ");
     const [m, d, y] = mdy.split("/").map(Number);
     let [hh, mm, ss] = time.split(":").map(Number);
 

@@ -19,7 +19,7 @@ const DateRow = ({ item, errors, value, showDatePicker }: any) => {
       >
         <Text style={{ color: value ? '#000' : '#888' }}>
           {
-            formatDateHr(value, false)
+           value && formatDateHr(value, false)
           }
         </Text>
         <MaterialIcons name="event" size={20} color="#555" />

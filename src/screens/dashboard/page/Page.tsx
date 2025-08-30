@@ -1,5 +1,3 @@
-/* eslint-disable react/no-unstable-nested-components */
-/* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useEffect, useLayoutEffect, useState } from 'react';
 import { Text, View, FlatList, StyleSheet } from 'react-native';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
@@ -18,7 +16,7 @@ import Input from './components/Input';
 import CustomAlert from '../../../components/alert/CustomAlert';
 import AjaxPicker from './components/AjaxPicker';
 import DateTimePicker from 'react-native-modal-datetime-picker';
-import {   parseCustomDatePage } from '../../../utils/helpers';
+import { parseCustomDatePage } from '../../../utils/helpers';
 import DateRow from './components/Date';
 
 type PageRouteParams = { PageScreen: { item: any } };
@@ -34,7 +32,6 @@ const PageScreen = () => {
 
   const [error, setError] = useState<string | null>(null);
   const [formValues, setFormValues] = useState<any>({});
-  console.log("🚀 ~ PageScreen ~ formValues:", formValues)
   const [datePickerVisible, setDatePickerVisible] = useState(false);
   const [activeDateField, setActiveDateField] = useState<string | null>(null);
   const [activeDate, setActiveDate] = useState<string | null>(null);
@@ -181,31 +178,23 @@ const PageScreen = () => {
     fetchPageData();
   }, [fetchPageData]);
 
- const handleAttachment = (base64: string, val: any) => {
-
-  setFormValues(prev => {
-    if (typeof val === 'object' && val !== null && val.field) {
-      return { ...prev, [val.field]: base64 };
-    }
-    return { ...prev, 'image': base64 };
-  });
-};
+  const handleAttachment = (base64: string, val: any) => {
+    setFormValues(prev => {
+      if (typeof val === 'object' && val !== null && val.field) {
+        return { ...prev, [val.field]: base64 };
+      }
+      return { ...prev, image: base64 };
+    });
+  };
 
   const renderItem = useCallback(
     ({ item }: { item: any }) => {
       const setValue = (val: any) => {
-        console.log('🚀 ~ setValue ~ val:', val);
         setFormValues(prev => {
-          console.log('🚀 ~ setValue ~ prev:', prev);
-
           if (typeof val === 'object' && val !== null) {
-            console.log('🚀 ~ setValue ~ prev: if part', val);
-
             return { ...prev, ...val };
           } else {
-            console.log('🚀 ~ setValue ~ prev: else part', [item?.field]);
-
-            return { ...prev,   val };
+            return { ...prev, val };
           }
         });
         setErrors(prev => ({ ...prev, [item?.field]: '' }));
@@ -213,7 +202,8 @@ const PageScreen = () => {
       const value = formValues[item?.field] || formValues[item?.text] || '';
 
       if (item?.visible === '1') return null;
-      if (item?.ctltype === 'IMAGE') return <Media item={item} handleAttachment={handleAttachment}/>;
+      if (item?.ctltype === 'IMAGE')
+        return <Media item={item} handleAttachment={handleAttachment} />;
       if (item?.disabled === '1') return <Disabled item={item} value={value} />;
       if (item?.ddl && item?.ddl !== '' && item?.ajax === 0) {
         return (
@@ -329,6 +319,7 @@ const PageScreen = () => {
             navigation.goBack();
           }
         }}
+        actionLoader={undefined}
       />
     </View>
   );
