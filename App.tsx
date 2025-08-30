@@ -21,33 +21,54 @@ const App = () => {
 
   const [locationEnabled, setLocationEnabled] = useState<boolean | null>(null);
   const [alertVisible, setAlertVisible] = useState(false);
+  const [modalCLose, setModalClose] = useState(false);
   const [alertConfig, setAlertConfig] = useState({
     title: '',
     message: '',
     type: 'info' as 'error' | 'success' | 'info',
   });
 
-  useEffect(() => {
-    const checkLocation = async () => {
-      const enabled = await DeviceInfo.isLocationEnabled();
+ useEffect(() => {
+  const checkLocation = async () => {
+    const enabled = await DeviceInfo.isLocationEnabled();
 
-      if (locationEnabled !== null && enabled !== locationEnabled) {
+    if (locationEnabled === null) {
+      if (!enabled) {
         setAlertConfig({
           title: 'Location Status',
-          message: `Location is now ${enabled ? 'enabled' : 'disabled'}`,
-          type: enabled ? 'success' : 'error',
+          message:
+            'To continue using our services, please enable location access. Without location permissions, you won’t be able to use this app',
+          type: 'error',
         });
         setAlertVisible(true);
       }
       setLocationEnabled(enabled);
-    };
+      return;
+    }
 
-    const interval = setInterval(() => {
-      checkLocation();
-    }, 10000);
+    // Handle location changes after initial state
+    if (enabled !== locationEnabled) {
+      setAlertConfig({
+        title: 'Location Status',
+        message: enabled
+          ? `Location is now enabled`
+          : 'To continue using our services, please enable location access. Without location permissions, you won’t be able to use this app',
+        type: enabled ? 'success' : 'error',
+      });
+      setAlertVisible(true);
+    }
 
-    return () => clearInterval(interval);
-  }, [locationEnabled]);
+    setModalClose(enabled);
+    setLocationEnabled(enabled);
+  };
+
+  // Run immediately on mount
+  checkLocation();
+
+  const interval = setInterval(checkLocation, 1000);
+  return () => clearInterval(interval);
+}, [locationEnabled]);
+
 
   if (!isConnected) {
     return (
@@ -69,7 +90,7 @@ const App = () => {
     <TranslationProvider>
       <Provider store={store}>
         <NavigationContainer>
-          <StatusBar backgroundColor={ERP_COLOR_CODE.ERP_APP_COLOR}/>
+          <StatusBar backgroundColor={ERP_COLOR_CODE.ERP_APP_COLOR} />
           <RootNavigator />
         </NavigationContainer>
         <CustomAlert
@@ -77,7 +98,12 @@ const App = () => {
           title={alertConfig.title}
           message={alertConfig.message}
           type={alertConfig.type}
-          onClose={() => setAlertVisible(false)}
+          onClose={() => {
+            if(modalCLose){
+              setAlertVisible(false)
+            }
+          }}
+          actionLoader={undefined}
         />
       </Provider>
     </TranslationProvider>

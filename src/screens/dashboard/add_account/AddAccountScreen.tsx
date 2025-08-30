@@ -22,20 +22,20 @@ import { DevERPService } from '../../../services/api';
 import { useApi } from '../../../hooks/useApi';
 import CustomAlert from '../../../components/alert/CustomAlert';
 import { generateGUID } from '../../../utils/helpers';
+import { getMessaging } from '@react-native-firebase/messaging';
+import useFcmToken from '../../../hooks/useFcmToken';
 
 const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose }) => {
-
   const dispatch = useAppDispatch();
-  
-  const { isLoading } = useAppSelector(state => state?.auth);
-  
+
   const { execute: validateCompanyCode, execute: loginWithERP } = useApi();
-  
   const { accounts } = useAppSelector(state => state.auth);
+  const { token: fcmToken } = useFcmToken();
 
   const appId = generateGUID();
 
   const [alertVisible, setAlertVisible] = useState(false);
+  const [loader, setLoader] = useState(false);
   const [alertConfig, setAlertConfig] = useState({
     title: '',
     message: '',
@@ -52,6 +52,7 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
     password: string;
   }) => {
     try {
+      setLoader(true);
       const userExists = accounts?.some(acc => acc?.user.name === values.user);
       if (userExists) {
         setAlertConfig({
@@ -68,13 +69,14 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
       if (!validation?.isValid) {
         return;
       }
+      const currentFcmToken = fcmToken || (await getMessaging().getToken());
 
       const loginResult = await loginWithERP(() =>
         DevERPService.loginToERP({
           user: values.user,
           pass: values.password,
           appid: appId,
-          firebaseid: '',
+          firebaseid: currentFcmToken,
         }),
       );
 
@@ -97,11 +99,13 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
           password: values.password,
           isAddingAccount: true,
           user_credentials: { user: values.user, name: values.user },
+          response: loginResult,
         }),
       );
       setAlertConfig({ title: 'Success', message: 'Account added successfully', type: 'success' });
       setAlertVisible(true);
       onClose();
+      setLoader(false);
     } catch (e: any) {
       setAlertConfig({
         title: 'Error',
@@ -109,6 +113,7 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
         type: 'error',
       });
       setAlertVisible(true);
+      setLoader(false);
     }
   };
 
@@ -189,12 +194,12 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
                   </View>
 
                   <TouchableOpacity
-                    style={[styles.addButton, isLoading && styles.disabledButton]}
+                    style={[styles.addButton, loader && styles.disabledButton]}
                     onPress={() => handleSubmit()}
-                    disabled={isLoading}
+                    disabled={loader}
                   >
-                    {isLoading ? (
-                      <ActivityIndicator color="#fff" />
+                    {loader ? (
+                      <Text style={styles.addButtonText}>Account adding...</Text>
                     ) : (
                       <Text style={styles.addButtonText}>Add Account</Text>
                     )}

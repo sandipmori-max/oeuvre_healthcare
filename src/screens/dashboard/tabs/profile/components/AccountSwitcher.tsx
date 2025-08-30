@@ -18,6 +18,7 @@ interface AccountSwitcherProps {
 const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onAddAccount }) => {
   const dispatch = useAppDispatch();
   const { accounts, activeAccountId } = useAppSelector(state => state.auth);
+  console.log("🚀 ~ AccountSwitcher ~ activeAccountId:", activeAccountId)
   const [alertVisible, setAlertVisible] = useState(false);
   const [selectedAccount, setSelectedAccount] = useState<any>(null);
   const [alertConfig, setAlertConfig] = useState({
@@ -53,7 +54,9 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
   };
 
   const renderAccount = ({ item }: { item: Account }) => {
-    const isActive = item?.id === activeAccountId;
+    const isActive = item?.id.toString() === activeAccountId?.toString();
+    console.log("🚀 ~ renderAccount ~ item:", item)
+    console.log("🚀 ~ renderAccount ~ isActive:", isActive)
     const lastLogin = new Date(item?.lastLoginAt).toLocaleDateString();
 
     return (
@@ -133,8 +136,10 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
         onCancel={() => setAlertVisible(false)}
         onDone={() => {
           handleRemovedAccount(selectedAccount);
-        }}
-      />
+        } }
+        doneText='Remove'
+        color='red'
+        actionLoader={undefined}      />
     </Modal>
   );
 };

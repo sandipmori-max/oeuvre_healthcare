@@ -50,8 +50,10 @@ const LoginScreen = ({ navigation, route }: any) => {
     user_credentials: { user: string; name?: string },
     response: any,
   ) => {
-    console.log("🚀 ~ handlePersistAfterLogin ~ response:---------", response)
-    dispatch(loginUserThunk({ company_code, password, isAddingAccount, user_credentials , response}));
+    console.log('🚀 ~ handlePersistAfterLogin ~ response:---------', response);
+    dispatch(
+      loginUserThunk({ company_code, password, isAddingAccount, user_credentials, response }),
+    );
   };
 
   const showAlert = (config: {
@@ -91,6 +93,7 @@ const LoginScreen = ({ navigation, route }: any) => {
           message={alertConfig.message}
           type={alertConfig.type}
           onClose={() => setAlertVisible(false)}
+          actionLoader={undefined}
         />
       </ScrollView>
     </TouchableWithoutFeedback>
