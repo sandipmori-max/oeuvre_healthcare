@@ -11,10 +11,11 @@ export interface CustomAlertProps {
   message: string;
   type?: 'error' | 'success' | 'info';
   onClose: () => void;
-  onDone?: () => void;
+  onDone?: (remarks?: any) => void;
   onCancel?: () => void;
   doneText?: string;
   cancelText?: string;
+  isFromButtonList?: boolean
 }
 
 export type DrawerItemConfig = {
