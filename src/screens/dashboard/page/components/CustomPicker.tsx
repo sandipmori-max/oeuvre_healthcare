@@ -14,6 +14,7 @@ const CustomPicker = ({ label, selectedValue, onValueChange, item, errors, dtext
   const [loader, setLoader] = useState(false);
 
   const [selectedOption, setSelectedOption] = useState('');
+  console.log('🚀 ~ CustomPicker ~ selectedOption:', selectedOption);
 
   useEffect(() => {
     setSelectedOption(dtext);
@@ -27,10 +28,10 @@ const CustomPicker = ({ label, selectedValue, onValueChange, item, errors, dtext
       ).unwrap();
       setOptions(res?.data ?? []);
       setOpen(o => !o);
-      setLoader(false)
+      setLoader(false);
     } catch (e) {
       setOptions([]);
-      setLoader(false)
+      setLoader(false);
     }
   }, [dispatch, item?.dtlid, item?.ddlwhere]);
 
@@ -42,9 +43,13 @@ const CustomPicker = ({ label, selectedValue, onValueChange, item, errors, dtext
         {item?.mandatory === '1' && <Text style={{ color: ERP_COLOR_CODE.ERP_ERROR }}>*</Text>}
       </View>
 
-      <TouchableOpacity style={[styles.pickerBox]} onPress={()=>{
-        handleOpen()
-      }} activeOpacity={0.7}>
+      <TouchableOpacity
+        style={[styles.pickerBox]}
+        onPress={() => {
+          handleOpen();
+        }}
+        activeOpacity={0.7}
+      >
         <Text style={{ color: selectedOption ? '#000' : '#888', flex: 1 }}>
           {selectedOption || 'Select...'}
         </Text>
@@ -53,35 +58,59 @@ const CustomPicker = ({ label, selectedValue, onValueChange, item, errors, dtext
 
       {open && (
         <View style={styles.dropdownCard}>
-          {
-            loader ? <> <FullViewLoader /></> : <>  {options.length > 0 ? (
-            options.map((opt: any, i: number) => (
-              <TouchableOpacity
-                key={i}
-                style={styles.option}
-                onPress={() => {
-                  onValueChange(opt.value);
-                  setOpen(false);
-                  setSelectedOption(opt?.name);
-                }}
-              >
-                <Text>{opt?.name}</Text>
-              </TouchableOpacity>
-            ))
+          {loader ? (
+            <>
+              {' '}
+              <FullViewLoader />
+            </>
           ) : (
-            <View
-              style={{
-                marginVertical: 12,
-                justifyContent: 'center',
-                alignItems: 'center',
-                height: 100,
-              }}
-            >
-              <Text>No data</Text>
-            </View>
-          )}</>
-          }
-        
+            <>
+              {' '}
+              {options.length > 0 ? (
+                options.map((opt: any, i: number) => (
+                  <TouchableOpacity
+                    key={i}
+                    style={[
+                      styles.option,
+                      {
+                        backgroundColor:
+                          selectedOption === opt?.name
+                            ? ERP_COLOR_CODE.ERP_APP_COLOR
+                            : ERP_COLOR_CODE.ERP_WHITE,
+                      },
+                    ]}
+                    onPress={() => {
+                      onValueChange(opt.value);
+                      setOpen(false);
+                      setSelectedOption(opt?.name);
+                    }}
+                  >
+                    <Text
+                      style={{
+                        color:
+                          selectedOption === opt?.name
+                            ? ERP_COLOR_CODE.ERP_WHITE
+                            : ERP_COLOR_CODE.ERP_BLACK,
+                      }}
+                    >
+                      {opt?.name}
+                    </Text>
+                  </TouchableOpacity>
+                ))
+              ) : (
+                <View
+                  style={{
+                    marginVertical: 12,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    height: 100,
+                  }}
+                >
+                  <Text>No data</Text>
+                </View>
+              )}
+            </>
+          )}
         </View>
       )}
 
