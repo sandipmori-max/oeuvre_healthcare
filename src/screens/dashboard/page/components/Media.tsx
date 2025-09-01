@@ -43,7 +43,7 @@ const Media = ({ item, handleAttachment }: any) => {
               if (response.assets && response.assets.length > 0) {
                 const asset: Asset = response.assets[0];
                 setImageUri(asset.uri || null);
-                handleAttachment(`${response.assets?.[0]?.fileName}; data:${asset.type};base64,${asset.base64}`, item.field);
+                handleAttachment(`savePage.jpeg; data:${asset.type};base64,${asset.base64}`, item.field);
               }
             },
           );
@@ -60,7 +60,7 @@ const Media = ({ item, handleAttachment }: any) => {
               if (response.assets && response.assets.length > 0) {
                 const asset: Asset = response.assets[0];
                 setImageUri(asset.uri || null);
-                handleAttachment(`${response.assets?.[0]?.fileName}; data:${asset.type};base64,${asset.base64}`, item.field);
+                handleAttachment(`savePage.jpeg; data:${asset.type};base64,${asset.base64}`, item.field);
               }
             },
           );

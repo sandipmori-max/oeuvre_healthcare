@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { AttendanceResponse } from '../../../services/api';
 import { AttendanceState } from './type';
-import { markAttendanceThunk } from './thunk';
+import { getLastPunchInThunk, markAttendanceThunk } from './thunk';
 
 const initialState: AttendanceState = {
   loading: false,
@@ -34,6 +34,19 @@ const attendanceSlice = createSlice({
         },
       )
       .addCase(markAttendanceThunk.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+
+      .addCase(getLastPunchInThunk.pending, state => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getLastPunchInThunk.fulfilled, (state, action: PayloadAction<AttendanceResponse>) => {
+        state.loading = false;
+        state.response = action.payload;
+      })
+      .addCase(getLastPunchInThunk.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       });
