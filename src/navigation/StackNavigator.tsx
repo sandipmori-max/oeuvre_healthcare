@@ -1,6 +1,6 @@
 import React from 'react';
 import { Image } from 'react-native';
-import { createStackNavigator } from '@react-navigation/stack';
+import { createStackNavigator, CardStyleInterpolators } from '@react-navigation/stack';
 
 import SettingsScreen from '../screens/dashboard/settings/SettingsScreen';
 import DrawerNavigator from './DrawerNavigator';
@@ -35,6 +35,23 @@ const StackNavigator = () => {
       fontSize: 18,
       fontWeight: 'bold',
       color: '#fff',
+    },
+    cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+    gestureEnabled: true,
+    gestureDirection: 'horizontal',
+    transitionSpec: {
+      open: {
+        animation: 'timing',
+        config: {
+          duration: 300,
+        },
+      },
+      close: {
+        animation: 'timing',
+        config: {
+          duration: 300,
+        },
+      },
     },
   };
 
