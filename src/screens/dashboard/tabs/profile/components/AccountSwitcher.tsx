@@ -8,6 +8,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { DevERPService } from '../../../../../services/api';
 import CustomAlert from '../../../../../components/alert/CustomAlert';
 import { ERP_ICON } from '../../../../../assets';
+import { useApi } from '../../../../../hooks/useApi';
 
 interface AccountSwitcherProps {
   visible: boolean;
@@ -17,6 +18,8 @@ interface AccountSwitcherProps {
 
 const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onAddAccount }) => {
   const dispatch = useAppDispatch();
+    const { execute: validateCompanyCode } = useApi();
+  
   const { accounts, activeAccountId } = useAppSelector(state => state.auth);
   console.log("🚀 ~ AccountSwitcher ~ activeAccountId:", activeAccountId)
   const [alertVisible, setAlertVisible] = useState(false);
@@ -67,8 +70,20 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
             await AsyncStorage.setItem('erp_token', item?.user?.token || '');
             await AsyncStorage.setItem('auth_token', item?.user?.token || '');
             DevERPService.setToken(item?.user?.token || '');
+             const validation = await validateCompanyCode(() =>
+                    DevERPService.validateCompanyCode(item?.user?.company_code),
+                  );
+                  if (!validation?.isValid) {
+                    return;
+                  }
             handleSwitchAccount(item?.id);
           } else {
+             const validation = await validateCompanyCode(() =>
+                    DevERPService.validateCompanyCode(item?.user?.company_code),
+                  );
+                  if (!validation?.isValid) {
+                    return;
+                  }
             await DevERPService.getAuth(true);
             handleSwitchAccount(item?.id);
           }

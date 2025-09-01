@@ -79,6 +79,7 @@ class DevERPService {
     const response = await apiClient.post<DevERPResponse>(`${this.baseUrl}/appcode.aspx/getLink`, {
       code,
     });
+    console.log("🚀 ~ DevERPService ~ getAppLink ~ response:", response)
 
     if (response.data.success === 1 && response.data.link) {
       if (response.data.link.startsWith('https://')) {
@@ -90,6 +91,7 @@ class DevERPService {
   }
 
   async validateCompanyCode(code: string) {
+    console.log("🚀🚀🚀🚀🚀🚀🚀 ~ DevERPService ~ validateCompanyCode ~ code:----------------------------------", code)
     try {
       const response = await this.getAppLink(code);
       return response.success === 1
