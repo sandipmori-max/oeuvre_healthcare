@@ -14,7 +14,7 @@ import { useAppDispatch, useAppSelector } from '../../../../store/hooks';
 import {
   getLastPunchInThunk,
   markAttendanceThunk,
-} from '../../../../store/slices/attandance/thunk';
+} from '../../../../store/slices/attendance/thunk';
 import { ERP_COLOR_CODE } from '../../../../utils/constants';
 import { useNavigation } from '@react-navigation/native';
 

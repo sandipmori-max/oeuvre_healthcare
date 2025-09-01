@@ -333,4 +333,6 @@ function buildFormatted(date, isFullDate) {
 
 }
  
-
+export const isTokenValid = (tokenValidTill: string) => {
+  return new Date(tokenValidTill).getTime() > Date.now();
+};
