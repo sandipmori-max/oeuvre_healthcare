@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useLayoutEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, ActivityIndicator, Image } from 'react-native';
+import { View, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
 
 import { styles } from './home_style';
 import { useAppDispatch, useAppSelector } from '../../../../store/hooks';
@@ -20,6 +20,7 @@ const HomeScreen = () => {
   const [isRefresh, setIsRefresh] = useState<boolean>(false);
 
   const theme = useAppSelector(state => state.theme);
+  const [actionLoader, setActionLoader] = useState(false)
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -28,8 +29,10 @@ const HomeScreen = () => {
           <ERPIcon
             name="refresh"
             onPress={() => {
+              setActionLoader(true)
               setIsRefresh(!isRefresh);
             }}
+            isLoading={actionLoader}
           />
         </>
       ),
@@ -39,11 +42,14 @@ const HomeScreen = () => {
         </>
       ),
     });
-  }, [navigation, isRefresh]);
+  }, [navigation, isRefresh, actionLoader]);
 
   useEffect(() => {
     if (isAuthenticated) {
       dispatch(getERPDashboardThunk());
+      setTimeout(() =>{
+        setActionLoader(false)
+      }, 100)
     }
   }, [isAuthenticated, dispatch, activeToken, isRefresh]);
 

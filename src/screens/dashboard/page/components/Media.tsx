@@ -5,6 +5,7 @@ import { launchCamera, launchImageLibrary, Asset } from 'react-native-image-pick
 import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 
 const Media = ({ item, handleAttachment }: any) => {
+  console.log("🚀 ~ Media ~ *-*-*-**-*---***-*----item:----------------*---**--*---*", item)
   const [imageUri, setImageUri] = useState<string | null>(null);
 
   const requestPermission = async (type: 'camera' | 'gallery') => {
