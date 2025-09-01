@@ -31,7 +31,7 @@ export interface DashboardItem {
   data: string;
   url?: string;
   title: string;
-  isReport: boolean;
+  isReport: any;
 }
 
 export interface AuthState {

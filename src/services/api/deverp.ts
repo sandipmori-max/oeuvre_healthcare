@@ -214,7 +214,7 @@ class DevERPService {
       outlocation: `${rawData?.latitude},${rawData?.longitude}`,
     };
 
-    const punchData = {
+    const punchInData = {
       id: '0',
       employeeid: user.id.toString(),
       inimage: rawData.imageBase64,
@@ -223,13 +223,13 @@ class DevERPService {
     };
     console.log(
       '🚀 ~ DevERPService ~ markAttendance ~ punchData:',
-      JSON.stringify(isPunchIn ? punchData : punchOutData),
+      JSON.stringify(isPunchIn ? punchInData : punchOutData),
     );
 
     return this.apiCall<AttendanceResponse>(`msp_api.aspx/savePage`, {
       token: this.token,
       page: pageType,
-      data: JSON.stringify(isPunchIn ? punchData : punchOutData),
+      data: JSON.stringify(isPunchIn ? punchInData : punchOutData),
     });
   }
 
@@ -247,6 +247,10 @@ class DevERPService {
 
   getAjax(dtlid: string, where: string, search: string) {
     return this.apiCall<any>('msp_api.aspx/getAjax', { token: this.token, dtlid, where, search });
+  }
+
+  getLastPunchIn() {
+    return this.apiCall<any>('msp_api.aspx/getLastPunchIn', { token: this.token});
   }
 
   async handlePageAction(action: string, id: string, remarks: string, page: string) {

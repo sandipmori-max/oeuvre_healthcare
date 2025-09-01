@@ -245,6 +245,7 @@ const authSlice = createSlice({
               console.error('Error parsing inner d property:', innerParseError);
             }
           }
+                console.log("🚀 ~ dashboardItems:--------", dashboardItems)
 
           state.dashboard = dashboardItems.map((item: any, index: number) => ({
             id: item.Link || `dashboard_${index}`,
@@ -252,7 +253,7 @@ const authSlice = createSlice({
             data: item.Data || '',
             url: item.Link || '',
             title: item.Title || '',
-            isReport: item.IsReport === '1' || item.IsReport === '2',
+            isReport: item.IsReport || '',
           }));
         } catch (error) {
           console.error('Error parsing dashboard data:', error);

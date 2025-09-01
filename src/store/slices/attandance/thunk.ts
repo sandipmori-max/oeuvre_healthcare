@@ -16,3 +16,17 @@ export const markAttendanceThunk = createAsyncThunk<
     }
   },
 );
+
+export const getLastPunchInThunk = createAsyncThunk<
+  AttendanceResponse,
+  void,
+  { rejectValue: string }
+>('attendance/getLastPunchIn', async (_, { rejectWithValue }) => {
+  try {
+    const response = await DevERPService.getLastPunchIn();
+    console.log("🚀 ~ response:", response)
+    return response;
+  } catch (error: any) {
+    return rejectWithValue(error?.message || 'Failed to fetch last punch-in');
+  }
+});

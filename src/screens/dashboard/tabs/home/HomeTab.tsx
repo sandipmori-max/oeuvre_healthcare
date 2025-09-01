@@ -8,12 +8,12 @@ import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import FullViewLoader from '../../../../components/loader/FullViewLoader';
 import NoData from '../../../../components/no_data/NoData';
 import ERPIcon from '../../../../components/icon/ERPIcon';
-import { BarChart, PieChart } from 'react-native-gifted-charts';
-import { getERPDashboardThunk, getERPMenuThunk } from '../../../../store/slices/auth/thunk';
+import { PieChart } from 'react-native-gifted-charts';
+import { getERPDashboardThunk } from '../../../../store/slices/auth/thunk';
 const HomeScreen = () => {
   const navigation = useNavigation<any>();
   const dispatch = useAppDispatch();
-  const { isLoading, isAuthenticated, activeToken } = useAppSelector(state => state.auth);
+  const { isAuthenticated, activeToken } = useAppSelector(state => state.auth);
 
   const { dashboard, isDashboardLoading } = useAppSelector(state => state.auth);
   const [loadingPageId, setLoadingPageId] = useState<string | null>(null);
@@ -72,8 +72,10 @@ const HomeScreen = () => {
       text: item.title?.split(' ')[0] || `Item ${index + 1}`,
     }));
 
-  const renderDashboardItem = (item: DashboardItem, index: number) => (
-    <TouchableOpacity
+  const renderDashboardItem = (item: DashboardItem, index: number) => {
+    console.log("🚀 ~ renderDashboardItem ~ item:", item)
+    return(
+       <TouchableOpacity
       key={item.id || index}
       style={[
         styles.dashboardItem,
@@ -155,7 +157,7 @@ const HomeScreen = () => {
               alignItems: 'center',
             }}
           >
-            {item.isReport && (
+            {item?.isReport && (
               <View style={styles.reportBadge}>
                 <Text style={styles.reportBadgeText}>Report</Text>
               </View>
@@ -171,7 +173,8 @@ const HomeScreen = () => {
         </View>
       </View>
     </TouchableOpacity>
-  );
+    )
+  };
 
   const renderLoadingState = () => <FullViewLoader />;
 

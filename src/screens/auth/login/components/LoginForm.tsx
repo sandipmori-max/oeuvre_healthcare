@@ -22,6 +22,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
 }) => {
   const { t } = useTranslations();
   const { token: fcmToken } = useFcmToken();
+  console.log("🚀 ~ LoginForm ~ fcmToken:", fcmToken)
 
   const {
     execute: validateCompanyCode,
@@ -47,7 +48,10 @@ const LoginForm: React.FC<LoginFormProps> = ({
       if (!companyValidation?.isValid) {
         return;
       }
+      console.log("🚀 ~ handleLoginSubmit ~ top:--------")
       const currentFcmToken = fcmToken || (await getMessaging().getToken());
+      console.log("🚀 ~ handleLoginSubmit ~ bottom:--------")
+
       const appId = generateGUID();
       DevERPService.setAppId(generateGUID());
       DevERPService.setDevice(deviceId);

@@ -1,22 +1,24 @@
 import { View, Text, Image, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import Geolocation from '@react-native-community/geolocation';
 import { launchCamera } from 'react-native-image-picker';
 
-import { AttendanceFormValues, User, UserLocation } from '../types';
+import { AttendanceFormValues, UserLocation } from '../types';
 import { requestCameraAndLocationPermission } from '../../../../utils/helpers';
 import useTranslations from '../../../../hooks/useTranslations';
 import { styles } from '../attendance_style';
 import CustomAlert from '../../../../components/alert/CustomAlert';
 import { useAppDispatch, useAppSelector } from '../../../../store/hooks';
-import { markAttendanceThunk } from '../../../../store/slices/attandance/thunk';
+import {
+  getLastPunchInThunk,
+  markAttendanceThunk,
+} from '../../../../store/slices/attandance/thunk';
 import { ERP_COLOR_CODE } from '../../../../utils/constants';
 import { useNavigation } from '@react-navigation/native';
 
-
-const AttendanceForm = ({setBlockAction}: any) => {
+const AttendanceForm = ({ setBlockAction }: any) => {
   const { t } = useTranslations();
   const navigation = useNavigation();
 
@@ -34,6 +36,17 @@ const AttendanceForm = ({setBlockAction}: any) => {
     message: '',
     type: 'info' as 'error' | 'success' | 'info',
   });
+
+  useEffect(() => {
+    dispatch(getLastPunchInThunk())
+      .unwrap()
+      .then(res => {
+        console.log('✅ Last Punch-In Response:', res);
+      })
+      .catch(err => {
+        console.log('❌ Error fetching last punch-in:', err);
+      });
+  }, [dispatch]);
 
   const openCamera = (
     setFieldValue: (field: keyof AttendanceFormValues, value: any) => void,
@@ -59,10 +72,7 @@ const AttendanceForm = ({setBlockAction}: any) => {
         console.log('🚀 ~ openCamera ~ photoUri:', photoUri);
 
         if (asset?.base64) {
-          setFieldValue(
-            'imageBase64',
-            `${response.assets?.[0]?.fileName}; data:${asset.type};base64,${asset.base64}`,
-          );
+          setFieldValue('imageBase64', `punchIn.jpeg; data:${asset.type};base64,${asset.base64}`);
         }
         setStatusImage(photoUri);
 
@@ -147,11 +157,11 @@ const AttendanceForm = ({setBlockAction}: any) => {
           imageBase64: Yup.string().required('Image required'),
         })}
         onSubmit={values => {
-          dispatch(markAttendanceThunk({ rawData: values, type: false, user }))
+          dispatch(markAttendanceThunk({ rawData: values, type: true, user }))
             .unwrap()
             .then(res => {
               console.log('✅ API Success:', res);
-              setAttendanceDone(true)
+              setAttendanceDone(true);
               setAlertConfig({
                 title: 'Success',
                 message: 'Attendance marked successfully!',
@@ -159,11 +169,11 @@ const AttendanceForm = ({setBlockAction}: any) => {
               });
               setAlertVisible(true);
               setLocationLoading(false);
-              setBlockAction(false)
+              setBlockAction(false);
             })
             .catch(err => {
               console.log('❌ API Error:', err);
-              setAttendanceDone(false)
+              setAttendanceDone(false);
               setAlertConfig({
                 title: 'Error',
                 message: err || 'Something went wrong',
@@ -171,7 +181,7 @@ const AttendanceForm = ({setBlockAction}: any) => {
               });
               setAlertVisible(true);
               setLocationLoading(false);
-              setBlockAction(false)
+              setBlockAction(false);
             });
         }}
       >
@@ -200,7 +210,7 @@ const AttendanceForm = ({setBlockAction}: any) => {
               </View>
             </View>
 
-          <View style={{ bottom: 22 }}>
+            <View style={{ bottom: 22 }}>
               <View style={styles.formGroup}>
                 <Text style={styles.label}>{t('attendance.employeeName')}</Text>
                 <TextInput
@@ -276,11 +286,11 @@ const AttendanceForm = ({setBlockAction}: any) => {
         message={alertConfig.message}
         type={alertConfig.type}
         onClose={() => {
-          if(attendanceDone){
+          if (attendanceDone) {
             navigation.goBack();
-            setAlertVisible(false)
-          }else{
-            setAlertVisible(false)
+            setAlertVisible(false);
+          } else {
+            setAlertVisible(false);
           }
         }}
         actionLoader={undefined}
