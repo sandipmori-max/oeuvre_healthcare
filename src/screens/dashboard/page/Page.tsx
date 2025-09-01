@@ -40,6 +40,9 @@ const PageScreen = () => {
   const [alertVisible, setAlertVisible] = useState(false);
   const [goBack, setGoBack] = useState(false);
   const [loader, setLoader] = useState(false);
+  const [actionLoader, setActionLoader] = useState(false);
+  const [actionSaveLoader, setActionSaveLoader] = useState(false);
+
 
   const [alertConfig, setAlertConfig] = useState({
     title: '',
@@ -80,47 +83,55 @@ const PageScreen = () => {
       ),
       headerRight: () => (
         <>
-          <ERPIcon
-            name="save-as"
-            onPress={async () => {
-              if (validateForm()) {
-                const submitValues: Record<string, any> = {};
-                controls.forEach(f => {
-                  if (f.refcol !== '1') submitValues[f.field] = formValues[f.field];
-                });
-
-                try {
-                  setLoader(true);
-                  await dispatch(
-                    savePageThunk({ page: title, id, data: { ...submitValues } }),
-                  ).unwrap();
-                  setLoader(false);
-                  fetchPageData();
-                  setAlertConfig({
-                    title: 'Record saved',
-                    message: `Record saved successfully!`,
-                    type: 'success',
+          {controls.length > 0 && (
+            <ERPIcon
+              name="save-as"
+              isLoading={actionSaveLoader}
+              onPress={async () => {
+                setActionSaveLoader(true)
+                if (validateForm()) {
+                  const submitValues: Record<string, any> = {};
+                  controls.forEach(f => {
+                    if (f.refcol !== '1') submitValues[f.field] = formValues[f.field];
                   });
-                  setAlertVisible(true);
-                  setGoBack(true);
-                } catch (err: any) {
-                  setLoader(false);
 
-                  setAlertConfig({
-                    title: 'Record saved',
-                    message: `Record not saved!`,
-                    type: 'error',
-                  });
-                  setAlertVisible(true);
-                  setGoBack(false);
-                }
-              }
-            }}
-          />
+                  try {
+                    setLoader(true);
+                    await dispatch(
+                      savePageThunk({ page: title, id, data: { ...submitValues } }),
+                    ).unwrap();
+                    setLoader(false);
+                    fetchPageData();
+                    setAlertConfig({
+                      title: 'Record saved',
+                      message: `Record saved successfully!`,
+                      type: 'success',
+                    });
+                    setAlertVisible(true);
+                    setGoBack(true);
+                  } catch (err: any) {
+                    setLoader(false);
+
+                    setAlertConfig({
+                      title: 'Record saved',
+                      message: `Record not saved!`,
+                      type: 'error',
+                    });
+                    setAlertVisible(true);
+                    setGoBack(false);
+                  }
+                } 
+                                setActionSaveLoader(false)
+
+              }}
+            />
+          )}
 
           <ERPIcon
             name="refresh"
+            isLoading={actionLoader}
             onPress={() => {
+              setActionLoader(true)
               fetchPageData();
               setErrors({});
               setErrorsList([]);
@@ -139,6 +150,8 @@ const PageScreen = () => {
     goBack,
     alertVisible,
     loader,
+    actionLoader,
+    actionSaveLoader
   ]);
 
   const fetchPageData = useCallback(async () => {
@@ -171,6 +184,9 @@ const PageScreen = () => {
       setError(e?.message || 'Failed to load page');
     } finally {
       setLoadingPageId(null);
+      setTimeout(() =>{
+          setActionLoader(false)
+      }, 10)
     }
   }, [dispatch, id, title]);
 

@@ -37,6 +37,7 @@ const ListScreen = () => {
 
   const [filteredData, setFilteredData] = useState<any[]>([]);
   const [alertVisible, setAlertVisible] = useState(false);
+  const [actionLoaders, setActionLoader] = useState(false);
 
   const [alertConfig, setAlertConfig] = useState({
     title: '',
@@ -90,13 +91,15 @@ const ListScreen = () => {
           <ERPIcon
             name="refresh"
             onPress={() => {
+              setActionLoader(true)
               onRefresh();
             }}
+            isLoading={actionLoaders}
           />
         </>
       ),
     });
-  }, [navigation, pageTitle, isFilterVisible, hasDateField, isTableView]);
+  }, [navigation, pageTitle, isFilterVisible, hasDateField, isTableView, actionLoaders]);
 
   const getCurrentMonthRange = useCallback(() => {
     const now = new Date();
@@ -255,6 +258,9 @@ const ListScreen = () => {
         setError(e?.message || 'Failed to load list data');
       } finally {
         setLoadingListId(null);
+        setTimeout(() => {
+          setActionLoader(false)
+        }, 10)
       }
     },
     [item, dispatch],

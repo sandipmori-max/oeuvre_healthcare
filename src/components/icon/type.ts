@@ -7,4 +7,5 @@ export interface ERPIconProps {
   extStyle?: ViewStyle | ViewStyle[];
   extSize?: number;
   color?: string;
+  isLoading?: boolean
 }
