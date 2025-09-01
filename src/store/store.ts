@@ -1,10 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit';
 import authReducer from './slices/auth/authSlice';
 import themeReducer from './slices/theme/themeSlice';
-import attendanceReducer from './slices/attandance/attendanceSlice';
+import attendanceReducer from './slices/attendance/attendanceSlice';
 import dropdownReducer from './slices/dropdown/dropdownSlice';
 import ajaxReducer from './slices/ajax/ajaxSlice';
 import pageReducer from './slices/page/pageSlice';
+import syncLocationReducer from './slices/location/syncLocationSlice';
 
 export const store = configureStore({
   reducer: {
@@ -14,6 +15,7 @@ export const store = configureStore({
     dropdown: dropdownReducer,
     ajax: ajaxReducer,
     page: pageReducer,
+    syncLocation: syncLocationReducer,
   },
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({

@@ -9,6 +9,7 @@ import {
   ScrollView,
   TouchableOpacity,
   FlatList,
+  Dimensions,
 } from 'react-native';
 import NoData from '../../../../components/no_data/NoData';
 import { PieChart } from 'react-native-gifted-charts';
@@ -19,8 +20,8 @@ const dummyAttendanceList = [
     id: '1',
     name: 'John Doe',
     email: 'john@example.com',
-    dateTime: '2025-06-10 08:30 AM',
-    punch_in: '08:25 AM',
+    dateTime: '2025-06-10 09:30 AM',
+    punch_in: '09:25 AM',
     punch_out: '05:00 PM',
     image: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=600',
   },
@@ -28,8 +29,8 @@ const dummyAttendanceList = [
     id: '2',
     name: 'John Doe',
     email: 'john@example.com',
-    dateTime: '2025-06-11 08:40 AM',
-    punch_in: '08:38 AM',
+    dateTime: '2025-06-11 09:40 AM',
+    punch_in: '09:38 AM',
     punch_out: '05:05 PM',
     image: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=600',
   },
@@ -37,8 +38,8 @@ const dummyAttendanceList = [
     id: '3',
     name: 'John Doe',
     email: 'john@example.com',
-    dateTime: '2025-07-05 08:45 AM',
-    punch_in: '08:43 AM',
+    dateTime: '2025-07-05 09:45 AM',
+    punch_in: '09:43 AM',
     punch_out: '05:10 PM',
     image: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=600',
   },
@@ -46,8 +47,8 @@ const dummyAttendanceList = [
     id: '4',
     name: 'John Doe',
     email: 'john@example.com',
-    dateTime: '2025-07-06 08:35 AM',
-    punch_in: '08:30 AM',
+    dateTime: '2025-07-06 09:35 AM',
+    punch_in: '09:30 AM',
     punch_out: '05:15 PM',
     image: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=600',
   },
@@ -55,8 +56,8 @@ const dummyAttendanceList = [
     id: '5',
     name: 'John Doe',
     email: 'john@example.com',
-    dateTime: '2025-07-07 08:50 AM',
-    punch_in: '08:45 AM',
+    dateTime: '2025-07-07 09:50 AM',
+    punch_in: '09:45 AM',
     punch_out: '05:20 PM',
     image: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=600',
   },
@@ -64,15 +65,15 @@ const dummyAttendanceList = [
     id: '100',
     name: 'John Doe',
     email: 'john@example.com',
-    dateTime: '2025-08-01 08:30 AM',
-    punch_in: '08:25 AM',
+    dateTime: '2025-09-01 09:30 AM',
+    punch_in: '09:25 AM',
     punch_out: '05:00 PM',
   },
   {
     id: '101',
     name: 'John Doe',
     email: 'john@example.com',
-    dateTime: '2025-08-02 08:30 AM',
+    dateTime: '2025-09-02 09:30 AM',
     punch_in: '10:16 AM',
     punch_out: '05:10 PM',
   },
@@ -80,7 +81,7 @@ const dummyAttendanceList = [
     id: '102',
     name: 'John Doe',
     email: 'john@example.com',
-    dateTime: '2025-08-03 08:30 AM',
+    dateTime: '2025-09-03 09:30 AM',
     punch_in: '',
     punch_out: '',
     status: 'leave',
@@ -89,23 +90,23 @@ const dummyAttendanceList = [
     id: '103',
     name: 'John Doe',
     email: 'john@example.com',
-    dateTime: '2025-08-04 08:30 AM',
+    dateTime: '2025-09-04 09:30 AM',
     punch_in: '10:16 AM',
-    punch_out: '08:10 PM',
+    punch_out: '09:10 PM',
   },
   {
     id: '104',
     name: 'John Doe',
     email: 'john@example.com',
-    dateTime: '2025-08-05 08:30 AM',
-    punch_in: '08:20 AM',
+    dateTime: '2025-09-05 09:30 AM',
+    punch_in: '09:20 AM',
     punch_out: '05:05 PM',
   },
   {
     id: '105',
     name: 'John Doe',
     email: 'john@example.com',
-    dateTime: '2025-08-06 08:30 AM',
+    dateTime: '2025-09-06 09:30 AM',
     punch_in: '01:30 PM',
     punch_out: '05:30 PM',
     status: 'leave_first_half',
@@ -114,40 +115,40 @@ const dummyAttendanceList = [
     id: '106',
     name: 'John Doe',
     email: 'john@example.com',
-    dateTime: '2025-08-07 08:30 AM',
-    punch_in: '08:40 AM',
+    dateTime: '2025-09-07 09:30 AM',
+    punch_in: '09:40 AM',
     punch_out: '05:00 PM',
   },
   {
     id: '107',
     name: 'John Doe',
     email: 'john@example.com',
-    dateTime: '2025-08-08 08:30 AM',
-    punch_in: '08:45 AM',
+    dateTime: '2025-09-09 09:30 AM',
+    punch_in: '09:45 AM',
     punch_out: '12:00 PM',
     status: 'leave_second_half',
   },
   {
-    id: '108',
+    id: '109',
     name: 'John Doe',
     email: 'john@example.com',
-    dateTime: '2025-08-09 08:30 AM',
-    punch_in: '08:30 AM',
+    dateTime: '2025-09-09 09:30 AM',
+    punch_in: '09:30 AM',
     punch_out: '05:00 PM',
   },
   {
     id: '109',
     name: 'John Doe',
     email: 'john@example.com',
-    dateTime: '2025-08-10 08:30 AM',
-    punch_in: '08:50 AM',
+    dateTime: '2025-09-10 09:30 AM',
+    punch_in: '09:50 AM',
     punch_out: '05:30 PM',
   },
   {
     id: '110',
     name: 'John Doe',
     email: 'john@example.com',
-    dateTime: '2025-08-11 08:30 AM',
+    dateTime: '2025-09-11 09:30 AM',
     punch_in: '',
     punch_out: '',
     status: 'leave',
@@ -156,7 +157,7 @@ const dummyAttendanceList = [
     id: '111',
     name: 'John Doe',
     email: 'john@example.com',
-    dateTime: '2025-08-12 08:30 AM',
+    dateTime: '2025-09-12 09:30 AM',
     punch_in: '09:15 AM',
     punch_out: '06:00 PM',
   },
@@ -164,39 +165,39 @@ const dummyAttendanceList = [
     id: '112',
     name: 'John Doe',
     email: 'john@example.com',
-    dateTime: '2025-08-13 08:30 AM',
-    punch_in: '08:35 AM',
+    dateTime: '2025-09-13 09:30 AM',
+    punch_in: '09:35 AM',
     punch_out: '05:00 PM',
   },
   {
     id: '113',
     name: 'John Doe',
     email: 'john@example.com',
-    dateTime: '2025-08-14 08:30 AM',
-    punch_in: '08:20 AM',
+    dateTime: '2025-09-14 09:30 AM',
+    punch_in: '09:20 AM',
     punch_out: '05:15 PM',
   },
   {
     id: '114',
     name: 'John Doe',
     email: 'john@example.com',
-    dateTime: '2025-08-15 08:30 AM',
-    punch_in: '08:55 AM',
+    dateTime: '2025-09-15 09:30 AM',
+    punch_in: '09:55 AM',
     punch_out: '05:30 PM',
   },
   {
     id: '115',
     name: 'John Doe',
     email: 'john@example.com',
-    dateTime: '2025-08-16 08:30 AM',
-    punch_in: '08:45 AM',
+    dateTime: '2025-09-16 09:30 AM',
+    punch_in: '09:45 AM',
     punch_out: '04:50 PM',
   },
   {
     id: '116',
     name: 'John Doe',
     email: 'john@example.com',
-    dateTime: '2025-08-17 08:30 AM',
+    dateTime: '2025-09-17 09:30 AM',
     punch_in: '',
     punch_out: '',
     status: 'leave',
@@ -205,23 +206,23 @@ const dummyAttendanceList = [
     id: '117',
     name: 'John Doe',
     email: 'john@example.com',
-    dateTime: '2025-08-18 08:30 AM',
-    punch_in: '08:25 AM',
+    dateTime: '2025-09-18 09:30 AM',
+    punch_in: '09:25 AM',
     punch_out: '05:00 PM',
   },
   {
     id: '118',
     name: 'John Doe',
     email: 'john@example.com',
-    dateTime: '2025-08-19 08:30 AM',
-    punch_in: '08:30 AM',
+    dateTime: '2025-09-19 09:30 AM',
+    punch_in: '09:30 AM',
     punch_out: '05:10 PM',
   },
   {
     id: '119',
     name: 'John Doe',
     email: 'john@example.com',
-    dateTime: '2025-08-20 08:30 AM',
+    dateTime: '2025-09-20 09:30 AM',
     punch_in: '01:30 PM',
     punch_out: '05:00 PM',
     status: 'leave_first_half',
@@ -230,15 +231,15 @@ const dummyAttendanceList = [
     id: '120',
     name: 'John Doe',
     email: 'john@example.com',
-    dateTime: '2025-08-21 08:30 AM',
+    dateTime: '2025-09-21 09:30 AM',
     punch_in: '10:30 AM',
-    punch_out: '08:00 PM',
+    punch_out: '09:00 PM',
   },
   {
     id: '121',
     name: 'John Doe',
     email: 'john@example.com',
-    dateTime: '2025-08-22 08:30 AM',
+    dateTime: '2025-09-22 09:30 AM',
     punch_in: '10:16 AM',
     punch_out: '05:10 PM',
   },
@@ -246,31 +247,31 @@ const dummyAttendanceList = [
     id: '122',
     name: 'John Doe',
     email: 'john@example.com',
-    dateTime: '2025-08-23 08:30 AM',
-    punch_in: '08:50 AM',
+    dateTime: '2025-09-23 09:30 AM',
+    punch_in: '09:50 AM',
     punch_out: '05:05 PM',
   },
   {
     id: '123',
     name: 'John Doe',
     email: 'john@example.com',
-    dateTime: '2025-08-24 08:30 AM',
-    punch_in: '08:45 AM',
+    dateTime: '2025-09-24 09:30 AM',
+    punch_in: '09:45 AM',
     punch_out: '05:10 PM',
   },
   {
     id: '124',
     name: 'John Doe',
     email: 'john@example.com',
-    dateTime: '2025-08-25 08:30 AM',
-    punch_in: '08:45 AM',
+    dateTime: '2025-09-25 09:30 AM',
+    punch_in: '09:45 AM',
     punch_out: '05:20 PM',
   },
   {
     id: '125',
     name: 'John Doe',
     email: 'john@example.com',
-    dateTime: '2025-08-26 08:30 AM',
+    dateTime: '2025-09-26 09:30 AM',
     punch_in: '',
     punch_out: '',
     status: 'leave',
@@ -279,7 +280,7 @@ const dummyAttendanceList = [
     id: '126',
     name: 'John Doe',
     email: 'john@example.com',
-    dateTime: '2025-08-27 08:30 AM',
+    dateTime: '2025-09-27 09:30 AM',
     punch_in: '01:30 PM',
     punch_out: '05:00 PM',
     status: 'leave_first_half',
@@ -288,8 +289,8 @@ const dummyAttendanceList = [
     id: '127',
     name: 'John Doe',
     email: 'john@example.com',
-    dateTime: '2025-08-28 08:30 AM',
-    punch_in: '08:45 AM',
+    dateTime: '2025-09-28 09:30 AM',
+    punch_in: '09:45 AM',
     punch_out: '12:00 PM',
     status: 'leave_second_half',
   },
@@ -297,15 +298,15 @@ const dummyAttendanceList = [
     id: '128',
     name: 'John Doe',
     email: 'john@example.com',
-    dateTime: '2025-08-29 08:30 AM',
-    punch_in: '08:15 AM',
+    dateTime: '2025-09-29 09:30 AM',
+    punch_in: '09:15 AM',
     punch_out: '05:00 PM',
   },
   {
     id: '129',
     name: 'John Doe',
     email: 'john@example.com',
-    dateTime: '2025-08-30 08:30 AM',
+    dateTime: '2025-09-30 09:30 AM',
     punch_in: '09:00 AM',
     punch_out: '05:45 PM',
   },
@@ -609,82 +610,93 @@ const List = ({ selectedMonth, showFilter }: any) => {
         renderItem={() => {
           return (
             <>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  borderBottomColor: '#ccc',
-                  borderBottomWidth: 1,
-                  paddingBottom: 18,
-                  justifyContent: 'center',
-                  paddingHorizontal: 16,
-                  paddingTop: 16,
-                }}
-              >
+              {data.length !== 0 && (
                 <View
                   style={{
+                    flexDirection: 'row',
+                    borderBottomColor: '#ccc',
+                    borderBottomWidth: 1,
+                    paddingBottom: 18,
                     justifyContent: 'center',
-                    alignContent: 'center',
-                    alignItems: 'center',
+                    paddingHorizontal: 16,
+                    paddingTop: 16,
                   }}
                 >
-                  <PieChart
-                    data={chartData}
-                    donut
-                    radius={90}
-                    textSize={14}
-                    innerRadius={50}
-                    showValuesAsLabels
-                    labelPosition="outside"
-                    innerCircleColor="#fff"
-                    centerLabelComponent={() => {
-                      return (
-                        <Text
-                          style={{
-                            textAlign: 'center',
-                            fontSize: 16,
-                            fontWeight: 'bold',
-                            color: '#000',
-                          }}
-                        >
-                          Total{'\n'}
-                          {totalPresent +
-                            leaveFullCount +
-                            leaveFirstHalfCount +
-                            leaveSecondHalfCount}
-                        </Text>
-                      );
+                  <View
+                    style={{
+                      justifyContent: 'center',
+                      alignContent: 'center',
+                      alignItems: 'center',
                     }}
-                  />
-                </View>
-                <View style={{ margin: 16, justifyContent: 'center', alignContent: 'center' }}>
-                  {chartData.map((item, idx) => (
-                    <View
-                      key={idx}
-                      style={{
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        marginHorizontal: 8,
-                        marginBottom: 8,
+                  >
+                    <PieChart
+                      data={chartData}
+                      donut
+                      radius={90}
+                      textSize={14}
+                      innerRadius={50}
+                      showValuesAsLabels
+                      labelPosition="outside"
+                      innerCircleColor="#fff"
+                      centerLabelComponent={() => {
+                        return (
+                          <Text
+                            style={{
+                              textAlign: 'center',
+                              fontSize: 16,
+                              fontWeight: 'bold',
+                              color: '#000',
+                            }}
+                          >
+                            Total{'\n'}
+                            {totalPresent +
+                              leaveFullCount +
+                              leaveFirstHalfCount +
+                              leaveSecondHalfCount}
+                          </Text>
+                        );
                       }}
-                    >
+                    />
+                  </View>
+                  <View style={{ margin: 16, justifyContent: 'center', alignContent: 'center' }}>
+                    {chartData.map((item, idx) => (
                       <View
+                        key={idx}
                         style={{
-                          width: 16,
-                          height: 16,
-                          borderRadius: 8,
-                          backgroundColor: item.color,
-                          marginRight: 6,
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          marginHorizontal: 8,
+                          marginBottom: 8,
                         }}
-                      />
-                      <Text style={{ fontSize: 14, color: '#444' }}>{item.title}</Text>
-                    </View>
-                  ))}
+                      >
+                        <View
+                          style={{
+                            width: 16,
+                            height: 16,
+                            borderRadius: 8,
+                            backgroundColor: item.color,
+                            marginRight: 6,
+                          }}
+                        />
+                        <Text style={{ fontSize: 14, color: '#444' }}>{item.title}</Text>
+                      </View>
+                    ))}
+                  </View>
                 </View>
-              </View>
+              )}
 
               <View style={styles.listSection}>
                 {data.length === 0 ? (
-                  <NoData />
+                  <View
+                    style={{
+                      height: Dimensions.get('screen').height,
+                      justifyContent: 'center',
+                      alignContent: 'center',
+                      alignItems: 'center',
+                    }}
+                  >
+                    <NoData />
+                  </View>
                 ) : (
                   <SectionList
                     sections={[{ title: selectedMonth, data }]}

@@ -264,6 +264,13 @@ class DevERPService {
     });
   }
 
+   async syncLocation(token: string, location: string) {
+    return this.apiCall<any>(`msp_api.aspx/syncLocation`, {
+      token: token,
+      location: location
+    });
+  }
+
   async initialize() {
     this.link = (await AsyncStorage.getItem('erp_link')) || '';
     this.token = (await AsyncStorage.getItem('erp_token')) || '';
