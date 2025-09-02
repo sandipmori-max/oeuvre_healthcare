@@ -94,11 +94,12 @@ class DevERPService {
     console.log("🚀🚀🚀🚀🚀🚀🚀 ~ DevERPService ~ validateCompanyCode ~ code:----------------------------------", code)
     try {
       const response = await this.getAppLink(code);
+      console.log("🚀 ~ DevERPService ~ validateCompanyCode ~ response:", response)
       return response.success === 1
         ? {
             isValid: true,
-            appName: response.name,
-            appUrl: response.link,
+            appName: response?.name,
+            appUrl: response?.link,
             message: 'Company code validated successfully',
           }
         : { isValid: false, message: 'Invalid company code' };
@@ -130,7 +131,7 @@ class DevERPService {
       `${this.link}msp_api.aspx/setAppID`,
       loginData,
     );
-    console.log('🚀 ~ DevERPService ~ loginToERP ~ response:', response);
+    console.log('🚀 ~ DevERPService ~ loginToERP ~ response:************', response);
     return response.data;
   }
 
@@ -161,6 +162,7 @@ class DevERPService {
       );
       if (tableCheckResult[0].rows.length > 0) {
         const activeAccount = await getActiveAccount(db);
+        console.log("🚀 ~ DevERPService ~ getAuth ~ activeAccount-*-*-*-*-*-*-*-*-*-*-*-*-*--/////////:", activeAccount)
         if (activeAccount) {
           const updatedUser = {
             ...activeAccount.user,
