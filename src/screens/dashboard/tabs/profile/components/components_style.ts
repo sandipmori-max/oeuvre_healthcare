@@ -39,8 +39,8 @@ export const styles = StyleSheet.create({
   },
   accountItem: {
     backgroundColor: ERP_COLOR_CODE.ERP_WHITE,
-    borderRadius: 12,
-    padding: 15,
+    borderRadius: 4,
+    padding: 16,
     marginBottom: 12,
     borderWidth: 1,
     borderColor: 'transparent',
@@ -66,7 +66,6 @@ export const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: '#333',
-    marginBottom: 4,
   },
   accountEmail: {
     fontSize: 14,

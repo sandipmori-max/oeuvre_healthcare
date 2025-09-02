@@ -28,75 +28,75 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
           source={{ uri: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=600' }}
           style={styles.profileImage}
         />
-       <>
-        <View style={{height:25, width: 100,}}></View>
-        <Text style={[styles.username,{top: 8} ]}>{firstLetterUpperCase(user?.name || '')}</Text>
-        <View style={{height:2, width: 100,}}></View>
-      
-        <View
-          style={{
-            top: 18,
-            width: '100%',
-            marginVertical: 8,
-            flexDirection: 'row',
-            alignContent: 'center',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-          }}
-        >
+        <>
+          <View style={{ height: 25, width: 100 }}></View>
+          <Text style={[styles.username, { top: 8 }]}>
+            {firstLetterUpperCase(user?.name || '')}
+          </Text>
+          <View style={{ height: 2, width: 100 }}></View>
+
           <View
             style={{
-              width: '28%',
+              top: 18,
+              width: '100%',
+              marginVertical: 8,
+              flexDirection: 'row',
               alignContent: 'center',
               alignItems: 'center',
               justifyContent: 'space-between',
-               borderRadius: 8,
-              borderWidth: 1,
-              borderColor: '#ccc',
-              padding: 6
             }}
           >
-            <MaterialIcons name={'call'} color={'white'} size={14} />
-            <Text style={styles.userPhone}>{user?.mobileno || ''}</Text>
+            <View
+              style={{
+                width: '28%',
+                alignContent: 'center',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                borderRadius: 8,
+                borderWidth: 0.6,
+                borderColor: '#ccc',
+                padding: 6,
+              }}
+            >
+              <MaterialIcons name={'call'} color={'white'} size={14} />
+              <Text style={styles.userPhone}>{user?.mobileno || ''}</Text>
+            </View>
+            <View
+              style={{
+                width: '38%',
+                alignContent: 'center',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                borderRadius: 8,
+                borderWidth: 0.6,
+                borderColor: '#ccc',
+                padding: 6,
+              }}
+            >
+              <MaterialIcons name={'mail-outline'} color={'white'} size={14} />
+
+              <Text numberOfLines={1} style={styles.userPhone}>
+                {user?.emailid || ''}
+              </Text>
+            </View>
+            <View
+              style={{
+                width: '28%',
+                alignContent: 'center',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                borderRadius: 8,
+                borderWidth: 0.6,
+                borderColor: '#ccc',
+                padding: 6,
+              }}
+            >
+              <MaterialIcons name={'person'} color={'white'} size={14} />
+
+              <Text style={styles.userPhone}>{user?.rolename || ''}</Text>
+            </View>
           </View>
-          <View
-            style={{
-              width: '38%',
-              alignContent: 'center',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              borderRadius: 8,
-              borderWidth: 1,
-              borderColor: '#ccc',
-                            padding: 6
-
-            }}
-          >
-            <MaterialIcons name={'mail-outline'} color={'white'} size={14} />
-
-            <Text 
-            numberOfLines={1}
-            style={styles.userPhone}>{user?.emailid || ''}</Text>
-          </View>
-          <View
-            style={{
-              width: '28%',
-              alignContent: 'center',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-               borderRadius: 8,
-              borderWidth: 1,
-              borderColor: '#ccc',
-                            padding: 6
-
-            }}
-          >
-            <MaterialIcons name={'person'} color={'white'} size={14} />
-
-            <Text style={styles.userPhone}>{user?.rolename || ''}</Text>
-          </View>
-        </View>
-        <View style={{height:15, width: 100,}}></View>
+          <View style={{ height: 15, width: 100 }}></View>
         </>
       </View>
 
