@@ -11,6 +11,7 @@ import {
 } from '../../../utils/sqlite';
 import { Account, User } from './type';
 import { DevERPService } from '../../../services/api';
+import { isTokenValid } from '../../../utils/helpers';
 
 export const checkAuthStateThunk = createAsyncThunk(
   'auth/checkAuthState',
@@ -76,6 +77,7 @@ export const loginUserThunk = createAsyncThunk(
       const tokenValidTill = isAddingAccount
         ? newvalidTill
         : await AsyncStorage.getItem('erp_token_valid_till');
+      console.log("🚀-🚀-🚀-🚀-🚀-🚀-v-v-🚀-🚀-🚀-🚀-🚀-🚀-🚀-🚀 ~ tokenValidTill:", tokenValidTill)
 
       if (!token) {
         return rejectWithValue('No authentication token found. Please login again.');
@@ -155,16 +157,23 @@ export const switchAccountThunk = createAsyncThunk(
     try {
       const db = await getDBConnection();
       await createAccountsTable(db);
+      const accounts1 = await getAccounts(db);
+
+      console.log("🚀 ~ accounts before updated ------------------- updates:", accounts1)
+
       await updateAccountActive(db, accountId);
       const accounts = await getAccounts(db);
+      console.log("🚀 ~ accounts ------------------------------after updates:", accounts)
       const targetAccount = accounts?.find((acc: Account) => acc?.id === accountId);
-      console.log("🚀 ~ targetAccount:", targetAccount)
+      console.log("🚀 ~ */////////////////////////////////////targetAccount:", targetAccount)
+            await AsyncStorage.setItem('erp_token', targetAccount?.user?.token || '');
+            await AsyncStorage.setItem('auth_token', targetAccount?.user?.token || '');
       DevERPService.setToken(targetAccount?.user?.token)
       if (!targetAccount) {
         return rejectWithValue('Account not found');
       }
 
-      if (targetAccount?.user?.token) {
+       if (targetAccount?.user?.token) {
         const tokenValidTill = targetAccount.user.tokenValidTill;
         if (tokenValidTill) {
           const validTill = new Date(tokenValidTill);
@@ -179,6 +188,8 @@ export const switchAccountThunk = createAsyncThunk(
       }
 
       return rejectWithValue('Account token expired. Please login again.');
+   
+
     } catch (error) {
       console.error('Error switching account:', error);
       return rejectWithValue('Failed to switch account');

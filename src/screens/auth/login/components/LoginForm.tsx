@@ -52,7 +52,6 @@ const LoginForm: React.FC<LoginFormProps> = ({
       const currentFcmToken = fcmToken || (await getMessaging().getToken());
       console.log("🚀 ~ handleLoginSubmit ~ bottom:--------")
 
-      const appId = generateGUID();
       DevERPService.setAppId(generateGUID());
       DevERPService.setDevice(deviceId);
 
@@ -60,7 +59,6 @@ const LoginForm: React.FC<LoginFormProps> = ({
         DevERPService.loginToERP({
           user: values.user,
           pass: values.password,
-          appid: appId,
           firebaseid: currentFcmToken || '',
         }),
       );

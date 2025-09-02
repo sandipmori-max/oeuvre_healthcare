@@ -68,7 +68,14 @@ const authSlice = createSlice({
       .addCase(checkAuthStateThunk.fulfilled, (state, action) => {
         state.isLoading = false;
         if (action.payload) {
+          if (action?.payload?.accounts) {
           state.accounts = action?.payload?.accounts;
+        } else {
+          state.accounts = state?.accounts.map(acc => ({
+            ...acc,
+            isActive: acc?.id === action?.payload?.accountId,
+          }));
+        }
           state.activeAccountId = action?.payload?.activeAccountId;
           state.user = action?.payload?.user;
           state.activeToken = action?.payload?.user?.token || null;
@@ -115,16 +122,25 @@ const authSlice = createSlice({
         state.isLoading = true;
       })
       .addCase(switchAccountThunk.fulfilled, (state, action) => {
-        console.log("🚀 ~ action:---------->>>>>>>>>>>>>>>>>----------", action?.payload)
+        console.log("🚀 ~ action:---------->>>>>>>>🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀>>>>>>>>>----------", action?.payload)
         state.isLoading = false;
         state.user = action?.payload?.user;
         state.activeAccountId = action?.payload?.accountId;
-        state.accounts = action?.payload?.accounts;
+        if (action?.payload?.accounts) {
+          state.accounts = action?.payload?.accounts;
+        } else {
+          state.accounts = state?.accounts.map(acc => ({
+            ...acc,
+            isActive: acc?.id === action?.payload?.accountId,
+          }));
+        }
         state.activeToken = action?.payload?.user?.token || null;
 
         state.error = null;
       })
       .addCase(switchAccountThunk.rejected, (state, action) => {
+        console.log("🚀 ~ action:- REJECTED--------->>>>>>>>🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀>>>>>>>>>----------", action?.payload)
+
         state.isLoading = false;
         state.error = action?.payload as string;
       })
@@ -134,7 +150,14 @@ const authSlice = createSlice({
       })
       .addCase(removeAccountThunk.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.accounts = action?.payload?.accounts;
+        if (action?.payload?.accounts) {
+          state.accounts = action?.payload?.accounts;
+        } else {
+          state.accounts = state?.accounts.map(acc => ({
+            ...acc,
+            isActive: acc?.id === action?.payload?.accountId,
+          }));
+        }
         state.user = action?.payload?.user;
         state.activeAccountId = action?.payload?.activeAccountId;
         state.isAuthenticated = !!action?.payload?.user;

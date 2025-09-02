@@ -24,7 +24,7 @@ export const getDBConnection = async () => {
 const ERP_QUERY_ACCOUNTS_TABLE_CREATE = `CREATE TABLE IF NOT EXISTS ${ERP_TABLE.ERP_ACCOUNTS} (
       id TEXT PRIMARY KEY NOT NULL,
       user_json TEXT NOT NULL,
-      isActive INTEGER,
+      isActive TEXT,
       lastLoginAt TEXT
     );`;
 
@@ -84,32 +84,65 @@ export const insertAccount = async (db, account) => {
 
 export const updateAccountActive = async (db, accountId) => {
   try {
-    console.log('🔍 updateAccountActive ----------- --- - - - - - -called with accountId:', accountId);
-    await db.executeSql(`UPDATE ${ERP_TABLE.ERP_ACCOUNTS} SET isActive = 0`);
+    console.log('🔍 updateAccountActive called with accountId:', accountId);
+
     const currentTime = new Date().toISOString();
-    console.log('🔍 Setting lastLoginAt to:', currentTime, 'type:', typeof currentTime);
+
     await db.executeSql(
-      `UPDATE ${ERP_TABLE.ERP_ACCOUNTS} SET isActive = 1, lastLoginAt = ? WHERE id = ?`,
-      [currentTime, accountId],
+      `UPDATE ${ERP_TABLE.ERP_ACCOUNTS}
+       SET isActive = CASE WHEN id = ? THEN 1 ELSE 0 END,
+           lastLoginAt = CASE WHEN id = ? THEN ? ELSE lastLoginAt END`,
+      [accountId, accountId, currentTime],
     );
+
     console.log('🔍 updateAccountActive completed successfully');
 
     const checkResult = await db.executeSql(
-      `SELECT lastLoginAt FROM ${ERP_TABLE.ERP_ACCOUNTS} WHERE id = ?`,
-      [accountId],
+      `SELECT id, isActive, lastLoginAt FROM ${ERP_TABLE.ERP_ACCOUNTS}`,
     );
-    if (checkResult[0].rows.length > 0) {
-      const updatedRow = checkResult[0].rows.item(0);
-      console.log('🔍 updateAccountActive - verified update:', {
-        accountId,
-        lastLoginAt: updatedRow.lastLoginAt,
-        lastLoginAtType: typeof updatedRow.lastLoginAt,
-      });
+    for (let i = 0; i < checkResult[0].rows.length; i++) {
+      console.log('🔍 Row after update:', checkResult[0].rows.item(i));
     }
   } catch (error) {
     console.error('Error updateAccountActive:', error);
   }
 };
+
+
+
+// export const updateAccountActive = async (db, accountId) => {
+//   try {
+//     console.log(
+//       '🔍 updateAccountActive ----------- --- - - - - - -called with accountId:',
+//       accountId,
+//     );
+//     const currentTime = new Date().toISOString();
+//     console.log('🔍 Setting lastLoginAt to:', currentTime, 'type:', typeof currentTime);
+//     await db.executeSql(
+//       `UPDATE ${ERP_TABLE.ERP_ACCOUNTS}
+//    SET isActive = CASE WHEN id = ? THEN 1 ELSE 0 END,
+//        lastLoginAt = CASE WHEN id = ? THEN ? ELSE lastLoginAt END`,
+//       [accountId, accountId, currentTime],
+//     );
+
+//     console.log('🔍 updateAccountActive completed successfully');
+
+//     const checkResult = await db.executeSql(
+//       `SELECT lastLoginAt FROM ${ERP_TABLE.ERP_ACCOUNTS} WHERE id = ?`,
+//       [accountId],
+//     );
+//     if (checkResult[0].rows.length > 0) {
+//       const updatedRow = checkResult[0].rows.item(0);
+//       console.log('🔍 updateAccountActive - verified update:', {
+//         accountId,
+//         lastLoginAt: updatedRow.lastLoginAt,
+//         lastLoginAtType: typeof updatedRow.lastLoginAt,
+//       });
+//     }
+//   } catch (error) {
+//     console.error('Error updateAccountActive:', error);
+//   }
+// };
 
 export const getAccounts = async db => {
   try {

@@ -9,6 +9,7 @@ import { DevERPService } from '../../../../../services/api';
 import CustomAlert from '../../../../../components/alert/CustomAlert';
 import { ERP_ICON } from '../../../../../assets';
 import { useApi } from '../../../../../hooks/useApi';
+import { isTokenValid } from '../../../../../utils/helpers';
 
 interface AccountSwitcherProps {
   visible: boolean;
@@ -21,7 +22,7 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
   const { execute: validateCompanyCode } = useApi();
 
   const { accounts, activeAccountId } = useAppSelector(state => state.auth);
-  console.log('🚀 ~ AccountSwitcher ~ activeAccountId:----------------', activeAccountId);
+  console.log('🚀 ~ AccountSwitcher ~ accounts:----------------', accounts);
   const [alertVisible, setAlertVisible] = useState(false);
   const [selectedAccount, setSelectedAccount] = useState<any>(null);
   const [alertConfig, setAlertConfig] = useState({
@@ -66,19 +67,23 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
       <TouchableOpacity
         style={[styles.accountItem, isActive && styles.activeAccount]}
         onPress={async () => {
-          console.log('🚀 ~ item:', item?.user?.token);
-          if (new Date(item?.user?.tokenValidTill) > new Date()) {
+          
+          if (isTokenValid(item?.user?.tokenValidTill)) {
+              console.log('🚀 ~ item:', "IF ________________________________________ CALLED", item);
             await DevERPService.setToken(item?.user?.token || '');
             await AsyncStorage.setItem('erp_token', item?.user?.token || '');
             await AsyncStorage.setItem('auth_token', item?.user?.token || '');
             const validation = await validateCompanyCode(() =>
               DevERPService.validateCompanyCode(item?.user?.company_code),
             );
+            console.log("🚀 ~ validation:", validation)
             if (!validation?.isValid) {
               return;
             }
             handleSwitchAccount(item?.id);
           } else {
+          console.log('🚀 ~ item:', "ELESPART ________________________________________ CALLED", item);
+
             const validation = await validateCompanyCode(() =>
               DevERPService.validateCompanyCode(item?.user?.company_code),
             );
@@ -103,7 +108,6 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
               {item?.user?.company_code}
             </Text>
             <Text style={styles.lastLogin}>Last login: {lastLogin}</Text>
-            <Text style={styles.lastLogin}>token: {item?.user?.token}</Text>
           </View>
           {isActive && (
             <View style={styles.activeIndicator}>

@@ -107,11 +107,8 @@ const RootNavigator = () => {
 
           try {
             const location = await getCurrentLocation();
-
-            const validAccounts = accounts.filter(u => isTokenValid(u?.user?.tokenValidTill || ''));
-
-            if (validAccounts.length > 0) {
-              for (const acc of validAccounts) {
+            if (accounts.length > 0) {
+              for (const acc of accounts) {
                 await dispatch(
                   syncLocationThunk({
                     token: acc?.user?.token || '',

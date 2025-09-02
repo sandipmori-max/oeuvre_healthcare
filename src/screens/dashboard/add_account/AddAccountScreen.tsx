@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -25,6 +25,7 @@ import { generateGUID } from '../../../utils/helpers';
 import { getMessaging } from '@react-native-firebase/messaging';
 import useFcmToken from '../../../hooks/useFcmToken';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import DeviceInfo from 'react-native-device-info';
 
 const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose }) => {
   const dispatch = useAppDispatch();
@@ -32,8 +33,21 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
   const { execute: validateCompanyCode, execute: loginWithERP } = useApi();
   const { accounts } = useAppSelector(state => state.auth);
   const { token: fcmToken } = useFcmToken();
+  const [deviceId, setDeviceId] = useState<string>('');
 
   const appId = generateGUID();
+
+
+   useEffect(() => {
+    const fetchDeviceName = async () => {
+      const name = await DeviceInfo.getDeviceName();
+      console.log('Device Name:', name);
+      setDeviceId(name);
+    };
+
+    fetchDeviceName();
+  }, []);
+
 
   const [alertVisible, setAlertVisible] = useState(false);
   const [loader, setLoader] = useState(false);
@@ -53,6 +67,8 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
     password: string;
   }) => {
     try {
+            DevERPService.setDevice(deviceId);
+      
       setLoader(true);
       const userExists = accounts?.some(acc => acc?.user.name === values.user);
       if (userExists) {
@@ -79,6 +95,7 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
           firebaseid: currentFcmToken,
         }),
       );
+      console.log("🚀0🚀0🚀0🚀0🚀00🚀🚀0🚀0🚀0🚀0🚀00🚀🚀0🚀0🚀0🚀0🚀0🚀0🚀v0🚀0🚀 ~ handleAddAccount ~ loginResult:", loginResult)
 
       if (!loginResult || loginResult?.success !== 1) {
         setAlertConfig({
@@ -97,7 +114,7 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
       dispatch(
         loginUserThunk({
           newToken: loginResult?.token,
-          newvalidTill: loginResult?.validTill,
+          newvalidTill: loginResult?.validtill,
           company_code: values.company_code,
           password: values.password,
           isAddingAccount: true,
