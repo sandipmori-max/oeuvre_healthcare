@@ -84,7 +84,7 @@ export const insertAccount = async (db, account) => {
 
 export const updateAccountActive = async (db, accountId) => {
   try {
-    console.log('🔍 updateAccountActive called with accountId:', accountId);
+    console.log('🔍 updateAccountActive ----------- --- - - - - - -called with accountId:', accountId);
     await db.executeSql(`UPDATE ${ERP_TABLE.ERP_ACCOUNTS} SET isActive = 0`);
     const currentTime = new Date().toISOString();
     console.log('🔍 Setting lastLoginAt to:', currentTime, 'type:', typeof currentTime);

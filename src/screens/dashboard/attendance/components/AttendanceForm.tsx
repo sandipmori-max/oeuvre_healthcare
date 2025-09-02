@@ -37,11 +37,14 @@ const AttendanceForm = ({ setBlockAction }: any) => {
     type: 'info' as 'error' | 'success' | 'info',
   });
 
+  const [resData, setResData] = useState<any>();
+
   useEffect(() => {
     dispatch(getLastPunchInThunk())
       .unwrap()
       .then(res => {
         console.log('✅ Last Punch-In Response:', res);
+        setResData(res);
       })
       .catch(err => {
         console.log('❌ Error fetching last punch-in:', err);
@@ -72,7 +75,7 @@ const AttendanceForm = ({ setBlockAction }: any) => {
         console.log('🚀 ~ openCamera ~ photoUri:', photoUri);
 
         if (asset?.base64) {
-          setFieldValue('imageBase64', `punchIn.jpeg; data:${asset.type};base64,${asset.base64}`);
+          setFieldValue('imageBase64', `${resData?.success === 1 || resData?.success === '1' ? 'punchOut.jpeg': 'punchIn.jpeg'}; data:${asset.type};base64,${asset.base64}`);
         }
         setStatusImage(photoUri);
 
@@ -157,7 +160,14 @@ const AttendanceForm = ({ setBlockAction }: any) => {
           imageBase64: Yup.string().required('Image required'),
         })}
         onSubmit={values => {
-          dispatch(markAttendanceThunk({ rawData: values, type: true, user }))
+          dispatch(
+            markAttendanceThunk({
+              rawData: values,
+              type: resData?.success === 1 || resData?.success === '1' ? false : true,
+              user,
+              id: resData?.success === 1 || resData?.success === '1' ? resData?.id : '0'
+            }),
+          )
             .unwrap()
             .then(res => {
               console.log('✅ API Success:', res);
@@ -266,10 +276,9 @@ const AttendanceForm = ({ setBlockAction }: any) => {
                     <>
                       {' '}
                       <Text style={styles.statusText}>
-                        {t('attendance.checkIn')}
-                        {/* {users.status === 'checkin'
-                          ? t('attendance.checkOut')
-                          : t('attendance.checkIn')} */}
+                        {resData?.success === 1 || resData?.success === '1'
+                          ? `${t('attendance.checkOut')}`
+                          : `${t('attendance.checkIn')}`}
                       </Text>
                     </>
                   )}

@@ -206,15 +206,16 @@ class DevERPService {
     }).then(res => JSON.stringify({ data: res.data, config: res.config || [] }));
   }
 
-  markAttendance(rawData: any, isPunchIn: boolean, user: any) {
+  markAttendance(rawData: any, isPunchIn: boolean, user: any, id: any) {
     const pageType = isPunchIn ? 'punchin' : 'punchout';
     const punchOutData = {
-      id: user.id,
+      id: id,
       employeeid: user.id,
       outimage: rawData.imageBase64,
       outremarks: rawData?.remark || '',
       outlocation: `${rawData?.latitude},${rawData?.longitude}`,
     };
+    console.log("🚀 ~ DevERPService ~ markAttendance ~ punchOutData:", punchOutData)
 
     const punchInData = {
       id: '0',
@@ -228,7 +229,7 @@ class DevERPService {
       JSON.stringify(isPunchIn ? punchInData : punchOutData),
     );
 
-    return this.apiCall<AttendanceResponse>(`msp_api.aspx/savePage`, {
+    return this.apiCall<AttendanceResponse>(`msp_api.aspx/pageSave`, {
       token: this.token,
       page: pageType,
       data: JSON.stringify(isPunchIn ? punchInData : punchOutData),
@@ -265,6 +266,7 @@ class DevERPService {
   }
 
    async syncLocation(token: string, location: string) {
+    console.log("🚀 ~ DevERPService ~ syncLocation ---------++++++-----++++++~ token:", token)
     return this.apiCall<any>(`msp_api.aspx/syncLocation`, {
       token: token,
       location: location

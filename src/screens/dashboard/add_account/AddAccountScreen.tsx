@@ -24,6 +24,7 @@ import CustomAlert from '../../../components/alert/CustomAlert';
 import { generateGUID } from '../../../utils/helpers';
 import { getMessaging } from '@react-native-firebase/messaging';
 import useFcmToken from '../../../hooks/useFcmToken';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose }) => {
   const dispatch = useAppDispatch();
@@ -75,7 +76,6 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
         DevERPService.loginToERP({
           user: values.user,
           pass: values.password,
-          appid: appId,
           firebaseid: currentFcmToken,
         }),
       );
@@ -90,7 +90,10 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
         return;
       }
 
-      await DevERPService.getAuth(true);
+      await DevERPService.getAuth();
+      await DevERPService.setToken(loginResult?.token);
+      await AsyncStorage.setItem('erp_token', loginResult?.token || '');
+      await AsyncStorage.setItem('auth_token', loginResult?.token || '');
       dispatch(
         loginUserThunk({
           newToken: loginResult?.token,

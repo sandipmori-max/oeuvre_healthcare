@@ -115,6 +115,7 @@ const authSlice = createSlice({
         state.isLoading = true;
       })
       .addCase(switchAccountThunk.fulfilled, (state, action) => {
+        console.log("🚀 ~ action:---------->>>>>>>>>>>>>>>>>----------", action?.payload)
         state.isLoading = false;
         state.user = action?.payload?.user;
         state.activeAccountId = action?.payload?.accountId;
