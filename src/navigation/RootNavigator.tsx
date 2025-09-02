@@ -98,46 +98,51 @@ const RootNavigator = () => {
       setModalClose(enabled);
       setLocationEnabled(enabled);
 
-      if (enabled) {
-        setHasSyncedDisabledLocation(false);
+      if (isAuthenticated) {
+        if (enabled) {
+          setHasSyncedDisabledLocation(false);
 
-        const hasPermission = await requestLocationPermission();
-        if (!hasPermission) return;
+          const hasPermission = await requestLocationPermission();
+          if (!hasPermission) return;
 
-        try {
-          const location = await getCurrentLocation();
-          console.log('📍 Current Location:', location);
+          try {
+            const location = await getCurrentLocation();
 
-          accounts.forEach(u => {
-            if (isTokenValid(u?.user?.tokenValidTill || '')) {
-              dispatch(
-                syncLocationThunk({
-                  token: u?.user?.token || '',
-                  location,
-                }),
-              );
+            const validAccounts = accounts.filter(u => isTokenValid(u?.user?.tokenValidTill || ''));
+
+            if (validAccounts.length > 0) {
+              for (const acc of validAccounts) {
+                await dispatch(
+                  syncLocationThunk({
+                    token: acc?.user?.token || '',
+                    location,
+                  }),
+                );
+              }
+            } else {
+              console.log('⚠️ No valid token found');
             }
-          });
-        } catch (err) {
-          console.log('Location fetch error:', err);
-        }
-      } else {
-        if (!hasSyncedDisabledLocation) {
-          console.log('📍 Location is disabled - syncing once');
-          const location = 'disabled';
+          } catch (err) {
+            console.log('Location fetch error:', err);
+          }
+        } else {
+          if (!hasSyncedDisabledLocation) {
+            console.log('📍 Location is disabled - syncing once');
+            const location = 'disabled';
 
-          accounts.forEach(u => {
-            if (isTokenValid(u?.user?.tokenValidTill || '')) {
-              dispatch(
-                syncLocationThunk({
-                  token: u?.user?.token || '',
-                  location,
-                }),
-              );
-            }
-          });
+            accounts.forEach(u => {
+              if (isTokenValid(u?.user?.tokenValidTill || '')) {
+                dispatch(
+                  syncLocationThunk({
+                    token: u?.user?.token || '',
+                    location,
+                  }),
+                );
+              }
+            });
 
-          setHasSyncedDisabledLocation(true); 
+            setHasSyncedDisabledLocation(true);
+          }
         }
       }
     };

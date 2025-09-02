@@ -3,13 +3,13 @@ import { DevERPService, AttendanceResponse } from '../../../services/api';
 
 export const markAttendanceThunk = createAsyncThunk<
   AttendanceResponse, 
-  { type: any,  rawData: any, user: any }, 
+  { type: any,  rawData: any, user: any, id: any }, 
   { rejectValue: string }  
 >(
   'attendance/markAttendance',
-  async ({  rawData , type, user}, { rejectWithValue }) => {
+  async ({  rawData , type, user, id}, { rejectWithValue }) => {
     try {
-      const response = await DevERPService.markAttendance(rawData, type, user);
+      const response = await DevERPService.markAttendance(rawData, type, user, id);
       return response;
     } catch (error: any) {
       return rejectWithValue(error?.message || 'Failed to mark attendance');

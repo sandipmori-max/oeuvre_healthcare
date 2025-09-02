@@ -3,11 +3,11 @@ import { ERP_COLOR_CODE } from '../../utils/constants';
 
 export const styles = StyleSheet.create({
   header: {
+    top: 60,
     padding: 20,
     alignItems: 'center',
     backgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR,
-    borderTopRightRadius: 48,
-    borderBottomLeftRadius: 48,
+    borderRadius: 8
   },
   profileImage: {
     width: 80,
@@ -16,6 +16,8 @@ export const styles = StyleSheet.create({
     marginBottom: 10,
     backgroundColor: '#fff',
     borderWidth: 2,
+    top: -40,
+    position:'absolute',
     borderColor: '#fff'
   },
   username: {
@@ -23,12 +25,18 @@ export const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
   },
+
   userPhone: {
+    color: '#fff',
+    fontSize: 10,
+  },
+  emailid:{
     color: '#fff',
   },
   menuContainer: {
     flex: 1,
     paddingTop: 10,
+    top: 60
   },
   itemRow: {
     flexDirection: 'row',
@@ -71,4 +79,5 @@ export const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: ERP_COLOR_CODE.ERP_APP_COLOR,
   },
+  
 });

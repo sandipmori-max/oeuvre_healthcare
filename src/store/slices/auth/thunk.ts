@@ -72,6 +72,7 @@ export const loginUserThunk = createAsyncThunk(
       console.log("🚀 ~ response:*-*-*-*-*-*-*-", response)
     try { 
       const token = isAddingAccount ? newToken : await AsyncStorage.getItem('erp_token');
+      console.log("🚀 ~ token---------------------------------------------------------------:", token)
       const tokenValidTill = isAddingAccount
         ? newvalidTill
         : await AsyncStorage.getItem('erp_token_valid_till');
@@ -95,6 +96,7 @@ export const loginUserThunk = createAsyncThunk(
         accountType: 'erp',
         token: token,
         tokenValidTill: tokenValidTill,
+        emailid: response?.emailid || '',
         fullname: response?.fullname,
         mobileno: response?.mobileno,
         roleid: response?.roleid,
@@ -149,12 +151,15 @@ export const loginUserThunk = createAsyncThunk(
 export const switchAccountThunk = createAsyncThunk(
   'auth/switchAccount',
   async (accountId: string, { rejectWithValue }) => {
+    console.log("🚀 ~ accountId:", accountId)
     try {
       const db = await getDBConnection();
       await createAccountsTable(db);
       await updateAccountActive(db, accountId);
       const accounts = await getAccounts(db);
       const targetAccount = accounts?.find((acc: Account) => acc?.id === accountId);
+      console.log("🚀 ~ targetAccount:", targetAccount)
+      DevERPService.setToken(targetAccount?.user?.token)
       if (!targetAccount) {
         return rejectWithValue('Account not found');
       }

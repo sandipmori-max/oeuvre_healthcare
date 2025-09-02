@@ -18,10 +18,10 @@ interface AccountSwitcherProps {
 
 const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onAddAccount }) => {
   const dispatch = useAppDispatch();
-    const { execute: validateCompanyCode } = useApi();
-  
+  const { execute: validateCompanyCode } = useApi();
+
   const { accounts, activeAccountId } = useAppSelector(state => state.auth);
-  console.log("🚀 ~ AccountSwitcher ~ activeAccountId:", activeAccountId)
+  console.log('🚀 ~ AccountSwitcher ~ activeAccountId:----------------', activeAccountId);
   const [alertVisible, setAlertVisible] = useState(false);
   const [selectedAccount, setSelectedAccount] = useState<any>(null);
   const [alertConfig, setAlertConfig] = useState({
@@ -58,39 +58,43 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
 
   const renderAccount = ({ item }: { item: Account }) => {
     const isActive = item?.id.toString() === activeAccountId?.toString();
-    console.log("🚀 ~ renderAccount ~ item:", item)
-    console.log("🚀 ~ renderAccount ~ isActive:", isActive)
+    console.log('🚀 ~ renderAccount ~ item:', item);
+    console.log('🚀 ~ renderAccount ~ isActive:', isActive);
     const lastLogin = new Date(item?.lastLoginAt).toLocaleDateString();
 
     return (
       <TouchableOpacity
         style={[styles.accountItem, isActive && styles.activeAccount]}
         onPress={async () => {
+          console.log('🚀 ~ item:', item?.user?.token);
           if (new Date(item?.user?.tokenValidTill) > new Date()) {
+            await DevERPService.setToken(item?.user?.token || '');
             await AsyncStorage.setItem('erp_token', item?.user?.token || '');
             await AsyncStorage.setItem('auth_token', item?.user?.token || '');
-            DevERPService.setToken(item?.user?.token || '');
-             const validation = await validateCompanyCode(() =>
-                    DevERPService.validateCompanyCode(item?.user?.company_code),
-                  );
-                  if (!validation?.isValid) {
-                    return;
-                  }
+            const validation = await validateCompanyCode(() =>
+              DevERPService.validateCompanyCode(item?.user?.company_code),
+            );
+            if (!validation?.isValid) {
+              return;
+            }
             handleSwitchAccount(item?.id);
           } else {
-             const validation = await validateCompanyCode(() =>
-                    DevERPService.validateCompanyCode(item?.user?.company_code),
-                  );
-                  if (!validation?.isValid) {
-                    return;
-                  }
-            await DevERPService.getAuth(true);
+            const validation = await validateCompanyCode(() =>
+              DevERPService.validateCompanyCode(item?.user?.company_code),
+            );
+            if (!validation?.isValid) {
+              return;
+            }
+            await DevERPService.getAuth();
             handleSwitchAccount(item?.id);
           }
         }}
       >
         <View style={styles.accountContent}>
-          <Image source={{ uri: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=600' }} style={styles.avatar} />
+          <Image
+            source={{ uri: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=600' }}
+            style={styles.avatar}
+          />
           <View style={styles.accountInfo}>
             <Text style={[styles.accountName, isActive && styles.activeText]}>
               {item?.user?.name.charAt(0).toUpperCase() + item?.user?.name.slice(1)}
@@ -99,6 +103,7 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
               {item?.user?.company_code}
             </Text>
             <Text style={styles.lastLogin}>Last login: {lastLogin}</Text>
+            <Text style={styles.lastLogin}>token: {item?.user?.token}</Text>
           </View>
           {isActive && (
             <View style={styles.activeIndicator}>
@@ -151,10 +156,11 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
         onCancel={() => setAlertVisible(false)}
         onDone={() => {
           handleRemovedAccount(selectedAccount);
-        } }
-        doneText='Remove'
-        color='red'
-        actionLoader={undefined}      />
+        }}
+        doneText="Remove"
+        color="red"
+        actionLoader={undefined}
+      />
     </Modal>
   );
 };
