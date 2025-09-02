@@ -47,7 +47,10 @@ class DevERPService {
 
   private async apiCall<T>(endpoint: string, payload: any): Promise<T> {
     try {
-      console.log('🚀 ~ DevERPService ~ apiCall ~ payload--------------------:', `${this.link}${endpoint}`);
+      console.log(
+        '🚀 ~ DevERPService ~ apiCall ~ payload--------------------:',
+        `${this.link}${endpoint}`,
+      );
       await this.checkNetwork();
       await this.ensureAuthToken();
 
@@ -79,7 +82,7 @@ class DevERPService {
     const response = await apiClient.post<DevERPResponse>(`${this.baseUrl}/appcode.aspx/getLink`, {
       code,
     });
-    console.log("🚀 ~ DevERPService ~ getAppLink ~ response:", response)
+    console.log('🚀 ~ DevERPService ~ getAppLink ~ response:', response);
 
     if (response.data.success === 1 && response.data.link) {
       if (response.data.link.startsWith('https://')) {
@@ -91,10 +94,13 @@ class DevERPService {
   }
 
   async validateCompanyCode(code: string) {
-    console.log("🚀🚀🚀🚀🚀🚀🚀 ~ DevERPService ~ validateCompanyCode ~ code:----------------------------------", code)
+    console.log(
+      '🚀🚀🚀🚀🚀🚀🚀 ~ DevERPService ~ validateCompanyCode ~ code:----------------------------------',
+      code,
+    );
     try {
       const response = await this.getAppLink(code);
-      console.log("🚀 ~ DevERPService ~ validateCompanyCode ~ response:", response)
+      console.log('🚀 ~ DevERPService ~ validateCompanyCode ~ response:', response);
       return response.success === 1
         ? {
             isValid: true,
@@ -125,7 +131,7 @@ class DevERPService {
       firebaseid: credentials.firebaseid || '',
       device: this.device,
     };
-    console.log("🚀 ~ DevERPService ~ loginToERP ~ loginData---------:", loginData)
+    console.log('🚀 ~ DevERPService ~ loginToERP ~ loginData---------:', loginData);
 
     const response = await apiClient.post<LoginResponse>(
       `${this.link}msp_api.aspx/setAppID`,
@@ -162,7 +168,10 @@ class DevERPService {
       );
       if (tableCheckResult[0].rows.length > 0) {
         const activeAccount = await getActiveAccount(db);
-        console.log("🚀 ~ DevERPService ~ getAuth ~ activeAccount-*-*-*-*-*-*-*-*-*-*-*-*-*--/////////:", activeAccount)
+        console.log(
+          '🚀 ~ DevERPService ~ getAuth ~ activeAccount-*-*-*-*-*-*-*-*-*-*-*-*-*--/////////:',
+          activeAccount,
+        );
         if (activeAccount) {
           const updatedUser = {
             ...activeAccount.user,
@@ -217,7 +226,7 @@ class DevERPService {
       outremarks: rawData?.remark || '',
       outlocation: `${rawData?.latitude},${rawData?.longitude}`,
     };
-    console.log("🚀 ~ DevERPService ~ markAttendance ~ punchOutData:", punchOutData)
+    console.log('🚀 ~ DevERPService ~ markAttendance ~ punchOutData:', punchOutData);
 
     const punchInData = {
       id: '0',
@@ -255,7 +264,12 @@ class DevERPService {
   }
 
   getLastPunchIn() {
-    return this.apiCall<any>('msp_api.aspx/getLastPunchIn', { token: this.token});
+    console.log(
+      '🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀 ~ DevERPService ~ getLastPunchIn ~ getLastPunchIn:',
+      this.token,
+    );
+
+    return this.apiCall<any>('msp_api.aspx/getLastPunchIn', { token: this.token });
   }
 
   async handlePageAction(action: string, id: string, remarks: string, page: string) {
@@ -267,11 +281,11 @@ class DevERPService {
     });
   }
 
-   async syncLocation(token: string, location: string) {
-    console.log("🚀 ~ DevERPService ~ syncLocation ---------++++++-----++++++~ token:", token)
+  async syncLocation(token: string, location: string) {
+    console.log('🚀 ~ DevERPService ~ syncLocation ---------++++++-----++++++~ token:', token);
     return this.apiCall<any>(`msp_api.aspx/syncLocation`, {
       token: token,
-      location: location
+      location: location,
     });
   }
 

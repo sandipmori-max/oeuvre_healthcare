@@ -9,7 +9,13 @@ import { DevERPService } from '../../../../../services/api';
 import CustomAlert from '../../../../../components/alert/CustomAlert';
 import { ERP_ICON } from '../../../../../assets';
 import { useApi } from '../../../../../hooks/useApi';
-import { isTokenValid } from '../../../../../utils/helpers';
+import {
+  formatDateHr,
+  formatDateMonthDateYear,
+  formatTimeTo12Hour,
+  isTokenValid,
+} from '../../../../../utils/helpers';
+import MaterialIcons from '@react-native-vector-icons/material-icons';
 
 interface AccountSwitcherProps {
   visible: boolean;
@@ -61,28 +67,32 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
     const isActive = item?.id.toString() === activeAccountId?.toString();
     console.log('🚀 ~ renderAccount ~ item:', item);
     console.log('🚀 ~ renderAccount ~ isActive:', isActive);
-    const lastLogin = new Date(item?.lastLoginAt).toLocaleDateString();
+    const lastLogin = formatDateHr(item?.lastLoginAt, false);
+    const lastLoginHr = formatTimeTo12Hour(item?.lastLoginAt);
 
     return (
       <TouchableOpacity
         style={[styles.accountItem, isActive && styles.activeAccount]}
         onPress={async () => {
-          
           if (isTokenValid(item?.user?.tokenValidTill)) {
-              console.log('🚀 ~ item:', "IF ________________________________________ CALLED", item);
+            console.log('🚀 ~ item:', 'IF ________________________________________ CALLED', item);
             await DevERPService.setToken(item?.user?.token || '');
             await AsyncStorage.setItem('erp_token', item?.user?.token || '');
             await AsyncStorage.setItem('auth_token', item?.user?.token || '');
             const validation = await validateCompanyCode(() =>
               DevERPService.validateCompanyCode(item?.user?.company_code),
             );
-            console.log("🚀 ~ validation:", validation)
+            console.log('🚀 ~ validation:', validation);
             if (!validation?.isValid) {
               return;
             }
             handleSwitchAccount(item?.id);
           } else {
-          console.log('🚀 ~ item:', "ELESPART ________________________________________ CALLED", item);
+            console.log(
+              '🚀 ~ item:',
+              'ELESPART ________________________________________ CALLED',
+              item,
+            );
 
             const validation = await validateCompanyCode(() =>
               DevERPService.validateCompanyCode(item?.user?.company_code),
@@ -107,7 +117,42 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
             <Text style={[styles.accountEmail, isActive && styles.activeText]}>
               {item?.user?.company_code}
             </Text>
-            <Text style={styles.lastLogin}>Last login: {lastLogin}</Text>
+            <Text style={[styles.accountEmail, isActive && styles.activeText]}>
+              {item?.user?.token}
+            </Text>
+            <View
+              style={{
+                width: isActive ? '100%' : '80%',
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignContent: 'center',
+                alignItems: 'center',
+              }}
+            >
+              <View
+                style={{
+                  gap: 2,
+                  flexDirection: 'row',
+                  alignContent: 'center',
+                  alignItems: 'center',
+                }}
+              >
+                <MaterialIcons name={'date-range'} color={'#ccc'} size={18} />
+                <Text style={styles.lastLogin}> {lastLogin}</Text>
+              </View>
+
+              <View
+                style={{
+                  gap: 2,
+                  flexDirection: 'row',
+                  alignContent: 'center',
+                  alignItems: 'center',
+                }}
+              >
+                <MaterialIcons name={'access-alarm'} color={'#ccc'} size={18} />
+                <Text style={styles.lastLogin}>{lastLoginHr}</Text>
+              </View>
+            </View>
           </View>
           {isActive && (
             <View style={styles.activeIndicator}>
