@@ -205,6 +205,7 @@ const PageScreen = () => {
 
   const renderItem = useCallback(
     ({ item }: { item: any }) => {
+      console.log("🚀 ~ item:*-*-*-*-*-*--*-", item)
       const setValue = (val: any) => {
         setFormValues(prev => {
           if (typeof val === 'object' && val !== null) {
