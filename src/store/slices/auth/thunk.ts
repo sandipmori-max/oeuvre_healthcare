@@ -73,7 +73,7 @@ export const loginUserThunk = createAsyncThunk(
       console.log("🚀 ~ response:*-*-*-*-*-*-*-", response)
     try { 
       const token = isAddingAccount ? newToken : await AsyncStorage.getItem('erp_token');
-      console.log("🚀 ~ token---------------------------------------------------------------:", token)
+      console.log("🚀 ~ token---------------------*****************------------------------------------------:", token)
       const tokenValidTill = isAddingAccount
         ? newvalidTill
         : await AsyncStorage.getItem('erp_token_valid_till');

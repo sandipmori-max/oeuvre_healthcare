@@ -79,6 +79,7 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
             await DevERPService.setToken(item?.user?.token || '');
             await AsyncStorage.setItem('erp_token', item?.user?.token || '');
             await AsyncStorage.setItem('auth_token', item?.user?.token || '');
+            await AsyncStorage.setItem('erp_token_valid_till', item?.user?.token || '');
             const validation = await validateCompanyCode(() =>
               DevERPService.validateCompanyCode(item?.user?.company_code),
             );
@@ -117,9 +118,6 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
             <Text style={[styles.accountEmail, isActive && styles.activeText]}>
               {item?.user?.company_code}
             </Text>
-            <Text style={[styles.accountEmail, isActive && styles.activeText]}>
-              {item?.user?.token}
-            </Text>
             <View
               style={{
                 width: isActive ? '100%' : '80%',
@@ -137,7 +135,7 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
                   alignItems: 'center',
                 }}
               >
-                <MaterialIcons name={'date-range'} color={'#ccc'} size={18} />
+                <MaterialIcons name={'date-range'} color={'#000'} size={18} />
                 <Text style={styles.lastLogin}> {lastLogin}</Text>
               </View>
 
@@ -149,7 +147,7 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
                   alignItems: 'center',
                 }}
               >
-                <MaterialIcons name={'access-alarm'} color={'#ccc'} size={18} />
+                <MaterialIcons name={'access-alarm'} color={'#000'} size={18} />
                 <Text style={styles.lastLogin}>{lastLoginHr}</Text>
               </View>
             </View>

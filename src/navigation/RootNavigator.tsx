@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { PermissionsAndroid, Platform } from 'react-native';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { checkAuthStateThunk } from '../store/slices/auth/thunk';
@@ -11,6 +11,7 @@ import CustomAlert from '../components/alert/CustomAlert';
 import { isTokenValid } from '../utils/helpers';
 import { syncLocationThunk } from '../store/slices/location/thunk';
 import Geolocation from '@react-native-community/geolocation';
+
 const RootNavigator = () => {
   const dispatch = useAppDispatch();
   const { isLoading, isAuthenticated, accounts } = useAppSelector(state => state.auth);
@@ -25,6 +26,9 @@ const RootNavigator = () => {
   });
 
   const [hasSyncedDisabledLocation, setHasSyncedDisabledLocation] = useState(false);
+
+  // ✅ last synced location (reference point for API call)
+  const lastSyncedLocationRef = useRef<{ lat: number; lng: number } | null>(null);
 
   const requestLocationPermission = async () => {
     if (Platform.OS === 'android') {
@@ -41,17 +45,14 @@ const RootNavigator = () => {
     return true;
   };
 
-  const getCurrentLocation = (): Promise<string> => {
+  const getCurrentLocation = (): Promise<{ lat: number; lng: number }> => {
     return new Promise((resolve, reject) => {
       Geolocation.getCurrentPosition(
         position => {
           const { latitude, longitude } = position.coords;
-          resolve(`${latitude},${longitude}`);
+          resolve({ lat: latitude, lng: longitude });
         },
-        error => {
-          console.error('Location error', error);
-          reject(error);
-        },
+        error => reject(error),
         {
           enableHighAccuracy: false,
           timeout: 15000,
@@ -59,6 +60,23 @@ const RootNavigator = () => {
         },
       );
     });
+  };
+
+  // 📍 Distance calculator (Haversine formula)
+  const getDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
+    const R = 6371000; // Earth radius in meters
+    const toRad = (value: number) => (value * Math.PI) / 180;
+
+    const dLat = toRad(lat2 - lat1);
+    const dLon = toRad(lon2 - lon1);
+
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c; // distance in meters
   };
 
   useEffect(() => {
@@ -106,18 +124,38 @@ const RootNavigator = () => {
           if (!hasPermission) return;
 
           try {
-            const location = await getCurrentLocation();
+            const newLocation = await getCurrentLocation();
+            console.log("🚀 ~ checkLocation ~ newLocation:", newLocation)
+
+            if (lastSyncedLocationRef.current) {
+              const distance = getDistance(
+                lastSyncedLocationRef.current.lat,
+                lastSyncedLocationRef.current.lng,
+                newLocation.lat,
+                newLocation.lng,
+              );
+
+              console.log(`📏 Distance from last SYNC: ${distance.toFixed(2)}m`);
+
+              if (distance < 10) {
+                console.log("⏸ Skipping sync — not moved ≥10m from last sync");
+                return;
+              }
+            }
+
+            // ✅ Update last synced location
+            lastSyncedLocationRef.current = newLocation;
+
+            // Dispatch API only if user moved ≥ 10m from last sync
             if (accounts.length > 0) {
               for (const acc of accounts) {
                 await dispatch(
                   syncLocationThunk({
                     token: acc?.user?.token || '',
-                    location,
+                    location: `${newLocation.lat},${newLocation.lng}`,
                   }),
                 );
               }
-            } else {
-              console.log('⚠️ No valid token found');
             }
           } catch (err) {
             console.log('Location fetch error:', err);

@@ -111,6 +111,8 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
       await DevERPService.setToken(loginResult?.token);
       await AsyncStorage.setItem('erp_token', loginResult?.token || '');
       await AsyncStorage.setItem('auth_token', loginResult?.token || '');
+            await AsyncStorage.setItem('erp_token_valid_till', loginResult?.token || '')
+
       dispatch(
         loginUserThunk({
           newToken: loginResult?.token,
