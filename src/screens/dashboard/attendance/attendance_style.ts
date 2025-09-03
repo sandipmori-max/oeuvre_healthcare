@@ -1,4 +1,5 @@
 import { Dimensions, StyleSheet } from 'react-native';
+import { ERP_COLOR_CODE } from '../../../utils/constants';
 
 export const styles = StyleSheet.create({
   container: { flex: 1 },
@@ -36,7 +37,8 @@ export const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 8,
     padding: 16,
-    
+    borderWidth: 0.4,
+    borderColor: ERP_COLOR_CODE.ERP_APP_COLOR,
   },
   profileRow: {
     flexDirection: 'row',
@@ -100,8 +102,7 @@ export const styles = StyleSheet.create({
     marginTop: 6,
   },
   locationText: { fontSize: 12, color: '#666', marginTop: 6 },
-  loaderOverlay: { 
-   },
+  loaderOverlay: {},
   listSection: {
     paddingHorizontal: 16,
     marginTop: 32,
@@ -171,5 +172,4 @@ export const styles = StyleSheet.create({
     color: '#fff',
     marginBottom: 10,
   },
-  
 });

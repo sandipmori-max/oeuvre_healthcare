@@ -5,6 +5,7 @@ export const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: ERP_COLOR_CODE.ERP_BACKGROUND,
+    
   },
   back:{
     width: 24,
@@ -39,7 +40,6 @@ export const styles = StyleSheet.create({
     fontWeight: '600',
   },
   formContainer: {
-    flex: 1,
     padding: 20,
     justifyContent: 'center',
   },

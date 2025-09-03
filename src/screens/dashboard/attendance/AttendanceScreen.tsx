@@ -8,15 +8,22 @@ import FullViewLoader from '../../../components/loader/FullViewLoader';
 import ERPIcon from '../../../components/icon/ERPIcon';
 import List from './components/List';
 import AttendanceForm from './components/AttendanceForm';
+import { useAppDispatch } from '../../../store/hooks';
+import { getLastPunchInThunk } from '../../../store/slices/attendance/thunk';
 
 const AttendanceScreen = () => {
   const navigation = useNavigation<any>();
   const [isListVisible, setIsListVisible] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState(true);
+  const dispatch = useAppDispatch();
+
+  const [resData, setResData] = useState<any>();
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [showPicker, setShowPicker] = useState(false);
   const [showFilter, setShowFilter] = useState(false);
   const [blockAction, setBlockAction] = useState(false);
+  const [refresh, setRefresh] = useState(false);
+  const [actionLoader, setActionLoader] = useState(false);
 
   const formattedMonth = `${selectedDate.getFullYear()}-${(selectedDate.getMonth() + 1)
     .toString()
@@ -36,18 +43,18 @@ const AttendanceScreen = () => {
           <ERPIcon
             name={!isListVisible ? 'list' : 'post-add'}
             onPress={() => {
-             if(!blockAction){
-              setIsListVisible(!isListVisible);
-             }
+              if (!blockAction) {
+                setIsListVisible(!isListVisible);
+              }
             }}
           />
           {isListVisible && (
             <ERPIcon
               name="filter-alt"
               onPress={() => {
-              if(!blockAction){
-                 setShowFilter(!showFilter);
-              }
+                if (!blockAction) {
+                  setShowFilter(!showFilter);
+                }
               }}
             />
           )}
@@ -55,25 +62,45 @@ const AttendanceScreen = () => {
             <ERPIcon
               name="date-range"
               onPress={() => {
-               if(!blockAction){
-                setShowPicker(!showPicker);
-               }
+                if (!blockAction) {
+                  setShowPicker(!showPicker);
+                }
               }}
             />
           )}
-          <ERPIcon name="refresh" />
+          <ERPIcon
+            isLoading={actionLoader}
+            name="refresh"
+            onPress={() => {
+              setRefresh(!refresh);
+              setActionLoader(!actionLoader);
+            }}
+          />
         </>
       ),
     });
-  }, [navigation, isListVisible, showPicker, showFilter, blockAction]);
+  }, [navigation, isListVisible, showPicker, showFilter, blockAction, refresh, actionLoader]);
 
+  const checkAttendance = () => {
+    setIsLoading(true);
+    dispatch(getLastPunchInThunk())
+      .unwrap()
+      .then(res => {
+        console.log('✅ Last Punch-In Response:', res);
+        setResData(res);
+        setIsLoading(false);
+        setActionLoader(false);
+      })
+      .catch(err => {
+        setIsLoading(false);
+        setActionLoader(false);
+
+        console.log('❌ Error fetching last punch-in:', err);
+      });
+  };
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1500);
-
-    return () => clearTimeout(timer);
-  }, []);
+    checkAttendance();
+  }, [dispatch, refresh]);
 
   return (
     <View style={styles.container}>
@@ -94,10 +121,16 @@ const AttendanceScreen = () => {
               )}
             </View>
           ) : (
-            <View  style={{ flex:1, justifyContent:'center', alignContent:'center', alignItems:'center', width: '100%',}}>
-              <AttendanceForm
-              setBlockAction={setBlockAction}
-              />
+            <View
+              style={{
+                flex: 1,
+                justifyContent: 'center',
+                alignContent: 'center',
+                alignItems: 'center',
+                width: '100%',
+              }}
+            >
+              <AttendanceForm setBlockAction={setBlockAction} resData={resData} />
             </View>
           )}
         </>

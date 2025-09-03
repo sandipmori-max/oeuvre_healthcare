@@ -12,13 +12,12 @@ import { styles } from '../attendance_style';
 import CustomAlert from '../../../../components/alert/CustomAlert';
 import { useAppDispatch, useAppSelector } from '../../../../store/hooks';
 import {
-  getLastPunchInThunk,
-  markAttendanceThunk,
+   markAttendanceThunk,
 } from '../../../../store/slices/attendance/thunk';
 import { ERP_COLOR_CODE } from '../../../../utils/constants';
 import { useNavigation } from '@react-navigation/native';
 
-const AttendanceForm = ({ setBlockAction }: any) => {
+const AttendanceForm = ({ setBlockAction, resData }: any) => {
   const { t } = useTranslations();
   const navigation = useNavigation();
 
@@ -37,19 +36,7 @@ const AttendanceForm = ({ setBlockAction }: any) => {
     type: 'info' as 'error' | 'success' | 'info',
   });
 
-  const [resData, setResData] = useState<any>();
-
-  useEffect(() => {
-    dispatch(getLastPunchInThunk())
-      .unwrap()
-      .then(res => {
-        console.log('✅ Last Punch-In Response:', res);
-        setResData(res);
-      })
-      .catch(err => {
-        console.log('❌ Error fetching last punch-in:', err);
-      });
-  }, [dispatch]);
+  
 
   const openCamera = (
     setFieldValue: (field: keyof AttendanceFormValues, value: any) => void,
@@ -65,6 +52,8 @@ const AttendanceForm = ({ setBlockAction }: any) => {
       response => {
         if (response.didCancel || response.errorCode) {
           console.log('User cancelled or error:', response.errorMessage);
+          setLocationLoading(false);
+          setBlockAction(false);
           return;
         }
 
@@ -75,7 +64,12 @@ const AttendanceForm = ({ setBlockAction }: any) => {
         console.log('🚀 ~ openCamera ~ photoUri:', photoUri);
 
         if (asset?.base64) {
-          setFieldValue('imageBase64', `${resData?.success === 1 || resData?.success === '1' ? 'punchOut.jpeg': 'punchIn.jpeg'}; data:${asset.type};base64,${asset.base64}`);
+          setFieldValue(
+            'imageBase64',
+            `${
+              resData?.success === 1 || resData?.success === '1' ? 'punchOut.jpeg' : 'punchIn.jpeg'
+            }; data:${asset.type};base64,${asset.base64}`,
+          );
         }
         setStatusImage(photoUri);
 
@@ -165,7 +159,7 @@ const AttendanceForm = ({ setBlockAction }: any) => {
               rawData: values,
               type: resData?.success === 1 || resData?.success === '1' ? false : true,
               user,
-              id: resData?.success === 1 || resData?.success === '1' ? resData?.id : '0'
+              id: resData?.success === 1 || resData?.success === '1' ? resData?.id : '0',
             }),
           )
             .unwrap()
@@ -212,7 +206,7 @@ const AttendanceForm = ({ setBlockAction }: any) => {
                       },
                     ]}
                   >
-                    <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 18 }}>
+                    <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 26 }}>
                       {user?.name ? user.name.substring(0, 2).toUpperCase() : ''}
                     </Text>
                   </View>

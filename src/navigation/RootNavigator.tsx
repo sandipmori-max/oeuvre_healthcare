@@ -27,8 +27,11 @@ const RootNavigator = () => {
 
   const [hasSyncedDisabledLocation, setHasSyncedDisabledLocation] = useState(false);
 
-  // ✅ last synced location (reference point for API call)
   const lastSyncedLocationRef = useRef<{ lat: number; lng: number } | null>(null);
+ 
+  const RADIUS_FEET = 30;  
+  const FEET_TO_METERS = 0.3048;
+  const RADIUS_IN_METERS = RADIUS_FEET * FEET_TO_METERS;
 
   const requestLocationPermission = async () => {
     if (Platform.OS === 'android') {
@@ -62,9 +65,8 @@ const RootNavigator = () => {
     });
   };
 
-  // 📍 Distance calculator (Haversine formula)
   const getDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
-    const R = 6371000; // Earth radius in meters
+    const R = 6371000;  
     const toRad = (value: number) => (value * Math.PI) / 180;
 
     const dLat = toRad(lat2 - lat1);
@@ -76,7 +78,7 @@ const RootNavigator = () => {
       Math.sin(dLon / 2) * Math.sin(dLon / 2);
 
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return R * c; // distance in meters
+    return R * c;  
   };
 
   useEffect(() => {
@@ -125,7 +127,7 @@ const RootNavigator = () => {
 
           try {
             const newLocation = await getCurrentLocation();
-            console.log("🚀 ~ checkLocation ~ newLocation:", newLocation)
+            console.log("🚀 ~ checkLocation ~ newLocation:", newLocation);
 
             if (lastSyncedLocationRef.current) {
               const distance = getDistance(
@@ -135,18 +137,18 @@ const RootNavigator = () => {
                 newLocation.lng,
               );
 
-              console.log(`📏 Distance from last SYNC: ${distance.toFixed(2)}m`);
+              console.log(
+                `📏 Distance from circle center: ${distance.toFixed(2)}m (Threshold: ${RADIUS_IN_METERS}m)`
+              );
 
-              if (distance < 10) {
-                console.log("⏸ Skipping sync — not moved ≥10m from last sync");
+              if (distance < RADIUS_IN_METERS) {
+                console.log(`⏸ Inside ${RADIUS_FEET}ft circle — skipping sync`);
                 return;
               }
             }
 
-            // ✅ Update last synced location
             lastSyncedLocationRef.current = newLocation;
 
-            // Dispatch API only if user moved ≥ 10m from last sync
             if (accounts.length > 0) {
               for (const acc of accounts) {
                 await dispatch(
