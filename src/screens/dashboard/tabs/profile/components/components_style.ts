@@ -97,7 +97,7 @@ export const styles = StyleSheet.create({
     width: 24,
     height: 24,
     borderRadius: 12,
-    backgroundColor: ERP_COLOR_CODE.ERP_REMOVE_BUTTON,
+    backgroundColor: ERP_COLOR_CODE.ERP_ERROR,
     justifyContent: 'center',
     alignItems: 'center',
   },

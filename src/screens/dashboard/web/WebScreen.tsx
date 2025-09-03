@@ -30,6 +30,7 @@ const WebScreen = () => {
         const [storedLink, storedToken] = await Promise.all([
           AsyncStorage.getItem('erp_link'),
           AsyncStorage.getItem('erp_token'),
+          
         ]);
 
         if (isMounted) {

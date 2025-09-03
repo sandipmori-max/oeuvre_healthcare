@@ -5,7 +5,7 @@ import AccountSwitcher from './components/AccountSwitcher';
 import { styles } from './profile_style';
 import { useNavigation } from '@react-navigation/native';
 import { useAppSelector } from '../../../../store/hooks';
-import { firstLetterUpperCase, formatDateMonthDateYear } from '../../../../utils/helpers';
+import { firstLetterUpperCase, formatDateHr, formatDateMonthDateYear } from '../../../../utils/helpers';
 import AddAccountScreen from '../../add_account/AddAccountScreen';
 import ERPIcon from '../../../../components/icon/ERPIcon';
 import MaterialIcons from '@react-native-vector-icons/material-icons';
@@ -103,7 +103,7 @@ const ProfileTab = () => {
                 <View style={styles.settingInfo}>
                   <Text style={styles.settingTitle}>Last Login</Text>
                   <Text style={styles.settingSubtitle}>
-                    {formatDateMonthDateYear(activeAccount?.lastLoginAt)}
+                    {formatDateHr(activeAccount?.lastLoginAt, false)}
                   </Text>
                 </View>
               </View>

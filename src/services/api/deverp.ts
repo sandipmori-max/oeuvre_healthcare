@@ -175,8 +175,8 @@ class DevERPService {
         if (activeAccount) {
           const updatedUser = {
             ...activeAccount.user,
-            token: this.token,
-            tokenValidTill: this.tokenValidTill,
+            // token: this.token,
+            // tokenValidTill: this.tokenValidTill,
           };
           await db.executeSql(`UPDATE erp_accounts SET user_json = ? WHERE id = ?`, [
             JSON.stringify(updatedUser),
