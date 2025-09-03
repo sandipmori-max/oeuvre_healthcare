@@ -248,7 +248,7 @@ class DevERPService {
   }
 
   savePage(page: string, id: string, rawData: any) {
-    return this.apiCall<any>(`msp_api.aspx/savePage`, {
+    return this.apiCall<any>(`msp_api.aspx/pageSave`, {
       token: this.token,
       page,
       data: JSON.stringify(rawData),

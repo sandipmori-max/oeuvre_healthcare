@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Image, TouchableOpacity } from 'react-native';
+import { View, Text, Image, TouchableOpacity, ScrollView } from 'react-native';
 import { DrawerContentComponentProps, DrawerContentScrollView } from '@react-navigation/drawer';
 import { useNavigation } from '@react-navigation/native';
 import MaterialIcons from '@react-native-vector-icons/material-icons';
@@ -8,6 +8,7 @@ import { useAppSelector } from '../../store/hooks';
 import { firstLetterUpperCase } from '../../utils/helpers';
 import { ERP_DRAWER_LIST } from '../../constants';
 import { styles } from './drawer_style';
+import ERPIcon from '../icon/ERPIcon';
 
 const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
   const navigation = useNavigation();
@@ -23,7 +24,25 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
       {...props}
       contentContainerStyle={{ flex: 1, backgroundColor: theme === 'dark' ? 'black' : 'white' }}
     >
-      <View style={styles.header}>
+        <View
+        style={{
+          top: 2,
+          right: 0, 
+          alignContent: 'flex-end',
+          alignItems: 'flex-end',
+        }}
+      >
+        <TouchableOpacity
+          onPress={() => {
+            props.navigation.closeDrawer();
+          }}
+        >
+          <ERPIcon color="#000" name="close" />
+        </TouchableOpacity>
+      </View>
+      <View style={[styles.header,]}>
+
+      
         <Image
           source={{ uri: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=600' }}
           style={styles.profileImage}

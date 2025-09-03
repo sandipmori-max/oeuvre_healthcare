@@ -3,7 +3,7 @@ import { ERP_COLOR_CODE } from '../../utils/constants';
 
 export const styles = StyleSheet.create({
   header: {
-    top: 60,
+    top: 38,
     padding: 20,
     alignItems: 'center',
     backgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR,
@@ -36,7 +36,7 @@ export const styles = StyleSheet.create({
   menuContainer: {
     flex: 1,
     paddingTop: 10,
-    top: 60
+    top: 30
   },
   itemRow: {
     flexDirection: 'row',

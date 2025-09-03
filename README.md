@@ -14,10 +14,11 @@
 // gradlew installClientADebug -Pbrand=[BRAND_NAME]
 
 
-MOBILE APP - API DETAILS 
+Payroll Mobile App – API Documentation
 
-[ step 1. getLink: ---- ]
+1. Authentication Flow
 
+Step 1: getLink
 curl --location 'https://support.deverp.net/devws/appcode.aspx/getLink' \
 --header 'Content-Type: application/json' \
 --header 'Cookie: ASP.NET_SessionId=hg4u3v1lqcd000cgwcp35vyx' \
@@ -89,7 +90,7 @@ curl --location 'https://payroll.deverp.net/devws/msp_api.aspx/getListData' \
 
 [ Attandanced - punch in]
 
-curl --location 'https://payroll.deverp.net/devws/msp_api.aspx/punhin' \
+curl --location 'https://payroll.deverp.net/devws/msp_api.aspx/savePage' \
 --header 'Content-Type: application/json' \
 --header 'Cookie: ASP.NET_SessionId=scsvjmlmyltbdc0aial10axa' \
 --data '{
@@ -101,7 +102,7 @@ curl --location 'https://payroll.deverp.net/devws/msp_api.aspx/punhin' \
 
 [ Attandanced - punch out]
 
-curl --location 'https://payroll.deverp.net/devws/msp_api.aspx/punhout' \
+curl --location 'https://payroll.deverp.net/devws/msp_api.aspx/savePage' \
 --header 'Content-Type: application/json' \
 --header 'Cookie: ASP.NET_SessionId=scsvjmlmyltbdc0aial10axa; ASP.NET_SessionId=scsvjmlmyltbdc0aial10axa' \
 --data '{
@@ -193,5 +194,23 @@ curl --location 'https://payroll.deverp.net/devws/msp_api.aspx/pageCancel' \
      "id":"00100",
      "remarks":"1=1",
      "page": "EmployeeMaster"
+}'
+
+[ getLastPunchIn ] 
+
+curl --location 'https://payroll.deverp.net/devws/msp_api.aspx/getLastPunchIn' \
+--header 'Content-Type: application/json' \
+--data '{
+    "token": "49d45d99eff64492b94f449238507c7c"
+}'
+
+[ syncLocation ]
+
+curl --location 'https://payroll.deverp.net/devws/msp_api.aspx/syncLocation' \
+--header 'Content-Type: application/json' \
+--header 'Cookie: ASP.NET_SessionId=ibj4tkc5ffzqbyp2xoni4pvt; ASP.NET_SessionId=2vj4yympr4l0kqag3xaxdcul' \
+--data '{
+    "token":"9eecfb8d7bbf4acba7568f21f078c9f5",
+    "location":"45.5556,12.6655"
 }'
 

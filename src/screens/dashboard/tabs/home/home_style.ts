@@ -1,4 +1,5 @@
 import { StyleSheet, Dimensions } from 'react-native';
+import { ERP_COLOR_CODE } from '../../../../utils/constants';
 
 const { width } = Dimensions.get('window');
 const itemWidth = (width - 48) / 2;  
@@ -114,7 +115,7 @@ export const styles = StyleSheet.create({
     marginTop: 2,
   },
   reportBadge: {
-    backgroundColor: '#FF6B6B',
+    backgroundColor: ERP_COLOR_CODE.ERP_ERROR,
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 12,
