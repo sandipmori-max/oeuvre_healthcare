@@ -51,7 +51,7 @@ const CustomPicker = ({ label, selectedValue, onValueChange, item, errors, dtext
         activeOpacity={0.7}
       >
         <Text style={{ color: selectedOption ? '#000' : '#888', flex: 1 }}>
-          {selectedOption || 'Select...'}
+          {selectedOption || `Select ${label}`}
         </Text>
         <MaterialIcons name={open ? 'arrow-drop-up' : 'arrow-drop-down'} size={24} color="#555" />
       </TouchableOpacity>
