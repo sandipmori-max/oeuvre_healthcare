@@ -15,6 +15,8 @@ import ReadableView from './components/ReadableView';
 import ERPIcon from '../../../components/icon/ERPIcon';
 import CustomAlert from '../../../components/alert/CustomAlert';
 import { handlePageActionThunk } from '../../../store/slices/page/thunk';
+import BottomSheet from '../../../components/bottomsheet/bottom_sheet';
+import AddData from './components/AddData';
 
 const ListScreen = () => {
   const navigation = useNavigation();
@@ -28,6 +30,7 @@ const ListScreen = () => {
   const [loadingListId, setLoadingListId] = useState<string | null>(null);
   const [listData, setListData] = useState<any[]>([]);
   const [configData, setConfigData] = useState<any[]>([]);
+  console.log('🚀 ~ ListScreen ~ configData:', configData);
 
   const [error, setError] = useState<string | null>(null);
 
@@ -38,13 +41,14 @@ const ListScreen = () => {
   const [filteredData, setFilteredData] = useState<any[]>([]);
   const [alertVisible, setAlertVisible] = useState(false);
   const [actionLoaders, setActionLoader] = useState(false);
+  const [isVisibleFormData, setIsVisibleFormData] = useState(false);
 
   const [alertConfig, setAlertConfig] = useState({
     title: '',
     message: '',
     type: 'info' as 'error' | 'success' | 'info',
     actionValue: '',
-    color: '#000'
+    color: '#000',
   });
 
   const [fromDate, setFromDate] = useState<string>('');
@@ -91,7 +95,7 @@ const ListScreen = () => {
           <ERPIcon
             name="refresh"
             onPress={() => {
-              setActionLoader(true)
+              setActionLoader(true);
               onRefresh();
             }}
             isLoading={actionLoaders}
@@ -259,8 +263,8 @@ const ListScreen = () => {
       } finally {
         setLoadingListId(null);
         setTimeout(() => {
-          setActionLoader(false)
-        }, 10)
+          setActionLoader(false);
+        }, 10);
       }
     },
     [item, dispatch],
@@ -296,7 +300,7 @@ const ListScreen = () => {
       message: `Are you sure you want to ${label.toLowerCase()} ?`,
       type: 'info',
       actionValue: actionValue,
-      color: color
+      color: color,
     });
     setAlertVisible(true);
   };
@@ -400,9 +404,24 @@ const ListScreen = () => {
           )}
         </>
       )}
-      <TouchableOpacity style={styles.addButton} onPress={() => Alert.alert('Add button clicked')}>
-        <Text style={styles.addButtonText}>+ New</Text>
-      </TouchableOpacity>
+      {!loadingListId && configData && (
+        <TouchableOpacity
+          style={styles.addButton}
+          onPress={() => {
+            setIsVisibleFormData(true);
+          }}
+        >
+          <Text style={styles.addButtonText}>+ New</Text>
+        </TouchableOpacity>
+      )}
+      {isVisibleFormData && (
+        <AddData
+          setIsVisibleFormData={setIsVisibleFormData}
+          isVisibleFormData={isVisibleFormData}
+          configData={configData}
+          pageTitle={pageTitle}
+        />
+      )}
 
       <CustomAlert
         visible={alertVisible}

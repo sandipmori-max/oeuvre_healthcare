@@ -10,6 +10,7 @@ import NoData from '../../../../components/no_data/NoData';
 import ERPIcon from '../../../../components/icon/ERPIcon';
 import { PieChart } from 'react-native-gifted-charts';
 import { getERPDashboardThunk } from '../../../../store/slices/auth/thunk';
+import MaterialIcons from '@react-native-vector-icons/material-icons';
 const HomeScreen = () => {
   const navigation = useNavigation<any>();
   const dispatch = useAppDispatch();
@@ -20,7 +21,7 @@ const HomeScreen = () => {
   const [isRefresh, setIsRefresh] = useState<boolean>(false);
 
   const theme = useAppSelector(state => state.theme);
-  const [actionLoader, setActionLoader] = useState(false)
+  const [actionLoader, setActionLoader] = useState(false);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -29,7 +30,7 @@ const HomeScreen = () => {
           <ERPIcon
             name="refresh"
             onPress={() => {
-              setActionLoader(true)
+              setActionLoader(true);
               setIsRefresh(!isRefresh);
             }}
             isLoading={actionLoader}
@@ -47,9 +48,9 @@ const HomeScreen = () => {
   useEffect(() => {
     if (isAuthenticated) {
       dispatch(getERPDashboardThunk());
-      setTimeout(() =>{
-        setActionLoader(false)
-      }, 100)
+      setTimeout(() => {
+        setActionLoader(false);
+      }, 100);
     }
   }, [isAuthenticated, dispatch, activeToken, isRefresh]);
 
@@ -79,107 +80,107 @@ const HomeScreen = () => {
     }));
 
   const renderDashboardItem = (item: DashboardItem, index: number) => {
-    console.log("🚀 ~ renderDashboardItem ~ item:", item)
-    return(
-       <TouchableOpacity
-      key={item.id || index}
-      style={[
-        styles.dashboardItem,
-        {
-          paddingLeft: 4,
-          backgroundColor: accentColors[index % accentColors.length],
-          borderRadius: 8,
-        },
-      ]}
-      activeOpacity={0.7}
-      onPress={async () => {
-        navigation.navigate('List', { item });
-      }}
-    >
-      <View
-        style={{
-          backgroundColor: theme === 'dark' ? '#333' : '#fff',
-          borderRadius: 8,
+    console.log('🚀 ~ renderDashboardItem ~ item:', item);
+    return (
+      <TouchableOpacity
+        key={item.id || index}
+        style={[
+          styles.dashboardItem,
+          {
+            paddingLeft: 4,
+            backgroundColor: accentColors[index % accentColors.length],
+            borderRadius: 8,
+          },
+        ]}
+        activeOpacity={0.7}
+        onPress={async () => {
+          navigation.navigate('List', { item });
         }}
       >
-        <View style={styles.dashboardItemContent}>
-          <View style={styles.dashboardItemHeader}>
-            <View style={styles.dashboardItemTopRow}>
-              <View
-                style={[
-                  styles.iconContainer,
-                  { backgroundColor: accentColors[index % accentColors.length] },
-                ]}
-              >
-                <Text style={styles.iconText}>{getInitials(item.name)}</Text>
-              </View>
-              <View style={styles.headerTextWrap}>
-                <Text
+        <View
+          style={{
+            backgroundColor: theme === 'dark' ? '#333' : '#fff',
+            borderRadius: 8,
+          }}
+        >
+          <View style={styles.dashboardItemContent}>
+            <View style={styles.dashboardItemHeader}>
+              <View style={styles.dashboardItemTopRow}>
+                <View
                   style={[
-                    styles.dashboardItemText,
-                    {
-                      color: theme === 'dark' ? '#fff' : '#000',
-                    },
+                    styles.iconContainer,
+                    { backgroundColor: accentColors[index % accentColors.length] },
                   ]}
-                  numberOfLines={2}
                 >
-                  {item.title}
-                </Text>
+                  <Text style={styles.iconText}>{getInitials(item.name)}</Text>
+                </View>
+                <View style={styles.headerTextWrap}>
+                  <Text
+                    style={[
+                      styles.dashboardItemText,
+                      {
+                        color: theme === 'dark' ? '#fff' : '#000',
+                      },
+                    ]}
+                    numberOfLines={2}
+                  >
+                    {item.title}
+                  </Text>
+                </View>
               </View>
             </View>
-          </View>
 
-          {/* Content section */}
-          <View style={styles.dashboardItemBody}>
-            {loadingPageId === (item.id || String(index)) && (
-              <View style={{ marginBottom: 8, flexDirection: 'row', alignItems: 'center' }}>
-                <ActivityIndicator size="small" color="#007AFF" />
-                <Text style={{ marginLeft: 8, color: '#6C757D' }}>Loading page...</Text>
-              </View>
-            )}
-            {item.data && (
-              <View style={styles.dataContainer}>
-                <Text style={styles.dashboardItemData} numberOfLines={2}>
-                  {item.data}
-                </Text>
-              </View>
-            )}
+            {/* Content section */}
+            <View style={styles.dashboardItemBody}>
+              {loadingPageId === (item.id || String(index)) && (
+                <View style={{ marginBottom: 8, flexDirection: 'row', alignItems: 'center' }}>
+                  <ActivityIndicator size="small" color="#007AFF" />
+                  <Text style={{ marginLeft: 8, color: '#6C757D' }}>Loading page...</Text>
+                </View>
+              )}
+              {item.data && (
+                <View style={styles.dataContainer}>
+                  <Text style={styles.dashboardItemData} numberOfLines={2}>
+                    {item.data}
+                  </Text>
+                </View>
+              )}
 
-            {item.url && (
-              <View style={styles.urlContainer}>
-                <Text style={styles.dashboardItemUrl} numberOfLines={1}>
-                  {item.url}
-                </Text>
-              </View>
-            )}
-          </View>
+              {item.url && (
+                <View style={styles.urlContainer}>
+                  <Text style={styles.dashboardItemUrl} numberOfLines={1}>
+                    {item.url}
+                  </Text>
+                </View>
+              )}
+            </View>
 
-          {/* Footer action */}
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              alignContent: 'center',
-              alignItems: 'center',
-            }}
-          >
-            {item?.isReport && (
-              <View style={styles.reportBadge}>
-                <Text style={styles.reportBadgeText}>Report</Text>
-              </View>
-            )}
-            <TouchableOpacity
-              onPress={() => navigation.navigate('Web', { item })}
-              style={styles.cardFooter}
+            {/* Footer action */}
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignContent: 'center',
+                alignItems: 'center',
+              }}
             >
-              <Text style={styles.footerLink}>View</Text>
-              <Text style={styles.chevron}>›</Text>
-            </TouchableOpacity>
+              {item?.isReport && (
+                <View style={styles.reportBadge}>
+                  <Text style={styles.reportBadgeText}>Report</Text>
+                </View>
+              )}
+              <TouchableOpacity
+                onPress={() => navigation.navigate('Web', { item })}
+                style={styles.cardFooter}
+              >
+                <Text style={styles.footerLink}>View</Text>
+                <MaterialIcons name={'chevron-right'} color={'#ccc'} size={18} />
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
-      </View>
-    </TouchableOpacity>
-    )
+      </TouchableOpacity>
+    );
   };
 
   const renderLoadingState = () => <FullViewLoader />;

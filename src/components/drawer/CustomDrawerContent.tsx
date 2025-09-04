@@ -14,7 +14,6 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
   const navigation = useNavigation();
 
   const { user } = useAppSelector(state => state?.auth);
-  console.log('🚀 ~ CustomDrawerContent ~ user:', user);
   const theme = useAppSelector(state => state.theme);
 
   const currentRoute = props.state.routeNames[props.state.index];
