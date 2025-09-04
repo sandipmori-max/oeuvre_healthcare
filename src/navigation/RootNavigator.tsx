@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { PermissionsAndroid, Platform } from 'react-native';
+import { PermissionsAndroid, Platform, NativeModules } from 'react-native';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { checkAuthStateThunk } from '../store/slices/auth/thunk';
 import DevERPService from '../services/api/deverp';
@@ -8,13 +8,14 @@ import StackNavigator from './StackNavigator';
 import FullViewLoader from '../components/loader/FullViewLoader';
 import DeviceInfo from 'react-native-device-info';
 import CustomAlert from '../components/alert/CustomAlert';
-import { isTokenValid } from '../utils/helpers';
+import { isTokenValid, requestLocationPermissions } from '../utils/helpers';
 import { syncLocationThunk } from '../store/slices/location/thunk';
 import Geolocation from '@react-native-community/geolocation';
+const { LocationModule } = NativeModules;
 
 const RootNavigator = () => {
   const dispatch = useAppDispatch();
-  const { isLoading, isAuthenticated, accounts } = useAppSelector(state => state.auth);
+  const { isLoading, isAuthenticated, accounts, user } = useAppSelector(state => state.auth);
 
   const [locationEnabled, setLocationEnabled] = useState<boolean | null>(null);
   const [alertVisible, setAlertVisible] = useState(false);
@@ -28,8 +29,8 @@ const RootNavigator = () => {
   const [hasSyncedDisabledLocation, setHasSyncedDisabledLocation] = useState(false);
 
   const lastSyncedLocationRef = useRef<{ lat: number; lng: number } | null>(null);
- 
-  const RADIUS_FEET = 30;  
+
+  const RADIUS_FEET = 30;
   const FEET_TO_METERS = 0.3048;
   const RADIUS_IN_METERS = RADIUS_FEET * FEET_TO_METERS;
 
@@ -66,7 +67,7 @@ const RootNavigator = () => {
   };
 
   const getDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
-    const R = 6371000;  
+    const R = 6371000;
     const toRad = (value: number) => (value * Math.PI) / 180;
 
     const dLat = toRad(lat2 - lat1);
@@ -74,17 +75,18 @@ const RootNavigator = () => {
 
     const a =
       Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
-      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+      Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
 
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return R * c;  
+    return R * c;
   };
 
   useEffect(() => {
     DevERPService.initialize();
     dispatch(checkAuthStateThunk());
   }, [dispatch]);
+
+
 
   useEffect(() => {
     const checkLocation = async () => {
@@ -189,6 +191,23 @@ const RootNavigator = () => {
     const interval = setInterval(checkLocation, 18000);
     return () => clearInterval(interval);
   }, [locationEnabled, accounts, dispatch, hasSyncedDisabledLocation]);
+
+  // useEffect(() => {
+  //   if (Platform.OS === 'android') {
+  //     requestLocationPermissions().then(granted => {
+  //       console.log('🚀 ~ RootNavigator ~ granted:', granted);
+  //       if (granted && isAuthenticated) {
+  //         console.log('Location permission OK, can start service');
+  //         NativeModules.LocationModule?.setUserToken?.(user?.token);
+  //         NativeModules.LocationModule?.startService?.();
+  //       }
+  //     });
+  //   }
+  //   return () => {
+  //     // Stop when unmount if needed
+  //     NativeModules.LocationModule?.stopService?.();
+  //   };
+  // }, [user, isAuthenticated]);
 
   if (isLoading) {
     return <FullViewLoader />;

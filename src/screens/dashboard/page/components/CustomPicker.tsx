@@ -44,9 +44,11 @@ const CustomPicker = ({ label, selectedValue, onValueChange, item, errors, dtext
       </View>
 
       <TouchableOpacity
-        style={[styles.pickerBox]}
+        style={[styles.pickerBox, item?.disabled === '1' && styles.disabledBox]}
         onPress={() => {
-          handleOpen();
+          if(item?.disabled !== '1'){
+           handleOpen();
+          }
         }}
         activeOpacity={0.7}
       >

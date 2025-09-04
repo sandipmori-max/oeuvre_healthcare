@@ -37,7 +37,7 @@ const ReadableView = ({
 
     const status = item['status'];
     const date = item['date'];
-    const remarks = item['remarks'];
+    const remarks = item['remarks'];      
     const address = item['address'];
     const amount = item['amount'];
 
@@ -67,7 +67,10 @@ const ReadableView = ({
           activeOpacity={0.8}
           style={{ flexDirection: 'row', alignItems: 'center' }}
           onPress={async () => {
-            navigation.navigate('Page', { item, title: pageParamsName, id: index + 1 });
+
+            console.log("🚀 ~ Page:", item)
+
+            navigation.navigate('Page', { item, title: pageParamsName, id: item?.id });
           }}
         >
           <View
@@ -81,8 +84,8 @@ const ReadableView = ({
               marginRight: 12,
             }}
           >
-            {/* <Text style={{ color: '#fff', fontWeight: '400', fontSize: 22 }}>{avatarLetter}</Text> */}
-            <Image source={ERP_ICON.APP_LOGO} style={styles.profileImage} />
+            <Text style={{ color: '#fff', fontWeight: '400', fontSize: 22 }}>{avatarLetter}</Text>
+            {/* <Image source={ERP_ICON.APP_LOGO} style={styles.profileImage} /> */}
           </View>
 
           <View style={{ flex: 1 }}>

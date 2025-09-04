@@ -18,6 +18,7 @@ import AjaxPicker from './components/AjaxPicker';
 import DateTimePicker from 'react-native-modal-datetime-picker';
 import { parseCustomDatePage } from '../../../utils/helpers';
 import DateRow from './components/Date';
+import BoolInput from './components/BoolInput';
 
 type PageRouteParams = { PageScreen: { item: any } };
 
@@ -43,7 +44,6 @@ const PageScreen = () => {
   const [actionLoader, setActionLoader] = useState(false);
   const [actionSaveLoader, setActionSaveLoader] = useState(false);
 
-
   const [alertConfig, setAlertConfig] = useState({
     title: '',
     message: '',
@@ -51,7 +51,9 @@ const PageScreen = () => {
   });
 
   const route = useRoute<RouteProp<PageRouteParams, 'PageScreen'>>();
-  const { item, title, id }: any = route.params;
+  const { item, title, id , isFromNew}: any = route.params;
+  console.log("🚀 ~ PageScreen ~ isFromNew:", isFromNew)
+  console.log('🚀 ~ PageScreen ~ item:', item);
 
   const validateForm = useCallback(() => {
     const validationErrors: Record<string, string> = {};
@@ -78,7 +80,7 @@ const PageScreen = () => {
           numberOfLines={1}
           style={{ maxWidth: 180, fontSize: 18, fontWeight: '700', color: '#fff' }}
         >
-          {item?.name || 'Details'}
+          {isFromNew ? 'New Data' : item?.name || 'Details'}
         </Text>
       ),
       headerRight: () => (
@@ -88,7 +90,7 @@ const PageScreen = () => {
               name="save-as"
               isLoading={actionSaveLoader}
               onPress={async () => {
-                setActionSaveLoader(true)
+                setActionSaveLoader(true);
                 if (validateForm()) {
                   const submitValues: Record<string, any> = {};
                   controls.forEach(f => {
@@ -120,9 +122,8 @@ const PageScreen = () => {
                     setAlertVisible(true);
                     setGoBack(false);
                   }
-                } 
-                                setActionSaveLoader(false)
-
+                }
+                setActionSaveLoader(false);
               }}
             />
           )}
@@ -131,7 +132,7 @@ const PageScreen = () => {
             name="refresh"
             isLoading={actionLoader}
             onPress={() => {
-              setActionLoader(true)
+              setActionLoader(true);
               fetchPageData();
               setErrors({});
               setErrorsList([]);
@@ -151,7 +152,7 @@ const PageScreen = () => {
     alertVisible,
     loader,
     actionLoader,
-    actionSaveLoader
+    actionSaveLoader,
   ]);
 
   const fetchPageData = useCallback(async () => {
@@ -159,7 +160,10 @@ const PageScreen = () => {
       setError(null);
       setLoadingPageId(id);
 
-      const parsed = await dispatch(getERPPageThunk({ page: title, id })).unwrap();
+      const parsed = await dispatch(getERPPageThunk({ page: title, id : isFromNew ? 0 :id })).unwrap();
+      console.log('🚀 ~ parsed:', parsed);
+      console.log('🚀 ~ id:', id);
+      console.log('🚀 ~ title:', title);
       const pageControls = Array.isArray(parsed?.pagectl) ? parsed.pagectl : [];
 
       const normalizedControls = pageControls.map(c => ({
@@ -184,9 +188,9 @@ const PageScreen = () => {
       setError(e?.message || 'Failed to load page');
     } finally {
       setLoadingPageId(null);
-      setTimeout(() =>{
-          setActionLoader(false)
-      }, 10)
+      setTimeout(() => {
+        setActionLoader(false);
+      }, 10);
     }
   }, [dispatch, id, title]);
 
@@ -205,7 +209,7 @@ const PageScreen = () => {
 
   const renderItem = useCallback(
     ({ item }: { item: any }) => {
-      console.log("🚀 ~ item:*-*-*-*-*-*--*-", item)
+      console.log('🚀 ~ item:*-*-*-*-*-*--*-', item);
       const setValue = (val: any) => {
         setFormValues(prev => {
           if (typeof val === 'object' && val !== null) {
@@ -219,9 +223,19 @@ const PageScreen = () => {
       const value = formValues[item?.field] || formValues[item?.text] || '';
 
       if (item?.visible === '1') return null;
+      if (item?.ctltype === 'BOOL') {
+        return (
+          <BoolInput
+            label={item?.fieldtitle}
+            value={!!formValues[item?.field]} // ensure boolean
+            onChange={val => setValue({ [item.field]: val })}
+          />
+        );
+      }
+
       if (item?.ctltype === 'IMAGE')
         return <Media item={item} handleAttachment={handleAttachment} />;
-      if (item?.disabled === '1') return <Disabled item={item} value={value} />;
+      if (item?.disabled === '1' && item?.ajax !== 1 && item?.ajax !== 0) return <Disabled item={item} value={value} />;
       if (item?.ddl && item?.ddl !== '' && item?.ajax === 0) {
         return (
           <CustomPicker

@@ -96,7 +96,7 @@ const TableView = ({
     return (
       <TouchableOpacity
         onPress={async () => {
-          navigation.navigate('Page', { item, title: pageParamsName, id: index + 1 });
+          navigation.navigate('Page', { item, title: pageParamsName, id: item?.id });
         }}
       >
         {' '}

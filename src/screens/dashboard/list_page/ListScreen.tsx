@@ -15,8 +15,7 @@ import ReadableView from './components/ReadableView';
 import ERPIcon from '../../../components/icon/ERPIcon';
 import CustomAlert from '../../../components/alert/CustomAlert';
 import { handlePageActionThunk } from '../../../store/slices/page/thunk';
-import BottomSheet from '../../../components/bottomsheet/bottom_sheet';
-import AddData from './components/AddData';
+
 
 const ListScreen = () => {
   const navigation = useNavigation();
@@ -62,7 +61,8 @@ const ListScreen = () => {
   const { item } = route.params;
 
   const pageTitle = item?.title || item?.name || 'List Data';
-  const pageParamsName = item?.name || 'List Data';
+  const pageParamsName =   item?.name || 'List Data';
+  console.log("🚀 ~ ListScreen ~ pageParamsName:", pageParamsName)
 
   const totalAmount = filteredData?.reduce((sum, item) => {
     const amount = parseFloat(item?.amount) || 0;
@@ -235,6 +235,7 @@ const ListScreen = () => {
           }),
         ).unwrap();
         const parsed = typeof raw === 'string' ? JSON.parse(raw) : raw;
+        console.log("🚀 ~ parsed--------:", parsed)
         let dataArray = [];
         let configArray = [];
 
@@ -290,7 +291,9 @@ const ListScreen = () => {
   );
 
   const handleItemPressed = (item, page) => {
-    navigation.navigate('Page', { item, title: page });
+    console.log("🚀 ~ handleItemPressed ~ page:", page)
+    console.log("🚀 ~ handleItemPressed ~ item:", item)
+    navigation.navigate('Page', { item, title: page, isFromNew: true });
   };
 
   const handleActionButtonPressed = (actionValue, label, color) => {
@@ -408,20 +411,13 @@ const ListScreen = () => {
         <TouchableOpacity
           style={styles.addButton}
           onPress={() => {
-            setIsVisibleFormData(true);
+            handleItemPressed(filteredData[0], pageParamsName)
           }}
         >
           <Text style={styles.addButtonText}>+ New</Text>
         </TouchableOpacity>
       )}
-      {isVisibleFormData && (
-        <AddData
-          setIsVisibleFormData={setIsVisibleFormData}
-          isVisibleFormData={isVisibleFormData}
-          configData={configData}
-          pageTitle={pageTitle}
-        />
-      )}
+      
 
       <CustomAlert
         visible={alertVisible}
