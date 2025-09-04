@@ -115,7 +115,7 @@ export const styles = StyleSheet.create({
     marginTop: 2,
   },
   reportBadge: {
-    backgroundColor: ERP_COLOR_CODE.ERP_ERROR,
+    backgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR,
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 12,
@@ -124,7 +124,7 @@ export const styles = StyleSheet.create({
   reportBadgeText: {
     color: '#FFFFFF',
     fontSize: 10,
-    fontWeight: '600',
+    fontWeight: '400',
     textAlign: 'center',
   },
   dashboardItemBody: {

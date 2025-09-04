@@ -117,7 +117,7 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
             </Text>
             <Text style={[styles.accountEmail, isActive && styles.activeText]}>
               {item?.user?.company_code}
-            </Text>
+            </Text> 
             <View
               style={{
                 width: isActive ? '100%' : '80%',
