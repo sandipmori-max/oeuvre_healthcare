@@ -1,5 +1,5 @@
 package com.deverp
-
+import com.deverp.location.LocationPackage 
 import android.app.Application
 import com.facebook.react.PackageList
 import com.facebook.react.ReactApplication
@@ -16,14 +16,11 @@ class MainApplication : Application(), ReactApplication {
       object : DefaultReactNativeHost(this) {
         override fun getPackages(): List<ReactPackage> =
             PackageList(this).packages.apply {
-              // Packages that cannot be autolinked yet can be added manually here, for example:
-              // add(MyReactNativePackage())
-            }
+                   add(LocationPackage())
 
+        }
         override fun getJSMainModuleName(): String = "index"
-
         override fun getUseDeveloperSupport(): Boolean = BuildConfig.DEBUG
-
         override val isNewArchEnabled: Boolean = BuildConfig.IS_NEW_ARCHITECTURE_ENABLED
         override val isHermesEnabled: Boolean = BuildConfig.IS_HERMES_ENABLED
       }

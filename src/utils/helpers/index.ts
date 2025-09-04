@@ -1,7 +1,7 @@
-import { Platform } from 'react-native';
 import { ERP_GIF, ERP_ICON } from '../../assets';
 import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 import moment from 'moment';
+import { PermissionsAndroid, Platform } from 'react-native';
 
 export const getBottomTabIcon = (iconName: string, focused: boolean, theme: any) => {
   switch (iconName) {
@@ -336,3 +336,35 @@ function buildFormatted(date, isFullDate) {
 export const isTokenValid = (tokenValidTill: string) => {
   return new Date(tokenValidTill).getTime() > Date.now();
 };
+
+
+
+
+export async function requestLocationPermissions() {
+  if (Platform.OS === 'android') {
+    try {
+      const granted = await PermissionsAndroid.requestMultiple([
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+        PermissionsAndroid.PERMISSIONS.ACCESS_COARSE_LOCATION,
+        PermissionsAndroid.PERMISSIONS.ACCESS_BACKGROUND_LOCATION, // needed for background & terminated
+      ]);
+
+      if (
+        granted['android.permission.ACCESS_FINE_LOCATION'] === PermissionsAndroid.RESULTS.GRANTED &&
+        granted['android.permission.ACCESS_COARSE_LOCATION'] === PermissionsAndroid.RESULTS.GRANTED &&
+        granted['android.permission.ACCESS_BACKGROUND_LOCATION'] === PermissionsAndroid.RESULTS.GRANTED
+      ) {
+        console.log('✅ Location permissions granted');
+        return true;
+      } else {
+        console.log('❌ Location permissions denied');
+        return false;
+      }
+    } catch (err) {
+      console.warn(err);
+      return false;
+    }
+  } else {
+    return true; // iOS handled via Info.plist
+  }
+}

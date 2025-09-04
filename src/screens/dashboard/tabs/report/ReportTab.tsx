@@ -21,7 +21,7 @@ const accentColors = ['#dbe0f5ff', '#c8f3edff', '#faf1e0ff', '#f0e1e1ff', '#f2e3
 const ReportTab = () => {
   const navigation = useNavigation<any>();
   const { menu, isMenuLoading } = useAppSelector(state => state.auth);
-  const allList = menu?.filter(item => item?.isReport === true) ?? [];
+  const allList = menu?.filter(item => item?.isReport === 'R') ?? [];
 
   const [isHorizontal, setIsHorizontal] = useState(false);
   const [bookmarks, setBookmarks] = useState<{ [key: string]: boolean }>({});
@@ -59,7 +59,13 @@ const ReportTab = () => {
       <TouchableOpacity
         style={[styles.card, { backgroundColor, flexDirection: isHorizontal ? 'row' : 'column' }]}
         activeOpacity={0.7}
-        onPress={() => navigation.navigate('Web', { item })}
+        onPress={() => {
+          if (item?.url.includes('.') || item?.url.includes('?') || item?.url.includes('/')) {
+            navigation.navigate('Web', { item });
+          } else {
+            navigation.navigate('List', { item });
+          }
+        }}
       >
         <TouchableOpacity
           onPress={() => toggleBookmark(item.id)}
@@ -72,9 +78,18 @@ const ReportTab = () => {
         </TouchableOpacity>
 
         <View style={[styles.iconContainer, { backgroundColor: 'rgba(243, 239, 239, 0.42)' }]}>
-          <Text style={styles.iconText}>
-            {item.title ? item.title.trim().slice(0, 2).toUpperCase() : '?'}
-          </Text>
+           <Text style={styles.iconText}>
+                      {item?.icon !== ''
+                        ? item?.icon
+                        : item.name
+                        ? item.name
+  .trim()
+  .split(' ')          // split into words
+  .slice(0, 2)         // take only the first two words
+  .map(word => word[0].toUpperCase()) // first letter of each
+  .join('')
+                        : '?'}
+                    </Text>
         </View>
 
         <View
@@ -84,8 +99,8 @@ const ReportTab = () => {
             alignItems: isHorizontal ? 'flex-start' : 'center',
           }}
         >
-          <Text style={styles.title}>{item.title}</Text>
-          <Text style={styles.subtitle}>{item.name}</Text>
+          <Text style={styles.title}>{item.name}</Text>
+          <Text style={styles.subtitle}>{item.title}</Text>
         </View>
       </TouchableOpacity>
     );

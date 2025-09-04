@@ -22,7 +22,7 @@ export interface MenuItem {
   icon?: string;
   children?: MenuItem[];
   title?: string;
-  isReport?: boolean;
+  isReport?: any;
 }
 
 export interface DashboardItem {

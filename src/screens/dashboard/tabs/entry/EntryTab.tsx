@@ -24,7 +24,8 @@ const EntryTab = () => {
   const dispatch = useAppDispatch();
   const { isLoading, isAuthenticated, activeToken } = useAppSelector(state => state.auth);
   const { menu, isMenuLoading } = useAppSelector(state => state.auth);
-  const allList = menu?.filter(item => item?.isReport === false) ?? [];
+  const allList = menu?.filter(item => item?.isReport === 'E') ?? [];
+  console.log('🚀 ~ EntryTab ~ allList:', allList);
   const [isRefresh, setIsRefresh] = useState<boolean>(false);
 
   const [isHorizontal, setIsHorizontal] = useState(false);
@@ -66,21 +67,29 @@ const EntryTab = () => {
       ),
     });
   }, [navigation, showBookmarksOnly, isHorizontal, isRefresh]);
-  
+
   useEffect(() => {
     if (isAuthenticated) {
       dispatch(getERPMenuThunk());
     }
   }, [isAuthenticated, dispatch, activeToken, isRefresh]);
   const renderItem = ({ item, index }: any) => {
+    console.log('🚀 ~ renderItem ~ item:', item);
     const backgroundColor = accentColors[index % accentColors.length];
-    console.log('🚀 ~ renderItem ~ backgroundColor:', bookmarks[item.id]);
 
     return (
       <TouchableOpacity
         style={[styles.card, { backgroundColor, flexDirection: isHorizontal ? 'row' : 'column' }]}
         activeOpacity={0.7}
-        onPress={() => navigation.navigate('Web', { item })}
+        onPress={() => {
+          console.log('🚀 ~ renderItem ~ backgroundColor:', item?.url);
+
+          if (item?.url.includes('.') || item?.url.includes('?') || item?.url.includes('/')) {
+            navigation.navigate('Web', { item });
+          } else {
+            navigation.navigate('List', { item });
+          }
+        }}
       >
         <TouchableOpacity
           onPress={() => toggleBookmark(item.id)}
@@ -94,7 +103,16 @@ const EntryTab = () => {
 
         <View style={[styles.iconContainer, { backgroundColor: 'rgba(243, 239, 239, 0.42)' }]}>
           <Text style={styles.iconText}>
-            {item.title ? item.title.trim().slice(0, 2).toUpperCase() : '?'}
+            {item?.icon !== ''
+              ? item?.icon
+              : item.name
+              ? item.name
+                  .trim()
+                  .split(' ') // split into words
+                  .slice(0, 2) // take only the first two words
+                  .map(word => word[0].toUpperCase()) // first letter of each
+                  .join('')
+              : '?'}
           </Text>
         </View>
 
@@ -105,8 +123,8 @@ const EntryTab = () => {
             alignItems: isHorizontal ? 'flex-start' : 'center',
           }}
         >
-          <Text style={styles.title}>{item.title}</Text>
-          <Text style={styles.subtitle}>{item.name}</Text>
+          <Text style={styles.title}>{item.name}</Text>
+          <Text style={styles.subtitle}>{item.title}</Text>
         </View>
       </TouchableOpacity>
     );
@@ -151,24 +169,3 @@ const EntryTab = () => {
 };
 
 export default EntryTab;
-
-const localStyles = StyleSheet.create({
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    paddingHorizontal: 12,
-    paddingTop: 10,
-    gap: 10,
-  },
-  button: {
-    backgroundColor: '#e0e0e0',
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 8,
-  },
-  buttonText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#333',
-  },
-});
