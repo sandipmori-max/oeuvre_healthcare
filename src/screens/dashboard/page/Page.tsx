@@ -51,8 +51,8 @@ const PageScreen = () => {
   });
 
   const route = useRoute<RouteProp<PageRouteParams, 'PageScreen'>>();
-  const { item, title, id , isFromNew}: any = route.params;
-  console.log("🚀 ~ PageScreen ~ isFromNew:", isFromNew)
+  const { item, title, id, isFromNew }: any = route.params;
+  console.log('🚀 ~ PageScreen ~ isFromNew:', isFromNew);
   console.log('🚀 ~ PageScreen ~ item:', item);
 
   const validateForm = useCallback(() => {
@@ -160,7 +160,9 @@ const PageScreen = () => {
       setError(null);
       setLoadingPageId(id);
 
-      const parsed = await dispatch(getERPPageThunk({ page: title, id : isFromNew ? 0 :id })).unwrap();
+      const parsed = await dispatch(
+        getERPPageThunk({ page: title, id: isFromNew ? '' : id }),
+      ).unwrap();
       console.log('🚀 ~ parsed:', parsed);
       console.log('🚀 ~ id:', id);
       console.log('🚀 ~ title:', title);
@@ -211,23 +213,25 @@ const PageScreen = () => {
     ({ item }: { item: any }) => {
       console.log('🚀 ~ item:*-*-*-*-*-*--*-', item);
       const setValue = (val: any) => {
-        setFormValues(prev => {
-          if (typeof val === 'object' && val !== null) {
-            return { ...prev, ...val };
-          } else {
-            return { ...prev, val };
-          }
-        });
+        if (typeof val === 'object' && val !== null) {
+          setFormValues(prev => ({ ...prev, ...val }));
+        } else {
+          setFormValues(prev => ({ ...prev, [item.field]: val })); // ✅ for Input
+        }
         setErrors(prev => ({ ...prev, [item?.field]: '' }));
       };
+
       const value = formValues[item?.field] || formValues[item?.text] || '';
 
       if (item?.visible === '1') return null;
       if (item?.ctltype === 'BOOL') {
+        const rawVal = formValues[item?.field] ?? item?.text; // jo form me hai ya phir API ka text
+        const boolVal = String(rawVal).toLowerCase() === 'true'; // convert to boolean
+
         return (
           <BoolInput
             label={item?.fieldtitle}
-            value={!!formValues[item?.field]} // ensure boolean
+            value={boolVal}
             onChange={val => setValue({ [item.field]: val })}
           />
         );
@@ -235,7 +239,8 @@ const PageScreen = () => {
 
       if (item?.ctltype === 'IMAGE')
         return <Media item={item} handleAttachment={handleAttachment} />;
-      if (item?.disabled === '1' && item?.ajax !== 1 && item?.ajax !== 0) return <Disabled item={item} value={value} />;
+      if (item?.disabled === '1' && item?.ajax !== 1)
+        return <Disabled item={item} value={value} type={item?.ctltype} />;
       if (item?.ddl && item?.ddl !== '' && item?.ajax === 0) {
         return (
           <CustomPicker

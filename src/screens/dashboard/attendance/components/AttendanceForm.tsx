@@ -11,11 +11,10 @@ import useTranslations from '../../../../hooks/useTranslations';
 import { styles } from '../attendance_style';
 import CustomAlert from '../../../../components/alert/CustomAlert';
 import { useAppDispatch, useAppSelector } from '../../../../store/hooks';
-import {
-   markAttendanceThunk,
-} from '../../../../store/slices/attendance/thunk';
+import { markAttendanceThunk } from '../../../../store/slices/attendance/thunk';
 import { ERP_COLOR_CODE } from '../../../../utils/constants';
 import { useNavigation } from '@react-navigation/native';
+import SlideButton from './SlideButton';
 
 const AttendanceForm = ({ setBlockAction, resData }: any) => {
   const { t } = useTranslations();
@@ -35,8 +34,6 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
     message: '',
     type: 'info' as 'error' | 'success' | 'info',
   });
-
-  
 
   const openCamera = (
     setFieldValue: (field: keyof AttendanceFormValues, value: any) => void,
@@ -250,34 +247,26 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
                   </View>
                 </>
               )}
-              <View style={{ marginVertical: 12 }}>
-                <TouchableOpacity
-                  style={[
-                    styles.statusBtn,
-                    {
-                      backgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR,
-                    },
-                    locationLoading && { opacity: 0.5 },
-                  ]}
-                  onPress={() => handleStatusToggle(setFieldValue, handleSubmit)}
-                  disabled={locationLoading}
-                >
-                  {locationLoading ? (
-                    <>
-                      <ActivityIndicator size="small" color="#fff" />
-                    </>
-                  ) : (
-                    <>
-                      {' '}
-                      <Text style={styles.statusText}>
-                        {resData?.success === 1 || resData?.success === '1'
-                          ? `${t('attendance.checkOut')}`
-                          : `${t('attendance.checkIn')}`}
-                      </Text>
-                    </>
-                  )}
-                </TouchableOpacity>
-              </View>
+             <View style={styles.slideWrapper}>
+  
+
+  <SlideButton
+    label={
+      resData?.success === 1 || resData?.success === '1'
+        ? `Slide to ${t('attendance.checkOut')}`
+        : `Slide to ${t('attendance.checkIn')}`
+    }
+    successColor={
+      resData?.success === 1 || resData?.success === '1'
+        ? ERP_COLOR_CODE.ERP_ERROR
+        : ERP_COLOR_CODE.ERP_APP_COLOR
+    }
+    loading={locationLoading}
+    completed={attendanceDone}
+    onSlideSuccess={() => handleStatusToggle(setFieldValue, handleSubmit)}
+  />
+</View>
+
             </View>
           </View>
         )}

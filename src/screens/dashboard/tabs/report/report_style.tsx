@@ -20,7 +20,7 @@ export const styles = StyleSheet.create({
   },
   card: {
     flex: 1,
-    borderRadius: 16,
+    borderRadius: 10,
     paddingVertical: 24,
     paddingHorizontal: 16,
     marginBottom: 16,
@@ -37,7 +37,8 @@ export const styles = StyleSheet.create({
     borderColor: 'rgba(107, 104, 104, 0.3)',
   },
   iconText: {
-    color: '#fff',
+     color: '#000',
+    opacity: 0.5,
     fontSize: 24,
     fontWeight: '700',
   },

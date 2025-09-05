@@ -2,8 +2,9 @@ import { View, Text } from 'react-native';
 import React from 'react';
 import { styles } from '../page_style';
 import { ERP_COLOR_CODE } from '../../../../utils/constants';
+import { formatDateHr } from '../../../../utils/helpers';
 
-const Disabled = ({ item, value }: any) => {
+const Disabled = ({ item, value, type }: any) => {
   return (
     <View style={{ marginBottom: 16 }}>
       <View style={{ flexDirection: 'row' }}>
@@ -12,7 +13,9 @@ const Disabled = ({ item, value }: any) => {
         {item?.mandatory === '1' && <Text style={{ color: ERP_COLOR_CODE.ERP_ERROR }}>*</Text>}
       </View>
       <View style={styles.disabledBox}>
-        <Text style={{ color: '#555' }}>{value || '-'}</Text>
+        <Text style={{ color: '#555' }}>
+          {type === 'DATETIME' ? formatDateHr(value, true) : value || '-'}
+        </Text>
       </View>
     </View>
   );

@@ -102,16 +102,16 @@ const ReportTab = () => {
           />
         </TouchableOpacity>
 
-        <View style={[styles.iconContainer, { backgroundColor: 'rgba(243, 239, 239, 0.42)' }]}>
+        <View style={[styles.iconContainer, { backgroundColor: '#fff' }]}>
           <Text style={styles.iconText}>
             {item?.icon !== ''
               ? item?.icon
               : item.name
               ? item.name
                   .trim()
-                  .split(' ') // split into words
-                  .slice(0, 2) // take only the first two words
-                  .map(word => word[0].toUpperCase()) // first letter of each
+                  .split(' ') 
+                  .slice(0, 2)
+                  .map(word => word[0].toUpperCase())
                   .join('')
               : '?'}
           </Text>

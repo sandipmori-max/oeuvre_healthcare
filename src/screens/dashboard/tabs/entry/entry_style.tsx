@@ -22,7 +22,7 @@ export const styles = StyleSheet.create({
   },
   card: {
     flex: 1,
-    borderRadius: 16,
+    borderRadius: 10,
     paddingVertical: 24,
     paddingHorizontal: 16,
     marginBottom: 16,

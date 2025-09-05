@@ -18,7 +18,7 @@ const Input = ({item, errors, value, setValue}: any) => {
           ]}
           keyboardType={item?.ctltype === 'NUMERIC' ? 'number-pad' : 'default'}
           value={value.toString()}
-          onChangeText={setValue}
+onChangeText={(text) => setValue(text)}
           placeholder={`Enter ${item?.fieldtitle}`}
         />
         {errors[item.field] && (
