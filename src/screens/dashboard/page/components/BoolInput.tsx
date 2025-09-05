@@ -2,12 +2,13 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 
 type BoolInputProps = {
-  value: boolean;
+  value: any;
   onChange: (val: boolean) => void;
   label?: string;
 };
 
 const BoolInput = ({ value, onChange, label }: BoolInputProps) => {
+  console.log("🚀 ~ BoolInput ~ value:", value)
   return (
     <View style={{  marginBottom: 10 }}>
       {label && <Text style={{ marginBottom: 4, fontWeight: '600' }}>{label}</Text>}

@@ -119,7 +119,7 @@ const EntryTab = () => {
           />
         </TouchableOpacity>
 
-        <View style={[styles.iconContainer, { backgroundColor: 'rgba(243, 239, 239, 0.42)' }]}>
+        <View style={[styles.iconContainer, { backgroundColor: '#fff' }]}>
           <Text style={styles.iconText}>
             {item?.icon !== ''
               ? item?.icon
