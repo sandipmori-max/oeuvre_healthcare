@@ -5,9 +5,25 @@ export const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: ERP_COLOR_CODE.ERP_BACKGROUND,
-    
   },
-  back:{
+  toggleButton: {
+    position: 'absolute',
+    right: 4,
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 5,
+    top: 16,
+  },
+
+  iconWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    position: 'absolute',
+    right: 10,
+    height: '100%',
+  },
+  back: {
     width: 24,
     height: 24,
     tintColor: '#fff',

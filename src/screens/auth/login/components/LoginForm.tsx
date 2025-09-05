@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { View, Text, Animated } from 'react-native';
 import { Formik } from 'formik';
 import { getMessaging } from '@react-native-firebase/messaging';
 
@@ -22,15 +22,42 @@ const LoginForm: React.FC<LoginFormProps> = ({
 }) => {
   const { t } = useTranslations();
   const { token: fcmToken } = useFcmToken();
-  console.log("🚀 ~ LoginForm ~ fcmToken:", fcmToken)
 
-  const {
-    execute: validateCompanyCode,
-    loading: validationLoading,
-    error: validationError,
-  } = useApi();
-
+  const { execute: validateCompanyCode, loading: validationLoading, error: validationError } =
+    useApi();
   const { execute: loginWithERP, loading: erpLoginLoading, error: erpLoginError } = useApi();
+
+  const fadeAnims = [useRef(new Animated.Value(0)).current, useRef(new Animated.Value(0)).current, useRef(new Animated.Value(0)).current];
+  const buttonScale = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    // staggered fade-in for inputs
+    Animated.stagger(200,
+      fadeAnims.map(anim =>
+        Animated.timing(anim, {
+          toValue: 1,
+          duration: 600,
+          useNativeDriver: true,
+        }),
+      ),
+    ).start();
+  }, []);
+
+  useEffect(() => {
+    if (!isLoading && !validationLoading && !erpLoginLoading) {
+      Animated.spring(buttonScale, {
+        toValue: 1.05,
+        friction: 3,
+        useNativeDriver: true,
+      }).start(() => {
+        Animated.spring(buttonScale, {
+          toValue: 1,
+          friction: 3,
+          useNativeDriver: true,
+        }).start();
+      });
+    }
+  }, [isLoading, validationLoading, erpLoginLoading]);
 
   const initialFormValues = {
     company_code: '',
@@ -45,13 +72,9 @@ const LoginForm: React.FC<LoginFormProps> = ({
       const companyValidation = await validateCompanyCode(() =>
         DevERPService.validateCompanyCode(values.company_code),
       );
-      if (!companyValidation?.isValid) {
-        return;
-      }
-      console.log("🚀 ~ handleLoginSubmit ~ top:--------")
-      const currentFcmToken = fcmToken || (await getMessaging().getToken());
-      console.log("🚀 ~ handleLoginSubmit ~ bottom:--------")
+      if (!companyValidation?.isValid) return;
 
+      const currentFcmToken = fcmToken || (await getMessaging().getToken());
       DevERPService.setAppId(generateGUID());
       DevERPService.setDevice(deviceId);
 
@@ -62,19 +85,10 @@ const LoginForm: React.FC<LoginFormProps> = ({
           firebaseid: currentFcmToken || '',
         }),
       );
-      console.log("🚀 ~ handleLoginSubmit ~ loginResult:--------", loginResult)
+
       if (loginResult?.success === 1) {
         await DevERPService.getAuth();
-        await onLoginSuccess(
-          values.company_code,
-          values.password, 
-          {
-          user: values.user,
-          name: values.user,
-          },
-          loginResult
-    
-      );
+        await onLoginSuccess(values.company_code, values.password, { user: values.user, name: values.user }, loginResult);
       } else {
         showAlert({
           title: t('auth.error'),
@@ -82,7 +96,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
           type: 'error',
         });
       }
-    } catch (e) {}
+    } catch {}
   };
 
   return (
@@ -101,67 +115,45 @@ const LoginForm: React.FC<LoginFormProps> = ({
       >
         {({ handleChange, handleBlur, values, errors, touched, handleSubmit }) => (
           <>
-            <ERPTextInput
-              label={t('auth.companyCode')}
-              placeholder={t('auth.enterCompanyCode')}
-              placeholderTextColor="#999"
-              autoCapitalize="none"
-              onChangeText={handleChange('company_code')}
-              onBlur={handleBlur('company_code')}
-              value={values.company_code}
-              error={errors.company_code}
-              touched={touched.company_code}
-              containerStyle={styles.inputContainer}
-              labelStyle={styles.inputLabel}
-              inputStyle={styles.input}
-              errorStyle={styles.errorText}
-            />
+            {['company_code', 'user', 'password'].map((field, index) => (
+              <Animated.View
+                key={field}
+                style={{ opacity: fadeAnims[index], transform: [{ translateY: fadeAnims[index].interpolate({ inputRange: [0, 1], outputRange: [20, 0] }) }] }}
+              >
+                <ERPTextInput
+                  label={t(`auth.${field === 'company_code' ? 'companyCode' : field}`)}
+                  placeholder={t(`auth.${field === 'company_code' ? 'enterCompanyCode' : field === 'user' ? 'enterUser' : 'enterPassword'}`)}
+                  placeholderTextColor="#999"
+                  autoCapitalize="none"
+                  secureTextEntry={field === 'password'}
+                  showToggle={field === 'password'}
+                  onChangeText={handleChange(field)}
+                  onBlur={handleBlur(field)}
+                  value={values[field as keyof typeof values] as string}
+                  error={errors[field as keyof typeof errors]}
+                  touched={touched[field as keyof typeof touched]}
+                  containerStyle={styles.inputContainer}
+                  labelStyle={styles.inputLabel}
+                  inputStyle={styles.input}
+                  errorStyle={styles.errorText}
+                />
+              </Animated.View>
+            ))}
 
-            <ERPTextInput
-              label={t('auth.user')}
-              placeholder={t('auth.enterUser')}
-              placeholderTextColor="#999"
-              autoCapitalize="none"
-              onChangeText={handleChange('user')}
-              onBlur={handleBlur('user')}
-              value={values.user}
-              error={errors.user}
-              touched={touched.user}
-              containerStyle={styles.inputContainer}
-              labelStyle={styles.inputLabel}
-              inputStyle={styles.input}
-              errorStyle={styles.errorText}
-            />
-
-            <ERPTextInput
-              label={t('auth.password')}
-              placeholder={t('auth.enterPassword')}
-              placeholderTextColor="#999"
-              secureTextEntry
-              showToggle
-              onChangeText={handleChange('password')}
-              onBlur={handleBlur('password')}
-              value={values.password}
-              error={errors.password}
-              touched={touched.password}
-              containerStyle={styles.inputContainer}
-              labelStyle={styles.inputLabel}
-              inputStyle={styles.input}
-              errorStyle={styles.errorText}
-            />
-
-            <ERPButton
-              text={
-                isLoading || validationLoading || erpLoginLoading
-                  ? t('auth.signingIn')
-                  : t('auth.signIn')
-              }
-              onPress={handleSubmit as any}
-              color={isLoading || validationLoading || erpLoginLoading ? '#aaa' : '#007bff'}
-              disabled={isLoading || validationLoading || erpLoginLoading}
-              style={styles.loginButton}
-              textStyle={styles.loginButtonText}
-            />
+            <Animated.View style={{ transform: [{ scale: buttonScale }] }}>
+              <ERPButton
+                text={
+                  isLoading || validationLoading || erpLoginLoading
+                    ? t('auth.signingIn')
+                    : t('auth.signIn')
+                }
+                onPress={handleSubmit as any}
+                color={isLoading || validationLoading || erpLoginLoading ? '#aaa' : '#007bff'}
+                disabled={isLoading || validationLoading || erpLoginLoading}
+                style={styles.loginButton}
+                textStyle={styles.loginButtonText}
+              />
+            </Animated.View>
           </>
         )}
       </Formik>
