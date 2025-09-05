@@ -1,6 +1,10 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable react/no-unstable-nested-components */
+/* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useEffect, useLayoutEffect, useState } from 'react';
 import { Text, View, FlatList, StyleSheet } from 'react-native';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
+import Animated, { FadeInUp, Layout } from 'react-native-reanimated'; // ✅ added
 import { useAppDispatch } from '../../../store/hooks';
 import { getERPPageThunk } from '../../../store/slices/auth/thunk';
 import { savePageThunk } from '../../../store/slices/page/thunk';
@@ -52,8 +56,6 @@ const PageScreen = () => {
 
   const route = useRoute<RouteProp<PageRouteParams, 'PageScreen'>>();
   const { item, title, id, isFromNew }: any = route.params;
-  console.log('🚀 ~ PageScreen ~ isFromNew:', isFromNew);
-  console.log('🚀 ~ PageScreen ~ item:', item);
 
   const validateForm = useCallback(() => {
     const validationErrors: Record<string, string> = {};
@@ -96,7 +98,6 @@ const PageScreen = () => {
                   controls.forEach(f => {
                     if (f.refcol !== '1') submitValues[f.field] = formValues[f.field];
                   });
-
                   try {
                     setLoader(true);
                     await dispatch(
@@ -127,7 +128,6 @@ const PageScreen = () => {
               }}
             />
           )}
-
           <ERPIcon
             name="refresh"
             isLoading={actionLoader}
@@ -163,9 +163,7 @@ const PageScreen = () => {
       const parsed = await dispatch(
         getERPPageThunk({ page: title, id: isFromNew ? '' : id }),
       ).unwrap();
-      console.log('🚀 ~ parsed:', parsed);
-      console.log('🚀 ~ id:', id);
-      console.log('🚀 ~ title:', title);
+
       const pageControls = Array.isArray(parsed?.pagectl) ? parsed.pagectl : [];
 
       const normalizedControls = pageControls.map(c => ({
@@ -210,13 +208,12 @@ const PageScreen = () => {
   };
 
   const renderItem = useCallback(
-    ({ item }: { item: any }) => {
-      console.log('🚀 ~ item:*-*-*-*-*-*--*-', item);
+    ({ item, index }: { item: any; index: number }) => {
       const setValue = (val: any) => {
         if (typeof val === 'object' && val !== null) {
           setFormValues(prev => ({ ...prev, ...val }));
         } else {
-          setFormValues(prev => ({ ...prev, [item.field]: val })); // ✅ for Input
+          setFormValues(prev => ({ ...prev, [item.field]: val }));
         }
         setErrors(prev => ({ ...prev, [item?.field]: '' }));
       };
@@ -224,25 +221,24 @@ const PageScreen = () => {
       const value = formValues[item?.field] || formValues[item?.text] || '';
 
       if (item?.visible === '1') return null;
-      if (item?.ctltype === 'BOOL') {
-        const rawVal = formValues[item?.field] ?? item?.text; // jo form me hai ya phir API ka text
-        const boolVal = String(rawVal).toLowerCase() === 'true'; // convert to boolean
 
-        return (
+      let content = null;
+      if (item?.ctltype === 'BOOL') {
+        const rawVal = formValues[item?.field] ?? item?.text;
+        const boolVal = String(rawVal).toLowerCase() === 'true';
+        content = (
           <BoolInput
             label={item?.fieldtitle}
             value={boolVal}
             onChange={val => setValue({ [item.field]: val })}
           />
         );
-      }
-
-      if (item?.ctltype === 'IMAGE')
-        return <Media item={item} handleAttachment={handleAttachment} />;
-      if (item?.disabled === '1' && item?.ajax !== 1)
-        return <Disabled item={item} value={value} type={item?.ctltype} />;
-      if (item?.ddl && item?.ddl !== '' && item?.ajax === 0) {
-        return (
+      } else if (item?.ctltype === 'IMAGE') {
+        content = <Media item={item} handleAttachment={handleAttachment} />;
+      } else if (item?.disabled === '1' && item?.ajax !== 1) {
+        content = <Disabled item={item} value={value} type={item?.ctltype} />;
+      } else if (item?.ddl && item?.ddl !== '' && item?.ajax === 0) {
+        content = (
           <CustomPicker
             label={item?.fieldtitle}
             selectedValue={value}
@@ -253,9 +249,8 @@ const PageScreen = () => {
             errors={errors}
           />
         );
-      }
-      if (item?.ddl && item?.ddl !== '' && item?.ajax === 1) {
-        return (
+      } else if (item?.ddl && item?.ddl !== '' && item?.ajax === 1) {
+        content = (
           <AjaxPicker
             label={item?.fieldtitle}
             selectedValue={value}
@@ -267,15 +262,22 @@ const PageScreen = () => {
             formValues={formValues}
           />
         );
-      }
-
-      if (item?.ctltype === 'DATE') {
-        return (
+      } else if (item?.ctltype === 'DATE') {
+        content = (
           <DateRow item={item} errors={errors} value={value} showDatePicker={showDatePicker} />
         );
+      } else {
+        content = <Input item={item} errors={errors} value={value} setValue={setValue} />;
       }
 
-      return <Input item={item} errors={errors} value={value} setValue={setValue} />;
+      return (
+        <Animated.View
+          entering={FadeInUp.delay(index * 70).springify()}
+          layout={Layout.springify()}
+        >
+          {content}
+        </Animated.View>
+      );
     },
     [formValues, errors],
   );
@@ -285,10 +287,12 @@ const PageScreen = () => {
     setActiveDate(date);
     setDatePickerVisible(true);
   };
+
   const hideDatePicker = () => {
     setDatePickerVisible(false);
     setActiveDateField(null);
   };
+  
   const handleConfirm = (date: Date) => {
     if (activeDateField) {
       setFormValues(prev => ({ ...prev, [activeDateField]: date.toISOString() }));
@@ -309,7 +313,6 @@ const PageScreen = () => {
             data={controls}
             keyExtractor={(it, idx) => it?.dtlid || idx?.toString()}
             renderItem={renderItem}
-            contentContainerStyle={{ paddingBottom: 50 }}
             removeClippedSubviews
           />
 

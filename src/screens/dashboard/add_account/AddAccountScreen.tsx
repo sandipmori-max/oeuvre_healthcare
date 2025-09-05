@@ -26,6 +26,7 @@ import { getMessaging } from '@react-native-firebase/messaging';
 import useFcmToken from '../../../hooks/useFcmToken';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DeviceInfo from 'react-native-device-info';
+import MaterialIcons from '@react-native-vector-icons/material-icons';
 
 const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose }) => {
   const dispatch = useAppDispatch();
@@ -34,11 +35,15 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
   const { accounts } = useAppSelector(state => state.auth);
   const { token: fcmToken } = useFcmToken();
   const [deviceId, setDeviceId] = useState<string>('');
+  const [showPassword, setShowPassword] = useState(false);
+
+  useEffect(() => {
+    setLoader(false);
+  }, [visible]);
 
   const appId = generateGUID();
 
-
-   useEffect(() => {
+  useEffect(() => {
     const fetchDeviceName = async () => {
       const name = await DeviceInfo.getDeviceName();
       console.log('Device Name:', name);
@@ -47,7 +52,6 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
 
     fetchDeviceName();
   }, []);
-
 
   const [alertVisible, setAlertVisible] = useState(false);
   const [loader, setLoader] = useState(false);
@@ -58,6 +62,9 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
   });
 
   const handleClose = () => {
+    setLoader(false);
+    setAlertVisible(false);
+    setAlertVisible(false);
     onClose();
   };
 
@@ -67,8 +74,8 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
     password: string;
   }) => {
     try {
-            DevERPService.setDevice(deviceId);
-      
+      DevERPService.setDevice(deviceId);
+
       setLoader(true);
       const userExists = accounts?.some(acc => acc?.user.name === values.user);
       if (userExists) {
@@ -95,7 +102,10 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
           firebaseid: currentFcmToken,
         }),
       );
-      console.log("🚀0🚀0🚀0🚀0🚀00🚀🚀0🚀0🚀0🚀0🚀00🚀🚀0🚀0🚀0🚀0🚀0🚀0🚀v0🚀0🚀 ~ handleAddAccount ~ loginResult:", loginResult)
+      console.log(
+        '🚀0🚀0🚀0🚀0🚀00🚀🚀0🚀0🚀0🚀0🚀00🚀🚀0🚀0🚀0🚀0🚀0🚀0🚀v0🚀0🚀 ~ handleAddAccount ~ loginResult:',
+        loginResult,
+      );
 
       if (!loginResult || loginResult?.success !== 1) {
         setAlertConfig({
@@ -111,7 +121,7 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
       await DevERPService.setToken(loginResult?.token);
       await AsyncStorage.setItem('erp_token', loginResult?.token || '');
       await AsyncStorage.setItem('auth_token', loginResult?.token || '');
-            await AsyncStorage.setItem('erp_token_valid_till', loginResult?.token || '')
+      await AsyncStorage.setItem('erp_token_valid_till', loginResult?.token || '');
 
       dispatch(
         loginUserThunk({
@@ -199,17 +209,36 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
                     )}
                   </View>
 
-                  <View style={styles.inputContainer}>
+                  <View
+                    style={[
+                      styles.inputContainer,
+                      { justifyContent: 'space-between', alignContent: 'center' },
+                    ]}
+                  >
                     <Text style={styles.inputLabel}>Password</Text>
                     <TextInput
                       style={styles.input}
                       placeholder="Password"
-                      secureTextEntry
+                      secureTextEntry={showPassword}
                       placeholderTextColor="#999"
                       value={values?.password}
                       onChangeText={handleChange('password')}
                       onBlur={handleBlur('password')}
-                    />
+                    ></TextInput>
+                    <View style={styles.iconWrapper}>
+                      <TouchableOpacity
+                        onPress={() => setShowPassword(s => !s)}
+                        style={styles.toggleButton}
+                        accessibilityLabel={showPassword ? 'Hide password' : 'Show password'}
+                      >
+                        <MaterialIcons
+                          name={showPassword ? 'visibility-off' : 'visibility'}
+                          color={'#000'}
+                          size={20}
+                        />
+                      </TouchableOpacity>
+                    </View>
+
                     {touched?.password && errors?.password && (
                       <Text style={styles.errorText}>{errors?.password}</Text>
                     )}
@@ -240,7 +269,12 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
           title={alertConfig.title}
           message={alertConfig.message}
           type={alertConfig.type}
-          onClose={() => setAlertVisible(false)}
+          onClose={() => {
+            setLoader(false);
+            setAlertVisible(false);
+            setAlertVisible(false);
+          }}
+          actionLoader={undefined}
         />
       </View>
     </Modal>

@@ -225,7 +225,7 @@ const SettingsScreen = () => {
             value={item.value}
             onValueChange={() =>{
                handleToggle(item.id)
-               dispatch(toggleTheme())
+              //  dispatch(toggleTheme())
             }}
             trackColor={{ false: '#e0e0e0', true: '#4CAF50' }}
             thumbColor={item.value ? '#fff' : '#f4f3f4'}

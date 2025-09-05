@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { View, Text, Image, StatusBar, Animated } from 'react-native';
+import { View, Image, StatusBar, Animated, Easing } from 'react-native';
 
 import { ERP_ICON } from '../../assets';
 import { styles } from './splash_style';
@@ -7,30 +7,93 @@ import { SplashProps } from './types';
 
 const CustomSplashScreen: React.FC<SplashProps> = ({ onFinish }) => {
   const fadeAnim = useRef(new Animated.Value(0)).current;
+  const scaleAnim = useRef(new Animated.Value(0.5)).current;
+  const textTranslateY = useRef(new Animated.Value(20)).current;
+  const subtitleOpacity = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    Animated.timing(fadeAnim, {
-      toValue: 1,
-      duration: 800,
-      useNativeDriver: true,
-    }).start();
+    // Animate logo (fade + scale)
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 800,
+        easing: Easing.out(Easing.ease),
+        useNativeDriver: true,
+      }),
+      Animated.spring(scaleAnim, {
+        toValue: 1,
+        friction: 4,
+        tension: 80,
+        useNativeDriver: true,
+      }),
+    ]).start(() => {
+      // After logo animation, animate text with staggered effect
+      Animated.sequence([
+        Animated.parallel([
+          Animated.timing(textTranslateY, {
+            toValue: 0,
+            duration: 600,
+            easing: Easing.out(Easing.ease),
+            useNativeDriver: true,
+          }),
+          Animated.timing(subtitleOpacity, {
+            toValue: 1,
+            duration: 800,
+            delay: 200,
+            useNativeDriver: true,
+          }),
+        ]),
+      ]).start();
+    });
 
     const timer = setTimeout(() => {
       onFinish();
-    }, 2000);
+    }, 2500);
 
     return () => clearTimeout(timer);
-  }, [fadeAnim, onFinish]);
+  }, [fadeAnim, scaleAnim, textTranslateY, subtitleOpacity, onFinish]);
 
   return (
-    <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
+    <View style={styles.container}>
       <StatusBar hidden />
-      <View style={styles.logoWrapper}>
+
+      {/* Logo Animation */}
+      <Animated.View
+        style={[
+          styles.logoWrapper,
+          {
+            opacity: fadeAnim,
+            transform: [{ scale: scaleAnim }],
+          },
+        ]}
+      >
         <Image source={ERP_ICON.APP_LOGO} style={styles.logo} resizeMode="contain" />
-      </View>
-      <Text style={styles.title}>Welcome to DevERP</Text>
-      <Text style={styles.subtitle}>Your business, simplified.</Text>
-    </Animated.View>
+      </Animated.View>
+
+      {/* Title Animation */}
+      <Animated.Text
+        style={[
+          styles.title,
+          {
+            transform: [{ translateY: textTranslateY }],
+          },
+        ]}
+      >
+        Welcome to DevERP
+      </Animated.Text>
+
+      {/* Subtitle Animation */}
+      <Animated.Text
+        style={[
+          styles.subtitle,
+          {
+            opacity: subtitleOpacity,
+          },
+        ]}
+      >
+        Your business, simplified.
+      </Animated.Text>
+    </View>
   );
 };
 
