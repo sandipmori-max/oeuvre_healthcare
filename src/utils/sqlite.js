@@ -9,6 +9,8 @@ const ERP_DB_SIZE = 200000;
 const ERP_TABLE = {
   ERP_ACCOUNTS: 'erp_accounts',
   ERP_META: 'meta',
+    ERP_BOOKMARKS: 'erp_bookmarks',
+
 };
 
 export const getDBConnection = async () => {
@@ -32,6 +34,14 @@ const ERP_QUERY_META_TABLE_CREATE = `CREATE TABLE IF NOT EXISTS ${ERP_TABLE.ERP_
       key TEXT PRIMARY KEY NOT NULL,
       value TEXT
     );`;
+
+    
+const ERP_QUERY_BOOKMARKS_TABLE_CREATE = `
+  CREATE TABLE IF NOT EXISTS ${ERP_TABLE.ERP_BOOKMARKS} (
+    id TEXT PRIMARY KEY NOT NULL,
+    isBookmarked INTEGER DEFAULT 0
+  );
+`;
 
 export const createAccountsTable = async db => {
   try {
@@ -263,5 +273,51 @@ export const debugDatabaseContents = async db => {
     }
   } catch (error) {
     console.error('Error debugDatabaseContents:', error);
+  }
+};
+
+export const createBookmarksTable = async (db) => {
+  try {
+    await db.executeSql(ERP_QUERY_BOOKMARKS_TABLE_CREATE);
+    console.log("🔍 createBookmarksTable done");
+  } catch (error) {
+    console.error("Error createBookmarksTable:", error);
+  }
+};
+
+export const insertOrUpdateBookmark = async (db, id: string, isBookmarked: boolean) => {
+  try {
+    await db.executeSql(
+      `INSERT OR REPLACE INTO ${ERP_TABLE.ERP_BOOKMARKS} (id, isBookmarked) VALUES (?, ?)`,
+      [id, isBookmarked ? 1 : 0]
+    );
+    console.log("🔍 insertOrUpdateBookmark done:", id, isBookmarked);
+  } catch (error) {
+    console.error("Error insertOrUpdateBookmark:", error);
+  }
+};
+
+export const getBookmarks = async (db) => {
+  try {
+    const results = await db.executeSql(`SELECT * FROM ${ERP_TABLE.ERP_BOOKMARKS}`);
+    const bookmarks: { [key: string]: boolean } = {};
+    for (let i = 0; i < results[0].rows.length; i++) {
+      const row = results[0].rows.item(i);
+      bookmarks[row.id] = !!row.isBookmarked;
+    }
+    console.log("🔍 getBookmarks:", bookmarks);
+    return bookmarks;
+  } catch (error) {
+    console.error("Error getBookmarks:", error);
+    return {};
+  }
+};
+
+export const removeBookmark = async (db, id: string) => {
+  try {
+    await db.executeSql(`DELETE FROM ${ERP_TABLE.ERP_BOOKMARKS} WHERE id = ?`, [id]);
+    console.log("🔍 removeBookmark done:", id);
+  } catch (error) {
+    console.error("Error removeBookmark:", error);
   }
 };

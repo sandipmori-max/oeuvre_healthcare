@@ -16,6 +16,7 @@ import { styles } from './entry_style';
 import { ERP_ICON } from '../../../../assets';
 import ERPIcon from '../../../../components/icon/ERPIcon';
 import { getERPDashboardThunk, getERPMenuThunk } from '../../../../store/slices/auth/thunk';
+import { createBookmarksTable, getBookmarks, getDBConnection, insertOrUpdateBookmark } from '../../../../utils/sqlite';
 
 const accentColors = ['#dbe0f5ff', '#c8f3edff', '#faf1e0ff', '#f0e1e1ff', '#f2e3f8ff', '#e0f3edff'];
 
@@ -34,9 +35,14 @@ const EntryTab = () => {
 
   const list = showBookmarksOnly ? allList.filter(item => bookmarks[item.id]) : allList;
 
-  const toggleBookmark = (id: string) => {
-    setBookmarks(prev => ({ ...prev, [id]: !prev[id] }));
-  };
+ const toggleBookmark = async (id: string) => {
+  const updated = !bookmarks[id];
+  setBookmarks(prev => ({ ...prev, [id]: updated }));
+
+  const db = await getDBConnection();
+  await insertOrUpdateBookmark(db, id, updated);
+};
+
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -68,11 +74,23 @@ const EntryTab = () => {
     });
   }, [navigation, showBookmarksOnly, isHorizontal, isRefresh]);
 
+
+  useEffect(() => {
+  (async () => {
+    const db = await getDBConnection();
+    await createBookmarksTable(db);
+    const saved = await getBookmarks(db);
+    setBookmarks(saved);
+  })();
+}, []);
+
+
   useEffect(() => {
     if (isAuthenticated) {
       dispatch(getERPMenuThunk());
     }
   }, [isAuthenticated, dispatch, activeToken, isRefresh]);
+
   const renderItem = ({ item, index }: any) => {
     console.log('🚀 ~ renderItem ~ item:', item);
     const backgroundColor = accentColors[index % accentColors.length];
@@ -108,9 +126,9 @@ const EntryTab = () => {
               : item.name
               ? item.name
                   .trim()
-                  .split(' ') // split into words
-                  .slice(0, 2) // take only the first two words
-                  .map(word => word[0].toUpperCase()) // first letter of each
+                  .split(' ') 
+                  .slice(0, 2) 
+                  .map(word => word[0].toUpperCase()) 
                   .join('')
               : '?'}
           </Text>

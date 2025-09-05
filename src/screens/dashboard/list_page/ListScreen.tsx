@@ -40,7 +40,6 @@ const ListScreen = () => {
   const [filteredData, setFilteredData] = useState<any[]>([]);
   const [alertVisible, setAlertVisible] = useState(false);
   const [actionLoaders, setActionLoader] = useState(false);
-  const [isVisibleFormData, setIsVisibleFormData] = useState(false);
 
   const [alertConfig, setAlertConfig] = useState({
     title: '',
@@ -70,7 +69,7 @@ const ListScreen = () => {
   }, 0);
 
   const hasDateField = configData.some(
-    item => item.datafield && item.datafield.toLowerCase() === 'date',
+    item => item?.datafield && item?.datafield.toLowerCase() === 'date',
   );
 
   useLayoutEffect(() => {
@@ -224,11 +223,11 @@ const ListScreen = () => {
     async (fromDateStr: string, toDateStr: string) => {
       try {
         setError(null);
-        setLoadingListId(item.id);
+        setLoadingListId(item?.id || 0);
 
         const raw = await dispatch(
           getERPListDataThunk({
-            page: item.name,
+            page: item?.name,
             fromDate: fromDateStr,
             toDate: toDateStr,
             param: '',
@@ -411,7 +410,7 @@ const ListScreen = () => {
         <TouchableOpacity
           style={styles.addButton}
           onPress={() => {
-            handleItemPressed(filteredData[0], pageParamsName)
+            handleItemPressed({}, pageParamsName)
           }}
         >
           <Text style={styles.addButtonText}>+ New</Text>

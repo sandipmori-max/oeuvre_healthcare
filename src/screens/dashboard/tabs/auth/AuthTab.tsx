@@ -16,6 +16,7 @@ import { ERP_ICON } from '../../../../assets';
 import ERPIcon from '../../../../components/icon/ERPIcon';
 import { getERPDashboardThunk, getERPMenuThunk } from '../../../../store/slices/auth/thunk';
 import { styles } from '../entry/entry_style';
+import { createBookmarksTable, getBookmarks, getDBConnection, insertOrUpdateBookmark } from '../../../../utils/sqlite';
 
 const accentColors = ['#dbe0f5ff', '#c8f3edff', '#faf1e0ff', '#f0e1e1ff', '#f2e3f8ff', '#e0f3edff'];
 
@@ -34,9 +35,22 @@ const EntryTab = () => {
 
   const list = showBookmarksOnly ? allList.filter(item => bookmarks[item.id]) : allList;
 
-  const toggleBookmark = (id: string) => {
-    setBookmarks(prev => ({ ...prev, [id]: !prev[id] }));
-  };
+  useEffect(() => {
+     (async () => {
+       const db = await getDBConnection();
+       await createBookmarksTable(db);
+       const saved = await getBookmarks(db);
+       setBookmarks(saved);
+     })();
+   }, []);
+ 
+   const toggleBookmark = async (id: string) => {
+     const updated = !bookmarks[id];
+     setBookmarks(prev => ({ ...prev, [id]: updated }));
+ 
+     const db = await getDBConnection();
+     await insertOrUpdateBookmark(db, id, updated);
+   };
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -75,7 +89,7 @@ const EntryTab = () => {
   }, [isAuthenticated, dispatch, activeToken, isRefresh]);
   const renderItem = ({ item, index }: any) => {
     const backgroundColor = accentColors[index % accentColors.length];
-    
+
     return (
       <TouchableOpacity
         style={[styles.card, { backgroundColor, flexDirection: isHorizontal ? 'row' : 'column' }]}
@@ -102,17 +116,17 @@ const EntryTab = () => {
 
         <View style={[styles.iconContainer, { backgroundColor: 'rgba(243, 239, 239, 0.42)' }]}>
           <Text style={styles.iconText}>
-                     {item?.icon !== ''
-                       ? item?.icon
-                       : item.name
-                       ? item.name
-  .trim()
-  .split(' ')          // split into words
-  .slice(0, 2)         // take only the first two words
-  .map(word => word[0].toUpperCase()) // first letter of each
-  .join('')
-                       : '?'}
-                   </Text>
+            {item?.icon !== ''
+              ? item?.icon
+              : item.name
+              ? item.name
+                  .trim()
+                  .split(' ')  
+                  .slice(0, 2)  
+                  .map(word => word[0].toUpperCase()) 
+                  .join('')
+              : '?'}
+          </Text>
         </View>
 
         <View

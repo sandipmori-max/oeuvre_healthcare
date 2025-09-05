@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, { useLayoutEffect, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { useAppSelector } from '../../../../store/hooks';
 import NoData from '../../../../components/no_data/NoData';
@@ -15,6 +15,12 @@ import FullViewLoader from '../../../../components/loader/FullViewLoader';
 import { styles } from './report_style';
 import { ERP_ICON } from '../../../../assets';
 import ERPIcon from '../../../../components/icon/ERPIcon';
+import {
+  createBookmarksTable,
+  getBookmarks,
+  getDBConnection,
+  insertOrUpdateBookmark,
+} from '../../../../utils/sqlite';
 
 const accentColors = ['#dbe0f5ff', '#c8f3edff', '#faf1e0ff', '#f0e1e1ff', '#f2e3f8ff', '#e0f3edff'];
 
@@ -29,29 +35,48 @@ const ReportTab = () => {
 
   const list = showBookmarksOnly ? allList.filter(item => bookmarks[item.id]) : allList;
 
-  const toggleBookmark = (id: string) => {
-    setBookmarks(prev => ({ ...prev, [id]: !prev[id] }));
+  useEffect(() => {
+    (async () => {
+      const db = await getDBConnection();
+      await createBookmarksTable(db);
+      const saved = await getBookmarks(db);
+      setBookmarks(saved);
+    })();
+  }, []);
+
+  const toggleBookmark = async (id: string) => {
+    const updated = !bookmarks[id];
+    setBookmarks(prev => ({ ...prev, [id]: updated }));
+
+    const db = await getDBConnection();
+    await insertOrUpdateBookmark(db, id, updated);
   };
 
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
         <>
-          <ERPIcon name= {!isHorizontal ? 'list' : 'apps'} onPress={() => setIsHorizontal(prev => !prev)} />
+          <ERPIcon
+            name={!isHorizontal ? 'list' : 'apps'}
+            onPress={() => setIsHorizontal(prev => !prev)}
+          />
 
-          <ERPIcon name={showBookmarksOnly ? 'star' : 'allout'} onPress={() => setShowBookmarksOnly(prev => !prev)} />
+          <ERPIcon
+            name={showBookmarksOnly ? 'star' : 'allout'}
+            onPress={() => setShowBookmarksOnly(prev => !prev)}
+          />
 
           <ERPIcon name="refresh" />
         </>
       ),
       headerLeft: () => (
         <>
-           <ERPIcon extSize={24} isMenu={true} name="menu" onPress={() => navigation.openDrawer()} />
+          <ERPIcon extSize={24} isMenu={true} name="menu" onPress={() => navigation.openDrawer()} />
         </>
       ),
     });
   }, [navigation, showBookmarksOnly, isHorizontal]);
-  
+
   const renderItem = ({ item, index }: any) => {
     const backgroundColor = accentColors[index % accentColors.length];
 
@@ -78,18 +103,18 @@ const ReportTab = () => {
         </TouchableOpacity>
 
         <View style={[styles.iconContainer, { backgroundColor: 'rgba(243, 239, 239, 0.42)' }]}>
-           <Text style={styles.iconText}>
-                      {item?.icon !== ''
-                        ? item?.icon
-                        : item.name
-                        ? item.name
-  .trim()
-  .split(' ')          // split into words
-  .slice(0, 2)         // take only the first two words
-  .map(word => word[0].toUpperCase()) // first letter of each
-  .join('')
-                        : '?'}
-                    </Text>
+          <Text style={styles.iconText}>
+            {item?.icon !== ''
+              ? item?.icon
+              : item.name
+              ? item.name
+                  .trim()
+                  .split(' ') // split into words
+                  .slice(0, 2) // take only the first two words
+                  .map(word => word[0].toUpperCase()) // first letter of each
+                  .join('')
+              : '?'}
+          </Text>
         </View>
 
         <View
