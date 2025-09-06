@@ -14,11 +14,13 @@ import MaterialIcons from '@react-native-vector-icons/material-icons';
 const HomeScreen = () => {
   const navigation = useNavigation<any>();
   const dispatch = useAppDispatch();
-  const { isAuthenticated, activeToken } = useAppSelector(state => state.auth);
 
-  const { dashboard, isDashboardLoading } = useAppSelector(state => state.auth);
+  const { dashboard, isDashboardLoading, isAuthenticated, activeToken, error } = useAppSelector(
+    state => state.auth,
+  );
   const [loadingPageId, setLoadingPageId] = useState<string | null>(null);
   const [isRefresh, setIsRefresh] = useState<boolean>(false);
+
 
   const theme = useAppSelector(state => state.theme);
   const [actionLoader, setActionLoader] = useState(false);
@@ -149,8 +151,6 @@ const HomeScreen = () => {
                   </Text>
                 </View>
               )}
-
-             
             </View>
 
             {/* Footer action */}
@@ -169,11 +169,15 @@ const HomeScreen = () => {
               )}
               <TouchableOpacity
                 onPress={() => {
-                   if (item?.url.includes('.') || item?.url.includes('?') || item?.url.includes('/')) {
-            navigation.navigate('Web', { item });
-          } else {
-            navigation.navigate('List', { item });
-          }
+                  if (
+                    item?.url.includes('.') ||
+                    item?.url.includes('?') ||
+                    item?.url.includes('/')
+                  ) {
+                    navigation.navigate('Web', { item });
+                  } else {
+                    navigation.navigate('List', { item });
+                  }
                 }}
                 style={styles.cardFooter}
               >
@@ -210,13 +214,11 @@ const HomeScreen = () => {
               }}
             >
               <TouchableOpacity
-
-              onPress={() =>{
-            navigation.navigate('Web', { isFromChart: true });
-
-              }}
-              
-              style={styles.chartContainer}>
+                onPress={() => {
+                  navigation.navigate('Web', { isFromChart: true });
+                }}
+                style={styles.chartContainer}
+              >
                 <PieChart
                   data={pieChartData}
                   donut

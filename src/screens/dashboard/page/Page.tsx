@@ -5,7 +5,7 @@ import React, { useCallback, useEffect, useLayoutEffect, useState } from 'react'
 import { Text, View, FlatList, StyleSheet } from 'react-native';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import Animated, { FadeInUp, Layout } from 'react-native-reanimated'; // ✅ added
-import { useAppDispatch } from '../../../store/hooks';
+import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { getERPPageThunk } from '../../../store/slices/auth/thunk';
 import { savePageThunk } from '../../../store/slices/page/thunk';
 import FullViewLoader from '../../../components/loader/FullViewLoader';
@@ -29,6 +29,8 @@ type PageRouteParams = { PageScreen: { item: any } };
 const PageScreen = () => {
   const navigation = useNavigation();
   const dispatch = useAppDispatch();
+  const { pageError } = useAppSelector(state => state.auth);
+  console.log("🚀 ~ PageScreen ~ -----------------------------pageError:", pageError)
 
   const [loadingPageId, setLoadingPageId] = useState<string | null>(null);
   const [controls, setControls] = useState<any[]>([]);
@@ -119,7 +121,7 @@ const PageScreen = () => {
 
                     setAlertConfig({
                       title: 'Record saved',
-                      message: `Record not saved!`,
+                      message: err,
                       type: 'error',
                     });
                     setAlertVisible(true);
@@ -187,7 +189,8 @@ const PageScreen = () => {
         return merged;
       });
     } catch (e: any) {
-      setError(e?.message || 'Failed to load page');
+      console.log("🚀 ~ e:", e)
+      setError(e || 'Failed to load page');
     } finally {
       setLoadingPageId(null);
       setTimeout(() => {

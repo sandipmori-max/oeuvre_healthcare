@@ -47,6 +47,7 @@ const ListScreen = () => {
     type: 'info' as 'error' | 'success' | 'info',
     actionValue: '',
     color: '#000',
+    id: 0
   });
 
   const [fromDate, setFromDate] = useState<string>('');
@@ -261,7 +262,7 @@ const ListScreen = () => {
         setFilteredData(dataArray);
       } catch (e: any) {
         console.log('Failed to load list data:', e);
-        setError(e?.message || 'Failed to load list data');
+        setError(e || 'Failed to load list data');
       } finally {
         setLoadingListId(null);
         setTimeout(() => {
@@ -296,7 +297,7 @@ const ListScreen = () => {
     navigation.navigate('Page', { item, title: page, isFromNew: true , url: pageName});
   };
 
-  const handleActionButtonPressed = (actionValue, label, color) => {
+  const handleActionButtonPressed = (actionValue, label, color, id) => {
     console.log('🚀 ~ handleActionButtonPressed ~ actionValue:', actionValue);
     setAlertConfig({
       title: label,
@@ -304,6 +305,7 @@ const ListScreen = () => {
       type: 'info',
       actionValue: actionValue,
       color: color,
+      id: id
     });
     setAlertVisible(true);
   };
@@ -434,16 +436,14 @@ const ListScreen = () => {
         onDone={async remark => {
           console.log('🚀 ~ async ~ remark:', alertConfig?.actionValue);
           try {
-            const str = alertConfig?.actionValue;
-            const [page, id] = str.split('/');
             const type = `page${alertConfig.title}`;
             console.log(type);
             const res = await dispatch(
               handlePageActionThunk({
                 action: type,
-                id: id,
+                id: alertConfig.id.toString(),
                 remarks: remark,
-                page: page,
+                page: pageName,
               }),
             ).unwrap();
 

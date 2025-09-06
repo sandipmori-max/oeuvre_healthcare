@@ -25,12 +25,12 @@ const WebScreen = () => {
     normalizedBase = normalizedBase.replace(/^https:\/\//i, 'http://');
 
 
-  const url = isFromChart ? `${normalizedBase}app/index.aspx/dashboard/0/&Token=${token}` : '';
+  const url = isFromChart ? `${normalizedBase}app/index.html?dashboard/0/&token=${token}` : '';
   console.log("🚀 ~ WebScreen *-*-*-*-*-*-*--*-*-*-**-~ url:", url)
   
   console.log("🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀 ~ WebScreen ~ url:", url)
   useLayoutEffect(() => {
-    navigation.setOptions({ title: item?.title || t('webScreen.details') });
+    navigation.setOptions({ title:  isFromChart ? 'Dashboard' : item?.title || t('webScreen.details') });
   }, [navigation, item?.title, t]);
 
   useEffect(() => {

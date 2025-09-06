@@ -483,7 +483,7 @@ export const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 32,
     right: 18,
-    backgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR,
+    backgroundColor: '#334239',
     paddingHorizontal: 18,
     paddingVertical: 12,
     borderRadius: 8,
