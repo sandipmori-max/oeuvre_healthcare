@@ -214,7 +214,7 @@ const RootNavigator = () => {
       }
     };
 
-    // checkLocation();
+    checkLocation();
 
     const interval = setInterval(checkLocation, 18000);
     return () => clearInterval(interval);

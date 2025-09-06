@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+/* eslint-disable react-hooks/rules-of-hooks */
+/* eslint-disable react-native/no-inline-styles */
+import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, Dimensions, FlatList, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
@@ -6,6 +8,7 @@ import { formatDateToDDMMMYYYY } from '../../../../utils/helpers';
 import { styles } from '../list_page_style';
 import NoData from '../../../../components/no_data/NoData';
 import { ERP_COLOR_CODE } from '../../../../utils/constants';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const ReadableView = ({
   configData,
@@ -19,6 +22,7 @@ const ReadableView = ({
 }: any) => {
   const navigation = useNavigation();
   const screenWidth = Dimensions.get('window').width;
+  const [baseLink, setBaseLink] = useState<string>('');
 
   const getButtonMeta = (key: string) => {
     if (!key || !configData?.length) return { label: 'Action', color: '#007BFF' };
@@ -29,19 +33,44 @@ const ReadableView = ({
     };
   };
 
+
+   useEffect(() => {
+    let isMounted = true;
+    (async () => {
+      try {
+        const [storedLink] = await Promise.all([
+          AsyncStorage.getItem('erp_link'),
+          
+        ]);
+
+        if (isMounted) {
+          setBaseLink(storedLink || '');
+        }
+      } catch (e) {
+        console.error('Error loading stored data:', e);
+      }
+    })();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   const RenderCard = ({ item, index }: any) => {
+    console.log("🚀 ~ RenderCard ~ item:-------------------------", item.image)
     if (!item) return null;
-    const name = item['name'] || `Item #${index + 1}`;
-    const subName = item['number'] || `Item #${index + 1}`;
+    const name = item.name || `Item #${index + 1}`;
+    const subName = item.number || `Item #${index + 1}`;
     const [isRemarksExpanded, setRemarksExpanded] = useState(false);
 
-    const status = item['status'];
-    const date = item['date'];
-    const remarks = item['remarks'];
-    const address = item['address'];
-    const amount = item['amount'];
+    const status = item.status;
+    const date = item.date;
+    const remarks = item.remarks;
+    const address = item.address;
+    const amount = item.amount;
 
     const btnKeys = Object.keys(item).filter(key => key.startsWith('btn_'));
+    const baseUrl = baseLink.replace(/^https:\/\//i, 'http://');
+    
 
     const avatarLetter = name
       .split('')
@@ -89,7 +118,7 @@ const ReadableView = ({
             }}
           >
             {item?.image && item?.image !== '' ? (
-              <Image source={{ uri: item?.image }} style={styles.profileImage} />
+              <Image source={{ uri: baseUrl+item?.image }} style={styles.profileImage} />
             ) : (
               <Text style={{ color: '#fff', fontWeight: '400', fontSize: 22 }}>{avatarLetter}</Text>
             )}
@@ -120,7 +149,14 @@ const ReadableView = ({
             )}
           </View>
         </TouchableOpacity>
-        <TouchableOpacity onPress={async () => handleItemPressed(item, pageParamsName)}>
+        <TouchableOpacity onPress={async () => {
+           navigation.navigate('Page', {
+              item,
+              title: pageParamsName,
+              id: item?.id,
+              url: pageName,
+            });
+        }}>
           {(remarks || address || amount) && (
             <View style={{ marginTop: 12 }}>
               <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
@@ -193,7 +229,7 @@ const ReadableView = ({
             {btnKeys.map((key, idx) => {
               const actionValue = item[key];
               const { label, color } = getButtonMeta(key);
-              const authUser = item['authuser'];
+              const authUser = item.authuser;
               return (
                 <TouchableOpacity
                   key={`${key}-${idx}`}
@@ -211,7 +247,7 @@ const ReadableView = ({
                       return;
                     }
 
-                    handleActionButtonPressed(actionValue, label, color);
+                    handleActionButtonPressed(actionValue, label, color, item?.id);
                   }}
                 >
                   <Text style={{ color: '#fff', fontWeight: '600', fontSize: 13 }}>{label}</Text>

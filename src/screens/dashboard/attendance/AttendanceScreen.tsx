@@ -10,6 +10,7 @@ import List from './components/List';
 import AttendanceForm from './components/AttendanceForm';
 import { useAppDispatch } from '../../../store/hooks';
 import { getLastPunchInThunk } from '../../../store/slices/attendance/thunk';
+import ErrorMessage from '../../../components/error/Error';
 
 const AttendanceScreen = () => {
   const navigation = useNavigation<any>();
@@ -24,6 +25,7 @@ const AttendanceScreen = () => {
   const [blockAction, setBlockAction] = useState(false);
   const [refresh, setRefresh] = useState(false);
   const [actionLoader, setActionLoader] = useState(false);
+  const [error, setError] = useState<any>('')
 
   const formattedMonth = `${selectedDate.getFullYear()}-${(selectedDate.getMonth() + 1)
     .toString()
@@ -90,11 +92,12 @@ const AttendanceScreen = () => {
         setResData(res);
         setIsLoading(false);
         setActionLoader(false);
+        setError(null)
       })
       .catch(err => {
         setIsLoading(false);
         setActionLoader(false);
-
+        setError(err)
         console.log('❌ Error fetching last punch-in:', err);
       });
   };
@@ -102,6 +105,9 @@ const AttendanceScreen = () => {
     checkAttendance();
   }, [dispatch, refresh]);
 
+  if(error && error !== ''){
+    <ErrorMessage message={error}/>
+  }
   return (
     <View style={styles.container}>
       {isLoading ? (

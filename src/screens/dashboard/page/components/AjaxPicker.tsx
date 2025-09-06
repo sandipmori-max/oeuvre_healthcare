@@ -28,6 +28,7 @@ const AjaxPicker = ({
   const dispatch = useAppDispatch();
   const [selectedOption, setSelectedOption] = useState('');
   const [search, setSearch] = useState('');
+  const [error, setError] = useState('')
 
   useEffect(() => {
     const timer = setTimeout(() => {

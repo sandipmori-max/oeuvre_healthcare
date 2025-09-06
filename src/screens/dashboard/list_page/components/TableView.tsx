@@ -160,7 +160,7 @@ const TableView = ({
                       alignItems: 'center',
                     }}
                     onPress={() => {
-                      handleActionButtonPressed(actionValue, label, color);
+                      handleActionButtonPressed(actionValue, label, color, item?.id);
                     }}
                   >
                     <Text style={{ color: '#fff', fontWeight: '600', fontSize: 13 }}>{label}</Text>
