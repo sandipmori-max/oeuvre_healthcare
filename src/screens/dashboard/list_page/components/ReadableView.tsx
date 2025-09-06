@@ -14,6 +14,7 @@ const ReadableView = ({
   totalAmount,
   pageParamsName,
   handleItemPressed,
+  pageName,
   handleActionButtonPressed,
 }: any) => {
   const navigation = useNavigation();
@@ -36,7 +37,7 @@ const ReadableView = ({
 
     const status = item['status'];
     const date = item['date'];
-    const remarks = item['remarks'];      
+    const remarks = item['remarks'];
     const address = item['address'];
     const amount = item['amount'];
 
@@ -66,10 +67,14 @@ const ReadableView = ({
           activeOpacity={0.8}
           style={{ flexDirection: 'row', alignItems: 'center' }}
           onPress={async () => {
+            console.log('🚀 ~ Page:', item);
 
-            console.log("🚀 ~ Page:", item)
-
-            navigation.navigate('Page', { item, title: pageParamsName, id: item?.id });
+            navigation.navigate('Page', {
+              item,
+              title: pageParamsName,
+              id: item?.id,
+              url: pageName,
+            });
           }}
         >
           <View
@@ -83,8 +88,11 @@ const ReadableView = ({
               marginRight: 12,
             }}
           >
-            <Text style={{ color: '#fff', fontWeight: '400', fontSize: 22 }}>{avatarLetter}</Text>
-            {/* <Image source={ERP_ICON.APP_LOGO} style={styles.profileImage} /> */}
+            {item?.image && item?.image !== '' ? (
+              <Image source={{ uri: item?.image }} style={styles.profileImage} />
+            ) : (
+              <Text style={{ color: '#fff', fontWeight: '400', fontSize: 22 }}>{avatarLetter}</Text>
+            )}
           </View>
 
           <View style={{ flex: 1 }}>

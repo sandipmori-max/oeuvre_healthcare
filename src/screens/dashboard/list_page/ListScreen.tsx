@@ -58,10 +58,12 @@ const ListScreen = () => {
 
   const route = useRoute<RouteProp<ListRouteParams, 'List'>>();
   const { item } = route.params;
+  console.log("🚀-------- ~ ListScreen ~ item:", item)
 
   const pageTitle = item?.title || item?.name || 'List Data';
   const pageParamsName =   item?.name || 'List Data';
-  console.log("🚀 ~ ListScreen ~ pageParamsName:", pageParamsName)
+  const pageName = item?.url;
+  console.log("🚀 ~ ListScreen ~ pageName:----------------------------------", pageName )
 
   const totalAmount = filteredData?.reduce((sum, item) => {
     const amount = parseFloat(item?.amount) || 0;
@@ -227,7 +229,7 @@ const ListScreen = () => {
 
         const raw = await dispatch(
           getERPListDataThunk({
-            page: item?.name,
+            page: item?.url,
             fromDate: fromDateStr,
             toDate: toDateStr,
             param: '',
@@ -289,10 +291,9 @@ const ListScreen = () => {
     }, [getCurrentMonthRange, fetchListData]),
   );
 
-  const handleItemPressed = (item, page) => {
-    console.log("🚀 ~ handleItemPressed ~ page:", page)
-    console.log("🚀 ~ handleItemPressed ~ item:", item)
-    navigation.navigate('Page', { item, title: page, isFromNew: true });
+  const handleItemPressed = (item, page) => { 
+    console.log("🚀 ~ handleItemPressed ~ page-----/-/-/-/-/-/-/-/-/-:", pageName)
+    navigation.navigate('Page', { item, title: page, isFromNew: true , url: pageName});
   };
 
   const handleActionButtonPressed = (actionValue, label, color) => {
@@ -386,6 +387,7 @@ const ListScreen = () => {
                     totalAmount={totalAmount}
                     pageParamsName={pageParamsName}
                     handleItemPressed={handleItemPressed}
+                    pageName={pageName}
                     handleActionButtonPressed={handleActionButtonPressed}
                   />
                 </>
@@ -398,6 +400,7 @@ const ListScreen = () => {
                     totalAmount={totalAmount}
                     pageParamsName={pageParamsName}
                     handleItemPressed={handleItemPressed}
+                    pageName={pageName}
                     handleActionButtonPressed={handleActionButtonPressed}
                   />
                 </>

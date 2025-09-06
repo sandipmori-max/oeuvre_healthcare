@@ -32,6 +32,7 @@ const PageScreen = () => {
 
   const [loadingPageId, setLoadingPageId] = useState<string | null>(null);
   const [controls, setControls] = useState<any[]>([]);
+  console.log("🚀 ~ PageScreen ~ controls:-------", controls)
   const [errorsList, setErrorsList] = useState<string[]>([]);
   const [showErrorModal, setShowErrorModal] = useState(false);
 
@@ -55,7 +56,8 @@ const PageScreen = () => {
   });
 
   const route = useRoute<RouteProp<PageRouteParams, 'PageScreen'>>();
-  const { item, title, id, isFromNew }: any = route.params;
+  const { item, title, id, isFromNew, url }: any = route.params;
+  console.log("🚀 ~ -----------------------------------------PageScreen ~ url:", url)
 
   const validateForm = useCallback(() => {
     const validationErrors: Record<string, string> = {};
@@ -101,7 +103,7 @@ const PageScreen = () => {
                   try {
                     setLoader(true);
                     await dispatch(
-                      savePageThunk({ page: title, id, data: { ...submitValues } }),
+                      savePageThunk({ page: url, id, data: { ...submitValues } }),
                     ).unwrap();
                     setLoader(false);
                     fetchPageData();
@@ -161,7 +163,7 @@ const PageScreen = () => {
       setLoadingPageId(id);
 
       const parsed = await dispatch(
-        getERPPageThunk({ page: title, id: isFromNew ? '' : id }),
+        getERPPageThunk({ page: url, id: isFromNew ? 0 : id }),
       ).unwrap();
 
       const pageControls = Array.isArray(parsed?.pagectl) ? parsed.pagectl : [];
@@ -192,7 +194,7 @@ const PageScreen = () => {
         setActionLoader(false);
       }, 10);
     }
-  }, [dispatch, id, title]);
+  }, [dispatch, id, url]);
 
   useEffect(() => {
     fetchPageData();
@@ -209,6 +211,8 @@ const PageScreen = () => {
 
   const renderItem = useCallback(
     ({ item, index }: { item: any; index: number }) => {
+
+      console.log("🚀 ~ item:", item)
       const setValue = (val: any) => {
         if (typeof val === 'object' && val !== null) {
           setFormValues(prev => ({ ...prev, ...val }));
@@ -275,7 +279,7 @@ const PageScreen = () => {
           entering={FadeInUp.delay(index * 70).springify()}
           layout={Layout.springify()}
         >
-          {content}
+          {content} 132
         </Animated.View>
       );
     },
@@ -308,14 +312,12 @@ const PageScreen = () => {
         <ErrorMessage message={error} />
       ) : controls.length > 0 ? (
         <>
-          <FlatList
+         <FlatList
             showsVerticalScrollIndicator={false}
             data={controls}
             keyExtractor={(it, idx) => it?.dtlid || idx?.toString()}
             renderItem={renderItem}
-            removeClippedSubviews
           />
-
           {loader && (
             <View
               style={{

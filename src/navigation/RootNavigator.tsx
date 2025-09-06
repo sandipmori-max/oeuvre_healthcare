@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { PermissionsAndroid, Platform, NativeModules } from 'react-native';
+import { PermissionsAndroid, Platform, NativeModules, Alert } from 'react-native';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { checkAuthStateThunk } from '../store/slices/auth/thunk';
 import DevERPService from '../services/api/deverp';
@@ -11,6 +11,33 @@ import CustomAlert from '../components/alert/CustomAlert';
 import { isTokenValid, requestLocationPermissions } from '../utils/helpers';
 import { syncLocationThunk } from '../store/slices/location/thunk';
 import Geolocation from '@react-native-community/geolocation';
+const { BatteryOptimization } = NativeModules;
+console.log('🚀 ~ BatteryOptimization:', BatteryOptimization);
+
+export async function checkBatteryOptimization() {
+  try {
+    const isIgnoring = await BatteryOptimization?.isIgnoringBatteryOptimizations();
+    console.log('🚀 ~ checkBatteryOptimization ~ isIgnoring:', isIgnoring);
+    if (!isIgnoring) {
+      Alert.alert('Battery Optimization', 'Please disable battery optimization for this app.', [
+        {
+          text: 'Open Settings',
+          onPress: async () => {
+            try {
+              const result = await BatteryOptimization.requestIgnoreBatteryOptimizations();
+              console.log('User request result:', result);
+            } catch (error) {
+              console.error('Battery optimization request failed:', error);
+            }
+          },
+        },
+        { text: 'Cancel', style: 'cancel' },
+      ]);
+    }
+  } catch (e) {
+    console.error('Battery optimization check failed:', e);
+  }
+}
 
 const RootNavigator = () => {
   const dispatch = useAppDispatch();
@@ -87,6 +114,7 @@ const RootNavigator = () => {
 
   useEffect(() => {
     const checkLocation = async () => {
+      //checkBatteryOptimization();
       const enabled = await DeviceInfo.isLocationEnabled();
 
       if (locationEnabled === null) {
@@ -186,7 +214,7 @@ const RootNavigator = () => {
       }
     };
 
-    checkLocation();
+    // checkLocation();
 
     const interval = setInterval(checkLocation, 18000);
     return () => clearInterval(interval);
