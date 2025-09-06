@@ -11,6 +11,7 @@ const TableView = ({
   loadingListId,
   totalAmount,
   pageParamsName,
+  pageName,
   handleActionButtonPressed,
 }: any) => {
   const screenWidth = Dimensions.get('window').width;
@@ -96,7 +97,7 @@ const TableView = ({
     return (
       <TouchableOpacity
         onPress={async () => {
-          navigation.navigate('Page', { item, title: pageParamsName, id: item?.id });
+          navigation.navigate('Page', { item, title: pageParamsName, id: item?.id, url: pageName });
         }}
       >
         {' '}

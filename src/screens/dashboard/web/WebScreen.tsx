@@ -9,16 +9,26 @@ import useTranslations from '../../../hooks/useTranslations';
 import FullViewLoader from '../../../components/loader/FullViewLoader';
 import { styles } from './web_style';
 
-type WebRouteParams = { Web: { item: MenuItem } };
 
 const WebScreen = () => {
   const { t } = useTranslations();
   const navigation = useNavigation<any>();
-  const route = useRoute<RouteProp<WebRouteParams, 'Web'>>();
-  const { item } = route.params;
+  const route = useRoute<any>();
+  const { item , isFromChart } = route.params;
+  console.log("🚀 ~ WebScreen ~ isFromChart:", isFromChart)
   const [baseLink, setBaseLink] = useState<string>('');
+  console.log("🚀 ~ WebScreen ~ baseLink:", baseLink)
   const [token, setToken] = useState<string>('');
 
+   let normalizedBase = (baseLink || '').replace(/\/+$/, '') + '';
+    normalizedBase = normalizedBase.replace(/\/devws\/?/, '/');
+    normalizedBase = normalizedBase.replace(/^https:\/\//i, 'http://');
+
+
+  const url = isFromChart ? `${normalizedBase}app/index.aspx/dashboard/0/&Token=${token}` : '';
+  console.log("🚀 ~ WebScreen *-*-*-*-*-*-*--*-*-*-**-~ url:", url)
+  
+  console.log("🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀 ~ WebScreen ~ url:", url)
   useLayoutEffect(() => {
     navigation.setOptions({ title: item?.title || t('webScreen.details') });
   }, [navigation, item?.title, t]);
@@ -68,9 +78,9 @@ const WebScreen = () => {
     const separator = fullUrl.includes('?') ? '/' : '?';
     return `${fullUrl}${separator}&token=${token}`;
   }, [baseLink, item?.url, token]);
-  console.log('🚀 ~ WebScreen ~ targetUrl:', targetUrl);
+  console.log('🚀 ~ WebScreen ~ targetUrl:-------', targetUrl);
 
-  if (!targetUrl) {
+  if (!isFromChart && !targetUrl) {
     return (
       <SafeAreaView style={styles.container}>
         <FullViewLoader />
@@ -78,6 +88,13 @@ const WebScreen = () => {
     );
   }
 
+  if (isFromChart && !url) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <FullViewLoader />
+      </SafeAreaView>
+    );
+  }
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar
@@ -85,7 +102,7 @@ const WebScreen = () => {
         translucent={false}
       />
       <WebView
-        source={{ uri: targetUrl }}
+        source={{ uri: isFromChart ? url : targetUrl }}
         startInLoadingState={true}
         javaScriptEnabled={true}
         domStorageEnabled={true}

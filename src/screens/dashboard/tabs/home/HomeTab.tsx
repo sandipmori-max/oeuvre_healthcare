@@ -80,7 +80,7 @@ const HomeScreen = () => {
     }));
 
   const renderDashboardItem = (item: DashboardItem, index: number) => {
-    console.log('🚀 ~ renderDashboardItem ~ item:', item);
+    console.log('🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀 ~ renderDashboardItem ~ item:', item);
     return (
       <TouchableOpacity
         key={item.id || index}
@@ -94,7 +94,11 @@ const HomeScreen = () => {
         ]}
         activeOpacity={0.7}
         onPress={async () => {
-          navigation.navigate('List', { item });
+          if (item?.url.includes('.') || item?.url.includes('?') || item?.url.includes('/')) {
+            navigation.navigate('Web', { item });
+          } else {
+            navigation.navigate('List', { item });
+          }
         }}
       >
         <View
@@ -146,13 +150,7 @@ const HomeScreen = () => {
                 </View>
               )}
 
-              {item.url && (
-                <View style={styles.urlContainer}>
-                  <Text style={styles.dashboardItemUrl} numberOfLines={1}>
-                    {item.url}
-                  </Text>
-                </View>
-              )}
+             
             </View>
 
             {/* Footer action */}
@@ -170,7 +168,13 @@ const HomeScreen = () => {
                 </View>
               )}
               <TouchableOpacity
-                onPress={() => navigation.navigate('Web', { item })}
+                onPress={() => {
+                   if (item?.url.includes('.') || item?.url.includes('?') || item?.url.includes('/')) {
+            navigation.navigate('Web', { item });
+          } else {
+            navigation.navigate('List', { item });
+          }
+                }}
                 style={styles.cardFooter}
               >
                 <Text style={styles.footerLink}>View</Text>
@@ -205,7 +209,14 @@ const HomeScreen = () => {
                 alignItems: 'center',
               }}
             >
-              <View style={styles.chartContainer}>
+              <TouchableOpacity
+
+              onPress={() =>{
+            navigation.navigate('Web', { isFromChart: true });
+
+              }}
+              
+              style={styles.chartContainer}>
                 <PieChart
                   data={pieChartData}
                   donut
@@ -225,11 +236,11 @@ const HomeScreen = () => {
                         color: '#000',
                       }}
                     >
-                      Total{`\n ${pieChartData.reduce((sum, item) => sum + item.value, 0)}`}
+                      Home
                     </Text>
                   )}
                 />
-              </View>
+              </TouchableOpacity>
               <View
                 style={{
                   justifyContent: 'center',
