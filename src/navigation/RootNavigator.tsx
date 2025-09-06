@@ -11,11 +11,10 @@ import CustomAlert from '../components/alert/CustomAlert';
 import { isTokenValid, requestLocationPermissions } from '../utils/helpers';
 import { syncLocationThunk } from '../store/slices/location/thunk';
 import Geolocation from '@react-native-community/geolocation';
-const { LocationModule } = NativeModules;
 
 const RootNavigator = () => {
   const dispatch = useAppDispatch();
-  const { isLoading, isAuthenticated, accounts, user } = useAppSelector(state => state.auth);
+  const { isLoading, isAuthenticated, accounts } = useAppSelector(state => state.auth);
 
   const [locationEnabled, setLocationEnabled] = useState<boolean | null>(null);
   const [alertVisible, setAlertVisible] = useState(false);
@@ -86,8 +85,6 @@ const RootNavigator = () => {
     dispatch(checkAuthStateThunk());
   }, [dispatch]);
 
-
-
   useEffect(() => {
     const checkLocation = async () => {
       const enabled = await DeviceInfo.isLocationEnabled();
@@ -129,7 +126,7 @@ const RootNavigator = () => {
 
           try {
             const newLocation = await getCurrentLocation();
-            console.log("🚀 ~ checkLocation ~ newLocation:", newLocation);
+            console.log('🚀 ~ checkLocation ~ newLocation:', newLocation);
 
             if (lastSyncedLocationRef.current) {
               const distance = getDistance(
@@ -140,7 +137,9 @@ const RootNavigator = () => {
               );
 
               console.log(
-                `📏 Distance from circle center: ${distance.toFixed(2)}m (Threshold: ${RADIUS_IN_METERS}m)`
+                `📏 Distance from circle center: ${distance.toFixed(
+                  2,
+                )}m (Threshold: ${RADIUS_IN_METERS}m)`,
               );
 
               if (distance < RADIUS_IN_METERS) {
@@ -152,13 +151,14 @@ const RootNavigator = () => {
             lastSyncedLocationRef.current = newLocation;
 
             if (accounts.length > 0) {
-              for (const acc of accounts) {
-                await dispatch(
-                  syncLocationThunk({
-                    token: acc?.user?.token || '',
-                    location: `${newLocation.lat},${newLocation.lng}`,
-                  }),
-                );
+              if (Platform.OS === 'android') {
+                requestLocationPermissions().then(granted => {
+                  if (granted && isAuthenticated) {
+                    const tokens = accounts?.map(u => u.user.token);
+                    NativeModules.LocationModule.setUserTokens(tokens);
+                    NativeModules.LocationModule?.startService?.();
+                  }
+                });
               }
             }
           } catch (err) {
@@ -190,24 +190,8 @@ const RootNavigator = () => {
 
     const interval = setInterval(checkLocation, 18000);
     return () => clearInterval(interval);
-  }, [locationEnabled, accounts, dispatch, hasSyncedDisabledLocation]);
-
-  // useEffect(() => {
-  //   if (Platform.OS === 'android') {
-  //     requestLocationPermissions().then(granted => {
-  //       console.log('🚀 ~ RootNavigator ~ granted:', granted);
-  //       if (granted && isAuthenticated) {
-  //         console.log('Location permission OK, can start service');
-  //         NativeModules.LocationModule?.setUserToken?.(user?.token);
-  //         NativeModules.LocationModule?.startService?.();
-  //       }
-  //     });
-  //   }
-  //   return () => {
-  //     // Stop when unmount if needed
-  //     NativeModules.LocationModule?.stopService?.();
-  //   };
-  // }, [user, isAuthenticated]);
+  }, [locationEnabled, accounts, dispatch, isAuthenticated, hasSyncedDisabledLocation]);
+  console.log('🚀 ~ RootNavigator ~ granted:', accounts);
 
   if (isLoading) {
     return <FullViewLoader />;

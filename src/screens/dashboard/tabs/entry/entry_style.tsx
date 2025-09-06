@@ -8,7 +8,7 @@ export const styles = StyleSheet.create({
   },
   listContent: {
     paddingVertical: 16,
-    paddingHorizontal: 12,
+    paddingHorizontal: 4,
   },
   columnWrapper: {
     justifyContent: 'space-between',

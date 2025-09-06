@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Image, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, Image, TouchableOpacity } from 'react-native';
 import { DrawerContentComponentProps, DrawerContentScrollView } from '@react-navigation/drawer';
 import { useNavigation } from '@react-navigation/native';
 import MaterialIcons from '@react-native-vector-icons/material-icons';
@@ -8,7 +8,6 @@ import { useAppSelector } from '../../store/hooks';
 import { firstLetterUpperCase } from '../../utils/helpers';
 import { ERP_DRAWER_LIST } from '../../constants';
 import { styles } from './drawer_style';
-import ERPIcon from '../icon/ERPIcon';
 
 const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
   const navigation = useNavigation();
@@ -23,7 +22,7 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
       {...props}
       contentContainerStyle={{ flex: 1, backgroundColor: theme === 'dark' ? 'black' : 'white' }}
     >
-        <View
+        {/* <View
         style={{
           top: 2,
           right: 0, 
@@ -38,7 +37,7 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
         >
           <ERPIcon color="#000" name="close" />
         </TouchableOpacity>
-      </View>
+      </View> */}
       <View style={[styles.header,]}>
 
       
@@ -66,7 +65,7 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
           >
             <View
               style={{
-                width: '28%',
+                width: '30%',
                 alignContent: 'center',
                 alignItems: 'center',
                 justifyContent: 'space-between',
@@ -99,7 +98,7 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
             </View>
             <View
               style={{
-                width: '28%',
+                width: '30%',
                 alignContent: 'center',
                 alignItems: 'center',
                 justifyContent: 'space-between',

@@ -4,7 +4,7 @@ import { ERP_COLOR_CODE } from '../../utils/constants';
 export const styles = StyleSheet.create({
   header: {
     top: 38,
-    padding: 20,
+    padding: 10,
     alignItems: 'center',
     backgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR,
     borderRadius: 8

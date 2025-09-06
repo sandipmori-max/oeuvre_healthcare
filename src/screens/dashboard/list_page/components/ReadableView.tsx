@@ -5,7 +5,6 @@ import { useNavigation } from '@react-navigation/native';
 import { formatDateToDDMMMYYYY } from '../../../../utils/helpers';
 import { styles } from '../list_page_style';
 import NoData from '../../../../components/no_data/NoData';
-import { ERP_ICON } from '../../../../assets';
 import { ERP_COLOR_CODE } from '../../../../utils/constants';
 
 const ReadableView = ({

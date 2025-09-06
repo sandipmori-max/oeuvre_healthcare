@@ -4,9 +4,12 @@ import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.location.Location
+import android.location.LocationManager
 import android.os.Build
 import android.os.Handler
 import android.os.IBinder
@@ -16,6 +19,8 @@ import com.google.android.gms.location.*
 import java.net.HttpURLConnection
 import java.net.URL
 
+
+
 class LocationService : Service() {
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
@@ -23,8 +28,8 @@ class LocationService : Service() {
     private var lastLocation: Location? = null
     private val handler = Handler()
 
-    companion object {
-        var userToken: String? = null
+   companion object {
+    var userTokens: MutableList<String> = mutableListOf()
     }
 
     override fun onCreate() {
@@ -34,6 +39,24 @@ class LocationService : Service() {
 
         startLocationUpdates()
         startRepeatingSync()
+
+         val filter = IntentFilter(LocationManager.PROVIDERS_CHANGED_ACTION)
+        registerReceiver(locationReceiver, filter)
+    }
+
+    private val locationReceiver = object : BroadcastReceiver() {
+
+        override fun onReceive(context: Context, intent: Intent) {
+        if (isLocationEnabled(context)) {
+            Log.d("LocationService", "Location enabled by user, restarting updates")
+            startLocationUpdates()
+        } else {
+            Log.w("LocationService", "Location disabled by user")
+            sendDisabledToApi()
+            fusedLocationClient.removeLocationUpdates(locationCallback)
+            notifyLocationDisabled()
+            }
+        }
     }
 
    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -41,6 +64,12 @@ class LocationService : Service() {
         return START_STICKY
     }
 
+
+    fun isLocationEnabled(context: Context): Boolean {
+        val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) ||
+            locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
+    }
 
     private fun createNotification(): Notification {
         val channelId = "location_service_channel"
@@ -63,45 +92,105 @@ class LocationService : Service() {
             .build()
     }
 
-    private fun startLocationUpdates() {
-        val request = LocationRequest.Builder(
-            Priority.PRIORITY_HIGH_ACCURACY,
-            1000  
-        ).setMinUpdateDistanceMeters(0f)
-            .build()
+   private fun startLocationUpdates() {
+    if (!isLocationEnabled(this)) {
+        Log.w("🚀 ~🚀 ~🚀 ~🚀 ~🚀 ~🚀 ~🚀 ~🚀 ~🚀 ~🚀 ~🚀 ~🚀 ~🚀 ~🚀 ~🚀 ~🚀 ~ LocationService", "Location is disabled by user")
+        notifyLocationDisabled()
+        return
+    }
 
-        locationCallback = object : LocationCallback() {
-            override fun onLocationResult(locationResult: LocationResult) {
-                super.onLocationResult(locationResult)
-                if (locationResult.locations.isNotEmpty()) {
-                    lastLocation = locationResult.locations.last()
-                }
+    val request = LocationRequest.Builder(
+        Priority.PRIORITY_HIGH_ACCURACY,
+        1000
+    ).setMinUpdateDistanceMeters(0f)
+     .build()
+
+    locationCallback = object : LocationCallback() {
+        override fun onLocationResult(locationResult: LocationResult) {
+            super.onLocationResult(locationResult)
+            if (locationResult.locations.isNotEmpty()) {
+                lastLocation = locationResult.locations.last()
             }
         }
-
-        fusedLocationClient.requestLocationUpdates(
-            request,
-            locationCallback,
-            mainLooper
-        )
     }
+
+    fusedLocationClient.requestLocationUpdates(
+        request,
+        locationCallback,
+        mainLooper
+    )
+    }
+    private fun notifyLocationDisabled() {
+        val channelId = "location_service_channel"
+        val notification = NotificationCompat.Builder(this, channelId)
+            .setContentTitle("Enable Location")
+            .setContentText("Please enable location services to use this app.")
+            .setSmallIcon(android.R.drawable.ic_dialog_alert)
+            .setOngoing(false)
+            .build()
+
+        val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        manager.notify(2, notification)
+    }
+
+    private var hasSentDisabled = false
 
     private fun startRepeatingSync() {
         val runnable = object : Runnable {
             override fun run() {
-                lastLocation?.let { handleNewLocation(it) }
-                handler.postDelayed(this, 30_000) 
+                if (!isLocationEnabled(this@LocationService)) {
+                    fusedLocationClient.removeLocationUpdates(locationCallback)
+                    if (!hasSentDisabled) {
+                        sendDisabledToApi()
+                        hasSentDisabled = true
+                    }
+                    notifyLocationDisabled()
+                } else {
+                    hasSentDisabled = false
+                    lastLocation?.let { handleNewLocation(it) }
+                }
+                handler.postDelayed(this, 30_000)
             }
         }
         handler.post(runnable)
     }
 
-    private fun handleNewLocation(location: Location) {
+    private fun sendDisabledToApi() {
+        for (token in userTokens) {
+            Thread {
+                try {
+                    val url = URL("http://payroll.deverp.net/devws/msp_api.aspx/syncLocation")
+                    val conn = url.openConnection() as HttpURLConnection
+                    conn.requestMethod = "POST"
+                    conn.doOutput = true
+                    conn.setRequestProperty("Content-Type", "application/json")
+
+                    val json = """
+                        {
+                        "token": "$token",
+                        "location": "disabled"
+                        }
+                    """.trimIndent()
+
+                    conn.outputStream.use { it.write(json.toByteArray()) }
+                    val response = conn.inputStream.bufferedReader().readText()
+                    Log.d("LocationService", "⚠️ API Response for disabled $token: $response")
+                } catch (e: Exception) {
+                    Log.e("LocationService", "❌ Failed to send disabled for $token", e)
+                }
+            }.start()
+        }
+    }
+        private fun handleNewLocation(location: Location) {
         Log.d("LocationService", "📍 New location: ${location.latitude}, ${location.longitude}")
 
-        val token = userToken ?: return
-        Log.d("LocationService", "🔑 Using token: $token")
+        val tokens = userTokens
+        if (tokens.isEmpty()) {
+            Log.w("LocationService", "⚠️ No tokens available, skipping API call")
+            return
+        }
 
+    for (token in tokens) {
         Thread {
             try {
                 val url = URL("http://payroll.deverp.net/devws/msp_api.aspx/syncLocation")
@@ -112,25 +201,28 @@ class LocationService : Service() {
 
                 val json = """
                     {
-                      "token": "$token",
-                      "location": "${location.latitude},${location.longitude}"
+                    "token": "$token",
+                    "location": "${location.latitude},${location.longitude}"
                     }
                 """.trimIndent()
 
                 conn.outputStream.use { it.write(json.toByteArray()) }
                 val response = conn.inputStream.bufferedReader().readText()
-                Log.d("LocationService", "✅ API Response: $response")
+                Log.d("LocationService", "✅------------✅ API Response for $token: $response")
             } catch (e: Exception) {
-                Log.e("LocationService", "❌ Failed to sync location", e)
+                Log.e("LocationService", "❌ Failed to sync location for $token", e)
             }
         }.start()
     }
 
-    override fun onBind(intent: Intent?): IBinder? = null
+    }
+
+        override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onDestroy() {
         super.onDestroy()
         fusedLocationClient.removeLocationUpdates(locationCallback)
         handler.removeCallbacksAndMessages(null)
+        unregisterReceiver(locationReceiver) // Don't forget to unregister!
     }
-}
+    }
