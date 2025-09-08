@@ -40,6 +40,7 @@ const PageScreen = () => {
 
   const [error, setError] = useState<string | null>(null);
   const [formValues, setFormValues] = useState<any>({});
+  console.log("🚀 ~ PageScreen ~ formValues:--------", formValues)
   const [datePickerVisible, setDatePickerVisible] = useState(false);
   const [activeDateField, setActiveDateField] = useState<string | null>(null);
   const [activeDate, setActiveDate] = useState<string | null>(null);
@@ -215,15 +216,23 @@ const PageScreen = () => {
   const renderItem = useCallback(
     ({ item, index }: { item: any; index: number }) => {
 
-      console.log("🚀 ~ item:", item)
-      const setValue = (val: any) => {
+      const setValue = (val: any) => { 
+
+         console.log("🙂🙂🙂🙂🙂🙂🙂🙂🙂 ~ handleSelect ~ opt:----"
+                      , val) 
+
+
         if (typeof val === 'object' && val !== null) {
           setFormValues(prev => ({ ...prev, ...val }));
         } else {
           setFormValues(prev => ({ ...prev, [item.field]: val }));
         }
+                   
+                    
+
         setErrors(prev => ({ ...prev, [item?.field]: '' }));
       };
+
 
       const value = formValues[item?.field] || formValues[item?.text] || '';
 
@@ -306,6 +315,8 @@ const PageScreen = () => {
     }
     hideDatePicker();
   };
+ 
+
 
   return (
     <View style={{ flex: 1, padding: 16, backgroundColor: '#f9f9f9' }}>
@@ -336,7 +347,9 @@ const PageScreen = () => {
           )}
         </>
       ) : (
-        <NoData />
+       <View style={{flex:1}}>
+         <NoData />
+        </View>
       )}
 
       <ErrorModal

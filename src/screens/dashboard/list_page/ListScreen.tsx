@@ -15,6 +15,7 @@ import ReadableView from './components/ReadableView';
 import ERPIcon from '../../../components/icon/ERPIcon';
 import CustomAlert from '../../../components/alert/CustomAlert';
 import { handlePageActionThunk } from '../../../store/slices/page/thunk';
+import MaterialIcons from '@react-native-vector-icons/material-icons';
 
 
 const ListScreen = () => {
@@ -418,7 +419,7 @@ const ListScreen = () => {
             handleItemPressed({}, pageParamsName)
           }}
         >
-          <Text style={styles.addButtonText}>+ New</Text>
+          <MaterialIcons size={32} name='add' color={'#fff'}/>
         </TouchableOpacity>
       )}
       
