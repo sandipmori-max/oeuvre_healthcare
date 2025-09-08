@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { Provider } from 'react-redux';
-import { StatusBar } from 'react-native';
+import { StatusBar, SafeAreaView, StyleSheet } from 'react-native';
 
 import { store } from './src/store/store';
 import RootNavigator from './src/navigation/RootNavigator';
@@ -16,12 +16,13 @@ import { ERP_COLOR_CODE } from './src/utils/constants';
 const App = () => {
   const isConnected = useNetworkStatus();
   const [isSplashVisible, setSplashVisible] = useState(true);
- 
 
   if (!isConnected) {
     return (
       <TranslationProvider>
-        <NoInternetScreen onRetry={() => {}} />
+        <SafeAreaView style={styles.safeArea}>
+          <NoInternetScreen onRetry={() => {}} />
+        </SafeAreaView>
       </TranslationProvider>
     );
   }
@@ -29,7 +30,9 @@ const App = () => {
   if (isSplashVisible) {
     return (
       <TranslationProvider>
-        <CustomSplashScreen onFinish={() => setSplashVisible(false)} />
+        <SafeAreaView style={styles.safeArea}>
+          <CustomSplashScreen onFinish={() => setSplashVisible(false)} />
+        </SafeAreaView>
       </TranslationProvider>
     );
   }
@@ -37,13 +40,22 @@ const App = () => {
   return (
     <TranslationProvider>
       <Provider store={store}>
-        <NavigationContainer>
-          <StatusBar backgroundColor={ERP_COLOR_CODE.ERP_APP_COLOR} />
-          <RootNavigator />
-        </NavigationContainer>
+        <SafeAreaView style={styles.safeArea}>
+          <NavigationContainer>
+            <StatusBar backgroundColor={ERP_COLOR_CODE.ERP_APP_COLOR} barStyle="light-content" />
+            <RootNavigator />
+          </NavigationContainer>
+        </SafeAreaView>
       </Provider>
     </TranslationProvider>
   );
 };
+
+const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+});
 
 export default App;

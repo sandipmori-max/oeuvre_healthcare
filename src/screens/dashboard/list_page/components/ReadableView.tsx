@@ -33,15 +33,11 @@ const ReadableView = ({
     };
   };
 
-
-   useEffect(() => {
+  useEffect(() => {
     let isMounted = true;
     (async () => {
       try {
-        const [storedLink] = await Promise.all([
-          AsyncStorage.getItem('erp_link'),
-          
-        ]);
+        const [storedLink] = await Promise.all([AsyncStorage.getItem('erp_link')]);
 
         if (isMounted) {
           setBaseLink(storedLink || '');
@@ -56,21 +52,21 @@ const ReadableView = ({
   }, []);
 
   const RenderCard = ({ item, index }: any) => {
-    console.log("🚀 ~ RenderCard ~ item:-------------------------", item.image)
+    console.log('🚀 ~ RenderCard ~ item:-------------------------', item.image);
     if (!item) return null;
-    const name = item.name || `Item #${index + 1}`;
-    const subName = item.number || `Item #${index + 1}`;
+    const name = item?.name || `Item #${index + 1}`;
+    const subName = item?.number || `Item #${index + 1}`;
     const [isRemarksExpanded, setRemarksExpanded] = useState(false);
 
-    const status = item.status;
-    const date = item.date;
-    const remarks = item.remarks;
-    const address = item.address;
-    const amount = item.amount;
+    const status = item?.status;
+    const date = item?.date;
+    const remarks = item?.remarks;
+    const address = item?.address;
+    const amount = item?.amount;
 
     const btnKeys = Object.keys(item).filter(key => key.startsWith('btn_'));
     const baseUrl = baseLink.replace(/^https:\/\//i, 'http://');
-    
+    const authUser = item?.authuser;
 
     const avatarLetter = name
       .split('')
@@ -84,10 +80,10 @@ const ReadableView = ({
         style={{
           backgroundColor: '#fff',
           borderRadius: 8,
-          paddingHorizontal: 16,
-          paddingBottom: 16,
+          paddingHorizontal: 8,
+          paddingBottom: 6,
           marginVertical: 4,
-          paddingTop: 16,
+          paddingTop: 6,
           borderWidth: 1,
           borderColor: '#ddd',
         }}
@@ -97,7 +93,9 @@ const ReadableView = ({
           style={{ flexDirection: 'row', alignItems: 'center' }}
           onPress={async () => {
             console.log('🚀 ~ Page:', item);
-
+            if (authUser) {
+              return;
+            }
             navigation.navigate('Page', {
               item,
               title: pageParamsName,
@@ -108,9 +106,9 @@ const ReadableView = ({
         >
           <View
             style={{
-              width: 48,
-              height: 48,
-              borderRadius: 24,
+              width: 34,
+              height: 34,
+              borderRadius: 34,
               backgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR,
               justifyContent: 'center',
               alignItems: 'center',
@@ -118,14 +116,14 @@ const ReadableView = ({
             }}
           >
             {item?.image && item?.image !== '' ? (
-              <Image source={{ uri: baseUrl+item?.image }} style={styles.profileImage} />
+              <Image source={{ uri: baseUrl + item?.image }} style={styles.profileImage} />
             ) : (
-              <Text style={{ color: '#fff', fontWeight: '400', fontSize: 22 }}>{avatarLetter}</Text>
+              <Text style={{ color: '#fff', fontWeight: '400', fontSize: 16 }}>{avatarLetter}</Text>
             )}
           </View>
 
           <View style={{ flex: 1 }}>
-            <Text style={{ fontSize: 16, fontWeight: '700' }} numberOfLines={1}>
+            <Text style={{ fontWeight: '700' }} numberOfLines={1}>
               {name}
             </Text>
             <Text style={{ fontSize: 12 }} numberOfLines={1}>
@@ -141,24 +139,29 @@ const ReadableView = ({
               justifyContent: 'flex-end',
             }}
           >
-            <Text style={{ fontWeight: '600', color: '#000' }}>{status}</Text>
+            <Text style={{ fontWeight: '600', fontSize: 12, color: '#000' }}>{status}</Text>
             {!!date && (
-              <Text style={{ fontWeight: '600', color: '#ccc' }}>
+              <Text style={{ fontWeight: '600', fontSize: 12, color: '#ccc' }}>
                 {formatDateToDDMMMYYYY(date)}
               </Text>
             )}
           </View>
         </TouchableOpacity>
-        <TouchableOpacity onPress={async () => {
-           navigation.navigate('Page', {
+        <TouchableOpacity
+          onPress={async () => {
+            if (authUser) {
+              return;
+            }
+            navigation.navigate('Page', {
               item,
               title: pageParamsName,
               id: item?.id,
               url: pageName,
             });
-        }}>
+          }}
+        >
           {(remarks || address || amount) && (
-            <View style={{ marginTop: 12 }}>
+            <View style={{ marginTop: 6 }}>
               <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                 <View
                   style={{
@@ -173,13 +176,22 @@ const ReadableView = ({
                           color: '#777',
                           fontStyle: 'italic',
                           marginBottom: 6,
+                          fontWeight: '600',
+                          fontSize: 12,
                         }}
                       >
                         {remarks}
                       </Text>
                       {remarks.length > 60 && (
                         <TouchableOpacity onPress={() => setRemarksExpanded(prev => !prev)}>
-                          <Text style={{ color: '#007bff', fontSize: 12, marginBottom: 6 }}>
+                          <Text
+                            style={{
+                              fontWeight: '600',
+                              fontSize: 12,
+                              color: '#007bff',
+                              marginBottom: 6,
+                            }}
+                          >
                             {isRemarksExpanded ? 'See Less ▲' : 'See More ▼'}
                           </Text>
                         </TouchableOpacity>
@@ -198,7 +210,7 @@ const ReadableView = ({
                       numberOfLines={1}
                       style={{
                         textAlign: 'right',
-                        fontSize: 16,
+                        fontSize: 14,
                         fontWeight: '700',
                         color: '#28a745',
                       }}
@@ -214,6 +226,8 @@ const ReadableView = ({
                     numberOfLines={2}
                     style={{
                       color: '#444',
+                      fontWeight: '600',
+                      fontSize: 12,
                     }}
                   >
                     📍 {address}
@@ -225,19 +239,18 @@ const ReadableView = ({
         </TouchableOpacity>
 
         {btnKeys.length > 0 && (
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginTop: 14, gap: 1 }}>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginTop: 6, gap: 1 }}>
             {btnKeys.map((key, idx) => {
               const actionValue = item[key];
               const { label, color } = getButtonMeta(key);
-              const authUser = item.authuser;
               return (
                 <TouchableOpacity
                   key={`${key}-${idx}`}
                   style={{
-                    backgroundColor: authUser ? 'gray' : color,
+                    backgroundColor: authUser ? '#C6C6C6' : color,
                     paddingHorizontal: 6,
-                    paddingVertical: 8,
-                    borderRadius: 6,
+                    paddingVertical: 4,
+                    borderRadius: 4,
                     flexGrow: 1,
                     maxWidth: (screenWidth - 64) / 2,
                     alignItems: 'center',
@@ -250,7 +263,7 @@ const ReadableView = ({
                     handleActionButtonPressed(actionValue, label, color, item?.id);
                   }}
                 >
-                  <Text style={{ color: '#fff', fontWeight: '600', fontSize: 13 }}>{label}</Text>
+                  <Text style={{ color: '#fff', fontWeight: '600', fontSize: 12 }}>{label}</Text>
                 </TouchableOpacity>
               );
             })}
@@ -287,22 +300,22 @@ const ReadableView = ({
           filteredData.length > 0 && totalAmount > 0 ? (
             <View
               style={{
-                marginTop: 16,
-                padding: 16,
+                marginTop: 6,
+                padding: 8,
                 borderRadius: 8,
                 backgroundColor: '#f1f1f1',
                 borderWidth: 1,
                 borderColor: '#ddd',
-                marginBottom: 28,
+                marginBottom: 28, 
               }}
             >
-              <Text style={{ fontSize: 16, fontWeight: '700', color: '#333' }}>Total Amount</Text>
+              <Text style={{ fontSize: 14, fontWeight: '700', color: '#333' }}>Total Amount</Text>
               <Text
                 style={{
-                  fontSize: 20,
+                  fontSize: 16,
                   fontWeight: 'bold',
                   color: '#28a745',
-                  marginTop: 4,
+                  marginTop: 2,
                 }}
               >
                 ₹ {totalAmount.toFixed(2)}

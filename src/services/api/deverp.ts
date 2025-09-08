@@ -48,8 +48,8 @@ class DevERPService {
   private async apiCall<T>(endpoint: string, payload: any): Promise<T> {
     try {
       console.log(
-        '🚀 ~ DevERPService ~ apiCall ~ payload--------------------:',
-        `${this.link}${endpoint}`,
+        '🚀 -🚀- -🚀- 🚀 - 🚀- 🚀 ~ DevERPService ~ apiCall ~ payload--------------------:',
+        `${payload}`,
       );
       await this.checkNetwork();
       await this.ensureAuthToken();

@@ -8,15 +8,13 @@ import MaterialIcons from '@react-native-vector-icons/material-icons';
 import FullViewLoader from '../../../../components/loader/FullViewLoader';
 
 const AjaxPicker = ({ label, onValueChange, item, errors, dtext, formValues }: any) => {
-  console.log('🚀🙂🙂🙂🙂🙂🙂🙂🙂🙂 ~ AjaxPicker ~ item:', item?.ddl.split(','));
+  const dispatch = useAppDispatch();
+
+  const [selectedOption, setSelectedOption] = useState(dtext || item?.text || item?.value);
   const [open, setOpen] = useState(false);
   const [options, setOptions] = useState<any[]>([]);
-  console.log('🚀🙂🙂🙂🙂🙂🙂🙂🙂🙂 ~ AjaxPicker----------------- ~ options:', options);
   const [loader, setLoader] = useState(false);
-  const dispatch = useAppDispatch();
-  const [selectedOption, setSelectedOption] = useState(dtext || item?.text || item?.value);
   const [search, setSearch] = useState('');
-  console.log('🚀🙂🙂🙂🙂🙂🙂🙂🙂🙂 ~ selectedOption----------------- ~ options:', selectedOption);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -28,7 +26,7 @@ const AjaxPicker = ({ label, onValueChange, item, errors, dtext, formValues }: a
   }, [search]);
 
   useEffect(() => {
-    setSelectedOption(dtext || item?.text || item?.value);
+    setSelectedOption(item?.dtext || item?.text || item?.value);
   }, [dtext, item]);
 
   const fetchOptions = useCallback(async () => {
@@ -55,29 +53,26 @@ const AjaxPicker = ({ label, onValueChange, item, errors, dtext, formValues }: a
   };
 
   const handleSelect = (opt: any) => {
-
     const afterDash = item?.ddl?.split('-')[1];
-    const arr = afterDash.split(',');
+    const arr = afterDash?.split(',');
 
-    const result = arr.reduce((acc, key) => {
-      const lowerKey = key.toLowerCase();
-      acc[lowerKey] = opt[lowerKey].toString();
+    const result = arr?.reduce((acc, key) => {
+      const lowerKey = key?.toLowerCase();
+      acc[lowerKey] = String(opt[lowerKey] ?? '');
       return acc;
     }, {});
 
-    console.log('result --- ', result);
-
     onValueChange({
-      [item.field]:
-        opt[`${item.ddlfield.toLowerCase()}id`] ?? opt[`${item.field}id`] ?? opt[item.field],
+      [item?.dfield]:
+        opt[`${item?.ddlfield.toLowerCase()}id`] ?? opt[`${item?.field}id`] ?? opt[item?.field],
 
       [item.dfield || item.ddlfield.toLowerCase()]:
-        opt[item.ddlfield.toLowerCase()] ?? opt[item.dfield],
+        opt[item?.ddlfield.toLowerCase()] ?? opt[item?.dfield],
 
       ...result,
     });
 
-    setSelectedOption(opt[item.ddlfield.toLowerCase()] ?? opt[item.dfield]);
+    setSelectedOption(opt[item?.ddlfield.toLowerCase()] ?? opt[item?.dfield]);
     setOpen(false);
   };
 
@@ -137,7 +132,7 @@ const AjaxPicker = ({ label, onValueChange, item, errors, dtext, formValues }: a
                 onChangeText={setSearch}
               />
 
-              {search.length > 0 && (
+              {search?.length > 0 && (
                 <TouchableOpacity
                   onPress={() => setSearch('')}
                   style={{

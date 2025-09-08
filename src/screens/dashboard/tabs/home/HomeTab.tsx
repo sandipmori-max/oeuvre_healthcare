@@ -72,12 +72,16 @@ const HomeScreen = () => {
   };
 
   const accentColors = ['#4C6FFF', '#00C2A8', '#FFB020', '#FF6B6B', '#9B59B6', '#20C997'];
+
   const pieChartData = dashboard
-    .filter(item => !isNaN(Number(item.data)))
+    .filter(item => {
+      const num = Number(item?.data);
+      return item?.data !== '' && !isNaN(num) && num > 0;
+    })
     .map((item, index) => ({
       value: Number(item.data),
       color: accentColors[index % accentColors.length],
-      text: item.title?.split(' ')[0] || `Item ${index + 1}`,
+      text: item.title?.split(' ')[0] || item.name,
     }));
 
   const renderDashboardItem = (item: DashboardItem, index: number) => {
@@ -127,9 +131,9 @@ const HomeScreen = () => {
                         color: theme === 'dark' ? '#fff' : '#000',
                       },
                     ]}
-                    numberOfLines={2}
+                    numberOfLines={1}
                   >
-                    {item.title}
+                    {item.title } 
                   </Text>
                 </View>
               </View>
@@ -195,7 +199,8 @@ const HomeScreen = () => {
   const renderEmptyState = () => <NoData />;
 
   return (
-    <FlatList
+    <View>
+      <FlatList
       showsVerticalScrollIndicator={false}
       data={['']}
       renderItem={() => {
@@ -297,6 +302,7 @@ const HomeScreen = () => {
         );
       }}
     />
+    </View>
   );
 };
 

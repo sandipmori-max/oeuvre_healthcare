@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import {
   View,
-  ScrollView,
   Keyboard,
   TouchableWithoutFeedback,
   TouchableOpacity,
   Text,
+  FlatList,
 } from 'react-native';
 import DeviceInfo from 'react-native-device-info';
 
@@ -67,35 +67,44 @@ const LoginScreen = ({ navigation, route }: any) => {
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.container}>
-        <View style={styles.formContainer}>
-          <LoginHeader isAddingAccount={isAddingAccount} t={t} />
-          <LoginForm
-            deviceId={deviceId}
-            isAddingAccount={isAddingAccount}
-            isLoading={isLoading}
-            onLoginSuccess={handlePersistAfterLogin}
-            showAlert={showAlert}
-          />
-          {isAddingAccount && (
-            <TouchableOpacity
-              style={styles.cancelButton}
-              onPress={() => navigation.goBack()}
-              activeOpacity={0.8}
-            >
-              <Text style={styles.cancelButtonText}>{t('auth.cancel')}</Text>
-            </TouchableOpacity>
-          )}
-        </View>
-        <CustomAlert
-          visible={alertVisible}
-          title={alertConfig.title}
-          message={alertConfig.message}
-          type={alertConfig.type}
-          onClose={() => setAlertVisible(false)}
-          actionLoader={undefined}
-        />
-      </ScrollView>
+      <FlatList
+        data={['']}
+        showsVerticalScrollIndicator={false}
+        renderItem={() => {
+          return (
+            <>
+              <View style={styles.formContainer}>
+                <LoginHeader isAddingAccount={isAddingAccount} t={t} />
+                <LoginForm
+                  deviceId={deviceId}
+                  isAddingAccount={isAddingAccount}
+                  isLoading={isLoading}
+                  onLoginSuccess={handlePersistAfterLogin}
+                  showAlert={showAlert}
+                />
+                {isAddingAccount && (
+                  <TouchableOpacity
+                    style={styles.cancelButton}
+                    onPress={() => navigation.goBack()}
+                    activeOpacity={0.8}
+                  >
+                    <Text style={styles.cancelButtonText}>{t('auth.cancel')}</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+
+              <CustomAlert
+                visible={alertVisible}
+                title={alertConfig.title}
+                message={alertConfig.message}
+                type={alertConfig.type}
+                onClose={() => setAlertVisible(false)}
+                actionLoader={undefined}
+              />
+            </>
+          );
+        }}
+      />
     </TouchableWithoutFeedback>
   );
 };

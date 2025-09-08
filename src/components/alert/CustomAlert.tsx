@@ -75,7 +75,7 @@ const CustomAlert: React.FC<CustomAlertProps> = ({
               <Text
                 style={[
                   alertStyles.message,
-                  { textAlign: 'left', fontSize: 18, fontWeight: '800' },
+                  { textAlign: 'left', fontSize: 14, fontWeight: '800' },
                 ]}
               >
                 {message}
@@ -88,8 +88,8 @@ const CustomAlert: React.FC<CustomAlertProps> = ({
                 autoCapitalize="none"
                 onChangeText={handleChangedRemarks}
                 value={remarks}
-                labelStyle={[styles.inputLabel, { fontWeight: '400' }]}
-                inputStyle={[styles.input]}
+                labelStyle={[styles.inputLabel, { fontWeight: '400', fontSize: 12 }]}
+                inputStyle={[styles.input,]}
               />
               {error ? <Text style={{ color: ERP_COLOR_CODE.ERP_ERROR }}>{error}</Text> : null}
             </View>
