@@ -1,12 +1,13 @@
 import { StyleSheet, Dimensions } from 'react-native';
 import { ERP_COLOR_CODE } from '../../../../utils/constants';
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('screen');
 const itemWidth = (width - 48) / 2;  
 
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
+    height: height,
     backgroundColor: '#F8F9FA',
   },
   containerDark: {

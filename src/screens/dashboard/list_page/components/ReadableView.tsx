@@ -274,7 +274,7 @@ const ReadableView = ({
             <View
               style={{
                 width: Dimensions.get('screen').width,
-                height: Dimensions.get('screen').height / 2.5,
+                height: Dimensions.get('screen').height / 1.5,
                 justifyContent: 'center',
                 alignItems: 'center',
               }}

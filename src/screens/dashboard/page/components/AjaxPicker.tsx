@@ -1,12 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import {
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-  Modal,
-  ScrollView,
-} from 'react-native';
+import { Text, TextInput, TouchableOpacity, View, Modal, ScrollView } from 'react-native';
 import { useAppDispatch } from '../../../../store/hooks';
 import { styles } from '../page_style';
 import { ERP_COLOR_CODE } from '../../../../utils/constants';
@@ -14,21 +7,16 @@ import { getAjaxThunk } from '../../../../store/slices/ajax/thunk';
 import MaterialIcons from '@react-native-vector-icons/material-icons';
 import FullViewLoader from '../../../../components/loader/FullViewLoader';
 
-const AjaxPicker = ({
-  label,
-  onValueChange,
-  item,
-  errors,
-  dtext,
-  formValues,
-}: any) => {
+const AjaxPicker = ({ label, onValueChange, item, errors, dtext, formValues }: any) => {
+  console.log('🚀🙂🙂🙂🙂🙂🙂🙂🙂🙂 ~ AjaxPicker ~ item:', item?.ddl.split(','));
   const [open, setOpen] = useState(false);
   const [options, setOptions] = useState<any[]>([]);
+  console.log('🚀🙂🙂🙂🙂🙂🙂🙂🙂🙂 ~ AjaxPicker----------------- ~ options:', options);
   const [loader, setLoader] = useState(false);
   const dispatch = useAppDispatch();
-  const [selectedOption, setSelectedOption] = useState('');
+  const [selectedOption, setSelectedOption] = useState(dtext || item?.text || item?.value);
   const [search, setSearch] = useState('');
-  const [error, setError] = useState('')
+  console.log('🚀🙂🙂🙂🙂🙂🙂🙂🙂🙂 ~ selectedOption----------------- ~ options:', selectedOption);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -67,25 +55,29 @@ const AjaxPicker = ({
   };
 
   const handleSelect = (opt: any) => {
-    if (item?.ddlfield) {
 
-      const ddlParts = item.ddlfield.split(',');
-      if (ddlParts.length > 1) {
-        const mappedValues: Record<string, any> = {};
-        ddlParts.forEach(f => {
-          const key = f.toLowerCase();
-          mappedValues[key] = opt[key];
-        });
+    const afterDash = item?.ddl?.split('-')[1];
+    const arr = afterDash.split(',');
 
-        onValueChange(mappedValues);
-      } else {
-        onValueChange(opt);
-      }
-    } else {
-      onValueChange(opt);
-    }
+    const result = arr.reduce((acc, key) => {
+      const lowerKey = key.toLowerCase();
+      acc[lowerKey] = opt[lowerKey].toString();
+      return acc;
+    }, {});
 
-    setSelectedOption(opt?.deptname || opt?.name || opt?.text || opt?.label || '');
+    console.log('result --- ', result);
+
+    onValueChange({
+      [item.field]:
+        opt[`${item.ddlfield.toLowerCase()}id`] ?? opt[`${item.field}id`] ?? opt[item.field],
+
+      [item.dfield || item.ddlfield.toLowerCase()]:
+        opt[item.ddlfield.toLowerCase()] ?? opt[item.dfield],
+
+      ...result,
+    });
+
+    setSelectedOption(opt[item.ddlfield.toLowerCase()] ?? opt[item.dfield]);
     setOpen(false);
   };
 
@@ -97,15 +89,17 @@ const AjaxPicker = ({
         {item?.mandatory === '1' && <Text style={{ color: ERP_COLOR_CODE.ERP_ERROR }}>*</Text>}
       </View>
 
-      <TouchableOpacity style={[styles.pickerBox, 
-        item?.disabled === '1' && styles.disabledBox
-      ]} onPress={() =>{
-        if(item?.disabled !== '1'){
-          handleOpen()
-        }
-      }} activeOpacity={0.7}>
+      <TouchableOpacity
+        style={[styles.pickerBox, item?.disabled === '1' && styles.disabledBox]}
+        onPress={() => {
+          if (item?.disabled !== '1') {
+            handleOpen();
+          }
+        }}
+        activeOpacity={0.7}
+      >
         <Text style={{ color: selectedOption ? '#000' : '#888', flex: 1 }}>
-          {formValues[label.toLowerCase()] || dtext || item?.text || 'Select...'}
+          {selectedOption || 'Select...'}
         </Text>
         <MaterialIcons name={'arrow-drop-down'} size={24} color="#555" />
       </TouchableOpacity>
@@ -176,12 +170,15 @@ const AjaxPicker = ({
                             <Text
                               key={idx}
                               style={{
-                                color: key === label.toLowerCase() ? ERP_COLOR_CODE.ERP_APP_COLOR : '#000',
+                                color:
+                                  key === label.toLowerCase()
+                                    ? ERP_COLOR_CODE.ERP_APP_COLOR
+                                    : '#000',
                                 fontSize: key === label.toLowerCase() ? 16 : 14,
-                                fontWeight: key === label.toLowerCase() ? '700' : '400'
+                                fontWeight: key === label.toLowerCase() ? '700' : '400',
                               }}
                             >
-                            {String(value)}
+                              {String(value)}
                             </Text>
                           );
                         })}
