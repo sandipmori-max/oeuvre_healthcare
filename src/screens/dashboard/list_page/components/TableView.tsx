@@ -212,30 +212,28 @@ const TableView = ({
               ListFooterComponent={
                 filteredData.length > 0 && totalAmount > 0 ? (
                   <View
-                    style={{
-                      marginTop: 16,
-                      padding: 16,
-                      borderRadius: 8,
-                      backgroundColor: '#f1f1f1',
-                      borderWidth: 1,
-                      borderColor: '#ddd',
-                      marginBottom: 28,
-                    }}
-                  >
-                    <Text style={{ fontSize: 16, fontWeight: '700', color: '#333' }}>
-                      Total Amount
-                    </Text>
-                    <Text
-                      style={{
-                        fontSize: 20,
-                        fontWeight: 'bold',
-                        color: '#28a745',
-                        marginTop: 4,
-                      }}
-                    >
-                      ₹ {totalAmount.toFixed(2)}
-                    </Text>
-                  </View>
+                               style={{
+                                 marginTop: 6,
+                                 padding: 8,
+                                 borderRadius: 8,
+                                 backgroundColor: '#f1f1f1',
+                                 borderWidth: 1,
+                                 borderColor: '#ddd',
+                                 marginBottom: 28, 
+                               }}
+                             >
+                               <Text style={{ fontSize: 14, fontWeight: '700', color: '#333' }}>Total Amount</Text>
+                               <Text
+                                 style={{
+                                   fontSize: 16,
+                                   fontWeight: 'bold',
+                                   color: '#28a745',
+                                   marginTop: 2,
+                                 }}
+                               >
+                                 ₹ {totalAmount.toFixed(2)}
+                               </Text>
+                             </View>
                 ) : null
               }
             />

@@ -87,7 +87,7 @@ const PageScreen = () => {
           numberOfLines={1}
           style={{ maxWidth: 180, fontSize: 18, fontWeight: '700', color: '#fff' }}
         >
-          {isFromNew ? 'New Data' : item?.name || 'Details'}
+          {isFromNew ? 'New Data ( New ) ' : item?.name + ' ( Edit )' || 'Details'}
         </Text>
       ),
       headerRight: () => (
@@ -217,22 +217,13 @@ const PageScreen = () => {
     ({ item, index }: { item: any; index: number }) => {
 
       const setValue = (val: any) => { 
-
-         console.log("🙂🙂🙂🙂🙂🙂🙂🙂🙂 ~ handleSelect ~ opt:----"
-                      , val) 
-
-
         if (typeof val === 'object' && val !== null) {
           setFormValues(prev => ({ ...prev, ...val }));
         } else {
           setFormValues(prev => ({ ...prev, [item.field]: val }));
         }
-                   
-                    
-
         setErrors(prev => ({ ...prev, [item?.field]: '' }));
       };
-
 
       const value = formValues[item?.field] || formValues[item?.text] || '';
 
@@ -249,7 +240,7 @@ const PageScreen = () => {
             onChange={val => setValue({ [item.field]: val })}
           />
         );
-      } else if (item?.ctltype === 'IMAGE') {
+      } else if (item?.ctltype === 'IMAGE' || item?.ctltype === 'PHOTO') {
         content = <Media item={item} handleAttachment={handleAttachment} />;
       } else if (item?.disabled === '1' && item?.ajax !== 1) {
         content = <Disabled item={item} value={value} type={item?.ctltype} />;
@@ -316,8 +307,6 @@ const PageScreen = () => {
     hideDatePicker();
   };
  
-
-
   return (
     <View style={{ flex: 1, padding: 16, backgroundColor: '#f9f9f9' }}>
       {loadingPageId ? (

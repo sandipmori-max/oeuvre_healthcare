@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
   Image,
   ScrollView,
+  FlatList,
 } from 'react-native';
 import { Formik } from 'formik';
 
@@ -163,9 +164,14 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
           </TouchableOpacity>
           <Text style={styles.title}>Add Account</Text>
         </View>
-
-        <ScrollView showsVerticalScrollIndicator={false}>
-          <View style={styles.formContainer}>
+        <FlatList 
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
+         data={['']}
+         renderItem={() =>{
+          return (
+            <>
+             <View style={styles.formContainer}>
             <Image source={ERP_ICON.APP_LOGO} style={styles.logo} resizeMode="contain" />
 
             <Text style={styles.subtitle}>Sign in to add another account</Text>
@@ -263,7 +269,11 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
               This account will be added to your list. You can switch between accounts anytime.
             </Text>
           </View>
-        </ScrollView>
+            </>
+          )
+         }}
+        />
+        
         <CustomAlert
           visible={alertVisible}
           title={alertConfig.title}

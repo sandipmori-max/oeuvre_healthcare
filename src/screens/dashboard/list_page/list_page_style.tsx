@@ -1,18 +1,16 @@
 import { StyleSheet } from 'react-native';
-import { ERP_COLOR_CODE } from '../../../utils/constants';
 
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 16,
-    paddingTop: 16,
+    paddingHorizontal: 8,
+    paddingTop: 0,
     backgroundColor: '#F8F9FA',
   },
    profileImage: {
-    width: 56,
-    height: 56,
+    width: 40,
+    height: 40,
     borderRadius: 50,
-    backgroundColor: '#fff',
   },
   card: {
     backgroundColor: '#fff',

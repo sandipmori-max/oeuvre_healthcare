@@ -5,7 +5,7 @@ import { launchCamera, launchImageLibrary, Asset } from 'react-native-image-pick
 import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 
 const Media = ({ item, handleAttachment }: any) => {
-  console.log("🚀 ~ Media ~ *-*-*-**-*---***-*----item:----------------*---**--*---*", item)
+  console.log('🚀 ~ Media ~ *-*-*-**-*---***-*----item:----------------*---**--*---*', item);
   const [imageUri, setImageUri] = useState<string | null>(null);
 
   const requestPermission = async (type: 'camera' | 'gallery') => {
@@ -31,42 +31,56 @@ const Media = ({ item, handleAttachment }: any) => {
     }
   };
 
+  const renderMedia = () => {
+    if (item?.ctltype === 'IMAGE') {
+      return [
+        {
+          text: 'Camera',
+          onPress: async () => {
+            const granted = await requestPermission('camera');
+            if (!granted) return Alert.alert('Permission denied', 'Camera access is required');
+            launchCamera({ mediaType: 'photo', quality: 0.8, includeBase64: true }, response => {
+              if (response.assets && response.assets.length > 0) {
+                const asset: Asset = response.assets[0];
+                setImageUri(asset.uri || null);
+                handleAttachment(
+                  `savePage.jpeg; data:${asset.type};base64,${asset.base64}`,
+                  item.field,
+                );
+              }
+            });
+          },
+        },
+      ];
+    } else {
+      return [
+        {
+          text: 'Gallery',
+          onPress: async () => {
+            const granted = await requestPermission('gallery');
+            if (!granted) return Alert.alert('Permission denied', 'Gallery access is required');
+            launchImageLibrary(
+              { mediaType: 'photo', quality: 0.8, includeBase64: true },
+              response => {
+                if (response.assets && response.assets.length > 0) {
+                  const asset: Asset = response.assets[0];
+                  setImageUri(asset.uri || null);
+                  handleAttachment(
+                    `savePage.jpeg; data:${asset.type};base64,${asset.base64}`,
+                    item.field,
+                  );
+                }
+              },
+            );
+          },
+        },
+      ];
+    }
+  };
+
   const handleChooseImage = async () => {
     Alert.alert('Select Image', 'Choose an option', [
-      {
-        text: 'Camera',
-        onPress: async () => {
-          const granted = await requestPermission('camera');
-          if (!granted) return Alert.alert('Permission denied', 'Camera access is required');
-          launchCamera(
-            { mediaType: 'photo', quality: 0.8, includeBase64: true },
-            response => {
-              if (response.assets && response.assets.length > 0) {
-                const asset: Asset = response.assets[0];
-                setImageUri(asset.uri || null);
-                handleAttachment(`savePage.jpeg; data:${asset.type};base64,${asset.base64}`, item.field);
-              }
-            },
-          );
-        },
-      },
-      {
-        text: 'Gallery',
-        onPress: async () => {
-          const granted = await requestPermission('gallery');
-          if (!granted) return Alert.alert('Permission denied', 'Gallery access is required');
-          launchImageLibrary(
-            { mediaType: 'photo', quality: 0.8, includeBase64: true },
-            response => {
-              if (response.assets && response.assets.length > 0) {
-                const asset: Asset = response.assets[0];
-                setImageUri(asset.uri || null);
-                handleAttachment(`savePage.jpeg; data:${asset.type};base64,${asset.base64}`, item.field);
-              }
-            },
-          );
-        },
-      },
+      ...renderMedia(),
       { text: 'Cancel', style: 'cancel' },
     ]);
   };
