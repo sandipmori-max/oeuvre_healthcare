@@ -200,10 +200,10 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
                   </View>
 
                   <View style={styles.inputContainer}>
-                    <Text style={styles.inputLabel}>User</Text>
+                    <Text style={styles.inputLabel}>User name</Text>
                     <TextInput
                       style={styles.input}
-                      placeholder="Enter user"
+                      placeholder="Enter user name"
                       placeholderTextColor="#999"
                       autoCapitalize="none"
                       onChangeText={handleChange('user')}

@@ -65,7 +65,7 @@ const ReadableView = ({
     const amount = item?.amount;
 
     const btnKeys = Object.keys(item).filter(key => key.startsWith('btn_'));
-    const baseUrl = baseLink.replace(/^https:\/\//i, 'http://');
+    const baseUrl = item?.image.replace(/^https:\/\//i, 'http://');
     const authUser = item?.authuser;
 
     const avatarLetter = name
@@ -116,7 +116,7 @@ const ReadableView = ({
             }}
           >
             {item?.image && item?.image !== '' ? (
-              <Image source={{ uri: baseUrl + item?.image }} style={styles.profileImage} />
+              <Image source={{ uri: baseUrl }} style={styles.profileImage} />
             ) : (
               <Text style={{ color: '#fff', fontWeight: '400', fontSize: 16 }}>{avatarLetter}</Text>
             )}
@@ -296,7 +296,9 @@ const ReadableView = ({
             </View>
           ) : null
         }
-        ListFooterComponent={
+        
+      />
+      {
           filteredData.length > 0 && totalAmount > 0 ? (
             <View
               style={{
@@ -322,8 +324,7 @@ const ReadableView = ({
               </Text>
             </View>
           ) : null
-        }
-      />
+      }
     </View>
   );
 };

@@ -22,6 +22,8 @@ const LoginScreen = ({ navigation, route }: any) => {
 
   const dispatch = useAppDispatch();
 
+  const isAddingAccount = route?.params?.isAddingAccount || false;
+
   const { isLoading } = useAppSelector(state => state.auth);
 
   const [deviceId, setDeviceId] = useState<string>('');
@@ -42,7 +44,6 @@ const LoginScreen = ({ navigation, route }: any) => {
     fetchDeviceName();
   }, []);
 
-  const isAddingAccount = route?.params?.isAddingAccount || false;
 
   const handlePersistAfterLogin = async (
     company_code: string,
@@ -50,7 +51,6 @@ const LoginScreen = ({ navigation, route }: any) => {
     user_credentials: { user: string; name?: string },
     response: any,
   ) => {
-    console.log('🚀 ~ handlePersistAfterLogin ~ response:---------', response);
     dispatch(
       loginUserThunk({ company_code, password, isAddingAccount, user_credentials, response }),
     );
