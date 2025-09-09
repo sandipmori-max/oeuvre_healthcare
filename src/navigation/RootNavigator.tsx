@@ -8,6 +8,9 @@ import StackNavigator from './StackNavigator';
 import FullViewLoader from '../components/loader/FullViewLoader';
 // import DeviceInfo from 'react-native-device-info';
 import CustomAlert from '../components/alert/CustomAlert';
+import { generateGUID } from '../utils/helpers';
+import DeviceInfo from 'react-native-device-info';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 // import { isTokenValid, requestLocationPermissions } from '../utils/helpers';
 // import { syncLocationThunk } from '../store/slices/location/thunk';
 // import Geolocation from '@react-native-community/geolocation';
@@ -45,6 +48,8 @@ const RootNavigator = () => {
 
   const [locationEnabled, setLocationEnabled] = useState<boolean | null>(null);
   const [alertVisible, setAlertVisible] = useState(false);
+    const [deviceId, setDeviceId] = useState<string>('');
+  
   const [modalClose, setModalClose] = useState(false);
   const [alertConfig, setAlertConfig] = useState({
     title: '',
@@ -107,10 +112,37 @@ const RootNavigator = () => {
   //   return R * c;
   // };
 
-  useEffect(() => {
+  const app_id = generateGUID();
+
+useEffect(() => {
+  const fetchDeviceName = async () => {
+    const name = await DeviceInfo.getDeviceName();
+    
+    // Check if appid exists in AsyncStorage
+    let appid = await AsyncStorage.getItem('appid');
+    if (!appid) {
+      // If not, use the generated app_id and save it
+      appid = app_id;
+      await AsyncStorage.setItem('appid', appid);
+    }
+
+    console.log('---------------------------------------Device :', appid);
+    
+    setDeviceId(name);
+    await AsyncStorage.setItem('device', name);
+
+    // Initialize your service
     DevERPService.initialize();
+    DevERPService.setAppId(appid);
+    DevERPService.setDevice(name);
+
+    // Dispatch auth state check
     dispatch(checkAuthStateThunk());
-  }, [dispatch]);
+  };
+
+  fetchDeviceName();
+}, [dispatch]);
+
 
   // useEffect(() => {
   //   const checkLocation = async () => {
@@ -245,3 +277,4 @@ const RootNavigator = () => {
 };
 
 export default RootNavigator;
+// 47e0d50d-9c90-4b03-acd2-4548010ad609

@@ -21,7 +21,7 @@ class DevERPService {
   private token: string = '';
   private tokenValidTill: string = '';
   private appid: string = generateGUID();
-  private device: string = 'mobile';
+  private device: string = '';
 
   private async checkNetwork() {
     const netInfo = await NetInfo.fetch();
@@ -34,7 +34,9 @@ class DevERPService {
     }
 
     const storedToken = await AsyncStorage.getItem('erp_token');
+    console.log("🚀 ~ DevERPService ~ ensureAuthToken ~ storedToken:", storedToken)
     const storedTokenValidTill = await AsyncStorage.getItem('erp_token_valid_till');
+    console.log("🚀 ~ DevERPService ~ ensureAuthToken ~ storedTokenValidTill:", storedTokenValidTill)
 
     if (storedToken && storedTokenValidTill && new Date(storedTokenValidTill) > new Date()) {
       this.token = storedToken;
@@ -143,12 +145,15 @@ class DevERPService {
 
   async getAuth(): Promise<string> {
     await this.checkNetwork();
+    console.log("🚀 ~ DevERPService ~  this.appid ~  this.appid:",  this.appid)
 
     const tokenData: TokenRequest = { appid: this.appid, device: this.device };
+    console.log("🚀 ~ DevERPService ~ getAuth ~ tokenData:", tokenData)
     const response = await apiClient.post<TokenResponse>(
       `${this.link}msp_api.aspx/getAuth`,
       tokenData,
     );
+    console.log("🚀 ~ DevERPService ~ getAuth ~ response:", response)
 
     if (String(response.data.success) !== '1')
       throw new Error(response.data.message || 'Failed to get token');
@@ -294,6 +299,7 @@ class DevERPService {
     this.token = (await AsyncStorage.getItem('erp_token')) || '';
     this.tokenValidTill = (await AsyncStorage.getItem('erp_token_valid_till')) || '';
     this.appid = (await AsyncStorage.getItem('erp_appid')) || '';
+    this.device = (await AsyncStorage.getItem('device')) || '';
   }
 
   async clearData() {
@@ -309,11 +315,18 @@ class DevERPService {
     AsyncStorage.setItem('erp_token', token);
   }
   setDevice(device: string) {
+    console.log("🚀 ~ DevERPService ~ setDevice ~ device:", device)
+    AsyncStorage.setItem('device',device)
+
     this.device = device;
   }
   setAppId(appId: string) {
+    console.log("🚀 ~ DevERPService ~ setAppId ~ appId:", appId)
+    AsyncStorage.setItem('erp_appid',appId)
     this.appid = appId;
   }
 }
 
 export default new DevERPService();
+// 7e5f9467-ba1b-49ae-9081-b2b24e45667b
+//  sdk_gphone64_x86_64

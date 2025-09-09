@@ -21,6 +21,7 @@ export const checkAuthStateThunk = createAsyncThunk(
       await createAccountsTable(db);
       const accounts = await getAccounts(db);
       const activeAccount = await getActiveAccount(db);
+      console.log("🚀 ~ activeAccount:", activeAccount)
 
       if (activeAccount?.user?.token) {
         const tokenValidTill = activeAccount.user.tokenValidTill;
@@ -84,7 +85,6 @@ export const loginUserThunk = createAsyncThunk(
       }
 
       await AsyncStorage.setItem('auth_token', token);
-      await AsyncStorage.setItem('erp_appid', company_code);
 
       const erpUser: User = {
         id: response?.userid,

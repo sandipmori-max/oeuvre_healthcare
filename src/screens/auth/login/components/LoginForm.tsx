@@ -13,6 +13,7 @@ import ERPTextInput from '../../../../components/input/ERPTextInput';
 import ERPButton from '../../../../components/button/ERPButton';
 import useFcmToken from '../../../../hooks/useFcmToken';
 import { generateGUID } from '../../../../utils/helpers';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const LoginForm: React.FC<LoginFormProps> = ({
   deviceId,
@@ -75,7 +76,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
       if (!companyValidation?.isValid) return;
 
       const currentFcmToken = fcmToken || (await getMessaging().getToken());
-      DevERPService.setAppId(generateGUID());
+
       DevERPService.setDevice(deviceId);
 
       const loginResult = await loginWithERP(() =>
