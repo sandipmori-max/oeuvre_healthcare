@@ -1,4 +1,5 @@
 import { StyleSheet } from 'react-native';
+import { ERP_COLOR_CODE } from '../../../utils/constants';
 
 export const styles = StyleSheet.create({
   container: {
@@ -479,9 +480,9 @@ export const styles = StyleSheet.create({
   },
   addButton: {
     position: 'absolute',
-    bottom: 32,
+    bottom: 64,
     right: 18,
-    backgroundColor: '#68C39F', 
+    backgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR, 
     borderRadius: 56,
     elevation: 5,
     height: 56,

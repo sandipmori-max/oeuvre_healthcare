@@ -163,18 +163,31 @@ const EntryTab = () => {
   if (error) {
     return (
       <View
-        style={{
-          flex: 1,
-          justifyContent: 'center',
-          alignItems: 'center',
-          marginTop: 20,
-        }}
+          style={{
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor:'white'
+          }}
       >
         <ErrorMessage message={error} />{' '}
       </View>
     );
   }
-
+  if(list.length === 0){
+    return(<>
+     <View
+              style={{
+                flex: 1,
+                justifyContent: 'center',
+                alignItems: 'center',
+                backgroundColor: '#fff',
+              }}
+            >
+              <NoData />
+            </View>
+    </>)
+  }
   return (
     <>
       <FlatList
@@ -186,20 +199,7 @@ const EntryTab = () => {
         columnWrapperStyle={!isHorizontal ? styles.columnWrapper : undefined}
         renderItem={renderItem}
         showsVerticalScrollIndicator={false}
-        ListEmptyComponent={() => {
-          return (
-            <View
-              style={{
-                height: Dimensions.get('window').height * 0.6,
-                flex: 1,
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}
-            >
-              <NoData />
-            </View>
-          );
-        }}
+        
       />
     </>
   );

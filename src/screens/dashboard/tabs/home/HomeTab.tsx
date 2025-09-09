@@ -182,7 +182,7 @@ const HomeScreen = () => {
             flex: 1,
             justifyContent: 'center',
             alignItems: 'center',
-            marginTop: 20,
+            backgroundColor:'white'
           }}
         >
           <ErrorMessage message={error} />{' '}

@@ -9,8 +9,8 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 12,
   },
   errorImage: {
-    width: 80,
-    height: 80,
+    width: 380,
+    height: 280,
     marginBottom: 10,
   },
   errorText: {
