@@ -110,7 +110,7 @@ const ReportTab = () => {
               : item.name
               ? item.name
                   .trim()
-                  .split(' ') 
+                  .split(' ')
                   .slice(0, 2)
                   .map(word => word[0].toUpperCase())
                   .join('')
@@ -140,14 +140,14 @@ const ReportTab = () => {
     );
   }
 
-    if (error) {
+  if (error) {
     return (
       <View
         style={{
           flex: 1,
           justifyContent: 'center',
           alignItems: 'center',
-          marginTop: 20,
+          backgroundColor: 'white',
         }}
       >
         <ErrorMessage message={error} />{' '}
@@ -155,6 +155,20 @@ const ReportTab = () => {
     );
   }
 
+  if(list.length === 0){
+    return(<>
+     <View
+              style={{
+                flex: 1,
+                justifyContent: 'center',
+                alignItems: 'center',
+                backgroundColor: '#fff',
+              }}
+            >
+              <NoData />
+            </View>
+    </>)
+  }
   return (
     <>
       <FlatList
@@ -166,44 +180,11 @@ const ReportTab = () => {
         columnWrapperStyle={!isHorizontal ? styles.columnWrapper : undefined}
         renderItem={renderItem}
         showsVerticalScrollIndicator={false}
-        ListEmptyComponent={() => {
-          return (
-            <View
-              style={{
-                height: Dimensions.get('window').height * 0.6,
-                flex: 1,
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}
-            >
-              <NoData />
-            </View>
-          );
-        }}
+         
       />
     </>
   );
 };
 
 export default ReportTab;
-
-const localStyles = StyleSheet.create({
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    paddingHorizontal: 12,
-    paddingTop: 10,
-    gap: 10,
-  },
-  button: {
-    backgroundColor: '#e0e0e0',
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 8,
-  },
-  buttonText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#333',
-  },
-});
+ 

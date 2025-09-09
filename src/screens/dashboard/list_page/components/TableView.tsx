@@ -173,7 +173,22 @@ const TableView = ({
       </TouchableOpacity>
     );
   };
-
+  if (!loadingListId && filteredData.length === 0) {
+    return (
+      <>
+        <View
+          style={{
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: '#fff',
+          }}
+        >
+          <NoData />
+        </View>
+      </>
+    );
+  }
   return (
     <View
       style={{
@@ -194,21 +209,6 @@ const TableView = ({
               keyExtractor={(item, idx) => String(item?.id || idx)}
               renderItem={renderItem}
               contentContainerStyle={styles.listContent}
-              ListEmptyComponent={
-                !loadingListId ? (
-                  <View
-                    style={{
-                      width: Dimensions.get('screen').width,
-                      height: Dimensions.get('screen').height / 1.5,
-                      justifyContent: 'center',
-                      alignContent: 'center',
-                      alignItems: 'center',
-                    }}
-                  >
-                    <NoData />
-                  </View>
-                ) : null
-              }
             />
           );
         }}

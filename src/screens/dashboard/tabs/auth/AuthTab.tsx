@@ -16,7 +16,12 @@ import { ERP_ICON } from '../../../../assets';
 import ERPIcon from '../../../../components/icon/ERPIcon';
 import { getERPDashboardThunk, getERPMenuThunk } from '../../../../store/slices/auth/thunk';
 import { styles } from '../entry/entry_style';
-import { createBookmarksTable, getBookmarks, getDBConnection, insertOrUpdateBookmark } from '../../../../utils/sqlite';
+import {
+  createBookmarksTable,
+  getBookmarks,
+  getDBConnection,
+  insertOrUpdateBookmark,
+} from '../../../../utils/sqlite';
 import ErrorMessage from '../../../../components/error/Error';
 
 const accentColors = ['#dbe0f5ff', '#c8f3edff', '#faf1e0ff', '#f0e1e1ff', '#f2e3f8ff', '#e0f3edff'];
@@ -37,21 +42,21 @@ const EntryTab = () => {
   const list = showBookmarksOnly ? allList.filter(item => bookmarks[item.id]) : allList;
 
   useEffect(() => {
-     (async () => {
-       const db = await getDBConnection();
-       await createBookmarksTable(db);
-       const saved = await getBookmarks(db);
-       setBookmarks(saved);
-     })();
-   }, []);
- 
-   const toggleBookmark = async (id: string) => {
-     const updated = !bookmarks[id];
-     setBookmarks(prev => ({ ...prev, [id]: updated }));
- 
-     const db = await getDBConnection();
-     await insertOrUpdateBookmark(db, id, updated);
-   };
+    (async () => {
+      const db = await getDBConnection();
+      await createBookmarksTable(db);
+      const saved = await getBookmarks(db);
+      setBookmarks(saved);
+    })();
+  }, []);
+
+  const toggleBookmark = async (id: string) => {
+    const updated = !bookmarks[id];
+    setBookmarks(prev => ({ ...prev, [id]: updated }));
+
+    const db = await getDBConnection();
+    await insertOrUpdateBookmark(db, id, updated);
+  };
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -115,16 +120,16 @@ const EntryTab = () => {
           />
         </TouchableOpacity>
 
-        <View style={[styles.iconContainer,{ backgroundColor: '#fff' }]}>
+        <View style={[styles.iconContainer, { backgroundColor: '#fff' }]}>
           <Text style={styles.iconText}>
             {item?.icon !== ''
               ? item?.icon
               : item.name
               ? item.name
                   .trim()
-                  .split(' ')  
-                  .slice(0, 2)  
-                  .map(word => word[0].toUpperCase()) 
+                  .split(' ')
+                  .slice(0, 2)
+                  .map(word => word[0].toUpperCase())
                   .join('')
               : '?'}
           </Text>
@@ -159,14 +164,29 @@ const EntryTab = () => {
           flex: 1,
           justifyContent: 'center',
           alignItems: 'center',
-          marginTop: 20,
+          backgroundColor: 'white',
         }}
       >
         <ErrorMessage message={error} />{' '}
       </View>
     );
   }
-
+  if (list.length === 0) {
+    return (
+      <>
+        <View
+          style={{
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: '#fff',
+          }}
+        >
+          <NoData />
+        </View>
+      </>
+    );
+  }
   return (
     <>
       <FlatList
@@ -178,20 +198,6 @@ const EntryTab = () => {
         columnWrapperStyle={!isHorizontal ? styles.columnWrapper : undefined}
         renderItem={renderItem}
         showsVerticalScrollIndicator={false}
-        ListEmptyComponent={() => {
-          return (
-            <View
-              style={{
-                height: Dimensions.get('window').height * 0.6,
-                flex: 1,
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}
-            >
-              <NoData />
-            </View>
-          );
-        }}
       />
     </>
   );
