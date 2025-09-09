@@ -18,6 +18,7 @@ import useTranslations from '../../../hooks/useTranslations';
 import { styles } from './login_style';
 import LoginHeader from './components/LoginHeader';
 import LoginForm from './components/LoginForm';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const LoginScreen = ({ navigation, route }: any) => {
   const { t } = useTranslations();
@@ -39,6 +40,7 @@ const LoginScreen = ({ navigation, route }: any) => {
     const fetchDeviceName = async () => {
       const name = await DeviceInfo.getDeviceName();
       setDeviceId(name);
+      AsyncStorage.setItem('device', name)
     };
     fetchDeviceName();
 

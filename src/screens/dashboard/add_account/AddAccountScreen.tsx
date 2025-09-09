@@ -42,13 +42,13 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
     setLoader(false);
   }, [visible]);
 
-  const appId = generateGUID();
 
   useEffect(() => {
     const fetchDeviceName = async () => {
       const name = await DeviceInfo.getDeviceName();
       console.log('Device Name:', name);
       setDeviceId(name);
+      AsyncStorage.setItem('device', name)
     };
 
     fetchDeviceName();
@@ -75,6 +75,7 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
     password: string;
   }) => {
     try {
+
       DevERPService.setDevice(deviceId);
 
       setLoader(true);
@@ -118,8 +119,9 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
         return;
       }
 
+      DevERPService.setToken(loginResult?.token);
+       
       await DevERPService.getAuth();
-      await DevERPService.setToken(loginResult?.token);
       await AsyncStorage.setItem('erp_token', loginResult?.token || '');
       await AsyncStorage.setItem('auth_token', loginResult?.token || '');
       await AsyncStorage.setItem('erp_token_valid_till', loginResult?.token || '');
@@ -140,6 +142,7 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
       onClose();
       setLoader(false);
     } catch (e: any) {
+      console.log("🚀 ~ handleAddAccount ~ e:", e)
       setAlertConfig({
         title: 'Error',
         message: e?.message || 'Something went wrong',
