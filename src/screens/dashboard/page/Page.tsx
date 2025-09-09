@@ -193,13 +193,15 @@ const PageScreen = () => {
       const parsed = await dispatch(
         getERPPageThunk({ page: url, id: isFromNew ? 0 : id }),
       ).unwrap();
-      console.log('🚀 ~ parsed:------------------------', parsed);
 
-      setInfoData({
-        id: id.toString(),
-        tableName: parsed?.table,
-        title: parsed?.title,
-      });
+      if (!isFromNew) {
+        setInfoData({
+          id: id.toString(),
+          tableName: parsed?.table,
+          title: parsed?.title,
+        });
+      }
+
       const pageControls = Array.isArray(parsed?.pagectl) ? parsed.pagectl : [];
 
       const normalizedControls = pageControls.map(c => ({

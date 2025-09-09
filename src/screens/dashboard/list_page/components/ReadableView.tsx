@@ -65,7 +65,7 @@ const ReadableView = ({
     const amount = item?.amount;
 
     const btnKeys = Object.keys(item).filter(key => key.startsWith('btn_'));
-    const baseUrl = item?.image.replace(/^https:\/\//i, 'http://');
+    const baseUrl =  item?.image && item?.image?.replace(/^https:\/\//i, 'http://');
     const authUser = item?.authuser;
 
     const avatarLetter = name

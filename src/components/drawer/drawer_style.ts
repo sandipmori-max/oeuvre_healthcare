@@ -28,7 +28,8 @@ export const styles = StyleSheet.create({
 
   userPhone: {
     color: '#fff',
-    fontSize: 10,
+    fontSize: 12,
+    marginLeft: 6,
   },
   emailid:{
     color: '#fff',
