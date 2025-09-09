@@ -16,14 +16,21 @@ import { styles } from './entry_style';
 import { ERP_ICON } from '../../../../assets';
 import ERPIcon from '../../../../components/icon/ERPIcon';
 import { getERPDashboardThunk, getERPMenuThunk } from '../../../../store/slices/auth/thunk';
-import { createBookmarksTable, getBookmarks, getDBConnection, insertOrUpdateBookmark } from '../../../../utils/sqlite';
+import {
+  createBookmarksTable,
+  getBookmarks,
+  getDBConnection,
+  insertOrUpdateBookmark,
+} from '../../../../utils/sqlite';
+import ErrorMessage from '../../../../components/error/Error';
 
 const accentColors = ['#dbe0f5ff', '#c8f3edff', '#faf1e0ff', '#f0e1e1ff', '#f2e3f8ff', '#e0f3edff'];
 
 const EntryTab = () => {
   const navigation = useNavigation<any>();
   const dispatch = useAppDispatch();
-  const { isLoading, isAuthenticated, activeToken } = useAppSelector(state => state.auth);
+  const { isLoading, isAuthenticated, activeToken, error } = useAppSelector(state => state.auth);
+  console.log('🚀 ~ EntryTab ~ error:', error);
   const { menu, isMenuLoading } = useAppSelector(state => state.auth);
   const allList = menu?.filter(item => item?.isReport === 'E') ?? [];
   console.log('🚀 ~ EntryTab ~ allList:', allList);
@@ -35,14 +42,13 @@ const EntryTab = () => {
 
   const list = showBookmarksOnly ? allList.filter(item => bookmarks[item.id]) : allList;
 
- const toggleBookmark = async (id: string) => {
-  const updated = !bookmarks[id];
-  setBookmarks(prev => ({ ...prev, [id]: updated }));
+  const toggleBookmark = async (id: string) => {
+    const updated = !bookmarks[id];
+    setBookmarks(prev => ({ ...prev, [id]: updated }));
 
-  const db = await getDBConnection();
-  await insertOrUpdateBookmark(db, id, updated);
-};
-
+    const db = await getDBConnection();
+    await insertOrUpdateBookmark(db, id, updated);
+  };
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -74,16 +80,14 @@ const EntryTab = () => {
     });
   }, [navigation, showBookmarksOnly, isHorizontal, isRefresh]);
 
-
   useEffect(() => {
-  (async () => {
-    const db = await getDBConnection();
-    await createBookmarksTable(db);
-    const saved = await getBookmarks(db);
-    setBookmarks(saved);
-  })();
-}, []);
-
+    (async () => {
+      const db = await getDBConnection();
+      await createBookmarksTable(db);
+      const saved = await getBookmarks(db);
+      setBookmarks(saved);
+    })();
+  }, []);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -126,9 +130,9 @@ const EntryTab = () => {
               : item.name
               ? item.name
                   .trim()
-                  .split(' ') 
-                  .slice(0, 2) 
-                  .map(word => word[0].toUpperCase()) 
+                  .split(' ')
+                  .slice(0, 2)
+                  .map(word => word[0].toUpperCase())
                   .join('')
               : '?'}
           </Text>
@@ -152,6 +156,21 @@ const EntryTab = () => {
     return (
       <View style={styles.centered}>
         <FullViewLoader />
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+          marginTop: 20,
+        }}
+      >
+        <ErrorMessage message={error} />{' '}
       </View>
     );
   }

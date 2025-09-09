@@ -26,6 +26,7 @@ const ListScreen = () => {
     error: actionError,
     response: actionResponse,
   } = useAppSelector(state => state.page);
+    console.log("🚀 ~ ListScreen ~ actionError:", actionError)
 
   const [loadingListId, setLoadingListId] = useState<string | null>(null);
   const [listData, setListData] = useState<any[]>([]);

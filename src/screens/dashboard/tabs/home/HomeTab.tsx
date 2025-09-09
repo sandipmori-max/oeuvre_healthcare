@@ -11,6 +11,7 @@ import ERPIcon from '../../../../components/icon/ERPIcon';
 import { PieChart } from 'react-native-gifted-charts';
 import { getERPDashboardThunk } from '../../../../store/slices/auth/thunk';
 import MaterialIcons from '@react-native-vector-icons/material-icons';
+import ErrorMessage from '../../../../components/error/Error';
 const HomeScreen = () => {
   const navigation = useNavigation<any>();
   const dispatch = useAppDispatch();
@@ -18,7 +19,8 @@ const HomeScreen = () => {
   const { dashboard, isDashboardLoading, isAuthenticated, activeToken, error } = useAppSelector(
     state => state.auth,
   );
-  const [loadingPageId, setLoadingPageId] = useState<string | null>(null);
+  console.log('🚀 ~ HomeScreen ~ isDashboardLoading:', isDashboardLoading);
+  const [loadingPageId, setLoadingPageId] = useState<any>(null);
   const [isRefresh, setIsRefresh] = useState<boolean>(false);
 
   const theme = useAppSelector(state => state.theme);
@@ -33,6 +35,10 @@ const HomeScreen = () => {
             onPress={() => {
               setActionLoader(true);
               setIsRefresh(!isRefresh);
+              dispatch(getERPDashboardThunk());
+              setTimeout(() => {
+                setActionLoader(false);
+              }, 100);
             }}
             isLoading={actionLoader}
           />
@@ -46,20 +52,14 @@ const HomeScreen = () => {
     });
   }, [navigation, isRefresh, actionLoader]);
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      dispatch(getERPDashboardThunk());
-      setTimeout(() => {
-        setActionLoader(false);
-      }, 100);
-    }
-  }, [isAuthenticated, dispatch, activeToken, isRefresh]);
-
   useFocusEffect(
     useCallback(() => {
+      setLoadingPageId(true);
+
       if (isAuthenticated) {
         dispatch(getERPDashboardThunk());
       }
+
       return () => {};
     }, [isAuthenticated, dispatch]),
   );
@@ -133,14 +133,13 @@ const HomeScreen = () => {
                     ]}
                     numberOfLines={1}
                   >
-                    {item.title } 
+                    {item.title}
                   </Text>
                 </View>
               </View>
             </View>
 
-            {/* Content section */}
-            <View style={styles.dashboardItemBody}>
+            <View style={{ marginVertical: item.data ? 4 : 0 }}>
               {loadingPageId === (item.id || String(index)) && (
                 <View style={{ marginBottom: 8, flexDirection: 'row', alignItems: 'center' }}>
                   <ActivityIndicator size="small" color="#007AFF" />
@@ -155,153 +154,113 @@ const HomeScreen = () => {
                 </View>
               )}
             </View>
-
-            {/* Footer action */}
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                alignContent: 'center',
-                alignItems: 'center',
-              }}
-            >
-              {item?.isReport && (
-                <View style={styles.reportBadge}>
-                  <Text style={styles.reportBadgeText}>Report</Text>
-                </View>
-              )}
-              <TouchableOpacity
-                onPress={() => {
-                  if (
-                    item?.url.includes('.') ||
-                    item?.url.includes('?') ||
-                    item?.url.includes('/')
-                  ) {
-                    navigation.navigate('Web', { item });
-                  } else {
-                    navigation.navigate('List', { item });
-                  }
-                }}
-                style={styles.cardFooter}
-              >
-                <Text style={styles.footerLink}>View</Text>
-                <MaterialIcons name={'chevron-right'} color={'#ccc'} size={18} />
-              </TouchableOpacity>
-            </View>
           </View>
         </View>
       </TouchableOpacity>
     );
   };
 
-  const renderLoadingState = () => <FullViewLoader />;
-
-  const renderEmptyState = () => <NoData />;
-
   return (
-    <View>
-      <FlatList
-      showsVerticalScrollIndicator={false}
-      data={['']}
-      renderItem={() => {
-        return (
-          <>
-            <View style={theme === 'dark' ? styles.containerDark : styles.container}>
-              {isDashboardLoading ? (
-                <>{renderLoadingState()}</>
-              ) : (
-                <>
-                  {' '}
-                  {dashboard.length > 0 && (
-                    <View
-                      style={{
-                        borderColor: '#000',
-                        borderBottomWidth: 1,
-                        flexDirection: 'row',
-                        justifyContent: 'center',
-                        alignContent: 'center',
-                        alignItems: 'center',
-                      }}
-                    >
-                      <TouchableOpacity
-                        onPress={() => {
-                          navigation.navigate('Web', { isFromChart: true });
-                        }}
-                        style={styles.chartContainer}
-                      >
-                        <PieChart
-                          data={pieChartData}
-                          donut
-                          radius={90}
-                          textSize={14}
-                          innerRadius={50}
-                          textColor="#000"
-                          showValuesAsLabels
-                          labelPosition="outside"
-                          innerCircleColor="#fff"
-                          centerLabelComponent={() => (
-                            <Text
-                              style={{
-                                textAlign: 'center',
-                                fontSize: 16,
-                                fontWeight: 'bold',
-                                color: '#000',
-                              }}
-                            >
-                              Home
-                            </Text>
-                          )}
-                        />
-                      </TouchableOpacity>
+    <View style={theme === 'dark' ? styles.containerDark : styles.container}>
+      {isDashboardLoading ? (
+        <FullViewLoader />
+      ) : error ? (
+        <View
+          style={{
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginTop: 20,
+          }}
+        >
+          <ErrorMessage message={error} />{' '}
+        </View>
+      ) : dashboard.length === 0 ? (
+        <NoData />
+      ) : (
+        <FlatList
+          showsVerticalScrollIndicator={false}
+          data={['']}
+          renderItem={() => (
+            <>
+              {/* Pie chart section */}
+              {dashboard.length > 0 && (
+                <View
+                  style={{
+                    borderColor: '#000',
+                    borderBottomWidth: 0.4,
+                    flexDirection: 'row',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}
+                >
+                  <TouchableOpacity
+                    onPress={() => navigation.navigate('Web', { isFromChart: true })}
+                    style={styles.chartContainer}
+                  >
+                    <PieChart
+                      data={pieChartData}
+                      donut
+                      radius={90}
+                      textSize={14}
+                      innerRadius={50}
+                      textColor="#000"
+                      showValuesAsLabels
+                      labelPosition="outside"
+                      innerCircleColor="#fff"
+                      centerLabelComponent={() => (
+                        <Text
+                          style={{
+                            textAlign: 'center',
+                            fontSize: 16,
+                            fontWeight: 'bold',
+                            color: '#000',
+                          }}
+                        >
+                          Home
+                        </Text>
+                      )}
+                    />
+                  </TouchableOpacity>
+
+                  {/* Legend */}
+                  <View style={{ justifyContent: 'center', marginTop: 16 }}>
+                    {pieChartData.map((item, idx) => (
                       <View
+                        key={idx}
                         style={{
-                          justifyContent: 'center',
-                          marginTop: 16,
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          marginHorizontal: 8,
+                          marginBottom: 8,
                         }}
                       >
-                        {pieChartData.map((item, idx) => (
-                          <View
-                            key={idx}
-                            style={{
-                              flexDirection: 'row',
-                              alignItems: 'center',
-                              marginHorizontal: 8,
-                              marginBottom: 8,
-                            }}
-                          >
-                            <View
-                              style={{
-                                width: 16,
-                                height: 16,
-                                borderRadius: 8,
-                                backgroundColor: item.color,
-                                marginRight: 6,
-                              }}
-                            />
-                            <Text style={{ fontSize: 14, color: '#444' }}>
-                              {item.text}: {item.value}
-                            </Text>
-                          </View>
-                        ))}
+                        <View
+                          style={{
+                            width: 16,
+                            height: 16,
+                            borderRadius: 8,
+                            backgroundColor: item.color,
+                            marginRight: 6,
+                          }}
+                        />
+                        <Text style={{ fontSize: 14, color: '#444' }}>
+                          {item.text}: {item.value}
+                        </Text>
                       </View>
-                    </View>
-                  )}
-                  <View style={styles.dashboardSection}>
-                    {isDashboardLoading ? (
-                      renderLoadingState()
-                    ) : dashboard.length > 0 ? (
-                      <View style={styles.dashboardGrid}>{dashboard.map(renderDashboardItem)}</View>
-                    ) : (
-                      renderEmptyState()
-                    )}
-                  </View>{' '}
-                </>
+                    ))}
+                  </View>
+                </View>
               )}
-            </View>
-          </>
-        );
-      }}
-    />
+
+              {/* Dashboard items */}
+              <View style={styles.dashboardSection}>
+                <View style={styles.dashboardGrid}>{dashboard.map(renderDashboardItem)}</View>
+              </View>
+            </>
+          )}
+        />
+      )}
     </View>
   );
 };

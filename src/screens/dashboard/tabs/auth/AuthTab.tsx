@@ -17,13 +17,14 @@ import ERPIcon from '../../../../components/icon/ERPIcon';
 import { getERPDashboardThunk, getERPMenuThunk } from '../../../../store/slices/auth/thunk';
 import { styles } from '../entry/entry_style';
 import { createBookmarksTable, getBookmarks, getDBConnection, insertOrUpdateBookmark } from '../../../../utils/sqlite';
+import ErrorMessage from '../../../../components/error/Error';
 
 const accentColors = ['#dbe0f5ff', '#c8f3edff', '#faf1e0ff', '#f0e1e1ff', '#f2e3f8ff', '#e0f3edff'];
 
 const EntryTab = () => {
   const navigation = useNavigation<any>();
   const dispatch = useAppDispatch();
-  const { isLoading, isAuthenticated, activeToken } = useAppSelector(state => state.auth);
+  const { error, isAuthenticated, activeToken } = useAppSelector(state => state.auth);
   const { menu, isMenuLoading } = useAppSelector(state => state.auth);
   const allList = menu?.filter(item => item?.isReport === 'A') ?? [];
   console.log('🚀 ~ EntryTab ~ allList:', allList);
@@ -147,6 +148,21 @@ const EntryTab = () => {
     return (
       <View style={styles.centered}>
         <FullViewLoader />
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+          marginTop: 20,
+        }}
+      >
+        <ErrorMessage message={error} />{' '}
       </View>
     );
   }

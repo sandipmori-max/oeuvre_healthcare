@@ -230,6 +230,7 @@ const authSlice = createSlice({
         }
       })
       .addCase(getERPMenuThunk.rejected, (state, action) => {
+        console.log("🚀 ~ action:", action)
         state.isMenuLoading = false;
         state.error = action.payload as string;
       })
@@ -238,7 +239,6 @@ const authSlice = createSlice({
         state.isDashboardLoading = true;
       })
       .addCase(getERPDashboardThunk.fulfilled, (state, action) => {
-        state.isDashboardLoading = false;
 
         try {
           let dashboardData;
@@ -281,6 +281,8 @@ const authSlice = createSlice({
             title: item.Title || '',
             isReport: item.IsReport || '',
           }));
+        state.isDashboardLoading = false;
+
         } catch (error) {
           console.error('Error parsing dashboard data:', error);
           state.dashboard = [];
