@@ -56,22 +56,15 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
             style={{
               top: 18,
               width: '100%',
-              marginVertical: 8,
-              flexDirection: 'row',
-              alignContent: 'center',
-              alignItems: 'center',
-              justifyContent: 'space-between',
+              marginVertical: 8, 
             }}
           >
             <View
-              style={{
-                width: '30%',
+              style={{ 
+                flexDirection:'row',
                 alignContent: 'center',
                 alignItems: 'center',
-                justifyContent: 'space-between',
                 borderRadius: 8,
-                borderWidth: 0.6,
-                borderColor: '#ccc',
                 padding: 6,
               }}
             >
@@ -79,15 +72,14 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
               <Text style={styles.userPhone}>{user?.mobileno || ''}</Text>
             </View>
             <View
-              style={{
-                width: '38%',
+              style={{ 
+                flexDirection:'row',
+
                 alignContent: 'center',
                 alignItems: 'center',
-                justifyContent: 'space-between',
                 borderRadius: 8,
-                borderWidth: 0.6,
-                borderColor: '#ccc',
                 padding: 6,
+                marginVertical: 4
               }}
             >
               <MaterialIcons name={'mail-outline'} color={'white'} size={14} />
@@ -97,14 +89,11 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
               </Text>
             </View>
             <View
-              style={{
-                width: '30%',
+              style={{ 
+                flexDirection:'row',
                 alignContent: 'center',
                 alignItems: 'center',
-                justifyContent: 'space-between',
                 borderRadius: 8,
-                borderWidth: 0.6,
-                borderColor: '#ccc',
                 padding: 6,
               }}
             >

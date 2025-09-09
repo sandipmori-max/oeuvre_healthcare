@@ -6,6 +6,8 @@ import {
   TouchableOpacity,
   Text,
   FlatList,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import DeviceInfo from 'react-native-device-info';
 
@@ -19,11 +21,9 @@ import LoginForm from './components/LoginForm';
 
 const LoginScreen = ({ navigation, route }: any) => {
   const { t } = useTranslations();
-
   const dispatch = useAppDispatch();
 
   const isAddingAccount = route?.params?.isAddingAccount || false;
-
   const { isLoading } = useAppSelector(state => state.auth);
 
   const [deviceId, setDeviceId] = useState<string>('');
@@ -33,17 +33,27 @@ const LoginScreen = ({ navigation, route }: any) => {
     message: '',
     type: 'info' as 'error' | 'success' | 'info',
   });
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
 
   useEffect(() => {
     const fetchDeviceName = async () => {
       const name = await DeviceInfo.getDeviceName();
-      console.log('Device Name:', name);
       setDeviceId(name);
     };
-
     fetchDeviceName();
-  }, []);
 
+    const keyboardDidShow = Keyboard.addListener('keyboardDidShow', (e) => {
+      setKeyboardHeight(e.endCoordinates.height + 10); // 👈 keyboard height + 10
+    });
+    const keyboardDidHide = Keyboard.addListener('keyboardDidHide', () => {
+      setKeyboardHeight(0);
+    });
+
+    return () => {
+      keyboardDidShow.remove();
+      keyboardDidHide.remove();
+    };
+  }, []);
 
   const handlePersistAfterLogin = async (
     company_code: string,
@@ -66,12 +76,19 @@ const LoginScreen = ({ navigation, route }: any) => {
   };
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <FlatList
-        data={['']}
-        showsVerticalScrollIndicator={false}
-        renderItem={() => {
-          return (
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      >
+        <FlatList
+          data={['']}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{
+            flexGrow: 1,
+            paddingBottom: keyboardHeight/2 || 20,
+          }}
+          renderItem={() => (
             <>
               <View style={styles.formContainer}>
                 <LoginHeader isAddingAccount={isAddingAccount} t={t} />
@@ -99,12 +116,11 @@ const LoginScreen = ({ navigation, route }: any) => {
                 message={alertConfig.message}
                 type={alertConfig.type}
                 onClose={() => setAlertVisible(false)}
-                actionLoader={undefined}
               />
             </>
-          );
-        }}
-      />
+          )}
+        />
+      </KeyboardAvoidingView>
     </TouchableWithoutFeedback>
   );
 };
