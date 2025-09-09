@@ -14,8 +14,9 @@ import {
 } from 'react-native';
 import { launchCamera, launchImageLibrary, Asset } from 'react-native-image-picker';
 import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
+import { ERP_ICON } from '../../../../assets';
 
-const Media = ({ item, handleAttachment, infoData, baseLink }: any) => {
+const Media = ({ item, handleAttachment, infoData, baseLink, isFromNew }: any) => {
   const [imageUri, setImageUri] = useState<string | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [pickerModalVisible, setPickerModalVisible] = useState(false);
@@ -116,18 +117,34 @@ const Media = ({ item, handleAttachment, infoData, baseLink }: any) => {
     <>
       <Text style={{ fontWeight: '600', marginBottom: 4 }}>{item?.fieldtitle}</Text>
       <View style={styles.imageWrapper}>
-        <TouchableOpacity onPress={() => setModalVisible(true)}>
+        <TouchableOpacity
+          onPress={() => {
+            if (isFromNew) {
+              return;
+            }
+
+            setModalVisible(true);
+          }}
+        >
           <View style={{ width: 100, height: 100 }}>
             {loadingSmall && (
               <ActivityIndicator style={StyleSheet.absoluteFill} size="small" color="#000" />
             )}
-            <Image
-              key={item.field}
-              source={{ uri: getImageUri('small') }}
-              style={styles.imageThumb}
-              onLoadStart={() => setLoadingSmall(true)}
-              onLoadEnd={() => setLoadingSmall(false)}
-            />
+            {isFromNew ? (
+              <>
+                <Image source={ERP_ICON.APP_LOGO} style={styles.imageThumb} resizeMode="contain" />
+              </>
+            ) : (
+              <>
+                <Image
+                  key={item.field}
+                  source={{ uri: isFromNew ? '' : getImageUri('small') }}
+                  style={styles.imageThumb}
+                  onLoadStart={() => setLoadingSmall(true)}
+                  onLoadEnd={() => setLoadingSmall(false)}
+                />
+              </>
+            )}
           </View>
         </TouchableOpacity>
 
@@ -275,12 +292,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
-    marginHorizontal: 10,
-    elevation: 3,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 4,
+    marginHorizontal: 10, 
   },
   optionLabel: {
     marginTop: 6,
