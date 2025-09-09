@@ -129,7 +129,7 @@ export const styles = StyleSheet.create({
     textAlign: 'center',
   },
   dashboardItemBody: {
-    marginBottom: 12,
+    marginBottom: 2,
   },
   dataContainer: {
     marginBottom: 8,

@@ -183,9 +183,9 @@ const TableView = ({
       <FlatList
         data={['']}
         showsVerticalScrollIndicator={false}
-        ListHeaderComponent={() => {
-          return <TableHeader />;
-        }}
+        // ListHeaderComponent={() => {
+        //   return <TableHeader />;
+        // }}
         renderItem={() => {
           return (
             <FlatList
@@ -209,37 +209,36 @@ const TableView = ({
                   </View>
                 ) : null
               }
-              ListFooterComponent={
-                filteredData.length > 0 && totalAmount > 0 ? (
-                  <View
-                               style={{
-                                 marginTop: 6,
-                                 padding: 8,
-                                 borderRadius: 8,
-                                 backgroundColor: '#f1f1f1',
-                                 borderWidth: 1,
-                                 borderColor: '#ddd',
-                                 marginBottom: 28, 
-                               }}
-                             >
-                               <Text style={{ fontSize: 14, fontWeight: '700', color: '#333' }}>Total Amount</Text>
-                               <Text
-                                 style={{
-                                   fontSize: 16,
-                                   fontWeight: 'bold',
-                                   color: '#28a745',
-                                   marginTop: 2,
-                                 }}
-                               >
-                                 ₹ {totalAmount.toFixed(2)}
-                               </Text>
-                             </View>
-                ) : null
-              }
             />
           );
         }}
       ></FlatList>
+
+      {filteredData.length > 0 && totalAmount > 0 ? (
+        <View
+          style={{
+            marginTop: 6,
+            padding: 8,
+            borderRadius: 8,
+            backgroundColor: '#f1f1f1',
+            borderWidth: 1,
+            borderColor: '#ddd',
+            marginBottom: 28,
+          }}
+        >
+          <Text style={{ fontSize: 14, fontWeight: '700', color: '#333' }}>Total Amount</Text>
+          <Text
+            style={{
+              fontSize: 16,
+              fontWeight: 'bold',
+              color: '#28a745',
+              marginTop: 2,
+            }}
+          >
+            ₹ {totalAmount.toFixed(2)}
+          </Text>
+        </View>
+      ) : null}
     </View>
   );
 };

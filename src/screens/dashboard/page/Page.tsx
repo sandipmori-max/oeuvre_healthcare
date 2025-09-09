@@ -23,6 +23,7 @@ import DateTimePicker from 'react-native-modal-datetime-picker';
 import { parseCustomDatePage } from '../../../utils/helpers';
 import DateRow from './components/Date';
 import BoolInput from './components/BoolInput';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type PageRouteParams = { PageScreen: { item: any } };
 
@@ -30,17 +31,18 @@ const PageScreen = () => {
   const navigation = useNavigation();
   const dispatch = useAppDispatch();
   const { pageError } = useAppSelector(state => state.auth);
-  console.log("🚀 ~ PageScreen ~ -----------------------------pageError:", pageError)
+  console.log('🚀 ~ PageScreen ~ -----------------------------pageError:', pageError);
 
   const [loadingPageId, setLoadingPageId] = useState<string | null>(null);
   const [controls, setControls] = useState<any[]>([]);
-  console.log("🚀 ~ PageScreen ~ controls:-------", controls)
+  console.log('🚀 ~ PageScreen ~ controls:-------', controls);
   const [errorsList, setErrorsList] = useState<string[]>([]);
   const [showErrorModal, setShowErrorModal] = useState(false);
+  const [baseLink, setBaseLink] = useState<string>('');
 
   const [error, setError] = useState<string | null>(null);
   const [formValues, setFormValues] = useState<any>({});
-  console.log("🚀 ~ PageScreen ~ formValues:--------", formValues)
+  console.log('🚀 ~ PageScreen ~ formValues:--------', formValues);
   const [datePickerVisible, setDatePickerVisible] = useState(false);
   const [activeDateField, setActiveDateField] = useState<string | null>(null);
   const [activeDate, setActiveDate] = useState<string | null>(null);
@@ -52,6 +54,8 @@ const PageScreen = () => {
   const [actionLoader, setActionLoader] = useState(false);
   const [actionSaveLoader, setActionSaveLoader] = useState(false);
 
+  const [infoData, setInfoData] = useState<any>({});
+
   const [alertConfig, setAlertConfig] = useState({
     title: '',
     message: '',
@@ -60,7 +64,7 @@ const PageScreen = () => {
 
   const route = useRoute<RouteProp<PageRouteParams, 'PageScreen'>>();
   const { item, title, id, isFromNew, url }: any = route.params;
-  console.log("🚀 ~ -----------------------------------------PageScreen ~ url:", url)
+  console.log('🚀 ~ -----------------------------------------PageScreen ~ url:', url);
 
   const validateForm = useCallback(() => {
     const validationErrors: Record<string, string> = {};
@@ -160,6 +164,27 @@ const PageScreen = () => {
     actionSaveLoader,
   ]);
 
+  useEffect(() => {
+    let isMounted = true;
+    (async () => {
+      try {
+        const [storedLink] = await Promise.all([AsyncStorage.getItem('erp_link')]);
+
+        if (isMounted) {
+          let normalizedBase = (storedLink || '').replace(/\/+$/, '') + '';
+          normalizedBase = normalizedBase.replace(/\/devws\/?/, '/');
+          normalizedBase = normalizedBase.replace(/^https:\/\//i, 'http://');
+          setBaseLink(normalizedBase || '');
+        }
+      } catch (e) {
+        console.error('Error loading stored data:', e);
+      }
+    })();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   const fetchPageData = useCallback(async () => {
     try {
       setError(null);
@@ -168,7 +193,13 @@ const PageScreen = () => {
       const parsed = await dispatch(
         getERPPageThunk({ page: url, id: isFromNew ? 0 : id }),
       ).unwrap();
+      console.log('🚀 ~ parsed:------------------------', parsed);
 
+      setInfoData({
+        id: id.toString(),
+        tableName: parsed?.table,
+        title: parsed?.title,
+      });
       const pageControls = Array.isArray(parsed?.pagectl) ? parsed.pagectl : [];
 
       const normalizedControls = pageControls.map(c => ({
@@ -190,7 +221,7 @@ const PageScreen = () => {
         return merged;
       });
     } catch (e: any) {
-      console.log("🚀 ~ e:", e)
+      console.log('🚀 ~ e:', e);
       setError(e || 'Failed to load page');
     } finally {
       setLoadingPageId(null);
@@ -215,8 +246,7 @@ const PageScreen = () => {
 
   const renderItem = useCallback(
     ({ item, index }: { item: any; index: number }) => {
-
-      const setValue = (val: any) => { 
+      const setValue = (val: any) => {
         if (typeof val === 'object' && val !== null) {
           setFormValues(prev => ({ ...prev, ...val }));
         } else {
@@ -241,7 +271,14 @@ const PageScreen = () => {
           />
         );
       } else if (item?.ctltype === 'IMAGE' || item?.ctltype === 'PHOTO') {
-        content = <Media item={item} handleAttachment={handleAttachment} />;
+        content = (
+          <Media
+            baseLink={baseLink}
+            infoData={infoData}
+            item={item}
+            handleAttachment={handleAttachment}
+          />
+        );
       } else if (item?.disabled === '1' && item?.ajax !== 1) {
         content = <Disabled item={item} value={value} type={item?.ctltype} />;
       } else if (item?.ddl && item?.ddl !== '' && item?.ajax === 0) {
@@ -299,14 +336,14 @@ const PageScreen = () => {
     setDatePickerVisible(false);
     setActiveDateField(null);
   };
-  
+
   const handleConfirm = (date: Date) => {
     if (activeDateField) {
       setFormValues(prev => ({ ...prev, [activeDateField]: date.toISOString() }));
     }
     hideDatePicker();
   };
- 
+
   return (
     <View style={{ flex: 1, padding: 16, backgroundColor: '#f9f9f9' }}>
       {loadingPageId ? (
@@ -315,7 +352,7 @@ const PageScreen = () => {
         <ErrorMessage message={error} />
       ) : controls.length > 0 ? (
         <>
-         <FlatList
+          <FlatList
             showsVerticalScrollIndicator={false}
             data={controls}
             keyExtractor={(it, idx) => it?.dtlid || idx?.toString()}
@@ -336,8 +373,8 @@ const PageScreen = () => {
           )}
         </>
       ) : (
-       <View style={{flex:1}}>
-         <NoData />
+        <View style={{ flex: 1 }}>
+          <NoData />
         </View>
       )}
 
@@ -372,3 +409,5 @@ const PageScreen = () => {
 };
 
 export default PageScreen;
+// https://support.deverp.net/fileupload/1/UserExp/1754/image.jpeg
+// https://support.deverp.net/devws/fileupload/1/USEREXP/1756/image.jpeg
