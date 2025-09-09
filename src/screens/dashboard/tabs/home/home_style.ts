@@ -10,6 +10,9 @@ export const styles = StyleSheet.create({
     height: height,
     backgroundColor: '#F8F9FA',
   },
+   columnWrapper: {
+    justifyContent: 'space-between',
+  },
   containerDark: {
     flex: 1,
     backgroundColor: '#000',
@@ -102,7 +105,7 @@ export const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   headerTextWrap: {
-    flex: 1,
+    flex: 1, 
   },
   dashboardItemText: {
     fontSize: 16,

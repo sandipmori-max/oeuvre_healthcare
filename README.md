@@ -3,6 +3,7 @@
 // Multiple build creation with different Name + icon + package name
 
 // --- android build ----
+// gradlew --stop
 // gradlew clean
 // gradlew generateCodegenArtifactsFromSchema 
 // gradlew app:assembleRelease 

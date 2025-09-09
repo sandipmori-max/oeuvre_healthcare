@@ -2,9 +2,18 @@
 /* eslint-disable react/no-unstable-nested-components */
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useEffect, useLayoutEffect, useState } from 'react';
-import { Text, View, FlatList, StyleSheet } from 'react-native';
+import {
+  Text,
+  View,
+  FlatList,
+  StyleSheet,
+  ScrollView,
+  Dimensions,
+  Keyboard,
+  Platform,
+} from 'react-native';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
-import Animated, { FadeInUp, Layout } from 'react-native-reanimated';  
+import Animated, { FadeInUp, Layout } from 'react-native-reanimated';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { getERPPageThunk } from '../../../store/slices/auth/thunk';
 import { savePageThunk } from '../../../store/slices/page/thunk';
@@ -91,7 +100,7 @@ const PageScreen = () => {
           numberOfLines={1}
           style={{ maxWidth: 180, fontSize: 18, fontWeight: '700', color: '#fff' }}
         >
-          {isFromNew ? 'New Data ( New ) ' : item?.name + ' ( Edit )' || 'Details'}
+          {isFromNew ? 'New Data ( New ) ' : title + ' ( Edit )' || 'Details'}
         </Text>
       ),
       headerRight: () => (
@@ -278,6 +287,7 @@ const PageScreen = () => {
             baseLink={baseLink}
             infoData={infoData}
             item={item}
+            isFromNew={isFromNew}
             handleAttachment={handleAttachment}
           />
         );
@@ -346,6 +356,24 @@ const PageScreen = () => {
     hideDatePicker();
   };
 
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
+
+  useEffect(() => {
+    const showSub = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
+      (e: KeyboardEvent) => setKeyboardHeight(e.endCoordinates.height),
+    );
+    const hideSub = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
+      () => setKeyboardHeight(0),
+    );
+
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, []);
+
   return (
     <View style={{ flex: 1, padding: 16, backgroundColor: '#f9f9f9' }}>
       {loadingPageId ? (
@@ -354,12 +382,21 @@ const PageScreen = () => {
         <ErrorMessage message={error} />
       ) : controls.length > 0 ? (
         <>
-          <FlatList
-            showsVerticalScrollIndicator={false}
-            data={controls}
-            keyExtractor={(it, idx) => it?.dtlid || idx?.toString()}
-            renderItem={renderItem}
-          />
+          <View
+            style={{
+              flex: 1,
+              height: Dimensions.get('screen').height,
+            }}
+          >
+            <FlatList
+              showsVerticalScrollIndicator={false}
+              data={controls}
+              keyExtractor={(it, idx) => it?.dtlid || idx?.toString()}
+              renderItem={renderItem}
+              contentContainerStyle={{ paddingBottom: keyboardHeight }}
+              keyboardShouldPersistTaps="handled"
+            />
+          </View>
           {loader && (
             <View
               style={{
@@ -411,5 +448,3 @@ const PageScreen = () => {
 };
 
 export default PageScreen;
-// https://support.deverp.net/fileupload/1/UserExp/1754/image.jpeg
-// https://support.deverp.net/devws/fileupload/1/USEREXP/1756/image.jpeg

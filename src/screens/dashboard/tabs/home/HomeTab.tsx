@@ -3,20 +3,18 @@ import { View, Text, TouchableOpacity, ActivityIndicator, FlatList } from 'react
 
 import { styles } from './home_style';
 import { useAppDispatch, useAppSelector } from '../../../../store/hooks';
-import { DashboardItem } from '../../../../store/slices/auth/type';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import FullViewLoader from '../../../../components/loader/FullViewLoader';
 import NoData from '../../../../components/no_data/NoData';
 import ERPIcon from '../../../../components/icon/ERPIcon';
 import { PieChart } from 'react-native-gifted-charts';
 import { getERPDashboardThunk } from '../../../../store/slices/auth/thunk';
-import MaterialIcons from '@react-native-vector-icons/material-icons';
 import ErrorMessage from '../../../../components/error/Error';
 const HomeScreen = () => {
   const navigation = useNavigation<any>();
   const dispatch = useAppDispatch();
 
-  const { dashboard, isDashboardLoading, isAuthenticated, activeToken, error } = useAppSelector(
+  const { dashboard, isDashboardLoading, isAuthenticated, error } = useAppSelector(
     state => state.auth,
   );
   console.log('🚀 ~ HomeScreen ~ isDashboardLoading:', isDashboardLoading);
@@ -25,11 +23,17 @@ const HomeScreen = () => {
 
   const theme = useAppSelector(state => state.theme);
   const [actionLoader, setActionLoader] = useState(false);
+  const [isHorizontal, setIsHorizontal] = useState(false);
 
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
         <>
+          <ERPIcon
+            name={!isHorizontal ? 'list' : 'apps'}
+            onPress={() => setIsHorizontal(prev => !prev)}
+          />
+
           <ERPIcon
             name="refresh"
             onPress={() => {
@@ -50,7 +54,7 @@ const HomeScreen = () => {
         </>
       ),
     });
-  }, [navigation, isRefresh, actionLoader]);
+  }, [navigation, isRefresh, actionLoader, isHorizontal]);
 
   useFocusEffect(
     useCallback(() => {
@@ -84,7 +88,7 @@ const HomeScreen = () => {
       text: item.title?.split(' ')[0] || item.name,
     }));
 
-  const renderDashboardItem = (item: DashboardItem, index: number) => {
+  const renderDashboardItem = ({item, index}: any) => {
     console.log('🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀 ~ renderDashboardItem ~ item:', item);
     return (
       <TouchableOpacity
@@ -93,8 +97,10 @@ const HomeScreen = () => {
           styles.dashboardItem,
           {
             paddingLeft: 4,
-            backgroundColor: accentColors[index % accentColors.length],
+            marginHorizontal: 4,
+             backgroundColor: accentColors[index % accentColors.length],
             borderRadius: 8,
+            width: isHorizontal ? '100%' : '48%'
           },
         ]}
         activeOpacity={0.7}
@@ -129,9 +135,11 @@ const HomeScreen = () => {
                       styles.dashboardItemText,
                       {
                         color: theme === 'dark' ? '#fff' : '#000',
+                        
                       },
+                      
                     ]}
-                    numberOfLines={1}
+                    numberOfLines={2}
                   >
                     {item.title}
                   </Text>
@@ -154,6 +162,10 @@ const HomeScreen = () => {
                 </View>
               )}
             </View>
+
+            <Text style={{
+              color: accentColors[index % accentColors.length]
+            }}>Footer dummy</Text>
           </View>
         </View>
       </TouchableOpacity>
@@ -255,7 +267,15 @@ const HomeScreen = () => {
 
               {/* Dashboard items */}
               <View style={styles.dashboardSection}>
-                <View style={styles.dashboardGrid}>{dashboard.map(renderDashboardItem)}</View>
+                <FlatList
+                          key={`${isHorizontal}`}
+                          data={dashboard}
+                          keyExtractor={item => item?.id}
+                          numColumns={isHorizontal ? 1 : 2}
+                          columnWrapperStyle={!isHorizontal ? styles.columnWrapper : undefined}
+                          renderItem={renderDashboardItem}
+                          showsVerticalScrollIndicator={false}
+                          />
               </View>
             </>
           )}

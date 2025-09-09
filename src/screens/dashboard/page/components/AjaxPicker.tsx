@@ -152,34 +152,49 @@ const AjaxPicker = ({ label, onValueChange, item, errors, dtext, formValues }: a
             ) : (
               <ScrollView showsVerticalScrollIndicator={false}>
                 {options.length > 0 ? (
-                  options.map((opt: any, i: number) => (
-                    <TouchableOpacity
-                      key={i}
-                      style={[styles.option, { paddingVertical: 12 }]}
-                      onPress={() => handleSelect(opt)}
-                    >
-                      <View>
-                        {Object.entries(opt).map(([key, value], idx) => {
-                          if (key.toLowerCase().includes('id')) return null;
-                          return (
-                            <Text
-                              key={idx}
-                              style={{
-                                color:
-                                  key === label.toLowerCase()
-                                    ? ERP_COLOR_CODE.ERP_APP_COLOR
-                                    : '#000',
-                                fontSize: key === label.toLowerCase() ? 16 : 14,
-                                fontWeight: key === label.toLowerCase() ? '700' : '400',
-                              }}
-                            >
-                              {String(value)}
-                            </Text>
-                          );
-                        })}
-                      </View>
-                    </TouchableOpacity>
-                  ))
+                  options.map((opt: any, i: number) => {
+  // filter out unwanted keys first
+  const entries = Object.entries(opt).filter(([key]) => !key.toLowerCase().includes('id'));
+
+  const isGrid = entries.length >= 3; 
+
+  return (
+    <TouchableOpacity
+      key={i}
+      style={[styles.option, { paddingVertical: 12 }]}
+      onPress={() => handleSelect(opt)}
+    >
+      <View style={{ flexDirection: isGrid ? 'row' : 'column', flexWrap: isGrid ? 'wrap' : 'nowrap' }}>
+        {entries.map(([key, value], idx) => (
+          <View
+            key={idx}
+            style={{
+              width: isGrid ? '33.33%' : '100%',
+              paddingVertical: 4,
+              paddingHorizontal: 6,
+            }}
+          >
+            <Text
+              style={{
+                color:
+                  key === label.toLowerCase()
+                    ? ERP_COLOR_CODE.ERP_APP_COLOR
+                    : '#000',
+                fontSize: key === label.toLowerCase() ? 16 : 14,
+                fontWeight: key === label.toLowerCase() ? '700' : '400',
+              }}
+              numberOfLines={1}
+              ellipsizeMode="tail"
+            >
+              {String(value)}
+            </Text>
+          </View>
+        ))}
+      </View>
+    </TouchableOpacity>
+  );
+}
+)
                 ) : (
                   <View
                     style={{
