@@ -21,12 +21,13 @@ import {
   getDBConnection,
   insertOrUpdateBookmark,
 } from '../../../../utils/sqlite';
+import ErrorMessage from '../../../../components/error/Error';
 
 const accentColors = ['#dbe0f5ff', '#c8f3edff', '#faf1e0ff', '#f0e1e1ff', '#f2e3f8ff', '#e0f3edff'];
 
 const ReportTab = () => {
   const navigation = useNavigation<any>();
-  const { menu, isMenuLoading } = useAppSelector(state => state.auth);
+  const { menu, isMenuLoading, error } = useAppSelector(state => state.auth);
   const allList = menu?.filter(item => item?.isReport === 'R') ?? [];
 
   const [isHorizontal, setIsHorizontal] = useState(false);
@@ -135,6 +136,21 @@ const ReportTab = () => {
     return (
       <View style={styles.centered}>
         <FullViewLoader />
+      </View>
+    );
+  }
+
+    if (error) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+          marginTop: 20,
+        }}
+      >
+        <ErrorMessage message={error} />{' '}
       </View>
     );
   }

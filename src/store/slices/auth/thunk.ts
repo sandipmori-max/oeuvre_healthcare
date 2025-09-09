@@ -299,6 +299,7 @@ export const getERPDashboardThunk = createAsyncThunk(
       const dashboard = await DevERPService.getDashboard();
       return dashboard;
     } catch (error: any) {
+      console.log("🚀 ~ error:", error)
       return rejectWithValue(error?.message || 'Failed to get ERP dashboard');
     }
   },

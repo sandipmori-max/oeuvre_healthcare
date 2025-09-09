@@ -81,7 +81,7 @@ export const styles = StyleSheet.create({
     padding: 16,
   },
   dashboardItemHeader: {
-    marginBottom: 12,
+    marginBottom: 2,
   },
   dashboardItemTopRow: {
     flexDirection: 'row',
@@ -132,7 +132,7 @@ export const styles = StyleSheet.create({
     marginBottom: 2,
   },
   dataContainer: {
-    marginBottom: 8,
+    marginBottom: 0,
   },
   dataLabel: {
     fontSize: 12,

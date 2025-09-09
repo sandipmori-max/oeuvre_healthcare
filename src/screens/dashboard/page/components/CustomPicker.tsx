@@ -21,20 +21,29 @@ const CustomPicker = ({ label, selectedValue, onValueChange, item, errors, dtext
     setSelectedOption(dtext);
   }, [dtext]);
 
-  const handleOpen = useCallback(async () => {
-    try {
-      setLoader(true);
-      const res = await dispatch(
-        getDDLThunk({ dtlid: item?.dtlid, where: item?.ddlwhere }),
-      ).unwrap();
-      setOptions(res?.data ?? []);
-      setOpen(o => !o);
+const handleOpen = useCallback(async () => {
+  if (open) {
+    setOpen(false);
+    return;
+  }
+
+  setOpen(true);
+  setLoader(true);
+
+  try {
+    const res = await dispatch(
+      getDDLThunk({ dtlid: item?.dtlid, where: item?.ddlwhere }),
+    ).unwrap();
+    setOptions(res?.data ?? []);
+  } catch (e) {
+    setOptions([]);
+  } finally {
+    setTimeout(() =>{
       setLoader(false);
-    } catch (e) {
-      setOptions([]);
-      setLoader(false);
-    }
-  }, [dispatch, item?.dtlid, item?.ddlwhere]);
+    }, 1000)
+  }
+}, [dispatch, item?.dtlid, item?.ddlwhere, open]);
+
 
   return (
     <View style={{ marginBottom: 16 }}>

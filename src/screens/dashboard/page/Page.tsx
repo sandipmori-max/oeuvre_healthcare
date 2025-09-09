@@ -4,7 +4,7 @@
 import React, { useCallback, useEffect, useLayoutEffect, useState } from 'react';
 import { Text, View, FlatList, StyleSheet } from 'react-native';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
-import Animated, { FadeInUp, Layout } from 'react-native-reanimated'; // ✅ added
+import Animated, { FadeInUp, Layout } from 'react-native-reanimated';  
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { getERPPageThunk } from '../../../store/slices/auth/thunk';
 import { savePageThunk } from '../../../store/slices/page/thunk';
@@ -321,11 +321,11 @@ const PageScreen = () => {
           entering={FadeInUp.delay(index * 70).springify()}
           layout={Layout.springify()}
         >
-          {content} 132
+          {content}
         </Animated.View>
       );
     },
-    [formValues, errors],
+    [formValues, errors, controls],
   );
 
   const showDatePicker = (field: string, date: any) => {
