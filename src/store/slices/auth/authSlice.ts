@@ -69,13 +69,13 @@ const authSlice = createSlice({
         state.isLoading = false;
         if (action.payload) {
           if (action?.payload?.accounts) {
-          state.accounts = action?.payload?.accounts;
-        } else {
-          state.accounts = state?.accounts.map(acc => ({
-            ...acc,
-            isActive: acc?.id === action?.payload?.accountId,
-          }));
-        }
+            state.accounts = action?.payload?.accounts;
+          } else {
+            state.accounts = state?.accounts.map(acc => ({
+              ...acc,
+              isActive: acc?.id === action?.payload?.accountId,
+            }));
+          }
           state.activeAccountId = action?.payload?.activeAccountId;
           state.user = action?.payload?.user;
           state.activeToken = action?.payload?.user?.token || null;
@@ -122,7 +122,10 @@ const authSlice = createSlice({
         state.isLoading = true;
       })
       .addCase(switchAccountThunk.fulfilled, (state, action) => {
-        console.log("🚀 ~ action:---------->>>>>>>>🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀>>>>>>>>>----------", action?.payload)
+        console.log(
+          '🚀 ~ action:---------->>>>>>>>🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀>>>>>>>>>----------',
+          action?.payload,
+        );
         state.isLoading = false;
         state.user = action?.payload?.user;
         state.activeAccountId = action?.payload?.accountId;
@@ -139,7 +142,10 @@ const authSlice = createSlice({
         state.error = null;
       })
       .addCase(switchAccountThunk.rejected, (state, action) => {
-        console.log("🚀 ~ action:- REJECTED--------->>>>>>>>🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀>>>>>>>>>----------", action?.payload)
+        console.log(
+          '🚀 ~ action:- REJECTED--------->>>>>>>>🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀>>>>>>>>>----------',
+          action?.payload,
+        );
 
         state.isLoading = false;
         state.error = action?.payload as string;
@@ -214,7 +220,7 @@ const authSlice = createSlice({
               }
             }
           }
-          console.log("🚀 ~ menus:", menus)
+          console.log('🚀 ~ menus:', menus);
 
           state.menu = menus.map((menu: any, index: number) => ({
             id: menu?.Link || `menu_${index}`,
@@ -230,7 +236,7 @@ const authSlice = createSlice({
         }
       })
       .addCase(getERPMenuThunk.rejected, (state, action) => {
-        console.log("🚀 ~ action:", action)
+        console.log('🚀 ~ action:', action);
         state.isMenuLoading = false;
         state.error = action.payload as string;
       })
@@ -239,7 +245,6 @@ const authSlice = createSlice({
         state.isDashboardLoading = true;
       })
       .addCase(getERPDashboardThunk.fulfilled, (state, action) => {
-
         try {
           let dashboardData;
           if (typeof action.payload === 'string') {
@@ -271,18 +276,18 @@ const authSlice = createSlice({
               console.error('Error parsing inner d property:', innerParseError);
             }
           }
-                console.log("🚀 ~ dashboardItems:--------", dashboardItems)
+          console.log('🚀 ~ dashboardItems:--------', dashboardItems);
 
           state.dashboard = dashboardItems.map((item: any, index: number) => ({
-            id: item.Link || `dashboard_${index}`,
-            name: item.Name || '',
-            data: item.Data || '',
-            url: item.Link || '',
-            title: item.Title || '',
+            id: item?.Link || `dashboard_${index}`,
+            name: item?.Name || '',
+            data: item?.Data || '',
+            url: item?.Link || '',
+            title: item?.Title || '',
             isReport: item.IsReport || '',
+            footer: item?.footer || '',
           }));
-        state.isDashboardLoading = false;
-
+          state.isDashboardLoading = false;
         } catch (error) {
           console.error('Error parsing dashboard data:', error);
           state.dashboard = [];

@@ -277,6 +277,11 @@ class DevERPService {
     return this.apiCall<any>('msp_api.aspx/getLastPunchIn', { token: this.token });
   }
 
+   getLastPunchList(id: any) {
+    return this.apiCall<any>('msp_api.aspx/getListData', { token: this.token, page: 'punchin', id });
+  }
+
+
   async handlePageAction(action: string, id: string, remarks: string, page: string) {
     return this.apiCall<any>(`msp_api.aspx/${action}`, {
       token: this.token,

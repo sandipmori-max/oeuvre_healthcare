@@ -12,7 +12,7 @@ const StartupScreen = ({ navigation }: any) => {
       if (enabled) {
         navigation.replace("PinVerify");
       } else {
-        navigation.replace("Home");
+        navigation.replace("Drawer");
       }
     };
     checkPin();

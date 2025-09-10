@@ -89,10 +89,9 @@ const HomeScreen = () => {
     }));
 
   const renderDashboardItem = ({ item, index }: any) => {
-    console.log('🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀 ~ renderDashboardItem ~ item:', item);
-    return (
+     return (
       <TouchableOpacity
-        key={item.id || index}
+        key={item?.id || index}
         style={[
           styles.dashboardItem,
           {
@@ -139,7 +138,7 @@ const HomeScreen = () => {
                     ]}
                     numberOfLines={2}
                   >
-                    {item.title}
+                    {item?.title}
                   </Text>
                 </View>
               </View>
@@ -155,7 +154,7 @@ const HomeScreen = () => {
               {item.data && (
                 <View style={styles.dataContainer}>
                   <Text style={styles.dashboardItemData} numberOfLines={2}>
-                    {item.data}
+                    {item?.data}
                   </Text>
                 </View>
               )}
@@ -166,7 +165,7 @@ const HomeScreen = () => {
                 color: accentColors[index % accentColors.length],
               }}
             >
-              Footer dummy
+               {item?.footer}
             </Text>
           </View>
         </View>

@@ -30,3 +30,17 @@ export const getLastPunchInThunk = createAsyncThunk<
     return rejectWithValue(error?.message || 'Failed to fetch last punch-in');
   }
 });
+
+export const getLastPunchInList = createAsyncThunk<
+  AttendanceResponse,
+  {id: any},
+  { rejectValue: string }
+>('attendance/getLastPunchInList', async ({id}, { rejectWithValue }) => {
+  try {
+    const response = await DevERPService.getLastPunchList(id);
+    console.log("🚀 ~ response:", response)
+    return response;
+  } catch (error: any) {
+    return rejectWithValue(error?.message || 'Failed to fetch last punch-in');
+  }
+});
