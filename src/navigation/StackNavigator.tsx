@@ -14,6 +14,7 @@ import ListScreen from '../screens/dashboard/list_page/ListScreen';
 import PageScreen from '../screens/dashboard/page/Page';
 import { ERP_ICON } from '../assets';
 import { ERP_COLOR_CODE } from '../utils/constants';
+import UserProfileScreen from '../screens/dashboard/profile/Profile';
 
 const Stack = createStackNavigator<any>();
 
@@ -64,6 +65,8 @@ const StackNavigator = () => {
     >
       <Stack.Screen name="Drawer" component={DrawerNavigator} />
       <Stack.Screen options={screenOptions} name="Settings" component={SettingsScreen} />
+      <Stack.Screen options={screenOptions} name="ProfileEdit" component={UserProfileScreen} />
+
       <Stack.Screen name="Home" component={TabNavigator} />
       <Stack.Screen options={screenOptions} name="Attendance" component={AttendanceScreen} />
       <Stack.Screen options={screenOptions} name="Display" component={DisplayScreen} />

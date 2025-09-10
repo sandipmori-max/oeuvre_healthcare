@@ -5,7 +5,7 @@ import AccountSwitcher from './components/AccountSwitcher';
 import { styles } from './profile_style';
 import { useNavigation } from '@react-navigation/native';
 import { useAppSelector } from '../../../../store/hooks';
-import { firstLetterUpperCase, formatDateHr, formatDateMonthDateYear } from '../../../../utils/helpers';
+import { firstLetterUpperCase, formatDateHr } from '../../../../utils/helpers';
 import AddAccountScreen from '../../add_account/AddAccountScreen';
 import ERPIcon from '../../../../components/icon/ERPIcon';
 import MaterialIcons from '@react-native-vector-icons/material-icons';
@@ -13,7 +13,7 @@ import MaterialIcons from '@react-native-vector-icons/material-icons';
 const ProfileTab = () => {
   const navigation = useNavigation<any>();
   const { user, accounts } = useAppSelector(state => state?.auth);
-  console.log("🚀 ~ ProfileTab ~ user:", user)
+  console.log('🚀 ~ ProfileTab ~ user:', user);
   const [showAccountSwitcher, setShowAccountSwitcher] = useState(false);
   const [showAddAccount, setShowAddAccount] = useState(false);
 
@@ -53,7 +53,13 @@ const ProfileTab = () => {
       >
         {/* Profile Card */}
         {user && (
-          <View style={styles.profileCard}>
+          <TouchableOpacity
+            onPress={() => {
+              console.log("🚀 ~ onPress:", 'onPress')
+              navigation.navigate('ProfileEdit')
+            }}
+            style={styles.profileCard}
+          >
             <View style={styles.profileHeader}>
               <View style={styles.profileAvatar}>
                 <MaterialIcons name={'person'} color={'#000'} size={40} />
@@ -73,7 +79,7 @@ const ProfileTab = () => {
                 <MaterialIcons name={'settings'} color={'#000'} size={28} />
               </TouchableOpacity>
             </View>
-          </View>
+          </TouchableOpacity>
         )}
 
         {/* Account Section */}
