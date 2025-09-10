@@ -81,7 +81,7 @@ const SettingsScreen = () => {
         title: t('settings.biometricAuth'),
         subtitle: t('settings.useBiometric'),
         icon: 'fingerprint',
-        type: 'toggle',
+        type: 'navigate',
         value: true,
       },
       {
@@ -164,7 +164,11 @@ const SettingsScreen = () => {
       case 'navigate':
         if (item.action === 'Language') {
           setLanguageModalVisible(true);
-        } else if (item.action) {
+        }
+        else if(item.title ===  t('settings.biometricAuth')){
+          navigation.navigate("PinSet")
+        }
+        else if (item.action) {
           setAlertConfig({
             title: t('common.navigate'),
             message: `${t('common.navigate')} to ${item.action} functionality would go here`,

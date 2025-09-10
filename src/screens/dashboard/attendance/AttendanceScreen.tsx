@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
-import { View, Platform } from 'react-native';
+import { View, Platform, FlatList } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useNavigation } from '@react-navigation/native';
 
@@ -25,7 +25,7 @@ const AttendanceScreen = () => {
   const [blockAction, setBlockAction] = useState(false);
   const [refresh, setRefresh] = useState(false);
   const [actionLoader, setActionLoader] = useState(false);
-  const [error, setError] = useState<any>('')
+  const [error, setError] = useState<any>('');
 
   const formattedMonth = `${selectedDate.getFullYear()}-${(selectedDate.getMonth() + 1)
     .toString()
@@ -92,12 +92,12 @@ const AttendanceScreen = () => {
         setResData(res);
         setIsLoading(false);
         setActionLoader(false);
-        setError(null)
+        setError(null);
       })
       .catch(err => {
         setIsLoading(false);
         setActionLoader(false);
-        setError(err)
+        setError(err);
         console.log('❌ Error fetching last punch-in:', err);
       });
   };
@@ -105,8 +105,8 @@ const AttendanceScreen = () => {
     checkAttendance();
   }, [dispatch, refresh]);
 
-  if(error && error !== ''){
-    <ErrorMessage message={error}/>
+  if (error && error !== '') {
+    <ErrorMessage message={error} />;
   }
   return (
     <View style={styles.container}>
@@ -130,10 +130,7 @@ const AttendanceScreen = () => {
             <View
               style={{
                 flex: 1,
-                justifyContent: 'center',
-                alignContent: 'center',
-                alignItems: 'center',
-                width: '100%',
+                marginTop: 60,
               }}
             >
               <AttendanceForm setBlockAction={setBlockAction} resData={resData} />

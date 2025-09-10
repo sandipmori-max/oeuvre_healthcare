@@ -248,16 +248,25 @@ export default function UserProfileScreen() {
   );
 }
 
-function renderField(label, field, profile, setProfile, editMode, multiline = false) {
+function renderField(
+  label,
+  field,
+  profile,
+  setProfile,
+  editMode,
+  multiline = false
+) {
   return (
     <View style={{ marginBottom: 8 }}>
       <Text style={styles.label}>{label}</Text>
       {editMode ? (
         <TextInput
           value={profile[field]}
-          onChangeText={val => setProfile({ ...profile, [field]: val })}
+          onChangeText={(val) => setProfile({ ...profile, [field]: val })}
           style={styles.input}
           multiline={multiline}
+          placeholder={`Enter ${label}`}      
+          placeholderTextColor="#9ca3af"       
         />
       ) : (
         <Text style={styles.value}>{profile[field]}</Text>
@@ -265,6 +274,7 @@ function renderField(label, field, profile, setProfile, editMode, multiline = fa
     </View>
   );
 }
+
 
 function CustomCheckbox({
   value,
