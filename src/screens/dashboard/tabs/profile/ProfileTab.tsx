@@ -34,7 +34,12 @@ const ProfileTab = () => {
               handleAddAccount();
             }}
           />
-          <ERPIcon name="refresh" />
+          <ERPIcon
+            name="settings"
+            onPress={() => {
+              navigation.navigate('Settings')
+            }}
+          />
         </>
       ),
       headerLeft: () => (
@@ -55,12 +60,13 @@ const ProfileTab = () => {
         {user && (
           <TouchableOpacity
             onPress={() => {
-              console.log("🚀 ~ onPress:", 'onPress')
-              // navigation.navigate('ProfileEdit')
-                  navigation.navigate('Page', {
-                    id: user?.id,
-                    item: {}, title: 'UserProfile', isFromNew: false , url: 'UserProfile'});
-
+              navigation.navigate('Page', {
+                id: user?.id,
+                item: {},
+                title: 'My Profile',
+                isFromNew: false,
+                url: 'UserProfile',
+              });
             }}
             style={styles.profileCard}
           >
@@ -77,10 +83,18 @@ const ProfileTab = () => {
               </View>
               <TouchableOpacity
                 style={styles.switchButton}
-                onPress={() => navigation.navigate('Settings')}
+                onPress={() => {
+                  navigation.navigate('Page', {
+                    id: user?.id,
+                    item: {},
+                    title: 'My Profile',
+                    isFromNew: false,
+                    url: 'UserProfile',
+                  });
+                }}
                 activeOpacity={0.8}
               >
-                <MaterialIcons name={'settings'} color={'#000'} size={28} />
+                <MaterialIcons name={'edit'} color={'#000'} size={28} />
               </TouchableOpacity>
             </View>
           </TouchableOpacity>
