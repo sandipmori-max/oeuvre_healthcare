@@ -100,7 +100,8 @@ export const styles = StyleSheet.create({
     shadowRadius: 2,
   },
   disabledButton: {
-    backgroundColor: '#aaa',
+    backgroundColor:  ERP_COLOR_CODE.ERP_APP_COLOR,
+    opacity: 0.4
   },
   addButtonText: {
     color: ERP_COLOR_CODE.ERP_WHITE,

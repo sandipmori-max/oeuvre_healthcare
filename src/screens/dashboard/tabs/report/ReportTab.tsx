@@ -29,6 +29,7 @@ const ReportTab = () => {
   const navigation = useNavigation<any>();
   const { menu, isMenuLoading, error } = useAppSelector(state => state.auth);
   const allList = menu?.filter(item => item?.isReport === 'R') ?? [];
+  const { user } = useAppSelector(state => state?.auth);
 
   const [isHorizontal, setIsHorizontal] = useState(false);
   const [bookmarks, setBookmarks] = useState<{ [key: string]: boolean }>({});
@@ -40,7 +41,7 @@ const ReportTab = () => {
     (async () => {
       const db = await getDBConnection();
       await createBookmarksTable(db);
-      const saved = await getBookmarks(db);
+      const saved = await getBookmarks(db, user?.id);
       setBookmarks(saved);
     })();
   }, []);
@@ -50,7 +51,7 @@ const ReportTab = () => {
     setBookmarks(prev => ({ ...prev, [id]: updated }));
 
     const db = await getDBConnection();
-    await insertOrUpdateBookmark(db, id, updated);
+    await insertOrUpdateBookmark(db, id, user?.id, updated);
   };
 
   useLayoutEffect(() => {

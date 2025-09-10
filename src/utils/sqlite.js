@@ -36,10 +36,13 @@ const ERP_QUERY_META_TABLE_CREATE = `CREATE TABLE IF NOT EXISTS ${ERP_TABLE.ERP_
 
 const ERP_QUERY_BOOKMARKS_TABLE_CREATE = `
   CREATE TABLE IF NOT EXISTS ${ERP_TABLE.ERP_BOOKMARKS} (
-    id TEXT PRIMARY KEY NOT NULL,
-    isBookmarked INTEGER DEFAULT 0
+    id TEXT NOT NULL,
+    userId TEXT NOT NULL,
+    isBookmarked INTEGER DEFAULT 0,
+    PRIMARY KEY (id, userId)
   );
 `;
+
 
 export const createAccountsTable = async db => {
   try {
@@ -240,31 +243,40 @@ export const createBookmarksTable = async (db) => {
   }
 };
 
-export const insertOrUpdateBookmark = async (db, id, isBookmarked) => {
+export const insertOrUpdateBookmark = async (db, id, userId, isBookmarked) => {
   try {
     await db.executeSql(
-      `INSERT OR REPLACE INTO ${ERP_TABLE.ERP_BOOKMARKS} (id, isBookmarked) VALUES (?, ?)`,
-      [id, isBookmarked ? 1 : 0]
+      `INSERT OR REPLACE INTO ${ERP_TABLE.ERP_BOOKMARKS} (id, userId, isBookmarked) VALUES (?, ?, ?)`,
+      [id, userId, isBookmarked ? 1 : 0]
     );
   } catch (error) {
     console.error("Error insertOrUpdateBookmark:", error);
   }
 };
 
-export const getBookmarks = async (db) => {
+
+export const getBookmarks = async (db, userId) => {
   try {
-    const results = await db.executeSql(`SELECT * FROM ${ERP_TABLE.ERP_BOOKMARKS}`);
+    const results = await db.executeSql(
+      `SELECT * FROM ${ERP_TABLE.ERP_BOOKMARKS} WHERE userId = ?`,
+      [userId]
+    );
+
+    const rows = results[0].rows;
     const bookmarks = {};
-    for (let i = 0; i < results[0].rows.length; i++) {
-      const row = results[0].rows.item(i);
-      bookmarks[row.id] = !!row.isBookmarked;
+
+    for (let i = 0; i < rows.length; i++) {
+      const row = rows.item(i);
+      bookmarks[row.id] = row.isBookmarked === 1;
     }
+
     return bookmarks;
   } catch (error) {
     console.error("Error getBookmarks:", error);
     return {};
   }
 };
+
 
 export const removeBookmark = async (db, id) => {
   try {
