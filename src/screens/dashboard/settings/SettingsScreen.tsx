@@ -80,7 +80,7 @@ const SettingsScreen = () => {
         id: '4',
         title: t('settings.biometricAuth'),
         subtitle: t('settings.useBiometric'),
-        icon: 'fingerprint',
+        icon: 'password',
         type: 'navigate',
         value: true,
       },

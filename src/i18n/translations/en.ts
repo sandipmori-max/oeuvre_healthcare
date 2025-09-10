@@ -61,8 +61,9 @@ export default {
     receiveAlerts: 'Receive alerts and updates',
     getEmailUpdates: 'Get updates via email',
     switchDarkTheme: 'Switch to dark theme',
-    biometricAuth: 'Biometric Authentication',
-    useBiometric: 'Use fingerprint or face ID',
+    biometricAuth: 'Set Up Your PIN',
+    useBiometric: 'Secure your account with a 4-digit PIN',
+
     twoFactorAuth: 'Two-Factor Authentication',
     extraSecurityLayer: 'Add extra security layer',
     changePassword: 'Change Password',
