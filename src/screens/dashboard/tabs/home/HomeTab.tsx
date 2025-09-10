@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useLayoutEffect, useState } from 'react';
+import React, { useCallback, useLayoutEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, ActivityIndicator, FlatList } from 'react-native';
 
 import { styles } from './home_style';
@@ -85,10 +85,10 @@ const HomeScreen = () => {
     .map((item, index) => ({
       value: Number(item.data),
       color: accentColors[index % accentColors.length],
-      text: item.title?.split(' ')[0] || item.name,
+      text: item.title,
     }));
 
-  const renderDashboardItem = ({item, index}: any) => {
+  const renderDashboardItem = ({ item, index }: any) => {
     console.log('🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀 ~ renderDashboardItem ~ item:', item);
     return (
       <TouchableOpacity
@@ -98,9 +98,9 @@ const HomeScreen = () => {
           {
             paddingLeft: 4,
             marginHorizontal: 4,
-             backgroundColor: accentColors[index % accentColors.length],
+            backgroundColor: accentColors[index % accentColors.length],
             borderRadius: 8,
-            width: isHorizontal ? '100%' : '48%'
+            width: isHorizontal ? '100%' : '48%',
           },
         ]}
         activeOpacity={0.7}
@@ -135,9 +135,7 @@ const HomeScreen = () => {
                       styles.dashboardItemText,
                       {
                         color: theme === 'dark' ? '#fff' : '#000',
-                        
                       },
-                      
                     ]}
                     numberOfLines={2}
                   >
@@ -163,9 +161,13 @@ const HomeScreen = () => {
               )}
             </View>
 
-            <Text style={{
-              color: accentColors[index % accentColors.length]
-            }}>Footer dummy</Text>
+            <Text
+              style={{
+                color: accentColors[index % accentColors.length],
+              }}
+            >
+              Footer dummy
+            </Text>
           </View>
         </View>
       </TouchableOpacity>
@@ -182,7 +184,7 @@ const HomeScreen = () => {
             flex: 1,
             justifyContent: 'center',
             alignItems: 'center',
-            backgroundColor:'white'
+            backgroundColor: 'white',
           }}
         >
           <ErrorMessage message={error} />{' '}
@@ -268,14 +270,14 @@ const HomeScreen = () => {
               {/* Dashboard items */}
               <View style={styles.dashboardSection}>
                 <FlatList
-                          key={`${isHorizontal}`}
-                          data={dashboard}
-                          keyExtractor={item => item?.id}
-                          numColumns={isHorizontal ? 1 : 2}
-                          columnWrapperStyle={!isHorizontal ? styles.columnWrapper : undefined}
-                          renderItem={renderDashboardItem}
-                          showsVerticalScrollIndicator={false}
-                          />
+                  key={`${isHorizontal}`}
+                  data={dashboard}
+                  keyExtractor={item => item?.id}
+                  numColumns={isHorizontal ? 1 : 2}
+                  columnWrapperStyle={!isHorizontal ? styles.columnWrapper : undefined}
+                  renderItem={renderDashboardItem}
+                  showsVerticalScrollIndicator={false}
+                />
               </View>
             </>
           )}
