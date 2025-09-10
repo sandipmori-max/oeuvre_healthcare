@@ -50,7 +50,7 @@ const HomeScreen = () => {
       ),
       headerLeft: () => (
         <>
-          <ERPIcon extSize={24} isMenu={true} name="menu" onPress={() => navigation.openDrawer()} />
+          <ERPIcon extSize={24} isMenu={true} name="menu" onPress={() => navigation?.openDrawer()} />
         </>
       ),
     });

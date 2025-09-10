@@ -9,8 +9,7 @@ const ERP_DB_SIZE = 200000;
 const ERP_TABLE = {
   ERP_ACCOUNTS: 'erp_accounts',
   ERP_META: 'meta',
-    ERP_BOOKMARKS: 'erp_bookmarks',
-
+  ERP_BOOKMARKS: 'erp_bookmarks',
 };
 
 export const getDBConnection = async () => {
@@ -35,7 +34,6 @@ const ERP_QUERY_META_TABLE_CREATE = `CREATE TABLE IF NOT EXISTS ${ERP_TABLE.ERP_
       value TEXT
     );`;
 
-    
 const ERP_QUERY_BOOKMARKS_TABLE_CREATE = `
   CREATE TABLE IF NOT EXISTS ${ERP_TABLE.ERP_BOOKMARKS} (
     id TEXT PRIMARY KEY NOT NULL,
@@ -48,45 +46,93 @@ export const createAccountsTable = async db => {
     console.log('🔍 createAccountsTable called');
     await db.executeSql(ERP_QUERY_ACCOUNTS_TABLE_CREATE);
     await db.executeSql(ERP_QUERY_META_TABLE_CREATE);
-
-    try {
-      const tableInfo = await db.executeSql(`PRAGMA table_info(${ERP_TABLE.ERP_ACCOUNTS})`);
-      console.log('🔍 Table structure:', tableInfo[0].rows);
-    } catch (pragmaError) {
-      console.log(
-        '🔍 Could not get table info (this is normal for some SQLite versions):',
-        pragmaError,
-      );
-    }
-
     console.log('🔍 createAccountsTable completed successfully');
   } catch (error) {
     console.error('Error createAccountsTable:', error);
   }
 };
 
+// =============================
+// PIN MANAGEMENT HELPERS
+// =============================
+
+const META_KEYS = {
+  PIN_ENABLED: 'pin_enabled',
+  PIN_CODE: 'pin_code',
+};
+
+export const setPinEnabled = async (db, enabled) => {
+  try {
+    await db.executeSql(
+      `INSERT OR REPLACE INTO ${ERP_TABLE.ERP_META} (key, value) VALUES (?, ?)`,
+      [META_KEYS.PIN_ENABLED, enabled ? '1' : '0']
+    );
+    console.log('🔐 setPinEnabled:', enabled);
+  } catch (error) {
+    console.error('Error setPinEnabled:', error);
+  }
+};
+
+export const isPinEnabled = async (db) => {
+  try {
+    const results = await db.executeSql(
+      `SELECT value FROM ${ERP_TABLE.ERP_META} WHERE key = ?`,
+      [META_KEYS.PIN_ENABLED]
+    );
+    if (results[0].rows.length > 0) {
+      return results[0].rows.item(0).value === '1';
+    }
+    return false;
+  } catch (error) {
+    console.error('Error isPinEnabled:', error);
+    return false;
+  }
+};
+
+export const setPinCode = async (db, pin) => {
+  try {
+    await db.executeSql(
+      `INSERT OR REPLACE INTO ${ERP_TABLE.ERP_META} (key, value) VALUES (?, ?)`,
+      [META_KEYS.PIN_CODE, pin]
+    );
+    console.log('🔐 setPinCode: saved');
+  } catch (error) {
+    console.error('Error setPinCode:', error);
+  }
+};
+
+export const getPinCode = async (db) => {
+  try {
+    const results = await db.executeSql(
+      `SELECT value FROM ${ERP_TABLE.ERP_META} WHERE key = ?`,
+      [META_KEYS.PIN_CODE]
+    );
+    if (results[0].rows.length > 0) {
+      return results[0].rows.item(0).value;
+    }
+    return null;
+  } catch (error) {
+    console.error('Error getPinCode:', error);
+    return null;
+  }
+};
+
+// =============================
+// (Your existing account + bookmark code remains same below)
+// =============================
+
 export const insertAccount = async (db, account) => {
   try {
-    console.log('🔍 insertAccount called with:', {
-      id: account.id,
-      isActive: account.isActive,
-      lastLoginAt: account.lastLoginAt,
-      lastLoginAtType: typeof account.lastLoginAt,
-    });
-
     const insertValues = [
       account.id,
       JSON.stringify(account.user),
       account.isActive ? 1 : 0,
       account.lastLoginAt,
     ];
-    console.log('🔍 insertAccount - SQL values:', insertValues);
-
     await db.executeSql(
       `INSERT OR REPLACE INTO ${ERP_TABLE.ERP_ACCOUNTS} (id, user_json, isActive, lastLoginAt) VALUES (?, ?, ?, ?);`,
       insertValues,
     );
-    console.log('🔍 insertAccount completed successfully');
   } catch (error) {
     console.error('Error insertAccount:', error);
   }
@@ -94,73 +140,21 @@ export const insertAccount = async (db, account) => {
 
 export const updateAccountActive = async (db, accountId) => {
   try {
-    console.log('🔍 updateAccountActive called with accountId:', accountId);
-
     const currentTime = new Date().toISOString();
-
     await db.executeSql(
       `UPDATE ${ERP_TABLE.ERP_ACCOUNTS}
        SET isActive = CASE WHEN id = ? THEN 1 ELSE 0 END,
            lastLoginAt = CASE WHEN id = ? THEN ? ELSE lastLoginAt END`,
       [accountId, accountId, currentTime],
     );
-
-    console.log('🔍 updateAccountActive completed successfully');
-
-    const checkResult = await db.executeSql(
-      `SELECT id, isActive, lastLoginAt FROM ${ERP_TABLE.ERP_ACCOUNTS}`,
-    );
-    for (let i = 0; i < checkResult[0].rows.length; i++) {
-      console.log('🔍 Row after update:', checkResult[0].rows.item(i));
-    }
   } catch (error) {
     console.error('Error updateAccountActive:', error);
   }
 };
 
-
-
-// export const updateAccountActive = async (db, accountId) => {
-//   try {
-//     console.log(
-//       '🔍 updateAccountActive ----------- --- - - - - - -called with accountId:',
-//       accountId,
-//     );
-//     const currentTime = new Date().toISOString();
-//     console.log('🔍 Setting lastLoginAt to:', currentTime, 'type:', typeof currentTime);
-//     await db.executeSql(
-//       `UPDATE ${ERP_TABLE.ERP_ACCOUNTS}
-//    SET isActive = CASE WHEN id = ? THEN 1 ELSE 0 END,
-//        lastLoginAt = CASE WHEN id = ? THEN ? ELSE lastLoginAt END`,
-//       [accountId, accountId, currentTime],
-//     );
-
-//     console.log('🔍 updateAccountActive completed successfully');
-
-//     const checkResult = await db.executeSql(
-//       `SELECT lastLoginAt FROM ${ERP_TABLE.ERP_ACCOUNTS} WHERE id = ?`,
-//       [accountId],
-//     );
-//     if (checkResult[0].rows.length > 0) {
-//       const updatedRow = checkResult[0].rows.item(0);
-//       console.log('🔍 updateAccountActive - verified update:', {
-//         accountId,
-//         lastLoginAt: updatedRow.lastLoginAt,
-//         lastLoginAtType: typeof updatedRow.lastLoginAt,
-//       });
-//     }
-//   } catch (error) {
-//     console.error('Error updateAccountActive:', error);
-//   }
-// };
-
 export const getAccounts = async db => {
   try {
-    console.log('🔍 getAccounts called');
     const results = await db.executeSql(`SELECT * FROM ${ERP_TABLE.ERP_ACCOUNTS}`);
-
-    await debugDatabaseContents(db);
-
     const accounts = [];
     for (let i = 0; i < results[0].rows.length; i++) {
       const row = results[0].rows.item(i);
@@ -171,15 +165,6 @@ export const getAccounts = async db => {
         lastLoginAt: row.lastLoginAt,
       });
     }
-    console.log(
-      '🔍 getAccounts retrieved:',
-      accounts.map(acc => ({
-        id: acc.id,
-        isActive: acc.isActive,
-        lastLoginAt: acc.lastLoginAt,
-        user: acc.user?.name,
-      })),
-    );
     return accounts;
   } catch (error) {
     console.error('Error getAccounts:', error);
@@ -188,26 +173,18 @@ export const getAccounts = async db => {
 
 export const getActiveAccount = async db => {
   try {
-    console.log('🔍 getActiveAccount called');
     const results = await db.executeSql(
       `SELECT * FROM ${ERP_TABLE.ERP_ACCOUNTS} WHERE isActive = 1 LIMIT 1`,
     );
     if (results[0].rows.length > 0) {
       const row = results[0].rows.item(0);
-      const account = {
+      return {
         id: row.id,
         user: JSON.parse(row.user_json),
         isActive: !!row.isActive,
         lastLoginAt: row.lastLoginAt,
       };
-      console.log('🔍 getActiveAccount found:', {
-        id: account.id,
-        isActive: account.isActive,
-        lastLoginAt: account.lastLoginAt,
-      });
-      return account;
     }
-    console.log('🔍 getActiveAccount - no active account found');
     return null;
   } catch (error) {
     console.error('Error getActiveAccount:', error);
@@ -255,43 +232,20 @@ export const clearAccounts = async db => {
   }
 };
 
-export const debugDatabaseContents = async db => {
-  try {
-    console.log('🔍 Debug: Checking database contents...');
-    const results = await db.executeSql(`SELECT * FROM ${ERP_TABLE.ERP_ACCOUNTS}`);
-    console.log('🔍 Debug: Raw database results:', results[0].rows);
-
-    for (let i = 0; i < results[0].rows.length; i++) {
-      const row = results[0].rows.item(i);
-      console.log('🔍 Debug: Row', i, ':', {
-        id: row.id,
-        isActive: row.isActive,
-        lastLoginAt: row.lastLoginAt,
-        lastLoginAtType: typeof row.lastLoginAt,
-        user_json_length: row.user_json ? row.user_json.length : 0,
-      });
-    }
-  } catch (error) {
-    console.error('Error debugDatabaseContents:', error);
-  }
-};
-
 export const createBookmarksTable = async (db) => {
   try {
     await db.executeSql(ERP_QUERY_BOOKMARKS_TABLE_CREATE);
-    console.log("🔍 createBookmarksTable done");
   } catch (error) {
     console.error("Error createBookmarksTable:", error);
   }
 };
 
-export const insertOrUpdateBookmark = async (db, id: string, isBookmarked: boolean) => {
+export const insertOrUpdateBookmark = async (db, id, isBookmarked) => {
   try {
     await db.executeSql(
       `INSERT OR REPLACE INTO ${ERP_TABLE.ERP_BOOKMARKS} (id, isBookmarked) VALUES (?, ?)`,
       [id, isBookmarked ? 1 : 0]
     );
-    console.log("🔍 insertOrUpdateBookmark done:", id, isBookmarked);
   } catch (error) {
     console.error("Error insertOrUpdateBookmark:", error);
   }
@@ -300,12 +254,11 @@ export const insertOrUpdateBookmark = async (db, id: string, isBookmarked: boole
 export const getBookmarks = async (db) => {
   try {
     const results = await db.executeSql(`SELECT * FROM ${ERP_TABLE.ERP_BOOKMARKS}`);
-    const bookmarks: { [key: string]: boolean } = {};
+    const bookmarks = {};
     for (let i = 0; i < results[0].rows.length; i++) {
       const row = results[0].rows.item(i);
       bookmarks[row.id] = !!row.isBookmarked;
     }
-    console.log("🔍 getBookmarks:", bookmarks);
     return bookmarks;
   } catch (error) {
     console.error("Error getBookmarks:", error);
@@ -313,10 +266,9 @@ export const getBookmarks = async (db) => {
   }
 };
 
-export const removeBookmark = async (db, id: string) => {
+export const removeBookmark = async (db, id) => {
   try {
     await db.executeSql(`DELETE FROM ${ERP_TABLE.ERP_BOOKMARKS} WHERE id = ?`, [id]);
-    console.log("🔍 removeBookmark done:", id);
   } catch (error) {
     console.error("Error removeBookmark:", error);
   }

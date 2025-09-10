@@ -247,26 +247,23 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
                   </View>
                 </>
               )}
-             <View style={styles.slideWrapper}>
-  
-
-  <SlideButton
-    label={
-      resData?.success === 1 || resData?.success === '1'
-        ? `Slide to ${t('attendance.checkOut')}`
-        : `Slide to ${t('attendance.checkIn')}`
-    }
-    successColor={
-      resData?.success === 1 || resData?.success === '1'
-        ? ERP_COLOR_CODE.ERP_ERROR
-        : ERP_COLOR_CODE.ERP_APP_COLOR
-    }
-    loading={locationLoading}
-    completed={attendanceDone}
-    onSlideSuccess={() => handleStatusToggle(setFieldValue, handleSubmit)}
-  />
-</View>
-
+              <View style={styles.slideWrapper}>
+                <SlideButton
+                  label={
+                    resData?.success === 1 || resData?.success === '1'
+                      ? `Slide to ${t('attendance.checkOut')}`
+                      : `Slide to ${t('attendance.checkIn')}`
+                  }
+                  successColor={
+                    resData?.success === 1 || resData?.success === '1'
+                      ? ERP_COLOR_CODE.ERP_ERROR
+                      : ERP_COLOR_CODE.ERP_APP_COLOR
+                  }
+                  loading={locationLoading}
+                  completed={attendanceDone}
+                  onSlideSuccess={() => handleStatusToggle(setFieldValue, handleSubmit)}
+                />
+              </View>
             </View>
           </View>
         )}

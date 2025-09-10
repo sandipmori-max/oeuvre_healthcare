@@ -35,9 +35,8 @@ export const styles = StyleSheet.create({
   },
   profileCard: {
     backgroundColor: '#fff',
-    borderRadius: 8,
     padding: 16,
-    borderWidth: 0.4,
+    borderWidth: 0.6,
     borderColor: ERP_COLOR_CODE.ERP_APP_COLOR,
   },
   profileRow: {
