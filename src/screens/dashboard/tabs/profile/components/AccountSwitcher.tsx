@@ -28,7 +28,6 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
   const { execute: validateCompanyCode } = useApi();
 
   const { accounts, activeAccountId } = useAppSelector(state => state.auth);
-  console.log('🚀 ~ AccountSwitcher ~ accounts:----------------', accounts);
   const [alertVisible, setAlertVisible] = useState(false);
   const [selectedAccount, setSelectedAccount] = useState<any>(null);
   const [alertConfig, setAlertConfig] = useState({
@@ -41,7 +40,6 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
     if (accountId !== activeAccountId) {
       dispatch(switchAccountThunk(accountId));
     }
-
     onClose();
   };
 
@@ -49,7 +47,6 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
     if (accountId !== activeAccountId) {
       dispatch(removeAccountThunk(accountId));
     }
-
     onClose();
   };
 

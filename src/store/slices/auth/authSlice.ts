@@ -22,6 +22,7 @@ const initialState: AuthState = {
   dashboard: [],
   isDashboardLoading: false,
   activeToken: null,
+  isPinLoaded: false
 };
 
 const authSlice = createSlice({
@@ -30,6 +31,9 @@ const authSlice = createSlice({
   reducers: {
     clearError: state => {
       state.error = null;
+    },
+    setIsPinLoaded: state => {
+      state.isPinLoaded = true;
     },
     setLoading: (state, action: PayloadAction<boolean>) => {
       state.isLoading = action.payload;
@@ -44,19 +48,19 @@ const authSlice = createSlice({
       state.dashboard = [];
     },
     setMenu: (state, action: PayloadAction<MenuItem[]>) => {
-      state.menu = action.payload;
+      state.menu = action?.payload;
     },
     setMenuLoading: (state, action: PayloadAction<boolean>) => {
-      state.isMenuLoading = action.payload;
+      state.isMenuLoading = action?.payload;
     },
     setDashboard: (state, action: PayloadAction<DashboardItem[]>) => {
-      state.dashboard = action.payload;
+      state.dashboard = action?.payload;
     },
     setDashboardLoading: (state, action: PayloadAction<boolean>) => {
-      state.isDashboardLoading = action.payload;
+      state.isDashboardLoading = action?.payload;
     },
     setActiveToken: (state, action: PayloadAction<string | null>) => {
-      state.activeToken = action.payload;
+      state.activeToken = action?.payload;
     },
   },
   extraReducers: builder => {
@@ -309,5 +313,6 @@ export const {
   setDashboard,
   setDashboardLoading,
   setActiveToken,
+  setIsPinLoaded
 } = authSlice.actions;
 export default authSlice.reducer;
