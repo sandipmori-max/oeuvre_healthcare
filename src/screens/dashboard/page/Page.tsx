@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/no-unstable-nested-components */
 /* eslint-disable react-native/no-inline-styles */
-import React, { useCallback, useEffect, useLayoutEffect, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import {
   Text,
   View,
@@ -41,6 +41,7 @@ const PageScreen = () => {
   const dispatch = useAppDispatch();
   const { pageError } = useAppSelector(state => state.auth);
   console.log('🚀 ~ PageScreen ~ -----------------------------pageError:', pageError);
+const flatListRef = useRef<FlatList>(null);
 
   const [loadingPageId, setLoadingPageId] = useState<string | null>(null);
   const [controls, setControls] = useState<any[]>([]);
@@ -323,7 +324,9 @@ const PageScreen = () => {
           <DateRow item={item} errors={errors} value={value} showDatePicker={showDatePicker} />
         );
       } else {
-        content = <Input item={item} errors={errors} value={value} setValue={setValue} />;
+        content = <Input
+         onFocus={() => flatListRef.current?.scrollToIndex({ index, animated: true })}
+        item={item} errors={errors} value={value} setValue={setValue} />;
       }
 
       return (
@@ -391,6 +394,7 @@ const PageScreen = () => {
             <FlatList
               showsVerticalScrollIndicator={false}
               data={controls}
+                ref={flatListRef}
               keyExtractor={(it, idx) => it?.dtlid || idx?.toString()}
               renderItem={renderItem}
               contentContainerStyle={{ paddingBottom: keyboardHeight }}

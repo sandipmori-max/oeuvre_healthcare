@@ -17,10 +17,15 @@ import { ERP_COLOR_CODE } from '../utils/constants';
 import StartupScreen from '../screens/dashboard/startup/StartupScreen';
 import PinSetupScreen from '../screens/dashboard/pinset/Pinset';
 import PinVerifyScreen from '../screens/dashboard/pinset/PinVerify';
+import { useAppSelector } from '../store/hooks';
 
 const Stack = createStackNavigator<any>();
 
 const StackNavigator = () => {
+
+    const { isPinLoaded } = useAppSelector(state => state?.auth);
+    console.log("🚀 ~ StackNavigator ~ isPinLoaded-----------:", isPinLoaded)
+  
   const screenOptions = {
     headerShown: true,
     headerBackImage: () => (
@@ -65,7 +70,10 @@ const StackNavigator = () => {
         headerStyle: {},
       }}
     >
-      <Stack.Screen name="Startup" component={StartupScreen} />
+      {
+        isPinLoaded === false &&  <Stack.Screen name="Startup" component={StartupScreen} />
+      }
+     
       <Stack.Screen name="Drawer" component={DrawerNavigator} />
       <Stack.Screen options={screenOptions} name="Settings" component={SettingsScreen} />
        <Stack.Screen

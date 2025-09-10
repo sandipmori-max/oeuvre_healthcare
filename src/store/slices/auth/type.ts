@@ -46,4 +46,5 @@ export interface AuthState {
   dashboard: DashboardItem[];
   isDashboardLoading: boolean;
   activeToken: string | null;
+  isPinLoaded: boolean;
 }

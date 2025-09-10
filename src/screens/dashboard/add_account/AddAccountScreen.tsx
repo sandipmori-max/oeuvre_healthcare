@@ -42,7 +42,6 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
     setLoader(false);
   }, [visible]);
 
-
   useEffect(() => {
     const fetchDeviceName = async () => {
       const name = await DeviceInfo.getDeviceName();
