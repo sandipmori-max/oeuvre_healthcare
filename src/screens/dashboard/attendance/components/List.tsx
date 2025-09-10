@@ -1,5 +1,5 @@
 import MaterialIcons from '@react-native-vector-icons/material-icons';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -14,6 +14,8 @@ import {
 import NoData from '../../../../components/no_data/NoData';
 import { PieChart } from 'react-native-gifted-charts';
 import { ERP_COLOR_CODE } from '../../../../utils/constants';
+import { useAppDispatch, useAppSelector } from '../../../../store/hooks';
+import { getLastPunchInList } from '../../../../store/slices/attendance/thunk';
 
 const dummyAttendanceList = [
   {
@@ -398,6 +400,9 @@ const styles = StyleSheet.create({
 
 const List = ({ selectedMonth, showFilter }: any) => {
   const [activeFilter, setActiveFilter] = useState('all');
+  const [isLoading, setIsLoading] = useState(false);
+  const dispatch = useAppDispatch();
+  const { user } = useAppSelector(state => state?.auth);
 
   const parseDateTime = (dateTimeStr: string) => {
     const [datePart, timePart, ampm] = dateTimeStr.split(' ');
@@ -537,6 +542,8 @@ const List = ({ selectedMonth, showFilter }: any) => {
       item.status !== 'leave_first_half' &&
       item.status !== 'leave_second_half',
   ).length;
+
+  
   const chartData = [
     {
       value: totalPresent,
@@ -563,6 +570,24 @@ const List = ({ selectedMonth, showFilter }: any) => {
       title: `Late ${lateCount}`,
     },
   ];
+
+   const checkAttendance = () => {
+      setIsLoading(true);
+      dispatch(getLastPunchInList({id: user?.id}))
+        .unwrap()
+        .then(res => {
+          console.log('✅---------- Last Punch-In Response:', res);
+          
+        })
+        .catch(err => {
+          
+          console.log('❌---------- Error fetching last punch-in:', err);
+        });
+    };
+    useEffect(() => {
+      checkAttendance();
+    }, [dispatch]);
+
   return (
     <View style={{ flex: 1 }}>
       <View>

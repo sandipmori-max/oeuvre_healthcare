@@ -315,12 +315,12 @@ export function formatDateHr(input, isFullDate) {
 
 function buildFormatted(date, isFullDate) {
   const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", 
-                  "Jul", "Aug", "Sept", "Oct", "Nov", "Dec"];
+                  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   const day = String(date.getDate()).padStart(2, "0");
   const month = months[date.getMonth()];
   const year = date.getFullYear();
 
-  let hours = date.getHours() || 12; // 0 → 12
+  let hours = date.getHours() || 12;
   const minutes = String(date.getMinutes()).padStart(2, "0");
   const seconds = String(date.getSeconds()).padStart(2, "0");
   if(isFullDate){
@@ -336,9 +336,6 @@ function buildFormatted(date, isFullDate) {
 export const isTokenValid = (tokenValidTill: string) => {
   return new Date(tokenValidTill).getTime() > Date.now();
 };
-
-
-
 
 export async function requestLocationPermissions() {
   if (Platform.OS === 'android') {
@@ -365,6 +362,6 @@ export async function requestLocationPermissions() {
       return false;
     }
   } else {
-    return true; // iOS handled via Info.plist
+    return true;
   }
 }

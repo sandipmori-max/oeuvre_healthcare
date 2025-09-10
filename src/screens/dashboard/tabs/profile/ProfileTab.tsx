@@ -56,7 +56,11 @@ const ProfileTab = () => {
           <TouchableOpacity
             onPress={() => {
               console.log("🚀 ~ onPress:", 'onPress')
-              navigation.navigate('ProfileEdit')
+              // navigation.navigate('ProfileEdit')
+                  navigation.navigate('Page', {
+                    id: user?.id,
+                    item: {}, title: 'UserProfile', isFromNew: false , url: 'UserProfile'});
+
             }}
             style={styles.profileCard}
           >
