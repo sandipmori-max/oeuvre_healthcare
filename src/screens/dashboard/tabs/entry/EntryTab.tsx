@@ -29,6 +29,8 @@ const accentColors = ['#dbe0f5ff', '#c8f3edff', '#faf1e0ff', '#f0e1e1ff', '#f2e3
 const EntryTab = () => {
   const navigation = useNavigation<any>();
   const dispatch = useAppDispatch();
+  const { user } = useAppSelector(state => state?.auth);
+
   const { isLoading, isAuthenticated, activeToken, error } = useAppSelector(state => state.auth);
   console.log('🚀 ~ EntryTab ~ error:', error);
   const { menu, isMenuLoading } = useAppSelector(state => state.auth);
@@ -47,7 +49,7 @@ const EntryTab = () => {
     setBookmarks(prev => ({ ...prev, [id]: updated }));
 
     const db = await getDBConnection();
-    await insertOrUpdateBookmark(db, id, updated);
+    await insertOrUpdateBookmark(db, id, user?.id, updated);
   };
 
   useLayoutEffect(() => {
@@ -84,7 +86,7 @@ const EntryTab = () => {
     (async () => {
       const db = await getDBConnection();
       await createBookmarksTable(db);
-      const saved = await getBookmarks(db);
+      const saved = await getBookmarks(db, user?.id);
       setBookmarks(saved);
     })();
   }, []);
@@ -163,30 +165,32 @@ const EntryTab = () => {
   if (error) {
     return (
       <View
-          style={{
-            flex: 1,
-            justifyContent: 'center',
-            alignItems: 'center',
-            backgroundColor:'white'
-          }}
+        style={{
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+          backgroundColor: 'white',
+        }}
       >
         <ErrorMessage message={error} />{' '}
       </View>
     );
   }
-  if(list.length === 0){
-    return(<>
-     <View
-              style={{
-                flex: 1,
-                justifyContent: 'center',
-                alignItems: 'center',
-                backgroundColor: '#fff',
-              }}
-            >
-              <NoData />
-            </View>
-    </>)
+  if (list.length === 0) {
+    return (
+      <>
+        <View
+          style={{
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: '#fff',
+          }}
+        >
+          <NoData />
+        </View>
+      </>
+    );
   }
   return (
     <>
@@ -199,7 +203,6 @@ const EntryTab = () => {
         columnWrapperStyle={!isHorizontal ? styles.columnWrapper : undefined}
         renderItem={renderItem}
         showsVerticalScrollIndicator={false}
-        
       />
     </>
   );
