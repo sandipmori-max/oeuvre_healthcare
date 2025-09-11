@@ -34,6 +34,7 @@ import DateRow from './components/Date';
 import BoolInput from './components/BoolInput';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import SignaturePad from './components/SignaturePad';
+import DateTimeRow from './components/Date';
 
 type PageRouteParams = { PageScreen: { item: any } };
 
@@ -55,6 +56,11 @@ const PageScreen = () => {
   const [formValues, setFormValues] = useState<any>({});
   console.log('🚀 ~ PageScreen ~ formValues:--------', formValues);
   const [datePickerVisible, setDatePickerVisible] = useState(false);
+
+  const [dateTimePickerVisible, setDateTimePickerVisible] = useState(false);
+  const [activeDateTimeField, setActiveDateTimeField] = useState<string | null>(null);
+  const [activeDateTime, setActiveDateTime] = useState<string | null>(null);
+
   const [activeDateField, setActiveDateField] = useState<string | null>(null);
   const [activeDate, setActiveDate] = useState<string | null>(null);
 
@@ -249,18 +255,38 @@ const PageScreen = () => {
   }, [fetchPageData]);
 
   const handleAttachment = (base64: string, val: any) => {
-    console.log("🚀 ~ handleAttachment ~ val:", val)
-    console.log("🚀 ~ handleAttachment ~ base64:", base64)
+    console.log('🚀 ~ handleAttachment ~ val:', val);
+    console.log('🚀 ~ handleAttachment ~ base64:', base64);
     setFormValues(prev => {
-       return { ...prev, [val]: base64 };
+      return { ...prev, [val]: base64 };
     });
   };
 
-   const handleSignatureAttachment = (base64: string, val: any) => {
-    console.log("🚀 ~ handleSignatureAttachment ~ base64:", base64)
+  const handleSignatureAttachment = (base64: string, val: any) => {
+    console.log('🚀 ~ handleSignatureAttachment ~ base64:', base64);
     setFormValues(prev => {
-     return { ...prev, [val]: base64 };
+      return { ...prev, [val]: base64 };
     });
+  };
+
+  // show
+  const showDateTimePicker = (field: string, date: any) => {
+    setActiveDateTimeField(field);
+    setActiveDateTime(date);
+    setDateTimePickerVisible(true);
+  };
+
+  // hide
+  const hideDateTimePicker = () => {
+    setDateTimePickerVisible(false);
+    setActiveDateTimeField(null);
+  };
+
+  const handleDateTimeConfirm = (date: Date) => {
+    if (activeDateTimeField) {
+      setFormValues(prev => ({ ...prev, [activeDateTimeField]: date.toISOString() }));
+    }
+    hideDateTimePicker();
   };
 
   const renderItem = useCallback(
@@ -291,7 +317,9 @@ const PageScreen = () => {
           />
         );
       } else if (item?.ctltype === 'IMAGE' && item?.field === 'signimg') {
-        content = <SignaturePad item={item} handleSignatureAttachment={handleSignatureAttachment}/>;
+        content = (
+          <SignaturePad item={item} handleSignatureAttachment={handleSignatureAttachment} />
+        );
       } else if (item?.ctltype === 'IMAGE' || item?.ctltype === 'PHOTO') {
         content = (
           <Media
@@ -332,6 +360,15 @@ const PageScreen = () => {
       } else if (item?.ctltype === 'DATE') {
         content = (
           <DateRow item={item} errors={errors} value={value} showDatePicker={showDatePicker} />
+        );
+      } else if (item?.ctltype === 'DATETIME') {
+        content = (
+          <DateTimeRow
+            item={item}
+            errors={errors}
+            value={value}
+            showDateTimePicker={showDateTimePicker}
+          />
         );
       } else {
         content = (
@@ -442,6 +479,14 @@ const PageScreen = () => {
         errors={errorsList}
         onClose={() => setShowErrorModal(false)}
       />
+      <DateTimePicker
+        isVisible={dateTimePickerVisible}
+        mode="datetime"
+        date={activeDateTime ? parseCustomDatePage(activeDateTime) : new Date()}
+        onConfirm={handleDateTimeConfirm}
+        onCancel={hideDateTimePicker}
+      />
+
       <DateTimePicker
         isVisible={datePickerVisible}
         mode="date"
