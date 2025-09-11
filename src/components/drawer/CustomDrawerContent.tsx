@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, Image, TouchableOpacity } from 'react-native';
 import { DrawerContentComponentProps, DrawerContentScrollView } from '@react-navigation/drawer';
 import { useNavigation } from '@react-navigation/native';
@@ -8,6 +8,8 @@ import { useAppSelector } from '../../store/hooks';
 import { firstLetterUpperCase } from '../../utils/helpers';
 import { ERP_DRAWER_LIST } from '../../constants';
 import { styles } from './drawer_style';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import FastImage from 'react-native-fast-image';
 
 const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
   const navigation = useNavigation();
@@ -15,8 +17,32 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
   const { user } = useAppSelector(state => state?.auth);
   console.log("🚀 ~ CustomDrawerContent ~ user:", user)
   const theme = useAppSelector(state => state.theme);
+  const [baseLink, setBaseLink] = useState<string>('');
 
   const currentRoute = props.state.routeNames[props.state.index];
+
+
+  
+  useEffect(() => {
+    let isMounted = true;
+    (async () => {
+      try {
+        const [storedLink] = await Promise.all([AsyncStorage.getItem('erp_link')]);
+
+        if (isMounted) {
+          let normalizedBase = (storedLink || '').replace(/\/+$/, '') + '';
+          normalizedBase = normalizedBase.replace(/\/devws\/?/, '/');
+          normalizedBase = normalizedBase.replace(/^https:\/\//i, 'http://');
+          setBaseLink(normalizedBase || '');
+        }
+      } catch (e) {
+        console.error('Error loading stored data:', e);
+      }
+    })();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   return (
     <DrawerContentScrollView
@@ -25,11 +51,15 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
     >
        
       <View style={[styles.header,]}>
-
-        <Image
-          source={{ uri: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=600' }}
-          style={styles.profileImage}
-        />
+ 
+         <FastImage
+                  source={{
+                    uri: `${baseLink}/FileUpload/1/UserMaster/${user?.id}/profileimage.jpeg`,
+                    priority: FastImage.priority.normal,
+                    cache: FastImage.cacheControl.web,
+                  }}
+                    style={styles.profileImage}
+                />
         <>
           <View style={{ height: 25, width: 100 }}></View>
           <Text style={[styles.username, { top: 8 }]}>
@@ -128,7 +158,7 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
         })}
       </View>
       <View style={styles.logoutButton}>
-        <Text style={styles.logoutText}>DevERP Mobile app</Text>
+        <Text style={styles.logoutText}>DevERP Mobile App</Text>
       </View>
     </DrawerContentScrollView>
   );

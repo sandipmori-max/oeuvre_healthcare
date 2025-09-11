@@ -16,6 +16,7 @@ import { ERP_COLOR_CODE } from '../../../../utils/constants';
 import { useAppDispatch } from '../../../../store/hooks';
 import { getERPListDataThunk } from '../../../../store/slices/auth/thunk';
 import FullViewLoader from '../../../../components/loader/FullViewLoader';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const FILTERS = [
   { key: 'all', label: 'All' },
@@ -39,8 +40,8 @@ const styles = StyleSheet.create({
     borderWidth: 0.5,
   },
   recordAvatar: { width: 50, height: 50, borderRadius: 25 },
-  recordName: {  fontSize: 16 },
-  recordDateTime: {fontWeight: '600', fontSize: 12, color: '#000' },
+  recordName: { fontSize: 16 },
+  recordDateTime: { fontWeight: '600', fontSize: 12, color: '#000' },
   recordPunchTime: { fontSize: 14, color: '#333' },
   statusBadgeRed: {
     backgroundColor: '#fa1b1bff',
@@ -79,7 +80,9 @@ const List = ({ selectedMonth, showFilter, fromDate, toDate }: any) => {
   const [isLoading, setIsLoading] = useState(false);
   const [listData, setListData] = useState<any[]>([]);
   const dispatch = useAppDispatch();
-  const [parsedError, setParsedError] = useState<any>() 
+  const [parsedError, setParsedError] = useState<any>();
+  const [baseLink, setBaseLink] = useState<string>('');
+  console.log('🚀 ~ List ~ baseLink:', baseLink);
 
   const getWorkedHours = (punchIn: string, punchOut: string): number => {
     if (!punchIn || !punchOut) return 0;
@@ -115,7 +118,7 @@ const List = ({ selectedMonth, showFilter, fromDate, toDate }: any) => {
     return false;
   };
 
-   const fetchListData = useCallback(
+  const fetchListData = useCallback(
     async (fromDateStr: string, toDateStr: string) => {
       try {
         setIsLoading(true);
@@ -125,7 +128,7 @@ const List = ({ selectedMonth, showFilter, fromDate, toDate }: any) => {
             fromDate: fromDateStr,
             toDate: toDateStr,
             param: '',
-          })
+          }),
         ).unwrap();
 
         const parsed = typeof raw === 'string' ? JSON.parse(raw) : raw;
@@ -133,12 +136,12 @@ const List = ({ selectedMonth, showFilter, fromDate, toDate }: any) => {
         setListData(final?.data || final || []);
       } catch (e: any) {
         console.log('Failed to load list data:', e);
-        setParsedError(e)
+        setParsedError(e);
       } finally {
         setIsLoading(false);
       }
     },
-    [dispatch]
+    [dispatch],
   );
 
   useEffect(() => {
@@ -147,6 +150,26 @@ const List = ({ selectedMonth, showFilter, fromDate, toDate }: any) => {
     }
   }, [fromDate, toDate, fetchListData]);
 
+  useEffect(() => {
+    let isMounted = true;
+    (async () => {
+      try {
+        const [storedLink] = await Promise.all([AsyncStorage.getItem('erp_link')]);
+
+        if (isMounted) {
+          let normalizedBase = (storedLink || '').replace(/\/+$/, '') + '';
+          normalizedBase = normalizedBase.replace(/\/devws\/?/, '/');
+          normalizedBase = normalizedBase.replace(/^https:\/\//i, 'http://');
+          setBaseLink(normalizedBase || '');
+        }
+      } catch (e) {
+        console.error('Error loading stored data:', e);
+      }
+    })();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
   // ---- Filters ----
   let data = listData?.length > 0 ? [...listData] : [];
   if (data && activeFilter !== 'all') {
@@ -173,12 +196,16 @@ const List = ({ selectedMonth, showFilter, fromDate, toDate }: any) => {
   }
 
   const total = listData.length > 0 && listData?.length;
-  const leave = listData.length > 0 && listData?.filter(i => i.status?.toLowerCase() === 'leave').length;
-  const late = listData.length > 0 && listData?.filter(i => i.intime && isLatePunchIn(i.intime)).length;
-  const lessHours = listData.length > 0 && listData?.filter(i => {
-    if (!i.intime || !i.outtime) return false;
-    return getWorkedHours(i.intime, i.outtime) < 8.5;
-  }).length;
+  const leave =
+    listData.length > 0 && listData?.filter(i => i.status?.toLowerCase() === 'leave').length;
+  const late =
+    listData.length > 0 && listData?.filter(i => i.intime && isLatePunchIn(i.intime)).length;
+  const lessHours =
+    listData.length > 0 &&
+    listData?.filter(i => {
+      if (!i.intime || !i.outtime) return false;
+      return getWorkedHours(i.intime, i.outtime) < 8.5;
+    }).length;
   const present = total - leave;
 
   const chartData = [
@@ -188,10 +215,12 @@ const List = ({ selectedMonth, showFilter, fromDate, toDate }: any) => {
     { value: lessHours, color: '#ff9800', text: 'Less Hrs' },
   ];
 
-  if(parsedError){
-    return <View style={{flex: 1, }}>
-      <Text>{JSON.stringify(parsedError)}</Text>
-    </View>
+  if (parsedError) {
+    return (
+      <View style={{ flex: 1 }}>
+        <Text>{JSON.stringify(parsedError)}</Text>
+      </View>
+    );
   }
   return (
     <View style={{ flex: 1, backgroundColor: '#fff' }}>
@@ -239,18 +268,29 @@ const List = ({ selectedMonth, showFilter, fromDate, toDate }: any) => {
         renderItem={() => (
           <>
             {listData?.length > 0 && (
-              <View style={{ 
-                justifyContent:'space-around',
-                padding: 16, alignItems: 'center', flexDirection: 'row' }}>
+              <View
+                style={{
+                  justifyContent: 'space-around',
+                  padding: 16,
+                  alignItems: 'center',
+                  flexDirection: 'row',
+                }}
+              >
                 <PieChart
                   data={chartData}
                   donut
                   radius={90}
                   innerRadius={60}
                   centerLabelComponent={() => (
-                    <Text style={{ 
-                      textAlign:'center',
-                      fontSize: 18, fontWeight: '600' }}>{total + `\n`} Days</Text>
+                    <Text
+                      style={{
+                        textAlign: 'center',
+                        fontSize: 18,
+                        fontWeight: '600',
+                      }}
+                    >
+                      {total + `\n`} Days
+                    </Text>
                   )}
                 />
                 <View style={{ marginTop: 12, gap: 12, marginHorizontal: 20 }}>
@@ -294,21 +334,31 @@ const List = ({ selectedMonth, showFilter, fromDate, toDate }: any) => {
                 renderItem={({ item }) => {
                   const isLeaveFull = item?.status?.toLowerCase() === 'leave';
                   const workedHours =
-                    !item?.intime || !item?.outtime ? 0 : getWorkedHours(item?.intime, item?.outtime);
+                    !item?.intime || !item?.outtime
+                      ? 0
+                      : getWorkedHours(item?.intime, item?.outtime);
                   const isLessThanRequired = !isLeaveFull && workedHours < 8.5;
-                  
+
                   const isLate = !isLeaveFull && item?.intime && isLatePunchIn(item?.intime);
 
                   return (
                     <View style={styles.recordCard}>
-                      <Image
-                        source={{
-                          uri:
-                            item.image ||
-                            'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=600',
-                        }}
-                        style={styles.recordAvatar}
-                      />
+                      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                        <Image
+                          source={{ uri: baseLink + '/' + item?.image }}
+                          style={styles.recordAvatar}
+                        />
+                        {item?.image2 && (
+                          <Image
+                            source={{ uri: baseLink + '/' + item?.image2 }}
+                            style={[
+                              styles.recordAvatar,
+                              { marginLeft: -32, borderWidth: 2, borderColor: '#fff' },
+                            ]}
+                          />
+                        )}
+                      </View>
+
                       <View style={{ flex: 1, marginLeft: 12 }}>
                         <View
                           style={{
@@ -334,9 +384,11 @@ const List = ({ selectedMonth, showFilter, fromDate, toDate }: any) => {
                               <MaterialIcons color={'#666'} size={14} name="hourglass-bottom" />
                               <Text style={styles.recordPunchTime}>{item?.intime || '--'}</Text>
                             </View>
-                             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
                               <MaterialIcons color={'#666'} size={14} name="query-builder" />
-                              <Text style={styles.recordPunchTime}>{(workedHours - 1).toFixed(2) + ' hr' || '--'}</Text>
+                              <Text style={styles.recordPunchTime}>
+                                {(workedHours - 1).toFixed(2) + ' hr' || '--'}
+                              </Text>
                             </View>
                             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
                               <MaterialIcons color={'#666'} size={14} name="hourglass-top" />
@@ -349,13 +401,11 @@ const List = ({ selectedMonth, showFilter, fromDate, toDate }: any) => {
                         {isLeaveFull && <Text style={styles.statusBadgeRed}>Leave</Text>}
                         {isLate && <Text style={styles.statusBadgeBlue}>Late</Text>}
                         {isLessThanRequired && (
-                         <View style={{flexDirection:'row', justifyContent:'space-between'}}>
-                           <Text style={styles.statusBadgeGrey}>
-                            Less Hours
-                          </Text>
-                           <Text style={styles.statusBadgeGrey}>
-                            ({workedHours.toFixed(2)} hrs)
-                          </Text>
+                          <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                            <Text style={styles.statusBadgeGrey}>Less Hours</Text>
+                            <Text style={styles.statusBadgeGrey}>
+                              ({workedHours.toFixed(2)} hrs)
+                            </Text>
                           </View>
                         )}
                       </View>
