@@ -34,9 +34,12 @@ class DevERPService {
     }
 
     const storedToken = await AsyncStorage.getItem('erp_token');
-    console.log("🚀 ~ DevERPService ~ ensureAuthToken ~ storedToken:", storedToken)
+    console.log('🚀 ~ DevERPService ~ ensureAuthToken ~ storedToken:', storedToken);
     const storedTokenValidTill = await AsyncStorage.getItem('erp_token_valid_till');
-    console.log("🚀 ~ DevERPService ~ ensureAuthToken ~ storedTokenValidTill:", storedTokenValidTill)
+    console.log(
+      '🚀 ~ DevERPService ~ ensureAuthToken ~ storedTokenValidTill:',
+      storedTokenValidTill,
+    );
 
     if (storedToken && storedTokenValidTill && new Date(storedTokenValidTill) > new Date()) {
       this.token = storedToken;
@@ -145,15 +148,15 @@ class DevERPService {
 
   async getAuth(): Promise<string> {
     await this.checkNetwork();
-    console.log("🚀 ~ DevERPService ~  this.appid ~  this.appid:",  this.appid)
+    console.log('🚀 ~ DevERPService ~  this.appid ~  this.appid:', this.appid);
 
     const tokenData: TokenRequest = { appid: this.appid, device: this.device };
-    console.log("🚀 ~ DevERPService ~ getAuth ~ tokenData:", tokenData)
+    console.log('🚀 ~ DevERPService ~ getAuth ~ tokenData:', tokenData);
     const response = await apiClient.post<TokenResponse>(
       `${this.link}msp_api.aspx/getAuth`,
       tokenData,
     );
-    console.log("🚀 ~ DevERPService ~ getAuth ~ response:", response)
+    console.log('🚀 ~ DevERPService ~ getAuth ~ response:', response);
 
     if (String(response.data.success) !== '1')
       throw new Error(response.data.message || 'Failed to get token');
@@ -277,10 +280,15 @@ class DevERPService {
     return this.apiCall<any>('msp_api.aspx/getLastPunchIn', { token: this.token });
   }
 
-   getLastPunchList(id: any) {
-    return this.apiCall<any>('msp_api.aspx/getListData', { token: this.token, page: 'punchin', id });
+  getLastPunchList(id: any, fd: any, td: any) {
+    return this.apiCall<any>('msp_api.aspx/getListData', {
+      token: this.token,
+      page: 'PunchIn',
+      id,
+      fd: fd,
+      td: td,
+    });
   }
-
 
   async handlePageAction(action: string, id: string, remarks: string, page: string) {
     return this.apiCall<any>(`msp_api.aspx/${action}`, {
@@ -320,14 +328,14 @@ class DevERPService {
     AsyncStorage.setItem('erp_token', token);
   }
   setDevice(device: string) {
-    console.log("🚀 ~ DevERPService ~ setDevice ~ device:", device)
-    AsyncStorage.setItem('device',device)
+    console.log('🚀 ~ DevERPService ~ setDevice ~ device:', device);
+    AsyncStorage.setItem('device', device);
 
     this.device = device;
   }
   setAppId(appId: string) {
-    console.log("🚀 ~ DevERPService ~ setAppId ~ appId:", appId)
-    AsyncStorage.setItem('erp_appid',appId)
+    console.log('🚀 ~ DevERPService ~ setAppId ~ appId:', appId);
+    AsyncStorage.setItem('erp_appid', appId);
     this.appid = appId;
   }
 }

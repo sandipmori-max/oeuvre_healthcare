@@ -130,39 +130,34 @@ const Media = ({ item, handleAttachment, infoData, baseLink, isFromNew }: any) =
             {loadingSmall && (
               <ActivityIndicator style={StyleSheet.absoluteFill} size="small" color="#000" />
             )}
-          <View style={{ width: 100, height: 100 }}>
-  {loadingSmall && (
-    <ActivityIndicator style={StyleSheet.absoluteFill} size="small" color="#000" />
-  )}
+            <View style={{ width: 100, height: 100 }}>
+              {loadingSmall && (
+                <ActivityIndicator style={StyleSheet.absoluteFill} size="small" color="#000" />
+              )}
 
-  {isFromNew ? (
-    <Image
-       source={
-      imageUri
-        ? { uri: imageUri }
-        : !isFromNew
-        ? { uri: getImageUri('small') } 
-        : ERP_ICON.APP_LOGO 
-    }
-      style={styles.imageThumb}
-      resizeMode="contain"
-    />
-  ) : (
-    <Image
-      key={item.field}
-      source={
-        imageUri
-          ? { uri: imageUri }
-          : { uri: getImageUri('small') } 
-      }
-      style={styles.imageThumb}
-      onLoadStart={() => !imageUri && setLoadingSmall(true)}
-      onLoadEnd={() => setLoadingSmall(false)}
-      resizeMode="cover"
-    />
-  )}
-</View>
-
+              {isFromNew ? (
+                <Image
+                  source={
+                    imageUri
+                      ? { uri: imageUri }
+                      : !isFromNew
+                      ? { uri: getImageUri('small') }
+                      : ERP_ICON.APP_LOGO
+                  }
+                  style={styles.imageThumb}
+                  resizeMode="contain"
+                />
+              ) : (
+                <Image
+                  key={item.field}
+                  source={imageUri ? { uri: imageUri } : { uri: getImageUri('small') }}
+                  style={styles.imageThumb}
+                  onLoadStart={() => !imageUri && setLoadingSmall(true)}
+                  onLoadEnd={() => setLoadingSmall(false)}
+                  resizeMode="cover"
+                />
+              )}
+            </View>
           </View>
         </TouchableOpacity>
 
@@ -310,7 +305,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
-    marginHorizontal: 10, 
+    marginHorizontal: 10,
   },
   optionLabel: {
     marginTop: 6,

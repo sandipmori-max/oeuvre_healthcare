@@ -33,6 +33,7 @@ import { parseCustomDatePage } from '../../../utils/helpers';
 import DateRow from './components/Date';
 import BoolInput from './components/BoolInput';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import SignaturePad from './components/SignaturePad';
 
 type PageRouteParams = { PageScreen: { item: any } };
 
@@ -41,7 +42,7 @@ const PageScreen = () => {
   const dispatch = useAppDispatch();
   const { pageError } = useAppSelector(state => state.auth);
   console.log('🚀 ~ PageScreen ~ -----------------------------pageError:', pageError);
-const flatListRef = useRef<FlatList>(null);
+  const flatListRef = useRef<FlatList>(null);
 
   const [loadingPageId, setLoadingPageId] = useState<string | null>(null);
   const [controls, setControls] = useState<any[]>([]);
@@ -249,15 +250,20 @@ const flatListRef = useRef<FlatList>(null);
 
   const handleAttachment = (base64: string, val: any) => {
     setFormValues(prev => {
-      if (typeof val === 'object' && val !== null && val.field) {
-        return { ...prev, [val.field]: base64 };
-      }
-      return { ...prev, image: base64 };
+       return { ...prev, [val]: base64 };
+    });
+  };
+
+   const handleSignatureAttachment = (base64: string, val: any) => {
+    console.log("🚀 ~ handleSignatureAttachment ~ base64:", base64)
+    setFormValues(prev => {
+     return { ...prev, [val]: base64 };
     });
   };
 
   const renderItem = useCallback(
     ({ item, index }: { item: any; index: number }) => {
+      console.log('🚀 ~ item:--------------------------', item);
       const setValue = (val: any) => {
         if (typeof val === 'object' && val !== null) {
           setFormValues(prev => ({ ...prev, ...val }));
@@ -282,6 +288,8 @@ const flatListRef = useRef<FlatList>(null);
             onChange={val => setValue({ [item.field]: val })}
           />
         );
+      } else if (item?.ctltype === 'IMAGE' && item?.field === 'signimg') {
+        content = <SignaturePad item={item} handleSignatureAttachment={handleSignatureAttachment}/>;
       } else if (item?.ctltype === 'IMAGE' || item?.ctltype === 'PHOTO') {
         content = (
           <Media
@@ -324,9 +332,15 @@ const flatListRef = useRef<FlatList>(null);
           <DateRow item={item} errors={errors} value={value} showDatePicker={showDatePicker} />
         );
       } else {
-        content = <Input
-         onFocus={() => flatListRef.current?.scrollToIndex({ index, animated: true })}
-        item={item} errors={errors} value={value} setValue={setValue} />;
+        content = (
+          <Input
+            onFocus={() => flatListRef.current?.scrollToIndex({ index, animated: true })}
+            item={item}
+            errors={errors}
+            value={value}
+            setValue={setValue}
+          />
+        );
       }
 
       return (
@@ -394,7 +408,7 @@ const flatListRef = useRef<FlatList>(null);
             <FlatList
               showsVerticalScrollIndicator={false}
               data={controls}
-                ref={flatListRef}
+              ref={flatListRef}
               keyExtractor={(it, idx) => it?.dtlid || idx?.toString()}
               renderItem={renderItem}
               contentContainerStyle={{ paddingBottom: keyboardHeight }}
