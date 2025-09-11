@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useLayoutEffect, useCallback } from 'react';
-import { View, Platform, FlatList, Text, TouchableOpacity, Alert } from 'react-native';
+import { View, Platform, FlatList, Text, TouchableOpacity, Alert, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useNavigation } from '@react-navigation/native';
 
@@ -165,13 +165,15 @@ const AttendanceScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
+  <TouchableWithoutFeedback onPress={() => {
+    Keyboard.dismiss()
+  }}>
+      <View style={styles.container}>
       {isLoading ? (
         <FullViewLoader />
       ) : (
         <>
           
-         
           {showDateFilter && (
             <View style={styles.dateContainer}>
               <View style={styles.dateRow}>
@@ -249,6 +251,7 @@ const AttendanceScreen = () => {
         </>
       )}
     </View>
+  </TouchableWithoutFeedback>
   );
 };
 
