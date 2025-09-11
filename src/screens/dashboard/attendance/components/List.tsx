@@ -15,6 +15,7 @@ import { PieChart } from 'react-native-gifted-charts';
 import { ERP_COLOR_CODE } from '../../../../utils/constants';
 import { useAppDispatch } from '../../../../store/hooks';
 import { getERPListDataThunk } from '../../../../store/slices/auth/thunk';
+import FullViewLoader from '../../../../components/loader/FullViewLoader';
 
 const FILTERS = [
   { key: 'all', label: 'All' },
@@ -147,7 +148,7 @@ const List = ({ selectedMonth, showFilter, fromDate, toDate }: any) => {
   }, [fromDate, toDate, fetchListData]);
 
   // ---- Filters ----
-  let data = listData.length > 0 && [...listData];
+  let data = listData?.length > 0 ? [...listData] : [];
   if (data && activeFilter !== 'all') {
     switch (activeFilter) {
       case 'leave':
@@ -171,11 +172,10 @@ const List = ({ selectedMonth, showFilter, fromDate, toDate }: any) => {
     }
   }
 
-  // ---- Stats for PieChart ----
-  const total = listData.length;
-  const leave = listData.filter(i => i.status?.toLowerCase() === 'leave').length;
-  const late = listData.filter(i => i.intime && isLatePunchIn(i.intime)).length;
-  const lessHours = listData.filter(i => {
+  const total = listData.length > 0 && listData?.length;
+  const leave = listData.length > 0 && listData?.filter(i => i.status?.toLowerCase() === 'leave').length;
+  const late = listData.length > 0 && listData?.filter(i => i.intime && isLatePunchIn(i.intime)).length;
+  const lessHours = listData.length > 0 && listData?.filter(i => {
     if (!i.intime || !i.outtime) return false;
     return getWorkedHours(i.intime, i.outtime) < 8.5;
   }).length;
@@ -190,7 +190,6 @@ const List = ({ selectedMonth, showFilter, fromDate, toDate }: any) => {
 
   return (
     <View style={{ flex: 1, backgroundColor: '#fff' }}>
-      {/* Filters */}
       <View>
         {showFilter && (
           <ScrollView
@@ -234,8 +233,7 @@ const List = ({ selectedMonth, showFilter, fromDate, toDate }: any) => {
         showsVerticalScrollIndicator={false}
         renderItem={() => (
           <>
-            {/* PieChart */}
-            {listData.length > 0 && (
+            {listData?.length > 0 && (
               <View style={{ 
                 justifyContent:'space-around',
                 padding: 16, alignItems: 'center', flexDirection: 'row' }}>
@@ -270,8 +268,8 @@ const List = ({ selectedMonth, showFilter, fromDate, toDate }: any) => {
 
             {/* List Data */}
             {isLoading ? (
-              <Text style={{ textAlign: 'center', marginTop: 20 }}>Loading...</Text>
-            ) : data.length === 0 ? (
+              <FullViewLoader />
+            ) : data?.length === 0 ? (
               <View
                 style={{
                   height: Dimensions.get('screen').height * 0.45,
