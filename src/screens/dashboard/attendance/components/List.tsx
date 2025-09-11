@@ -38,8 +38,8 @@ const styles = StyleSheet.create({
     borderWidth: 0.5,
   },
   recordAvatar: { width: 50, height: 50, borderRadius: 25 },
-  recordName: { fontWeight: '600', fontSize: 16 },
-  recordDateTime: { fontSize: 12, color: '#666' },
+  recordName: {  fontSize: 16 },
+  recordDateTime: {fontWeight: '600', fontSize: 12, color: '#000' },
   recordPunchTime: { fontSize: 14, color: '#333' },
   statusBadgeRed: {
     backgroundColor: '#fa1b1bff',
@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
   },
 });
 
-const List = ({ selectedMonth, showFilter }: any) => {
+const List = ({ selectedMonth, showFilter, fromDate, toDate }: any) => {
   const [activeFilter, setActiveFilter] = useState('all');
   const [isLoading, setIsLoading] = useState(false);
   const [listData, setListData] = useState<any[]>([]);
@@ -141,12 +141,14 @@ const List = ({ selectedMonth, showFilter }: any) => {
   );
 
   useEffect(() => {
-    fetchListData('01-aug-2025', '10-sep-2025');
-  }, [dispatch]);
+    if (fromDate && toDate) {
+      fetchListData(fromDate, toDate);
+    }
+  }, [fromDate, toDate, fetchListData]);
 
   // ---- Filters ----
-  let data = [...listData];
-  if (activeFilter !== 'all') {
+  let data = listData.length > 0 && [...listData];
+  if (data && activeFilter !== 'all') {
     switch (activeFilter) {
       case 'leave':
         data = data.filter(item => item.status?.toLowerCase() === 'leave');
@@ -234,14 +236,18 @@ const List = ({ selectedMonth, showFilter }: any) => {
           <>
             {/* PieChart */}
             {listData.length > 0 && (
-              <View style={{ padding: 16, alignItems: 'center', flexDirection: 'row' }}>
+              <View style={{ 
+                justifyContent:'space-around',
+                padding: 16, alignItems: 'center', flexDirection: 'row' }}>
                 <PieChart
                   data={chartData}
                   donut
                   radius={90}
                   innerRadius={60}
                   centerLabelComponent={() => (
-                    <Text style={{ fontSize: 18, fontWeight: '600' }}>{total + `\n`} Days</Text>
+                    <Text style={{ 
+                      textAlign:'center',
+                      fontSize: 18, fontWeight: '600' }}>{total + `\n`} Days</Text>
                   )}
                 />
                 <View style={{ marginTop: 12, gap: 12, marginHorizontal: 20 }}>

@@ -19,13 +19,24 @@ const AttendanceScreen = () => {
   const dispatch = useAppDispatch();
 
   const [resData, setResData] = useState<any>();
-  const [selectedDate, setSelectedDate] = useState(new Date());
+const [selectedDate, setSelectedDate] = useState(new Date());
   const [showPicker, setShowPicker] = useState(false);
   const [showFilter, setShowFilter] = useState(false);
   const [blockAction, setBlockAction] = useState(false);
   const [refresh, setRefresh] = useState(false);
   const [actionLoader, setActionLoader] = useState(false);
   const [error, setError] = useState<any>('');
+
+
+  const getMonthStartEnd = (date: Date) => {
+  const start = new Date(date.getFullYear(), date.getMonth(), 1);
+  const end = new Date(date.getFullYear(), date.getMonth() + 1, 0); // last day of month
+  const format = (d: Date) => d.toISOString().split('T')[0]; // YYYY-MM-DD
+  return { startDate: format(start), endDate: format(end) };
+};
+
+const { startDate, endDate } = getMonthStartEnd(selectedDate);
+
 
   const formattedMonth = `${selectedDate.getFullYear()}-${(selectedDate.getMonth() + 1)
     .toString()
@@ -116,7 +127,13 @@ const AttendanceScreen = () => {
         <>
           {isListVisible ? (
             <View style={{ flex: 1 }}>
-              <List selectedMonth={formattedMonth} showFilter={showFilter} />
+             <List
+  selectedMonth={formattedMonth}
+  showFilter={showFilter}
+  fromDate={startDate}
+  toDate={endDate}
+/>
+
               {showPicker && (
                 <DateTimePicker
                   value={selectedDate}
