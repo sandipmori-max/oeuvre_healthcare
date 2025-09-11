@@ -1,5 +1,5 @@
-import React, { useLayoutEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
+import React, { useEffect, useLayoutEffect, useState } from 'react';
+import { View, Text, TouchableOpacity, ScrollView, Image } from 'react-native';
 
 import AccountSwitcher from './components/AccountSwitcher';
 import { styles } from './profile_style';
@@ -9,6 +9,8 @@ import { firstLetterUpperCase, formatDateHr } from '../../../../utils/helpers';
 import AddAccountScreen from '../../add_account/AddAccountScreen';
 import ERPIcon from '../../../../components/icon/ERPIcon';
 import MaterialIcons from '@react-native-vector-icons/material-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import FastImage from 'react-native-fast-image';
 
 const ProfileTab = () => {
   const navigation = useNavigation<any>();
@@ -16,12 +18,33 @@ const ProfileTab = () => {
   console.log('🚀 ~ ProfileTab ~ user:', user);
   const [showAccountSwitcher, setShowAccountSwitcher] = useState(false);
   const [showAddAccount, setShowAddAccount] = useState(false);
+  const [baseLink, setBaseLink] = useState<string>('');
 
   const handleAddAccount = () => {
     setShowAccountSwitcher(false);
     setShowAddAccount(true);
   };
 
+  useEffect(() => {
+    let isMounted = true;
+    (async () => {
+      try {
+        const [storedLink] = await Promise.all([AsyncStorage.getItem('erp_link')]);
+
+        if (isMounted) {
+          let normalizedBase = (storedLink || '').replace(/\/+$/, '') + '';
+          normalizedBase = normalizedBase.replace(/\/devws\/?/, '/');
+          normalizedBase = normalizedBase.replace(/^https:\/\//i, 'http://');
+          setBaseLink(normalizedBase || '');
+        }
+      } catch (e) {
+        console.error('Error loading stored data:', e);
+      }
+    })();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
   const activeAccount = accounts.find(acc => acc.user.id === user?.id);
 
   useLayoutEffect(() => {
@@ -37,7 +60,7 @@ const ProfileTab = () => {
           <ERPIcon
             name="settings"
             onPress={() => {
-              navigation.navigate('Settings')
+              navigation.navigate('Settings');
             }}
           />
         </>
@@ -72,7 +95,14 @@ const ProfileTab = () => {
           >
             <View style={styles.profileHeader}>
               <View style={styles.profileAvatar}>
-                <MaterialIcons name={'person'} color={'#000'} size={40} />
+                <FastImage
+                  source={{
+                    uri: `${baseLink}/FileUpload/1/UserMaster/${user?.id}/profileimage.jpeg`,
+                    priority: FastImage.priority.normal,
+                    cache: FastImage.cacheControl.web,
+                  }}
+                  style={{ height: 56, width: 56, borderRadius: 46 }}
+                />
               </View>
               <View style={styles.profileInfo}>
                 <Text style={styles.profileName}>{firstLetterUpperCase(user?.name)}</Text>
