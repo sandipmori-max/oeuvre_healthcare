@@ -33,11 +33,11 @@ export const getLastPunchInThunk = createAsyncThunk<
 
 export const getLastPunchInList = createAsyncThunk<
   AttendanceResponse,
-  {id: any},
+  {id: any, fd: any, td: any},
   { rejectValue: string }
->('attendance/getLastPunchInList', async ({id}, { rejectWithValue }) => {
+>('attendance/getLastPunchInList', async ({id, fd, td}, { rejectWithValue }) => {
   try {
-    const response = await DevERPService.getLastPunchList(id);
+    const response = await DevERPService.getLastPunchList(id, fd, td);
     console.log("🚀 ~ response:", response)
     return response;
   } catch (error: any) {
