@@ -31,13 +31,13 @@ const CustomAlert: React.FC<CustomAlertProps> = ({
 
   const handleChangedRemarks = (val: string) => {
     setRemarks(val);
-    if (val.trim().length > 0) {
+    if (val && val.trim().length > 0) {
       setError('');
     }
   };
 
   const handleDonePress = () => {
-    if (isFromButtonList && remarks.trim() === '') {
+    if (isFromButtonList &&  remarks && remarks?.trim() === '') {
       setError('Remarks are required.');
       return;
     }
@@ -58,7 +58,7 @@ const CustomAlert: React.FC<CustomAlertProps> = ({
       <View style={styles.overlay}>
         <View style={[styles.bottomSheet, alertStyles.container]}>
           <View style={styles.header}>
-            <Text style={alertStyles.title}>{title}</Text>
+            <Text style={alertStyles.title}>{title || ''}</Text>
             <TouchableOpacity onPress={onClose} style={styles.closeIcon}>
               <Text style={styles.closeIconText}>✕</Text>
             </TouchableOpacity>
@@ -78,7 +78,7 @@ const CustomAlert: React.FC<CustomAlertProps> = ({
                   { textAlign: 'left', fontSize: 14, fontWeight: '800' },
                 ]}
               >
-                {message}
+                {message || ''}
               </Text>
 
               <ERPTextInput
@@ -91,12 +91,12 @@ const CustomAlert: React.FC<CustomAlertProps> = ({
                 labelStyle={[styles.inputLabel, { fontWeight: '400', fontSize: 12 }]}
                 inputStyle={[styles.input,]}
               />
-              {error ? <Text style={{ color: ERP_COLOR_CODE.ERP_ERROR }}>{error}</Text> : null}
+              {error ? <Text style={{ color: ERP_COLOR_CODE.ERP_ERROR }}>{error || ''}</Text> : null}
             </View>
           ) : (
             <>
               {' '}
-              <Text style={alertStyles.message}>{message}</Text>
+              <Text style={alertStyles.message}>{message || ''}</Text>
             </>
           )}
 

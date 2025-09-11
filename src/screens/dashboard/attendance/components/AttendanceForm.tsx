@@ -1,5 +1,5 @@
-import { View, Text, Image, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native';
-import React, { useEffect, useState } from 'react';
+import { View, Text, Image, TextInput } from 'react-native';
+import React, { useState } from 'react';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import Geolocation from '@react-native-community/geolocation';
@@ -48,18 +48,14 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
       },
       response => {
         if (response.didCancel || response.errorCode) {
-          console.log('User cancelled or error:', response.errorMessage);
           setLocationLoading(false);
           setBlockAction(false);
           return;
         }
 
-        const photoUri = response.assets?.[0]?.uri;
-        console.log('🚀 ~ openCamera ~ photoUri:', response);
-        const asset = response.assets?.[0];
+        const photoUri = response?.assets?.[0]?.uri;
+        const asset = response?.assets?.[0];
         if (!photoUri) return;
-        console.log('🚀 ~ openCamera ~ photoUri:', photoUri);
-
         if (asset?.base64) {
           setFieldValue(
             'imageBase64',
@@ -85,7 +81,6 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
     if (locationLoading) return;
 
     const hasPermission = await requestCameraAndLocationPermission();
-    console.log('🚀 ~ handleStatusToggle ~ hasPermission:', hasPermission);
     if (!hasPermission) {
       setAlertConfig({
         title: t('errors.permissionRequired'),
@@ -99,9 +94,6 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
     setLocationLoading(true);
 
     const getLocationWithRetry = () => {
-      let watchId: number | null = null;
-      console.log('🚀 ~ getLocationWithRetry ~ watchId:', watchId);
-
       Geolocation.getCurrentPosition(
         position => {
           const { latitude, longitude } = position.coords;
@@ -111,7 +103,6 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
           openCamera(setFieldValue, handleSubmit);
         },
         error => {
-          console.error('Location error', error);
           setAlertConfig({
             title: t('errors.locationError'),
             message: error.message || 'Unable to fetch location',
@@ -161,7 +152,6 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
           )
             .unwrap()
             .then(res => {
-              console.log('✅ API Success:', res);
               setAttendanceDone(true);
               setAlertConfig({
                 title: 'Success',
@@ -173,7 +163,6 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
               setBlockAction(false);
             })
             .catch(err => {
-              console.log('❌ API Error:', err);
               setAttendanceDone(false);
               setAlertConfig({
                 title: 'Error',

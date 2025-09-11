@@ -81,7 +81,6 @@ const List = ({ selectedMonth, showFilter, fromDate, toDate }: any) => {
   const dispatch = useAppDispatch();
   const [parsedError, setParsedError] = useState<any>() 
 
-  // ---- Utility functions ----
   const getWorkedHours = (punchIn: string, punchOut: string): number => {
     if (!punchIn || !punchOut) return 0;
     const [inH, inM] = punchIn.split(':').map(Number);

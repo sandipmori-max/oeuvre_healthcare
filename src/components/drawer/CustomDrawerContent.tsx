@@ -23,25 +23,9 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
       {...props}
       contentContainerStyle={{ flex: 1, backgroundColor: theme === 'dark' ? 'black' : 'white' }}
     >
-        {/* <View
-        style={{
-          top: 2,
-          right: 0, 
-          alignContent: 'flex-end',
-          alignItems: 'flex-end',
-        }}
-      >
-        <TouchableOpacity
-          onPress={() => {
-            props.navigation.closeDrawer();
-          }}
-        >
-          <ERPIcon color="#000" name="close" />
-        </TouchableOpacity>
-      </View> */}
+       
       <View style={[styles.header,]}>
 
-      
         <Image
           source={{ uri: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=600' }}
           style={styles.profileImage}
@@ -109,24 +93,24 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
 
       <View style={styles.menuContainer}>
         {ERP_DRAWER_LIST.map(item => {
-          const isActive = currentRoute === item.route;
+          const isActive = currentRoute === item?.route;
           return (
             <TouchableOpacity
-              key={item.route}
+              key={item?.route}
               style={[styles.drawerItem, isActive && styles.activeItemBackground]}
               onPress={() => {
-                if (item.route === 'Home') {
-                  props.navigation.navigate('Home', { screen: 'Home' });
-                  props.navigation.closeDrawer();
+                if (item?.route === 'Home') {
+                  props?.navigation.navigate('Home', { screen: 'Home' });
+                  props?.navigation.closeDrawer();
                   return;
                 } else {
-                  props.navigation.closeDrawer();
-                  navigation.navigate(item.route as never);
+                  props?.navigation.closeDrawer();
+                  navigation.navigate(item?.route as never);
                 }
               }}
             >
               <View style={styles.itemRow}>
-                <MaterialIcons name={`${item.icon}`} color={isActive ? '#fff' : '#000'} size={20} />
+                <MaterialIcons name={`${item?.icon}`} color={isActive ? '#fff' : '#000'} size={20} />
                 <Text
                   style={[
                     styles.itemLabel,
@@ -136,7 +120,7 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
                     },
                   ]}
                 >
-                  {item.label}
+                  {item?.label}
                 </Text>
               </View>
             </TouchableOpacity>

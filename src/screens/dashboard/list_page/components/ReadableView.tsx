@@ -16,7 +16,6 @@ const ReadableView = ({
   loadingListId,
   totalAmount,
   pageParamsName,
-  handleItemPressed,
   pageName,
   handleActionButtonPressed,
 }: any) => {
@@ -52,7 +51,6 @@ const ReadableView = ({
   }, []);
 
   const RenderCard = ({ item, index }: any) => {
-    console.log('🚀 ~ RenderCard ~ item:-------------------------', item.image);
     if (!item) return null;
     const name = item?.name || `Item #${index + 1}`;
     const subName = item?.number || `Item #${index + 1}`;
