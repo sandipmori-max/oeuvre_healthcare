@@ -42,6 +42,7 @@ const ListScreen = () => {
   const [filteredData, setFilteredData] = useState<any[]>([]);
   const [alertVisible, setAlertVisible] = useState(false);
   const [actionLoaders, setActionLoader] = useState(false);
+  const [parsedError, setParsedError] = useState<any>() 
 
   const [alertConfig, setAlertConfig] = useState({
     title: '',
@@ -265,6 +266,7 @@ const ListScreen = () => {
       } catch (e: any) {
         console.log('Failed to load list data:', e);
         setError(e || 'Failed to load list data');
+        setParsedError(e)
       } finally {
         setLoadingListId(null);
         setTimeout(() => {
@@ -311,6 +313,12 @@ const ListScreen = () => {
     });
     setAlertVisible(true);
   };
+
+   if(parsedError){
+      return <View style={{flex: 1, }}>
+        <Text>{JSON.stringify(parsedError)}</Text>
+      </View>
+    }
   return (
     <View style={styles.container}>
       {isFilterVisible && (
