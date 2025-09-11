@@ -45,7 +45,7 @@ const LoginScreen = ({ navigation, route }: any) => {
     fetchDeviceName();
 
     const keyboardDidShow = Keyboard.addListener('keyboardDidShow', (e) => {
-      setKeyboardHeight(e.endCoordinates.height + 10); // 👈 keyboard height + 10
+      setKeyboardHeight(e.endCoordinates.height + 10);
     });
     const keyboardDidHide = Keyboard.addListener('keyboardDidHide', () => {
       setKeyboardHeight(0);
@@ -118,7 +118,7 @@ const LoginScreen = ({ navigation, route }: any) => {
                 message={alertConfig.message}
                 type={alertConfig.type}
                 onClose={() => setAlertVisible(false)}
-              />
+                actionLoader={undefined}              />
             </>
           )}
         />

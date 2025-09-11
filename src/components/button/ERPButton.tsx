@@ -4,7 +4,7 @@ import { ERPButtonProps } from './type';
 import { styles } from './style';
 
 const ERPButton: React.FC<ERPButtonProps> = ({
-  text,
+  text = '',
   onPress,
   color = '#007bff',
   disabled = false,

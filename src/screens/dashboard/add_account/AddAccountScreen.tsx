@@ -5,9 +5,7 @@ import {
   TextInput,
   TouchableOpacity,
   Modal,
-  ActivityIndicator,
   Image,
-  ScrollView,
   FlatList,
 } from 'react-native';
 import { Formik } from 'formik';
@@ -22,7 +20,6 @@ import { ERP_ICON } from '../../../assets';
 import { DevERPService } from '../../../services/api';
 import { useApi } from '../../../hooks/useApi';
 import CustomAlert from '../../../components/alert/CustomAlert';
-import { generateGUID } from '../../../utils/helpers';
 import { getMessaging } from '@react-native-firebase/messaging';
 import useFcmToken from '../../../hooks/useFcmToken';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -103,10 +100,6 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
           firebaseid: currentFcmToken,
         }),
       );
-      console.log(
-        '🚀0🚀0🚀0🚀0🚀00🚀🚀0🚀0🚀0🚀0🚀00🚀🚀0🚀0🚀0🚀0🚀0🚀0🚀v0🚀0🚀 ~ handleAddAccount ~ loginResult:',
-        loginResult,
-      );
 
       if (!loginResult || loginResult?.success !== 1) {
         setAlertConfig({
@@ -129,10 +122,10 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
         loginUserThunk({
           newToken: loginResult?.token,
           newvalidTill: loginResult?.validtill,
-          company_code: values.company_code,
-          password: values.password,
+          company_code: values?.company_code,
+          password: values?.password,
           isAddingAccount: true,
-          user_credentials: { user: values.user, name: values.user },
+          user_credentials: { user: values?.user, name: values?.user },
           response: loginResult,
         }),
       );
@@ -141,7 +134,6 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
       onClose();
       setLoader(false);
     } catch (e: any) {
-      console.log("🚀 ~ handleAddAccount ~ e:", e)
       setAlertConfig({
         title: 'Error',
         message: e?.message || 'Something went wrong',

@@ -13,7 +13,7 @@ const BottomSheet = ({ visible, onClose, children, heightRatio = 0.6 }: BottomSh
   useEffect(() => {
     if (visible) {
       Animated.timing(translateY, {
-        toValue: screenHeight - contentHeight, // dynamic height
+        toValue: screenHeight - contentHeight,
         duration: 300,
         useNativeDriver: true,
       }).start();
