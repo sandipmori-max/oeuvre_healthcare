@@ -80,7 +80,12 @@ const HomeScreen = () => {
   const pieChartData = dashboard
     .filter(item => {
       const num = Number(item?.data);
-      return item?.data !== '' && !isNaN(num) && num > 0;
+      return (
+        item?.title !== "Attendance Code" && 
+        item?.data !== "" &&
+        !isNaN(num) &&
+        num > 0
+      );
     })
     .map((item, index) => ({
       value: Number(item.data),
