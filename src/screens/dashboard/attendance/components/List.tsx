@@ -79,6 +79,7 @@ const List = ({ selectedMonth, showFilter, fromDate, toDate }: any) => {
   const [isLoading, setIsLoading] = useState(false);
   const [listData, setListData] = useState<any[]>([]);
   const dispatch = useAppDispatch();
+  const [parsedError, setParsedError] = useState<any>() 
 
   // ---- Utility functions ----
   const getWorkedHours = (punchIn: string, punchOut: string): number => {
@@ -115,8 +116,7 @@ const List = ({ selectedMonth, showFilter, fromDate, toDate }: any) => {
     return false;
   };
 
-  // ---- API fetch ----
-  const fetchListData = useCallback(
+   const fetchListData = useCallback(
     async (fromDateStr: string, toDateStr: string) => {
       try {
         setIsLoading(true);
@@ -134,6 +134,7 @@ const List = ({ selectedMonth, showFilter, fromDate, toDate }: any) => {
         setListData(final?.data || final || []);
       } catch (e: any) {
         console.log('Failed to load list data:', e);
+        setParsedError(e)
       } finally {
         setIsLoading(false);
       }
@@ -188,6 +189,11 @@ const List = ({ selectedMonth, showFilter, fromDate, toDate }: any) => {
     { value: lessHours, color: '#ff9800', text: 'Less Hrs' },
   ];
 
+  if(parsedError){
+    return <View style={{flex: 1, }}>
+      <Text>{JSON.stringify(parsedError)}</Text>
+    </View>
+  }
   return (
     <View style={{ flex: 1, backgroundColor: '#fff' }}>
       <View>

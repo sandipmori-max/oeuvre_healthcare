@@ -16,6 +16,8 @@ import useTranslations from '../../../hooks/useTranslations';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { toggleTheme } from '../../../store/slices/theme/themeSlice';
 import MaterialIcons from '@react-native-vector-icons/material-icons';
+import { removeAccountThunk } from '../../../store/slices/auth/thunk';
+import { ERP_COLOR_CODE } from '../../../utils/constants';
 
 interface SettingItem {
   id: string;
@@ -39,6 +41,7 @@ const SettingsScreen = () => {
   const [languageModalVisible, setLanguageModalVisible] = useState(false);
   const [currentLanguage, setCurrentLanguage] = useState(getCurrentLanguage());
   const [languages, setLanguages] = useState<LanguageOption[]>(getAvailableLanguages());
+  const { user, activeAccountId } = useAppSelector(state => state.auth);
 
    const theme = useAppSelector(state => state.theme);
   const dispatch = useAppDispatch();
@@ -261,6 +264,10 @@ const SettingsScreen = () => {
     </TouchableOpacity>
   );
 
+   const handleRemovedAccount = (accountId: string) => {
+      dispatch(removeAccountThunk(accountId));
+    };
+
   return (
     <View style={styles.container}>
       {/* Scrollable Content */}
@@ -362,13 +369,23 @@ const SettingsScreen = () => {
         </View>
       </Modal>
 
-      <CustomAlert
+       
+
+         <CustomAlert
         visible={alertVisible}
         title={alertConfig.title}
         message={alertConfig.message}
         type={alertConfig.type}
         onClose={() => setAlertVisible(false)}
+        onCancel={() => setAlertVisible(false)}
+        onDone={() => {
+          handleRemovedAccount(user?.id);
+        }}
+        doneText="Logout"
+        color={ERP_COLOR_CODE.ERP_ERROR}
+        actionLoader={undefined}
       />
+
     </View>
   );
 };
