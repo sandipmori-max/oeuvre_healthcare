@@ -359,16 +359,24 @@ const ListScreen = () => {
           {showDatePicker?.show && (
             <DateTimePicker
               value={
-                showDatePicker?.type === 'from' && fromDate ? parseCustomDate(fromDate) : new Date()
+                showDatePicker?.type === 'from' && fromDate
+                  ? parseCustomDate(fromDate)
+                  : showDatePicker?.type === 'to' && toDate
+                  ? parseCustomDate(toDate)
+                  : new Date()
               }
               mode="date"
               onChange={handleDateChange}
               minimumDate={
-                showDatePicker?.type === 'from'
-                  ? new Date(new Date().getFullYear(), new Date().getMonth(), 1)
+                showDatePicker?.type === 'to' && fromDate
+                  ? parseCustomDate(fromDate) 
+                  : new Date(new Date().getFullYear(), 0, 1) 
+              }
+              maximumDate={
+                showDatePicker?.type === 'from' && toDate
+                  ? parseCustomDate(toDate) 
                   : new Date()
               }
-              maximumDate={showDatePicker?.type === 'from' ? new Date() : undefined}
             />
           )}
         </View>

@@ -249,6 +249,8 @@ const PageScreen = () => {
   }, [fetchPageData]);
 
   const handleAttachment = (base64: string, val: any) => {
+    console.log("🚀 ~ handleAttachment ~ val:", val)
+    console.log("🚀 ~ handleAttachment ~ base64:", base64)
     setFormValues(prev => {
        return { ...prev, [val]: base64 };
     });

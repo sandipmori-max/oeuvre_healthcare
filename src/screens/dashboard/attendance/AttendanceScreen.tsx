@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useLayoutEffect } from 'react';
-import { View, Platform, FlatList } from 'react-native';
+import React, { useState, useEffect, useLayoutEffect, useCallback } from 'react';
+import { View, Platform, FlatList, Text, TouchableOpacity, Alert } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useNavigation } from '@react-navigation/native';
 
@@ -11,6 +11,7 @@ import AttendanceForm from './components/AttendanceForm';
 import { useAppDispatch } from '../../../store/hooks';
 import { getLastPunchInThunk } from '../../../store/slices/attendance/thunk';
 import ErrorMessage from '../../../components/error/Error';
+import { formatDateForAPI, parseCustomDate } from '../../../utils/helpers';
 
 const AttendanceScreen = () => {
   const navigation = useNavigation<any>();
@@ -19,24 +20,33 @@ const AttendanceScreen = () => {
   const dispatch = useAppDispatch();
 
   const [resData, setResData] = useState<any>();
-const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState(new Date());
   const [showPicker, setShowPicker] = useState(false);
+  const [showDateFilter, setShowDateFilter] = useState(false);
+
   const [showFilter, setShowFilter] = useState(false);
   const [blockAction, setBlockAction] = useState(false);
   const [refresh, setRefresh] = useState(false);
   const [actionLoader, setActionLoader] = useState(false);
   const [error, setError] = useState<any>('');
 
+  const [fromDate, setFromDate] = useState<string>('');
+  const [toDate, setToDate] = useState<string>('');
+  const [showDatePicker, setShowDatePicker] = useState<null | {
+    type: 'from' | 'to';
+    show: boolean;
+  }>(null);
 
-  const getMonthStartEnd = (date: Date) => {
-  const start = new Date(date.getFullYear(), date.getMonth(), 1);
-  const end = new Date(date.getFullYear(), date.getMonth() + 1, 0); // last day of month
-  const format = (d: Date) => d.toISOString().split('T')[0]; // YYYY-MM-DD
-  return { startDate: format(start), endDate: format(end) };
-};
-
-const { startDate, endDate } = getMonthStartEnd(selectedDate);
-
+  const getCurrentMonthRange = useCallback(() => {
+    const now = new Date();
+    const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+    const lastDay = new Date();
+    const fromDateStr = formatDateForAPI(firstDay);
+    const toDateStr = formatDateForAPI(lastDay);
+    setFromDate(fromDateStr);
+    setToDate(toDateStr);
+    return { fromDate: fromDateStr, toDate: toDateStr };
+  }, []);
 
   const formattedMonth = `${selectedDate.getFullYear()}-${(selectedDate.getMonth() + 1)
     .toString()
@@ -75,9 +85,7 @@ const { startDate, endDate } = getMonthStartEnd(selectedDate);
             <ERPIcon
               name="date-range"
               onPress={() => {
-                if (!blockAction) {
-                  setShowPicker(!showPicker);
-                }
+                 setShowDateFilter(!showDateFilter);
               }}
             />
           )}
@@ -92,7 +100,7 @@ const { startDate, endDate } = getMonthStartEnd(selectedDate);
         </>
       ),
     });
-  }, [navigation, isListVisible, showPicker, showFilter, blockAction, refresh, actionLoader]);
+  }, [navigation, isListVisible, showPicker, showFilter, blockAction, refresh, actionLoader, showDateFilter]);
 
   const checkAttendance = () => {
     setIsLoading(true);
@@ -113,26 +121,111 @@ const { startDate, endDate } = getMonthStartEnd(selectedDate);
       });
   };
   useEffect(() => {
+    getCurrentMonthRange();
     checkAttendance();
-  }, [dispatch, refresh]);
+  }, [refresh]);
 
   if (error && error !== '') {
     <ErrorMessage message={error} />;
   }
+
+  const handleDateChange = (event: any, selectedDate?: Date) => {
+    if (event.type === 'dismissed' || !selectedDate) {
+      setShowDatePicker(null);
+      return;
+    }
+    const { type } = showDatePicker!;
+    const formattedDate = formatDateForAPI(selectedDate);
+
+    if (type === 'to') {
+      const today = new Date();
+      today.setHours(23, 59, 59, 999);
+
+      if (fromDate) {
+        const fromDateObj = new Date(fromDate.split('-').reverse().join('-'));
+        if (selectedDate < fromDateObj) {
+          Alert.alert('Invalid Date Range', 'To date cannot be before From date.', [
+            { text: 'OK' },
+          ]);
+          setShowDatePicker(null);
+          return;
+        }
+      }
+      setToDate(formattedDate);
+    } else {
+      setFromDate(formattedDate);
+      if (toDate) {
+        const toDateObj = new Date(toDate.split('-').reverse().join('-'));
+        if (selectedDate > toDateObj) {
+          setToDate('');
+        }
+      }
+    }
+    setShowDatePicker(null);
+  };
+
   return (
     <View style={styles.container}>
       {isLoading ? (
         <FullViewLoader />
       ) : (
         <>
+          
+         
+          {showDateFilter && (
+            <View style={styles.dateContainer}>
+              <View style={styles.dateRow}>
+                <Text style={styles.dateLabel}>From Date:</Text>
+                <TouchableOpacity
+                  onPress={() => setShowDatePicker({ type: 'from', show: true })}
+                  style={styles.dateButton}
+                >
+                  <Text style={styles.dateButtonText}>{fromDate || 'Select Date'}</Text>
+                </TouchableOpacity>
+              </View>
+              <View style={styles.dateRow}>
+                <Text style={styles.dateLabel}>To Date:</Text>
+                <TouchableOpacity
+                  onPress={() => setShowDatePicker({ type: 'to', show: true })}
+                  style={styles.dateButton}
+                >
+                  <Text style={styles.dateButtonText}>{toDate || 'Select Date'}</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          )}
+
+           {showDatePicker?.show && (
+            <DateTimePicker
+              value={
+                showDatePicker?.type === 'from' && fromDate
+                  ? parseCustomDate(fromDate)
+                  : showDatePicker?.type === 'to' && toDate
+                  ? parseCustomDate(toDate)
+                  : new Date()
+              }
+              mode="date"
+              onChange={handleDateChange}
+              minimumDate={
+                showDatePicker?.type === 'to' && fromDate
+                  ? parseCustomDate(fromDate) 
+                  : new Date(new Date().getFullYear(), 0, 1) 
+              }
+              maximumDate={
+                showDatePicker?.type === 'from' && toDate
+                  ? parseCustomDate(toDate) 
+                  : new Date()
+              }
+            />
+          )}
           {isListVisible ? (
             <View style={{ flex: 1 }}>
-             <List
-  selectedMonth={formattedMonth}
-  showFilter={showFilter}
-  fromDate={startDate}
-  toDate={endDate}
-/>
+              <List
+                selectedMonth={formattedMonth}
+                showFilter={showFilter}
+                fromDate={fromDate}
+                toDate={toDate}
+              />
 
               {showPicker && (
                 <DateTimePicker
