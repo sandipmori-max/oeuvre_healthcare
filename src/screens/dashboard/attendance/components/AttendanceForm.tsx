@@ -227,7 +227,10 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
               <View style={styles.formGroup}>
                 <Text style={styles.label}>{t('attendance.remark')}</Text>
                 <TextInput
-                  style={[styles.input]}
+                  style={[
+                    styles.input,
+                    { minHeight: 100, textAlignVertical: 'top' },
+                  ]}
                   value={values.remark}
                   onChangeText={text => setFieldValue('remark', text)}
                   placeholder={t('attendance.enterRemark')}

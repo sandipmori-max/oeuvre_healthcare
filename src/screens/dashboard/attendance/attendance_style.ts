@@ -9,7 +9,7 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginHorizontal: 16,
-    marginVertical:8,
+    marginVertical: 8,
     backgroundColor: '#fff',
   },
   dateRow: {
@@ -140,7 +140,7 @@ export const styles = StyleSheet.create({
     marginBottom: 12,
   },
   formRow: { flexDirection: 'row' },
-  label: { fontSize: 12, color: '#666', marginBottom: 6 },
+  label: { fontSize: 14, color: '#000', fontWeight: '600', marginBottom: 6 },
   input: {
     backgroundColor: '#fff',
     borderWidth: 1,
