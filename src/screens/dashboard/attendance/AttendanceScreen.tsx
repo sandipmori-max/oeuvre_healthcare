@@ -188,7 +188,9 @@ const AttendanceScreen = () => {
         Keyboard.dismiss();
       }}
     >
-      <ScrollView style={styles.container}>
+      <ScrollView 
+      showsVerticalScrollIndicator={false}
+      style={styles.container}>
         {isLoading ? (
           <View
             style={{
