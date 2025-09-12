@@ -64,9 +64,7 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
   };
 
   const renderAccount = ({ item }: { item: Account }) => {
-    console.log("🚀 ~ renderAccount ~ item:", `${baseLink}/FileUpload/1/UserMaster/${
-                item?.user?.id
-              }/profileimage.jpeg?ts=${new Date().getTime()}`)
+     
     const isActive = item?.id.toString() === activeAccountId?.toString();
     const lastLogin = formatDateHr(item?.lastLoginAt, false);
     const lastLoginHr = formatTimeTo12Hour(item?.lastLoginAt);

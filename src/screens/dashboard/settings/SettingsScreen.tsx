@@ -16,8 +16,17 @@ import useTranslations from '../../../hooks/useTranslations';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { toggleTheme } from '../../../store/slices/theme/themeSlice';
 import MaterialIcons from '@react-native-vector-icons/material-icons';
-import { removeAccountThunk } from '../../../store/slices/auth/thunk';
+import { logoutUserThunk, removeAccountThunk, switchAccountThunk } from '../../../store/slices/auth/thunk';
 import { ERP_COLOR_CODE } from '../../../utils/constants';
+import {
+  createAccountsTable,
+  getActiveAccount,
+  getDBConnection,
+  logoutUser,
+} from '../../../utils/sqlite';
+import { DevERPService } from '../../../services/api';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useApi } from '../../../hooks/useApi';
 
 interface SettingItem {
   id: string;
@@ -42,8 +51,9 @@ const SettingsScreen = () => {
   const [currentLanguage, setCurrentLanguage] = useState(getCurrentLanguage());
   const [languages, setLanguages] = useState<LanguageOption[]>(getAvailableLanguages());
   const { user, activeAccountId } = useAppSelector(state => state.auth);
+  const { execute: validateCompanyCode } = useApi();
 
-   const theme = useAppSelector(state => state.theme);
+  const theme = useAppSelector(state => state.theme);
   const dispatch = useAppDispatch();
 
   const [alertConfig, setAlertConfig] = useState({
@@ -167,11 +177,9 @@ const SettingsScreen = () => {
       case 'navigate':
         if (item.action === 'Language') {
           setLanguageModalVisible(true);
-        }
-        else if(item.title ===  t('settings.biometricAuth')){
-          navigation.navigate("PinSet")
-        }
-        else if (item.action) {
+        } else if (item.title === t('settings.biometricAuth')) {
+          navigation.navigate('PinSet');
+        } else if (item.action) {
           setAlertConfig({
             title: t('common.navigate'),
             message: `${t('common.navigate')} to ${item.action} functionality would go here`,
@@ -221,7 +229,7 @@ const SettingsScreen = () => {
     >
       <View style={styles.settingHeader}>
         <View style={styles.settingIcon}>
-                <MaterialIcons name={item?.icon} color={'#000'} size={22} />
+          <MaterialIcons name={item?.icon} color={'#000'} size={22} />
         </View>
         <View style={styles.settingInfo}>
           <Text style={styles.settingTitle}>{item.title}</Text>
@@ -230,8 +238,8 @@ const SettingsScreen = () => {
         {item.type === 'toggle' ? (
           <Switch
             value={item.value}
-            onValueChange={() =>{
-               handleToggle(item.id)
+            onValueChange={() => {
+              handleToggle(item.id);
               //  dispatch(toggleTheme())
             }}
             trackColor={{ false: '#e0e0e0', true: '#4CAF50' }}
@@ -264,9 +272,9 @@ const SettingsScreen = () => {
     </TouchableOpacity>
   );
 
-   const handleRemovedAccount = (accountId: string) => {
-      dispatch(removeAccountThunk(accountId));
-    };
+  const handleRemovedAccount = (accountId: string) => {
+    dispatch(removeAccountThunk(accountId));
+  };
 
   return (
     <View style={styles.container}>
@@ -280,9 +288,7 @@ const SettingsScreen = () => {
         <View style={styles.sectionContainer}>
           <Text style={styles.sectionTitle}>{t('settings.notifications')}</Text>
           <FlatList
-            data={settings.filter(
-              item => item.id === '1' || item.id === '2',
-            )}
+            data={settings.filter(item => item.id === '1' || item.id === '2')}
             renderItem={renderSettingItem}
             keyExtractor={item => item.id}
             scrollEnabled={false}
@@ -303,11 +309,7 @@ const SettingsScreen = () => {
           <Text style={styles.sectionTitle}>{t('settings.security')}</Text>
           <FlatList
             data={settings.filter(
-              item =>
-                item.id === '4' ||  
-                item.id === '5' || 
-                item.id === '6' || 
-                item.id === '7',
+              item => item.id === '4' || item.id === '5' || item.id === '6' || item.id === '7',
             )}
             renderItem={renderSettingItem}
             keyExtractor={item => item.id}
@@ -319,11 +321,7 @@ const SettingsScreen = () => {
           <Text style={styles.sectionTitle}>{t('settings.general')}</Text>
           <FlatList
             data={settings.filter(
-              item =>
-                item.id === '8' || 
-                item.id === '9' ||  
-                item.id === '10' || 
-                item.id === '11',  
+              item => item.id === '8' || item.id === '9' || item.id === '10' || item.id === '11',
             )}
             renderItem={renderSettingItem}
             keyExtractor={item => item.id}
@@ -334,17 +332,16 @@ const SettingsScreen = () => {
         <View style={styles.sectionContainer}>
           <Text style={styles.sectionTitle}>{t('settings.account')}</Text>
           <FlatList
-            data={settings.filter(item => item.id === '12')} 
+            data={settings.filter(item => item.id === '12')}
             renderItem={renderSettingItem}
             keyExtractor={item => item.id}
             scrollEnabled={false}
           />
         </View>
 
-       
         <View style={styles.bottomSpacing} />
       </ScrollView>
- 
+
       <Modal
         visible={languageModalVisible}
         transparent
@@ -369,23 +366,45 @@ const SettingsScreen = () => {
         </View>
       </Modal>
 
-       
-
-         <CustomAlert
+      <CustomAlert
         visible={alertVisible}
         title={alertConfig.title}
         message={alertConfig.message}
         type={alertConfig.type}
         onClose={() => setAlertVisible(false)}
         onCancel={() => setAlertVisible(false)}
-        onDone={() => {
-          handleRemovedAccount(user?.id);
+        onDone={async () => {
+          const db = await getDBConnection();
+          await createAccountsTable(db);
+
+          const activeUser = await getActiveAccount(db);
+          if (activeUser) {
+            // 🔑 logoutUser now returns new active user (or null if none remain)
+            const newActiveUser = await logoutUser(db, activeUser.id);
+
+            if (newActiveUser) {
+               await DevERPService.setToken(newActiveUser.user?.token || '');
+              await AsyncStorage.setItem('erp_token', newActiveUser.user?.token || '');
+              await AsyncStorage.setItem('auth_token', newActiveUser.user?.token || '');
+              await AsyncStorage.setItem('erp_token_valid_till', newActiveUser.user?.token || '');
+
+              const validation = await validateCompanyCode(() =>
+                DevERPService.validateCompanyCode(newActiveUser.user?.company_code),
+              );
+              if (!validation?.isValid) {
+                return;
+              }
+
+              dispatch(switchAccountThunk(newActiveUser.id));
+            } else {
+              dispatch(logoutUserThunk())
+            }
+          }
         }}
         doneText="Logout"
         color={ERP_COLOR_CODE.ERP_ERROR}
         actionLoader={undefined}
       />
-
     </View>
   );
 };

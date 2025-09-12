@@ -229,8 +229,8 @@ const List = ({ selectedMonth, showFilter, fromDate, toDate }: any) => {
   }
 
   const markedDates = listData.reduce((acc, item) => {
-    const dateStr = normalizeDate(item.date); // e.g. 2025-09-12
-    let color = ERP_COLOR_CODE.ERP_APP_COLOR; // default Present
+    const dateStr = normalizeDate(item.date); 
+    let color = ERP_COLOR_CODE.ERP_APP_COLOR; 
 
     if (item.status?.toLowerCase() === 'leave') {
       color = '#f44336';
