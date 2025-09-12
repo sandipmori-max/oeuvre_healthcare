@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, Modal, FlatList, Image } from 'react-native';
 import { styles } from './components_style';
 import { useAppDispatch, useAppSelector } from '../../../../../store/hooks';
@@ -16,6 +16,7 @@ import {
   isTokenValid,
 } from '../../../../../utils/helpers';
 import MaterialIcons from '@react-native-vector-icons/material-icons';
+import FastImage from 'react-native-fast-image';
 
 interface AccountSwitcherProps {
   visible: boolean;
@@ -35,6 +36,29 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
     message: '',
     type: 'info' as 'error' | 'success' | 'info',
   });
+
+  const [baseLink, setBaseLink] = useState<string>('');
+
+  useEffect(() => {
+    let isMounted = true;
+    (async () => {
+      try {
+        const [storedLink] = await Promise.all([AsyncStorage.getItem('erp_link')]);
+
+        if (isMounted) {
+          let normalizedBase = (storedLink || '').replace(/\/+$/, '') + '';
+          normalizedBase = normalizedBase.replace(/\/devws\/?/, '/');
+          normalizedBase = normalizedBase.replace(/^https:\/\//i, 'http://');
+          setBaseLink(normalizedBase || '');
+        }
+      } catch (e) {
+        console.error('Error loading stored data:', e);
+      }
+    })();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const handleSwitchAccount = (accountId: string) => {
     if (accountId !== activeAccountId) {
@@ -104,17 +128,22 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
         }}
       >
         <View style={styles.accountContent}>
-          <Image
-            source={{ uri: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=600' }}
-            style={styles.avatar}
-          />
+          <FastImage
+  source={{
+    uri: `${baseLink}/FileUpload/1/UserMaster/${item?.user?.id}/profileimage.jpeg?ts=${new Date().getTime()}`,
+    priority: FastImage.priority.normal,
+    cache: FastImage.cacheControl.reload,
+  }}
+  style={styles.avatar}
+/>
+
           <View style={styles.accountInfo}>
             <Text style={[styles.accountName, isActive && styles.activeText]}>
               {item?.user?.name.charAt(0).toUpperCase() + item?.user?.name.slice(1)}
             </Text>
             <Text style={[styles.accountEmail, isActive && styles.activeText]}>
               {item?.user?.company_code}
-            </Text> 
+            </Text>
             <View
               style={{
                 width: isActive ? '100%' : '80%',

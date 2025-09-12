@@ -42,7 +42,7 @@ const styles = StyleSheet.create({
     borderWidth: 0.5,
   },
   recordAvatar: { width: 50, height: 50, borderRadius: 25 },
-  recordName: { fontSize: 16 },
+  recordName: { fontSize: 14 },
   recordDateTime: { fontWeight: '600', fontSize: 12, color: '#000' },
   recordPunchTime: { fontSize: 14, color: '#333' },
   statusBadgeRed: {
@@ -469,6 +469,7 @@ const List = ({ selectedMonth, showFilter, fromDate, toDate }: any) => {
                         {
                           backgroundColor:
                             item?.status?.toLowerCase() !== 'working' ? '#fff' : '#ccc',
+                          opacity: item?.status?.toLowerCase() === 'working' ? 0.5 : 1,
                         },
                       ]}
                     >
@@ -498,8 +499,8 @@ const List = ({ selectedMonth, showFilter, fromDate, toDate }: any) => {
                             marginBottom: 4,
                           }}
                         >
-                          <Text style={styles.recordName}>{item.employee}</Text>
-                          <Text style={styles.recordDateTime}>{item.date}</Text>
+                          <Text style={styles.recordName}>{item?.employee}</Text>
+                          <Text style={styles.recordDateTime}>{item?.date}</Text>
                         </View>
 
                         {!isLeaveFull && (

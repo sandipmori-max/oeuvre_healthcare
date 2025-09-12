@@ -1,5 +1,5 @@
 import { View, Text, Image, TextInput } from 'react-native';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import Geolocation from '@react-native-community/geolocation';
@@ -15,6 +15,8 @@ import { markAttendanceThunk } from '../../../../store/slices/attendance/thunk';
 import { ERP_COLOR_CODE } from '../../../../utils/constants';
 import { useNavigation } from '@react-navigation/native';
 import SlideButton from './SlideButton';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import FastImage from 'react-native-fast-image';
 
 const AttendanceForm = ({ setBlockAction, resData }: any) => {
   const { t } = useTranslations();
@@ -35,6 +37,28 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
     type: 'info' as 'error' | 'success' | 'info',
   });
 
+  const [baseLink, setBaseLink] = useState<string>('');
+
+  useEffect(() => {
+    let isMounted = true;
+    (async () => {
+      try {
+        const [storedLink] = await Promise.all([AsyncStorage.getItem('erp_link')]);
+
+        if (isMounted) {
+          let normalizedBase = (storedLink || '').replace(/\/+$/, '') + '';
+          normalizedBase = normalizedBase.replace(/\/devws\/?/, '/');
+          normalizedBase = normalizedBase.replace(/^https:\/\//i, 'http://');
+          setBaseLink(normalizedBase || '');
+        }
+      } catch (e) {
+        console.error('Error loading stored data:', e);
+      }
+    })();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
   const openCamera = (
     setFieldValue: (field: keyof AttendanceFormValues, value: any) => void,
     handleSubmit: () => void,
@@ -179,8 +203,15 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
           <View style={styles.profileCard}>
             <View style={styles.profileRow}>
               <View style={styles.imageCol}>
-                {user?.image ? (
-                  <Image source={{ uri: user?.image }} style={styles.profileAvatar} />
+                {`${baseLink}/FileUpload/1/UserMaster/${user?.id}/profileimage.jpeg` ? (
+                  <FastImage
+                    source={{
+                      uri: `${baseLink}/FileUpload/1/UserMaster/${user?.id}/profileimage.jpeg?ts=${new Date().getTime()}`,
+                      priority: FastImage.priority.normal,
+                      cache: FastImage.cacheControl.web,
+                    }}
+                    style={styles.profileAvatar}
+                  />
                 ) : (
                   <View
                     style={[
@@ -216,10 +247,7 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
               <View style={styles.formGroup}>
                 <Text style={styles.label}>{t('attendance.remark')}</Text>
                 <TextInput
-                  style={[
-                    styles.input,
-                    { minHeight: 100, textAlignVertical: 'top' },
-                  ]}
+                  style={[styles.input, { minHeight: 100, textAlignVertical: 'top' }]}
                   value={values.remark}
                   onChangeText={text => setFieldValue('remark', text)}
                   placeholder={t('attendance.enterRemark')}
