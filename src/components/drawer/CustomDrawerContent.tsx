@@ -54,9 +54,9 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
  
          <FastImage
                   source={{
-                    uri: `${baseLink}/FileUpload/1/UserMaster/${user?.id}/profileimage.jpeg`,
+                    uri: `${baseLink}/FileUpload/1/UserMaster/${user?.id}/profileimage.jpeg?ts=${new Date().getTime()}`,
                     priority: FastImage.priority.normal,
-                    cache: FastImage.cacheControl.web,
+                    cache: FastImage.cacheControl.reload,
                   }}
                     style={styles.profileImage}
                 />

@@ -50,7 +50,12 @@ const HomeScreen = () => {
       ),
       headerLeft: () => (
         <>
-          <ERPIcon extSize={24} isMenu={true} name="menu" onPress={() => navigation?.openDrawer()} />
+          <ERPIcon
+            extSize={24}
+            isMenu={true}
+            name="menu"
+            onPress={() => navigation?.openDrawer()}
+          />
         </>
       ),
     });
@@ -80,12 +85,7 @@ const HomeScreen = () => {
   const pieChartData = dashboard
     .filter(item => {
       const num = Number(item?.data);
-      return (
-        item?.title !== "Attendance Code" && 
-        item?.data !== "" &&
-        !isNaN(num) &&
-        num > 0
-      );
+      return item?.title !== 'Attendance Code' && item?.data !== '' && !isNaN(num) && num > 0;
     })
     .map((item, index) => ({
       value: Number(item.data),
@@ -94,7 +94,7 @@ const HomeScreen = () => {
     }));
 
   const renderDashboardItem = ({ item, index }: any) => {
-     return (
+    return (
       <TouchableOpacity
         key={item?.id || index}
         style={[
@@ -139,11 +139,15 @@ const HomeScreen = () => {
                       styles.dashboardItemText,
                       {
                         color: theme === 'dark' ? '#fff' : '#000',
+                        flexShrink: 1,
+                        includeFontPadding: false,
+                        textAlignVertical: 'top',
                       },
                     ]}
                     numberOfLines={2}
+                    ellipsizeMode="tail"
                   >
-                    {item?.title}
+                    {item?.title.replace(' ', '\n')}
                   </Text>
                 </View>
               </View>
@@ -170,7 +174,7 @@ const HomeScreen = () => {
                 color: accentColors[index % accentColors.length],
               }}
             >
-               {item?.footer}
+              {item?.footer}
             </Text>
           </View>
         </View>

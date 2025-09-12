@@ -1,5 +1,16 @@
 import React, { useState, useEffect, useLayoutEffect, useCallback } from 'react';
-import { View, Platform, FlatList, Text, TouchableOpacity, Alert, TouchableWithoutFeedback, Keyboard, ScrollView } from 'react-native';
+import {
+  View,
+  Platform,
+  FlatList,
+  Text,
+  TouchableOpacity,
+  Alert,
+  TouchableWithoutFeedback,
+  Keyboard,
+  ScrollView,
+  Dimensions,
+} from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useNavigation } from '@react-navigation/native';
 
@@ -85,7 +96,7 @@ const AttendanceScreen = () => {
             <ERPIcon
               name="date-range"
               onPress={() => {
-                 setShowDateFilter(!showDateFilter);
+                setShowDateFilter(!showDateFilter);
               }}
             />
           )}
@@ -100,7 +111,16 @@ const AttendanceScreen = () => {
         </>
       ),
     });
-  }, [navigation, isListVisible, showPicker, showFilter, blockAction, refresh, actionLoader, showDateFilter]);
+  }, [
+    navigation,
+    isListVisible,
+    showPicker,
+    showFilter,
+    blockAction,
+    refresh,
+    actionLoader,
+    showDateFilter,
+  ]);
 
   const checkAttendance = () => {
     setIsLoading(true);
@@ -165,93 +185,102 @@ const AttendanceScreen = () => {
   };
 
   return (
-  <TouchableWithoutFeedback onPress={() => {
-    Keyboard.dismiss()
-  }}>
+    <TouchableWithoutFeedback
+      onPress={() => {
+        Keyboard.dismiss();
+      }}
+    >
       <ScrollView style={styles.container}>
-      {isLoading ? (
-        <FullViewLoader />
-      ) : (
-        <>
-          
-          {showDateFilter && (
-            <View style={styles.dateContainer}>
-              <View style={styles.dateRow}>
-                <Text style={styles.dateLabel}>From Date:</Text>
-                <TouchableOpacity
-                  onPress={() => setShowDatePicker({ type: 'from', show: true })}
-                  style={styles.dateButton}
-                >
-                  <Text style={styles.dateButtonText}>{fromDate || 'Select Date'}</Text>
-                </TouchableOpacity>
+        {isLoading ? (
+          <View
+            style={{
+              flex: 1,
+              justifyContent: 'center',
+              alignContent: 'center',
+              alignItems: 'center',
+              height: Dimensions.get('screen').height * 0.85
+            }}
+          >
+            <FullViewLoader />
+          </View>
+        ) : (
+          <>
+            {showDateFilter && (
+              <View style={styles.dateContainer}>
+                <View style={styles.dateRow}>
+                  <Text style={styles.dateLabel}>From Date:</Text>
+                  <TouchableOpacity
+                    onPress={() => setShowDatePicker({ type: 'from', show: true })}
+                    style={styles.dateButton}
+                  >
+                    <Text style={styles.dateButtonText}>{fromDate || 'Select Date'}</Text>
+                  </TouchableOpacity>
+                </View>
+                <View style={styles.dateRow}>
+                  <Text style={styles.dateLabel}>To Date:</Text>
+                  <TouchableOpacity
+                    onPress={() => setShowDatePicker({ type: 'to', show: true })}
+                    style={styles.dateButton}
+                  >
+                    <Text style={styles.dateButtonText}>{toDate || 'Select Date'}</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
-              <View style={styles.dateRow}>
-                <Text style={styles.dateLabel}>To Date:</Text>
-                <TouchableOpacity
-                  onPress={() => setShowDatePicker({ type: 'to', show: true })}
-                  style={styles.dateButton}
-                >
-                  <Text style={styles.dateButtonText}>{toDate || 'Select Date'}</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          )}
+            )}
 
-           {showDatePicker?.show && (
-            <DateTimePicker
-              value={
-                showDatePicker?.type === 'from' && fromDate
-                  ? parseCustomDate(fromDate)
-                  : showDatePicker?.type === 'to' && toDate
-                  ? parseCustomDate(toDate)
-                  : new Date()
-              }
-              mode="date"
-              onChange={handleDateChange}
-              minimumDate={
-                showDatePicker?.type === 'to' && fromDate
-                  ? parseCustomDate(fromDate) 
-                  : new Date(new Date().getFullYear(), 0, 1) 
-              }
-              maximumDate={
-                showDatePicker?.type === 'from' && toDate
-                  ? parseCustomDate(toDate) 
-                  : new Date()
-              }
-            />
-          )}
-          {isListVisible ? (
-            <View style={{ flex: 1 }}>
-              <List
-                selectedMonth={formattedMonth}
-                showFilter={showFilter}
-                fromDate={fromDate}
-                toDate={toDate}
+            {showDatePicker?.show && (
+              <DateTimePicker
+                value={
+                  showDatePicker?.type === 'from' && fromDate
+                    ? parseCustomDate(fromDate)
+                    : showDatePicker?.type === 'to' && toDate
+                    ? parseCustomDate(toDate)
+                    : new Date()
+                }
+                mode="date"
+                onChange={handleDateChange}
+                minimumDate={
+                  showDatePicker?.type === 'to' && fromDate
+                    ? parseCustomDate(fromDate)
+                    : new Date(new Date().getFullYear(), 0, 1)
+                }
+                maximumDate={
+                  showDatePicker?.type === 'from' && toDate ? parseCustomDate(toDate) : new Date()
+                }
               />
-
-              {showPicker && (
-                <DateTimePicker
-                  value={selectedDate}
-                  mode="date"
-                  display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-                  onChange={onChangeDate}
+            )}
+            {isListVisible ? (
+              <View style={{ flex: 1 }}>
+                <List
+                  selectedMonth={formattedMonth}
+                  showFilter={showFilter}
+                  fromDate={fromDate}
+                  toDate={toDate}
                 />
-              )}
-            </View>
-          ) : (
-            <View
-              style={{
-                flex: 1,
-                marginTop: 60,
-              }}
-            >
-              <AttendanceForm setBlockAction={setBlockAction} resData={resData} />
-            </View>
-          )}
-        </>
-      )}
-    </ScrollView>
-  </TouchableWithoutFeedback>
+
+                {showPicker && (
+                  <DateTimePicker
+                    value={selectedDate}
+                    mode="date"
+                    display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                    onChange={onChangeDate}
+                  />
+                )}
+              </View>
+            ) : (
+              <View
+                style={{
+                  flex: 1,
+                  marginTop: 60,
+                }}
+              >
+                <AttendanceForm setBlockAction={setBlockAction} resData={resData} />
+              </View>
+            )}
+          </>
+        )}
+      </ScrollView>
+    </TouchableWithoutFeedback>
   );
 };
 

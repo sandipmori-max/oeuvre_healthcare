@@ -18,7 +18,7 @@ import StartupScreen from '../screens/dashboard/startup/StartupScreen';
 import PinSetupScreen from '../screens/dashboard/pinset/Pinset';
 import PinVerifyScreen from '../screens/dashboard/pinset/PinVerify';
 import { useAppSelector } from '../store/hooks';
-
+ 
 const Stack = createStackNavigator<any>();
 
 const StackNavigator = () => {
@@ -89,6 +89,7 @@ const StackNavigator = () => {
       <Stack.Screen options={screenOptions} name="Web" component={WebScreen} />
       <Stack.Screen options={screenOptions} name="Page" component={PageScreen} />
       <Stack.Screen options={screenOptions} name="List" component={ListScreen} />
+ 
     </Stack.Navigator>
   );
 };

@@ -97,7 +97,7 @@ const ProfileTab = () => {
               <View style={styles.profileAvatar}>
                 <FastImage
                   source={{
-                    uri: `${baseLink}/FileUpload/1/UserMaster/${user?.id}/profileimage.jpeg`,
+                    uri: `${baseLink}/FileUpload/1/UserMaster/${user?.id}/profileimage.jpeg?ts=${new Date().getTime()}`,
                     priority: FastImage.priority.normal,
                     cache: FastImage.cacheControl.web,
                   }}
