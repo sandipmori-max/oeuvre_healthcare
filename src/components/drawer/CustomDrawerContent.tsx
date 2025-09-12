@@ -8,40 +8,18 @@ import { useAppSelector } from '../../store/hooks';
 import { firstLetterUpperCase } from '../../utils/helpers';
 import { ERP_DRAWER_LIST } from '../../constants';
 import { styles } from './drawer_style';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import FastImage from 'react-native-fast-image';
+import { useBaseLink } from '../../hooks/useBaseLink';
 
 const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
   const navigation = useNavigation();
 
   const { user } = useAppSelector(state => state?.auth);
-   const theme = useAppSelector(state => state.theme);
-  const [baseLink, setBaseLink] = useState<string>('');
+  const theme = useAppSelector(state => state.theme);
+  const baseLink = useBaseLink();
 
+ 
   const currentRoute = props.state.routeNames[props.state.index];
-
-
-  
-  useEffect(() => {
-    let isMounted = true;
-    (async () => {
-      try {
-        const [storedLink] = await Promise.all([AsyncStorage.getItem('erp_link')]);
-
-        if (isMounted) {
-          let normalizedBase = (storedLink || '').replace(/\/+$/, '') + '';
-          normalizedBase = normalizedBase.replace(/\/devws\/?/, '/');
-          normalizedBase = normalizedBase.replace(/^https:\/\//i, 'http://');
-          setBaseLink(normalizedBase || '');
-        }
-      } catch (e) {
-        console.error('Error loading stored data:', e);
-      }
-    })();
-    return () => {
-      isMounted = false;
-    };
-  }, []);
 
   return (
     <DrawerContentScrollView

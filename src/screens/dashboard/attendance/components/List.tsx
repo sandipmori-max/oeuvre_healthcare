@@ -18,7 +18,8 @@ import { ERP_COLOR_CODE } from '../../../../utils/constants';
 import { useAppDispatch } from '../../../../store/hooks';
 import { getERPListDataThunk } from '../../../../store/slices/auth/thunk';
 import FullViewLoader from '../../../../components/loader/FullViewLoader';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useBaseLink } from '../../../../hooks/useBaseLink';
+import { Calendar } from 'react-native-calendars';
 
 const FILTERS = [
   { key: 'all', label: 'All' },
@@ -81,10 +82,10 @@ const List = ({ selectedMonth, showFilter, fromDate, toDate }: any) => {
   const [activeFilter, setActiveFilter] = useState('all');
   const [isLoading, setIsLoading] = useState(false);
   const [listData, setListData] = useState<any[]>([]);
-  const [baseLink, setBaseLink] = useState('');
   const [parsedError, setParsedError] = useState<any>();
   const dispatch = useAppDispatch();
   const [currentView, setCurrentView] = useState<'pie' | 'calendar'>('pie');
+  const baseLink = useBaseLink();
 
   const normalizeDate = (dateStr: string) => {
     const [day, monthStr, year] = dateStr.split(' ');
@@ -111,7 +112,7 @@ const List = ({ selectedMonth, showFilter, fromDate, toDate }: any) => {
     const [outH, outM] = punchOut.split(':').map(Number);
     const inDate = new Date(0, 0, 0, inH, inM);
     const outDate = new Date(0, 0, 0, outH, outM);
-    return (outDate.getTime() - inDate.getTime()) / 1000 / 60 / 60; 
+    return (outDate.getTime() - inDate.getTime()) / 1000 / 60 / 60;
   };
 
   const panResponder = PanResponder.create({
@@ -175,26 +176,6 @@ const List = ({ selectedMonth, showFilter, fromDate, toDate }: any) => {
     if (fromDate && toDate) fetchListData(fromDate, toDate);
   }, [fromDate, toDate, fetchListData]);
 
-  useEffect(() => {
-    let isMounted = true;
-    (async () => {
-      try {
-        const storedLink = await AsyncStorage.getItem('erp_link');
-        if (isMounted) {
-          let normalizedBase = (storedLink || '').replace(/\/+$/, '');
-          normalizedBase = normalizedBase.replace(/\/devws\/?/, '/');
-          normalizedBase = normalizedBase.replace(/^https:\/\//i, 'http://');
-          setBaseLink(normalizedBase || '');
-        }
-      } catch (e) {
-        console.error('Error loading stored data:', e);
-      }
-    })();
-    return () => {
-      isMounted = false;
-    };
-  }, []);
-
   let data = listData.length > 0 ? [...listData] : [];
   if (activeFilter !== 'all') {
     switch (activeFilter) {
@@ -247,12 +228,40 @@ const List = ({ selectedMonth, showFilter, fromDate, toDate }: any) => {
     );
   }
 
+  const markedDates = listData.reduce((acc, item) => {
+    const dateStr = normalizeDate(item.date); // e.g. 2025-09-12
+    let color = ERP_COLOR_CODE.ERP_APP_COLOR; // default Present
+
+    if (item.status?.toLowerCase() === 'leave') {
+      color = '#f44336';
+    } else if (
+      item.status?.toLowerCase() === 'leave_first_half' ||
+      item.status?.toLowerCase() === 'leave_second_half'
+    ) {
+      color = '#ff9800';
+    } else if (item.status?.toLowerCase() === 'working') {
+      color = '#ccc';
+    }
+
+    acc[dateStr] = {
+      selected: true,
+      selectedColor: color,
+      customStyles: {
+        container: { backgroundColor: color, borderRadius: 6 },
+        text: { color: '#fff', fontWeight: '600' },
+      },
+    };
+
+    return acc;
+  }, {});
+
   return (
     <View style={{ flex: 1, backgroundColor: '#fff' }}>
       {showFilter && (
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
           style={{ paddingHorizontal: 16, paddingVertical: 8 }}
           contentContainerStyle={{ alignItems: 'center', gap: 6 }}
         >
@@ -286,7 +295,6 @@ const List = ({ selectedMonth, showFilter, fromDate, toDate }: any) => {
               {...panResponder.panHandlers}
               style={{
                 flex: 1,
-                height: 350,
                 justifyContent: 'center',
                 alignContent: 'center',
                 alignItems: 'center',
@@ -299,13 +307,14 @@ const List = ({ selectedMonth, showFilter, fromDate, toDate }: any) => {
                     padding: 16,
                     alignItems: 'center',
                     flexDirection: 'row',
+                    borderRadius: 8,
                   }}
                 >
                   <PieChart
                     data={chartData}
                     donut
                     radius={90}
-                    innerRadius={60}
+                    innerRadius={80}
                     centerLabelComponent={() => (
                       <Text style={{ textAlign: 'center', fontSize: 18, fontWeight: '600' }}>
                         {total + `\n`}Days
@@ -331,111 +340,67 @@ const List = ({ selectedMonth, showFilter, fromDate, toDate }: any) => {
               )}
 
               {currentView === 'calendar' && (
-                <>
-                  <View
-                    style={{
-                      width: '100%',
-                      alignItems: 'center',
-                      marginVertical: 12,
-                      justifyContent: 'center',
-                      alignContent: 'center',
-                    }}
-                  >
-                    <Text>Current month</Text>
-                  </View>
-
-                  <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
-                    {Array.from({ length: daysInMonth }).map((_, index) => {
-                      const day = index + 1;
-                      const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(
-                        day,
-                      ).padStart(2, '0')}`;
-                      const dayData = listData.find(d => normalizeDate(d.date) === dateStr);
-
-                      let bgColor = '#fff';
-                      let textColor = '#000';
-
-                      if (dayData) {
-                        if (dayData.status?.toLowerCase() === 'leave') {
-                          bgColor = '#f44336';
-                          textColor = '#fff';
-                        }
-                        if (dayData.status?.toLowerCase() === 'working') {
-                          bgColor = '#ccc';
-                          textColor = '#000';
-                        } else if (
-                          dayData.status?.toLowerCase() === 'leave_first_half' ||
-                          dayData.status?.toLowerCase() === 'leave_second_half'
-                        ) {
-                          bgColor = '#ff9800';
-                          textColor = '#fff';
-                        } else {
-                          bgColor = '#4caf50';
-                          textColor = '#fff';
-                        }
-                      }
-
-                      return (
-                        <TouchableOpacity
-                          key={day}
-                          style={{
-                            width: '14.28%',
-                            height: 60,
-
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            borderWidth: 0.5,
-                            borderColor: '#ddd',
-                            backgroundColor: bgColor,
-                          }}
-                          onPress={() =>
-                            Alert.alert(
-                              `Attendance on ${dateStr}`,
-                              dayData ? JSON.stringify(dayData, null, 2) : 'No data',
-                            )
-                          }
-                        >
-                          <Text style={{ fontSize: 14, color: textColor }}>{day}</Text>
-                          {dayData && (
-                            <Text style={{ fontSize: 10, color: textColor, fontWeight: '600' }}>
-                              {dayData.status}
-                            </Text>
-                          )}
-                        </TouchableOpacity>
-                      );
-                    })}
-                  </View>
-                </>
+                <Calendar
+                  style={{
+                    width: Dimensions.get('window').width - 20,
+                    alignSelf: 'center',
+                    borderRadius: 8,
+                    elevation: 2,
+                  }}
+                  monthFormat={'MMMM yyyy'}
+                  hideExtraDays={false}
+                  firstDay={1}
+                  onDayPress={day => {
+                    const selectedData = listData.find(
+                      d => normalizeDate(d.date) === day.dateString,
+                    );
+                    Alert.alert(
+                      `Attendance on ${day.dateString}`,
+                      selectedData ? JSON.stringify(selectedData, null, 2) : 'No data',
+                    );
+                  }}
+                  markingType={'custom'}
+                  markedDates={markedDates}
+                  theme={{
+                    textDayFontWeight: '600',
+                    todayTextColor: ERP_COLOR_CODE.ERP_APP_COLOR,
+                    arrowColor: ERP_COLOR_CODE.ERP_APP_COLOR,
+                  }}
+                />
               )}
             </View>
 
-            <View style={{ flex: 1 }}>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'center',
-                  marginVertical: 10,
-                  gap: 8,
-                }}
-              >
+            {!isLoading && (
+              <View style={{ flex: 1 }}>
                 <View
                   style={{
-                    width: currentView === 'pie' ? 24 : 10,
-                    height: 10,
-                    borderRadius: 5,
-                    backgroundColor: currentView === 'pie' ? '#4caf50' : '#ccc',
+                    flexDirection: 'row',
+                    justifyContent: 'center',
+                    marginVertical: 10,
+                    gap: 8,
                   }}
-                />
-                <View
-                  style={{
-                    width: currentView === 'calendar' ? 24 : 10,
-                    height: 10,
-                    borderRadius: 5,
-                    backgroundColor: currentView === 'calendar' ? '#4caf50' : '#ccc',
-                  }}
-                />
+                >
+                  <View
+                    style={{
+                      width: currentView === 'pie' ? 24 : 10,
+                      height: 10,
+                      borderRadius: 5,
+                      backgroundColor:
+                        currentView === 'pie' ? ERP_COLOR_CODE.ERP_APP_COLOR : '#ccc',
+                    }}
+                  />
+                  <View
+                    style={{
+                      width: currentView === 'calendar' ? 24 : 10,
+                      height: 10,
+                      borderRadius: 5,
+                      backgroundColor:
+                        currentView === 'calendar' ? ERP_COLOR_CODE.ERP_APP_COLOR : '#ccc',
+                    }}
+                  />
+                </View>
               </View>
-            </View>
+            )}
 
             {/* List */}
             {isLoading ? (

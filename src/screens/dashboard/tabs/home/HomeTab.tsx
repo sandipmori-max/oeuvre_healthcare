@@ -146,7 +146,7 @@ const HomeScreen = () => {
                     numberOfLines={2}
                     ellipsizeMode="tail"
                   >
-                    {item?.title.replace(' ', '\n')}
+                    {!isHorizontal ? item?.title.replace(' ', '\n') : item?.title}
                   </Text>
                 </View>
               </View>
@@ -167,14 +167,15 @@ const HomeScreen = () => {
                 </View>
               )}
             </View>
-
-            <Text
-              style={{
-                color: accentColors[index % accentColors.length],
-              }}
-            >
-              {item?.footer}
-            </Text>
+            {item?.footer && (
+              <Text
+                style={{
+                  color: accentColors[index % accentColors.length],
+                }}
+              >
+                {item?.footer}
+              </Text>
+            )}
           </View>
         </View>
       </TouchableOpacity>
@@ -196,7 +197,7 @@ const HomeScreen = () => {
         >
           <ErrorMessage message={error} />{' '}
         </View>
-      ) : dashboard.length === 0 ? (
+      ) : dashboard?.length === 0 ? (
         <NoData />
       ) : (
         <FlatList
@@ -205,7 +206,7 @@ const HomeScreen = () => {
           renderItem={() => (
             <>
               {/* Pie chart section */}
-              {dashboard.length > 0 && (
+              {dashboard?.length > 0 && (
                 <View
                   style={{
                     borderColor: '#000',
@@ -224,7 +225,7 @@ const HomeScreen = () => {
                       donut
                       radius={90}
                       textSize={14}
-                      innerRadius={50}
+                      innerRadius={80}
                       textColor="#000"
                       showValuesAsLabels
                       labelPosition="outside"
@@ -238,7 +239,7 @@ const HomeScreen = () => {
                             color: '#000',
                           }}
                         >
-                          Home
+                          Dashboard
                         </Text>
                       )}
                     />

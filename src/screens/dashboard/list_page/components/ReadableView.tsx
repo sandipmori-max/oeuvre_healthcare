@@ -9,6 +9,7 @@ import { styles } from '../list_page_style';
 import NoData from '../../../../components/no_data/NoData';
 import { ERP_COLOR_CODE } from '../../../../utils/constants';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useBaseLink } from '../../../../hooks/useBaseLink';
 
 const ReadableView = ({
   configData,
@@ -21,7 +22,7 @@ const ReadableView = ({
 }: any) => {
   const navigation = useNavigation();
   const screenWidth = Dimensions.get('window').width;
-  const [baseLink, setBaseLink] = useState<string>('');
+  const baseLink = useBaseLink();
 
   const getButtonMeta = (key: string) => {
     if (!key || !configData?.length) return { label: 'Action', color: '#007BFF' };
@@ -31,24 +32,6 @@ const ReadableView = ({
       color: configItem?.colorcode || '#007BFF',
     };
   };
-
-  useEffect(() => {
-    let isMounted = true;
-    (async () => {
-      try {
-        const [storedLink] = await Promise.all([AsyncStorage.getItem('erp_link')]);
-
-        if (isMounted) {
-          setBaseLink(storedLink || '');
-        }
-      } catch (e) {
-        console.error('Error loading stored data:', e);
-      }
-    })();
-    return () => {
-      isMounted = false;
-    };
-  }, []);
 
   const RenderCard = ({ item, index }: any) => {
     if (!item) return null;
@@ -63,7 +46,7 @@ const ReadableView = ({
     const amount = item?.amount;
 
     const btnKeys = Object.keys(item).filter(key => key.startsWith('btn_'));
-    const baseUrl =  item?.image && item?.image?.replace(/^https:\/\//i, 'http://');
+    const baseUrl = item?.image && item?.image?.replace(/^https:\/\//i, 'http://');
     const authUser = item?.authuser;
 
     const avatarLetter = name
@@ -91,9 +74,7 @@ const ReadableView = ({
           style={{ flexDirection: 'row', alignItems: 'center' }}
           onPress={async () => {
             console.log('🚀 ~ Page:', item);
-            if (authUser) {
-              return;
-            }
+
             navigation.navigate('Page', {
               item,
               title: pageParamsName,
@@ -271,19 +252,21 @@ const ReadableView = ({
     );
   };
 
-    if(!loadingListId && filteredData.length === 0){
-    return(<>
-     <View
-              style={{
-                flex: 1,
-                justifyContent: 'center',
-                alignItems: 'center',
-                backgroundColor: '#fff',
-              }}
-            >
-              <NoData />
-            </View>
-    </>)
+  if (!loadingListId && filteredData.length === 0) {
+    return (
+      <>
+        <View
+          style={{
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: '#fff',
+          }}
+        >
+          <NoData />
+        </View>
+      </>
+    );
   }
   return (
     <View style={{ flex: 1 }}>
@@ -294,36 +277,32 @@ const ReadableView = ({
         keyExtractor={(item, idx) => String(item?.id || idx)}
         renderItem={({ item, index }) => <RenderCard item={item} index={index} />}
         contentContainerStyle={styles.listContent}
-       
-        
       />
-      {
-          filteredData.length > 0 && totalAmount > 0 ? (
-            <View
-              style={{
-                marginTop: 6,
-                padding: 8,
-                borderRadius: 8,
-                backgroundColor: '#f1f1f1',
-                borderWidth: 1,
-                borderColor: '#ddd',
-                marginBottom: 28, 
-              }}
-            >
-              <Text style={{ fontSize: 14, fontWeight: '700', color: '#333' }}>Total Amount</Text>
-              <Text
-                style={{
-                  fontSize: 16,
-                  fontWeight: 'bold',
-                  color: '#28a745',
-                  marginTop: 2,
-                }}
-              >
-                ₹ {totalAmount.toFixed(2)}
-              </Text>
-            </View>
-          ) : null
-      }
+      {filteredData.length > 0 && totalAmount > 0 ? (
+        <View
+          style={{
+            marginTop: 6,
+            padding: 8,
+            borderRadius: 8,
+            backgroundColor: '#f1f1f1',
+            borderWidth: 1,
+            borderColor: '#ddd',
+            marginBottom: 28,
+          }}
+        >
+          <Text style={{ fontSize: 14, fontWeight: '700', color: '#333' }}>Total Amount</Text>
+          <Text
+            style={{
+              fontSize: 16,
+              fontWeight: 'bold',
+              color: '#28a745',
+              marginTop: 2,
+            }}
+          >
+            ₹ {totalAmount.toFixed(2)}
+          </Text>
+        </View>
+      ) : null}
     </View>
   );
 };

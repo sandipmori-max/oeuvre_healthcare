@@ -15,8 +15,8 @@ import { markAttendanceThunk } from '../../../../store/slices/attendance/thunk';
 import { ERP_COLOR_CODE } from '../../../../utils/constants';
 import { useNavigation } from '@react-navigation/native';
 import SlideButton from './SlideButton';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import FastImage from 'react-native-fast-image';
+import { useBaseLink } from '../../../../hooks/useBaseLink';
 
 const AttendanceForm = ({ setBlockAction, resData }: any) => {
   const { t } = useTranslations();
@@ -37,28 +37,8 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
     type: 'info' as 'error' | 'success' | 'info',
   });
 
-  const [baseLink, setBaseLink] = useState<string>('');
+  const baseLink = useBaseLink();
 
-  useEffect(() => {
-    let isMounted = true;
-    (async () => {
-      try {
-        const [storedLink] = await Promise.all([AsyncStorage.getItem('erp_link')]);
-
-        if (isMounted) {
-          let normalizedBase = (storedLink || '').replace(/\/+$/, '') + '';
-          normalizedBase = normalizedBase?.replace(/\/devws\/?/, '/');
-          normalizedBase = normalizedBase?.replace(/^https:\/\//i, 'http://');
-          setBaseLink(normalizedBase || '');
-        }
-      } catch (e) {
-        console.error('Error loading stored data:', e);
-      }
-    })();
-    return () => {
-      isMounted = false;
-    };
-  }, []);
   const openCamera = (
     setFieldValue: (field: keyof AttendanceFormValues, value: any) => void,
     handleSubmit: () => void,
@@ -206,7 +186,9 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
                 {`${baseLink}/FileUpload/1/UserMaster/${user?.id}/profileimage.jpeg` ? (
                   <FastImage
                     source={{
-                      uri: `${baseLink}/FileUpload/1/UserMaster/${user?.id}/profileimage.jpeg?ts=${new Date().getTime()}`,
+                      uri: `${baseLink}/FileUpload/1/UserMaster/${
+                        user?.id
+                      }/profileimage.jpeg?ts=${new Date().getTime()}`,
                       priority: FastImage.priority.normal,
                       cache: FastImage.cacheControl.web,
                     }}

@@ -8,14 +8,15 @@ import { ERP_COLOR_CODE } from '../../../utils/constants';
 import useTranslations from '../../../hooks/useTranslations';
 import FullViewLoader from '../../../components/loader/FullViewLoader';
 import { styles } from './web_style';
+import { useBaseLink } from '../../../hooks/useBaseLink';
 
 const WebScreen = () => {
   const { t } = useTranslations();
   const navigation = useNavigation<any>();
   const route = useRoute<any>();
   const { item, isFromChart } = route.params;
-  const [baseLink, setBaseLink] = useState<string>('');
   const [token, setToken] = useState<string>('');
+  const baseLink = useBaseLink();
 
   let normalizedBase = (baseLink || '').replace(/\/+$/, '') + '';
   normalizedBase = normalizedBase.replace(/\/devws\/?/, '/');
@@ -26,28 +27,6 @@ const WebScreen = () => {
       title: isFromChart ? 'Dashboard' : item?.title || t('webScreen.details'),
     });
   }, [navigation, item?.title, t]);
-
-  useEffect(() => {
-    let isMounted = true;
-    (async () => {
-      try {
-        const [storedLink, storedToken] = await Promise.all([
-          AsyncStorage.getItem('erp_link'),
-          AsyncStorage.getItem('erp_token'),
-        ]);
-
-        if (isMounted) {
-          setBaseLink(storedLink || '');
-          setToken(storedToken || '');
-        }
-      } catch (e) {
-        console.error('Error loading stored data:', e);
-      }
-    })();
-    return () => {
-      isMounted = false;
-    };
-  }, []);
 
   const targetUrl = useMemo(() => {
     const itemUrl = item?.url || '';
