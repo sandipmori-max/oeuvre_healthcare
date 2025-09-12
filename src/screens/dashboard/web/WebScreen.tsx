@@ -9,28 +9,22 @@ import useTranslations from '../../../hooks/useTranslations';
 import FullViewLoader from '../../../components/loader/FullViewLoader';
 import { styles } from './web_style';
 
-
 const WebScreen = () => {
   const { t } = useTranslations();
   const navigation = useNavigation<any>();
   const route = useRoute<any>();
-  const { item , isFromChart } = route.params;
-  console.log("🚀 ~ WebScreen ~ isFromChart:", isFromChart)
+  const { item, isFromChart } = route.params;
   const [baseLink, setBaseLink] = useState<string>('');
-  console.log("🚀 ~ WebScreen ~ baseLink:", baseLink)
   const [token, setToken] = useState<string>('');
 
-   let normalizedBase = (baseLink || '').replace(/\/+$/, '') + '';
-    normalizedBase = normalizedBase.replace(/\/devws\/?/, '/');
-    normalizedBase = normalizedBase.replace(/^https:\/\//i, 'http://');
-
-
+  let normalizedBase = (baseLink || '').replace(/\/+$/, '') + '';
+  normalizedBase = normalizedBase.replace(/\/devws\/?/, '/');
+  normalizedBase = normalizedBase.replace(/^https:\/\//i, 'http://');
   const url = isFromChart ? `${normalizedBase}app/index.html?dashboard/0/&token=${token}` : '';
-  console.log("🚀 ~ WebScreen *-*-*-*-*-*-*--*-*-*-**-~ url:", url)
-  
-  console.log("🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀 ~ WebScreen ~ url:", url)
   useLayoutEffect(() => {
-    navigation.setOptions({ title:  isFromChart ? 'Dashboard' : item?.title || t('webScreen.details') });
+    navigation.setOptions({
+      title: isFromChart ? 'Dashboard' : item?.title || t('webScreen.details'),
+    });
   }, [navigation, item?.title, t]);
 
   useEffect(() => {
@@ -40,7 +34,6 @@ const WebScreen = () => {
         const [storedLink, storedToken] = await Promise.all([
           AsyncStorage.getItem('erp_link'),
           AsyncStorage.getItem('erp_token'),
-          
         ]);
 
         if (isMounted) {
@@ -73,12 +66,10 @@ const WebScreen = () => {
     }
     const cleanedPath = itemUrl.replace(/^\/+/, '');
     const fullUrl = normalizedBase + cleanedPath;
-    console.log('🚀 ~ WebScreen ~ normalizedBase:', normalizedBase);
 
     const separator = fullUrl.includes('?') ? '/' : '?';
     return `${fullUrl}${separator}&token=${token}`;
   }, [baseLink, item?.url, token]);
-  console.log('🚀 ~ WebScreen ~ targetUrl:-------', targetUrl);
 
   if (!isFromChart && !targetUrl) {
     return (
@@ -97,10 +88,7 @@ const WebScreen = () => {
   }
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar
-        backgroundColor={ERP_COLOR_CODE.ERP_APP_COLOR}
-        translucent={false}
-      />
+      <StatusBar backgroundColor={ERP_COLOR_CODE.ERP_APP_COLOR} translucent={false} />
       <WebView
         source={{ uri: isFromChart ? url : targetUrl }}
         startInLoadingState={true}

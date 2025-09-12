@@ -86,8 +86,6 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
 
   const renderAccount = ({ item }: { item: Account }) => {
     const isActive = item?.id.toString() === activeAccountId?.toString();
-    console.log('🚀 ~ renderAccount ~ item:', item);
-    console.log('🚀 ~ renderAccount ~ isActive:', isActive);
     const lastLogin = formatDateHr(item?.lastLoginAt, false);
     const lastLoginHr = formatTimeTo12Hour(item?.lastLoginAt);
 
@@ -96,7 +94,6 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
         style={[styles.accountItem, isActive && styles.activeAccount]}
         onPress={async () => {
           if (isTokenValid(item?.user?.tokenValidTill)) {
-            console.log('🚀 ~ item:', 'IF ________________________________________ CALLED', item);
             await DevERPService.setToken(item?.user?.token || '');
             await AsyncStorage.setItem('erp_token', item?.user?.token || '');
             await AsyncStorage.setItem('auth_token', item?.user?.token || '');
@@ -104,18 +101,11 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
             const validation = await validateCompanyCode(() =>
               DevERPService.validateCompanyCode(item?.user?.company_code),
             );
-            console.log('🚀 ~ validation:', validation);
             if (!validation?.isValid) {
               return;
             }
             handleSwitchAccount(item?.id);
           } else {
-            console.log(
-              '🚀 ~ item:',
-              'ELESPART ________________________________________ CALLED',
-              item,
-            );
-
             const validation = await validateCompanyCode(() =>
               DevERPService.validateCompanyCode(item?.user?.company_code),
             );

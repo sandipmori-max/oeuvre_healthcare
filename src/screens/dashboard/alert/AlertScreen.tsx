@@ -9,7 +9,7 @@ const NotificationScreen = () => {
     <View style={styles.container}>
       <FlatList
         data={NOTIFICATIONS}
-        keyExtractor={item => item.id}
+        keyExtractor={item => item?.id}
         renderItem={({ item }) => <NotificationItem item={item} />}
         contentContainerStyle={styles.list}
       />

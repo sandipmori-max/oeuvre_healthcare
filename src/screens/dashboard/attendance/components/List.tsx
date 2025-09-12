@@ -111,7 +111,7 @@ const List = ({ selectedMonth, showFilter, fromDate, toDate }: any) => {
     const [outH, outM] = punchOut.split(':').map(Number);
     const inDate = new Date(0, 0, 0, inH, inM);
     const outDate = new Date(0, 0, 0, outH, outM);
-    return (outDate.getTime() - inDate.getTime()) / 1000 / 60 / 60; // hours
+    return (outDate.getTime() - inDate.getTime()) / 1000 / 60 / 60; 
   };
 
   const panResponder = PanResponder.create({
@@ -160,7 +160,7 @@ const List = ({ selectedMonth, showFilter, fromDate, toDate }: any) => {
           }),
         ).unwrap();
         const parsed = typeof raw === 'string' ? JSON.parse(raw) : raw;
-        const final = parsed?.d ? JSON.parse(parsed.d) : parsed;
+        const final = parsed?.d ? JSON.parse(parsed?.d) : parsed;
         setListData(final?.data || final || []);
       } catch (e: any) {
         setParsedError(e);
@@ -249,7 +249,6 @@ const List = ({ selectedMonth, showFilter, fromDate, toDate }: any) => {
 
   return (
     <View style={{ flex: 1, backgroundColor: '#fff' }}>
-      {/* Filters */}
       {showFilter && (
         <ScrollView
           horizontal

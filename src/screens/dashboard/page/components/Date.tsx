@@ -6,8 +6,6 @@ import MaterialIcons from '@react-native-vector-icons/material-icons';
 import { formatDateHr } from '../../../../utils/helpers';
 
 const DateTimeRow = ({ item, errors, value, showDateTimePicker }: any) => {
-  console.log("🚀 ~ DateTimeRow date-time ~ item:", item, value);
-
   return (
     <View style={{ marginBottom: 16 }}>
       <View style={{ flexDirection: 'row' }}>

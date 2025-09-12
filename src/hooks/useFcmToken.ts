@@ -39,7 +39,6 @@ const useFcmToken = () => {
         authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
         authStatus === messaging.AuthorizationStatus.PROVISIONAL;
 
-      console.log('Permission status:', authStatus);
       return enabled;
     }
 
