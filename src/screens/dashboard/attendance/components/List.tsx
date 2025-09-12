@@ -418,6 +418,7 @@ const List = ({ selectedMonth, showFilter, fromDate, toDate }: any) => {
             ) : (
               <FlatList
                 data={data}
+                showsVerticalScrollIndicator={false}
                 keyExtractor={(item, index) => item.id?.toString() || index.toString()}
                 renderItem={({ item }) => {
                   const isLeaveFull = item.status?.toLowerCase() === 'leave';
