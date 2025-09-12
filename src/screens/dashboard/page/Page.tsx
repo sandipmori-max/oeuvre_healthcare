@@ -32,8 +32,8 @@ import DateTimePicker from 'react-native-modal-datetime-picker';
 import { parseCustomDatePage } from '../../../utils/helpers';
 import DateRow from './components/Date';
 import BoolInput from './components/BoolInput';
- import SignaturePad from './components/SignaturePad';
- import HtmlRow from './components/HtmlRow';
+import SignaturePad from './components/SignaturePad';
+import HtmlRow from './components/HtmlRow';
 import { useBaseLink } from '../../../hooks/useBaseLink';
 import DateTimeRow from './components/DateTimeRow';
 
@@ -50,7 +50,7 @@ const PageScreen = () => {
   const [controls, setControls] = useState<any[]>([]);
   const [errorsList, setErrorsList] = useState<string[]>([]);
   const [showErrorModal, setShowErrorModal] = useState(false);
- 
+
   const [error, setError] = useState<string | null>(null);
   const [formValues, setFormValues] = useState<any>({});
   const [datePickerVisible, setDatePickerVisible] = useState(false);
@@ -79,7 +79,7 @@ const PageScreen = () => {
 
   const route = useRoute<RouteProp<PageRouteParams, 'PageScreen'>>();
   const { item, title, id, isFromNew, url, pageTitle }: any = route.params;
-    const authUser = item?.authuser;
+  const authUser = item?.authuser;
 
   const validateForm = useCallback(() => {
     const validationErrors: Record<string, string> = {};
@@ -263,6 +263,7 @@ const PageScreen = () => {
 
   const renderItem = useCallback(
     ({ item, index }: { item: any; index: number }) => {
+      console.log('itemitemitemitem', item);
       const setValue = (val: any) => {
         if (typeof val === 'object' && val !== null) {
           setFormValues(prev => ({ ...prev, ...val }));
@@ -288,16 +289,18 @@ const PageScreen = () => {
           />
         );
       }
-      //test html 
-      else if(item?.ctltype === 'HTML') {
-        content = <HtmlRow item={item}/>
-      }
-      else if (item?.ctltype === 'IMAGE' && item?.field === 'signimg') {
+      //test html
+      else if (item?.ctltype === 'HTML') {
+        content = <HtmlRow item={item} />;
+      } else if (item?.ctltype === 'IMAGE' && item?.field === 'signature') {
         content = (
-          <SignaturePad item={item} handleSignatureAttachment={handleSignatureAttachment} />
+          <SignaturePad
+            infoData={infoData}
+            item={item}
+            handleSignatureAttachment={handleSignatureAttachment}
+          />
         );
-      } 
-      else if (item?.ctltype === 'IMAGE' || item?.ctltype === 'PHOTO') {
+      } else if (item?.ctltype === 'IMAGE' || item?.ctltype === 'PHOTO') {
         content = (
           <Media
             baseLink={baseLink}
@@ -338,8 +341,7 @@ const PageScreen = () => {
         content = (
           <DateRow item={item} errors={errors} value={value} showDatePicker={showDatePicker} />
         );
-      } 
-      else if (item?.ctltype === 'DATETIME') {
+      } else if (item?.ctltype === 'DATETIME') {
         content = (
           <DateTimeRow
             item={item}
@@ -348,8 +350,7 @@ const PageScreen = () => {
             showDateTimePicker={showDateTimePicker}
           />
         );
-      } 
-      else {
+      } else {
         content = (
           <Input
             onFocus={() => flatListRef.current?.scrollToIndex({ index, animated: true })}

@@ -1,14 +1,13 @@
 import { SafeAreaView, StatusBar, View } from 'react-native';
 import React, { useEffect, useLayoutEffect, useMemo, useState } from 'react';
-import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import WebView from 'react-native-webview';
-import { MenuItem } from '../../../store/slices/auth/type';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ERP_COLOR_CODE } from '../../../utils/constants';
 import useTranslations from '../../../hooks/useTranslations';
 import FullViewLoader from '../../../components/loader/FullViewLoader';
 import { styles } from './web_style';
 import { useBaseLink } from '../../../hooks/useBaseLink';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const WebScreen = () => {
   const { t } = useTranslations();
@@ -18,10 +17,18 @@ const WebScreen = () => {
   const [token, setToken] = useState<string>('');
   const baseLink = useBaseLink();
 
-  let normalizedBase = (baseLink || '').replace(/\/+$/, '') + '';
-  normalizedBase = normalizedBase.replace(/\/devws\/?/, '/');
-  normalizedBase = normalizedBase.replace(/^https:\/\//i, 'http://');
-  const url = isFromChart ? `${normalizedBase}app/index.html?dashboard/0/&token=${token}` : '';
+  console.log('baseLink', baseLink);
+
+  const url = isFromChart ? `${baseLink}app/index.html?dashboard/0/&token=${token}` : '';
+
+  console.log('url-------------------', url);
+  useEffect(() => {
+    (async () => {
+      const storedToken = await AsyncStorage.getItem('erp_token');
+      setToken(storedToken || '');
+    })();
+  }, []);
+
   useLayoutEffect(() => {
     navigation.setOptions({
       title: isFromChart ? 'Dashboard' : item?.title || t('webScreen.details'),
@@ -37,18 +44,14 @@ const WebScreen = () => {
       return `${baseUrl}${separator}token=${token}`;
     }
 
-    let normalizedBase = (baseLink || '').replace(/\/+$/, '') + '/';
-    normalizedBase = normalizedBase.replace(/\/devws\/?/, '/');
-    normalizedBase = normalizedBase.replace(/^https:\/\//i, 'http://');
-    if (!/^http:\/\//i.test(normalizedBase)) {
-      normalizedBase = 'http://' + normalizedBase.replace(/^\/+/, '');
-    }
     const cleanedPath = itemUrl.replace(/^\/+/, '');
-    const fullUrl = normalizedBase + cleanedPath;
+    const fullUrl = baseLink + cleanedPath;
 
     const separator = fullUrl.includes('?') ? '/' : '?';
     return `${fullUrl}${separator}&token=${token}`;
   }, [baseLink, item?.url, token]);
+
+  console.log('targetUrl------------------------', targetUrl);
 
   if (!isFromChart && !targetUrl) {
     return (
@@ -68,7 +71,8 @@ const WebScreen = () => {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar backgroundColor={ERP_COLOR_CODE.ERP_APP_COLOR} translucent={false} />
-      <WebView
+      {
+        token ?  <WebView
         source={{ uri: isFromChart ? url : targetUrl }}
         startInLoadingState={true}
         javaScriptEnabled={true}
@@ -97,7 +101,9 @@ const WebScreen = () => {
         }}
         onLoadStart={() => console.log('WebView loading started')}
         onLoadEnd={() => console.log('WebView loading finished')}
-      />
+      /> : <FullViewLoader />
+      }
+     
     </SafeAreaView>
   );
 };
