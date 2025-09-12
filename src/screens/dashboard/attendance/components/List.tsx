@@ -229,8 +229,8 @@ const List = ({ selectedMonth, showFilter, fromDate, toDate }: any) => {
   }
 
   const markedDates = listData.reduce((acc, item) => {
-    const dateStr = normalizeDate(item.date); 
-    let color = ERP_COLOR_CODE.ERP_APP_COLOR; 
+    const dateStr = normalizeDate(item.date);
+    let color = ERP_COLOR_CODE.ERP_APP_COLOR;
 
     if (item.status?.toLowerCase() === 'leave') {
       color = '#f44336';
@@ -404,7 +404,11 @@ const List = ({ selectedMonth, showFilter, fromDate, toDate }: any) => {
 
             {/* List */}
             {isLoading ? (
-              <FullViewLoader />
+              <View style={{ 
+                height:   Dimensions.get('screen').height,
+                flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                <FullViewLoader />
+              </View>
             ) : data.length === 0 ? (
               <View
                 style={{

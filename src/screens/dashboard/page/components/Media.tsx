@@ -32,6 +32,8 @@ const Media = ({ item, handleAttachment, infoData, baseLink, isFromNew }: any) =
       `${baseLink}fileupload/1/${infoData?.tableName}/${infoData?.id}/${
         type === 'small' ? `d_${item?.text}` : item?.text
       }`;
+
+      console.log('base', base)
     return `${base}?cb=${cacheBuster}`;
   };
 

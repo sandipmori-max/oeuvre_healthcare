@@ -13,17 +13,28 @@ import {
 } from 'react-native';
 import SignatureScreen, { SignatureViewRef } from 'react-native-signature-canvas';
 import { ERP_COLOR_CODE } from '../../../../utils/constants';
+import { useBaseLink } from '../../../../hooks/useBaseLink';
 
-const SignaturePad: React.FC = ({ item, handleSignatureAttachment }: any) => {
+const SignaturePad: React.FC = ({ item, handleSignatureAttachment, infoData }: any) => {
   const signatureRef = useRef<SignatureViewRef>(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [hasSignature, setHasSignature] = useState(false);
   const [savedSignature, setSavedSignature] = useState<string | null>(null);
+  const [imageUri, setImageUri] = useState<string | null>(null);
+  const baseLink = useBaseLink();
+  const [cacheBuster, setCacheBuster] = useState(Date.now());
 
   // Called when user saves signature
   const handleSignature = (signature: string) => {
-    setSavedSignature(signature); // save for preview
+    setSavedSignature(signature); // save base64
+    setImageUri(signature); // 🔑 show immediately in <Image>
+
+    // pass back to parent
     handleSignatureAttachment(`${item?.field}.jpeg; ${signature}`, item?.field);
+
+    // update cache buster for server reload
+    setCacheBuster(Date.now());
+
     setModalVisible(false);
     setHasSignature(false);
   };
@@ -33,6 +44,7 @@ const SignaturePad: React.FC = ({ item, handleSignatureAttachment }: any) => {
     signatureRef.current?.clearSignature();
     setHasSignature(false);
     setSavedSignature(null);
+    setImageUri(null);
   };
 
   // Save signature manually
@@ -40,26 +52,43 @@ const SignaturePad: React.FC = ({ item, handleSignatureAttachment }: any) => {
     signatureRef.current?.readSignature();
   };
 
+  const getImageUri = (type: 'small' | 'large') => {
+    // If user just signed → show base64 preview
+    if (imageUri) return imageUri;
+
+    // Else load from server
+    const base = `${baseLink}fileupload/1/${infoData?.tableName}/${infoData?.id}/${
+      type === 'small' ? `d_${item?.text}` : item?.text
+    }`;
+
+    return `${base}?cb=${cacheBuster}`;
+  };
+
   return (
     <View style={styles.container}>
       <Text style={{ marginVertical: 8, fontWeight: '600' }}>{item?.fieldtitle}</Text>
+
+      <Image
+        source={{ uri: getImageUri('small') }}
+        style={styles.imageThumb}
+        resizeMode="contain"
+      />
 
       <TouchableOpacity
         style={savedSignature ? styles.savedSignatureContainer : styles.openButton}
         onPress={() => setModalVisible(true)}
       >
-        {savedSignature ? (
-          <Image
-            source={{ uri: savedSignature }}
-            style={styles.savedSignature}
-            resizeMode="contain"
-          />
-        ) : (
-          <>
-            <MaterialIcons name="edit" size={18} color="#000" />
-            <Text style={styles.openButtonText}>Add signature</Text>
-          </>
-        )}
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'center',
+            alignContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <MaterialIcons name="edit" size={18} color="#000" />
+          <Text style={styles.openButtonText}> {savedSignature ? 'Edit signature' : 'Add signature'} </Text>
+        </View>
       </TouchableOpacity>
 
       <Modal
@@ -132,6 +161,11 @@ const styles = StyleSheet.create({
     marginTop: 12,
     backgroundColor: '#F8F9FA',
   },
+  imageThumb: {
+    borderWidth: 1,
+    height: 100,
+    marginBottom: 12,
+  },
   openButton: {
     flexDirection: 'row',
     width: '100%',
@@ -149,7 +183,7 @@ const styles = StyleSheet.create({
   },
   savedSignatureContainer: {
     width: '100%',
-    height: 100,
+    padding: 8,
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 8,
@@ -196,16 +230,9 @@ const styles = StyleSheet.create({
   saveButton: {
     borderColor: '#ccc',
     borderWidth: 1,
-
   },
-  clearButton: { borderColor: '#ccc',
-    borderWidth: 1,
-
-   },
-  closeButton: { borderColor: '#ccc',
-    borderWidth: 1,
-
-   },
+  clearButton: { borderColor: '#ccc', borderWidth: 1 },
+  closeButton: { borderColor: '#ccc', borderWidth: 1 },
   buttonText: {
     color: '#fff',
     fontSize: 14,

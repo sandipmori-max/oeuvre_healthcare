@@ -188,9 +188,7 @@ const AttendanceScreen = () => {
         Keyboard.dismiss();
       }}
     >
-      <ScrollView 
-      showsVerticalScrollIndicator={false}
-      style={styles.container}>
+      <ScrollView showsVerticalScrollIndicator={false} style={styles.container}>
         {isLoading ? (
           <View
             style={{
@@ -198,7 +196,7 @@ const AttendanceScreen = () => {
               justifyContent: 'center',
               alignContent: 'center',
               alignItems: 'center',
-              height: Dimensions.get('screen').height * 0.85
+              height: Dimensions.get('screen').height * 0.85,
             }}
           >
             <FullViewLoader />
@@ -264,7 +262,8 @@ const AttendanceScreen = () => {
                     mode="date"
                     display={Platform.OS === 'ios' ? 'spinner' : 'default'}
                     onChange={onChangeDate}
-                  />
+                   
+                    />
                 )}
               </View>
             ) : (

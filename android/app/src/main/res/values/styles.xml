@@ -1,9 +1,16 @@
 <resources>
-
-    <!-- Base application theme. -->
+    <!-- Base App Theme -->
     <style name="AppTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
-        <!-- Customize your theme here. -->
         <item name="android:editTextBackground">@drawable/rn_edit_text_material</item>
+        <item name="colorPrimary">#251d50</item>
+        <item name="colorAccent">#251d50</item>
     </style>
 
+    <!-- Custom DatePicker Theme -->
+    <style name="CustomDatePickerTheme" parent="Theme.MaterialComponents.DayNight.Dialog">
+        <item name="colorPrimary">#251d50</item>
+        <item name="colorPrimaryVariant">#1a1440</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="colorAccent">#251d50</item>
+    </style>
 </resources>
