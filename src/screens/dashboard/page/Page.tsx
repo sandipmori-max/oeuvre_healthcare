@@ -32,10 +32,10 @@ import DateTimePicker from 'react-native-modal-datetime-picker';
 import { parseCustomDatePage } from '../../../utils/helpers';
 import DateRow from './components/Date';
 import BoolInput from './components/BoolInput';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import SignaturePad from './components/SignaturePad';
-import DateTimeRow from './components/Date';
-import HtmlRow from './components/HtmlRow';
+ import SignaturePad from './components/SignaturePad';
+ import HtmlRow from './components/HtmlRow';
+import { useBaseLink } from '../../../hooks/useBaseLink';
+import DateTimeRow from './components/DateTimeRow';
 
 type PageRouteParams = { PageScreen: { item: any } };
 
@@ -44,13 +44,13 @@ const PageScreen = () => {
   const dispatch = useAppDispatch();
   const { pageError } = useAppSelector(state => state.auth);
   const flatListRef = useRef<FlatList>(null);
+  const baseLink = useBaseLink();
 
   const [loadingPageId, setLoadingPageId] = useState<string | null>(null);
   const [controls, setControls] = useState<any[]>([]);
   const [errorsList, setErrorsList] = useState<string[]>([]);
   const [showErrorModal, setShowErrorModal] = useState(false);
-  const [baseLink, setBaseLink] = useState<string>('');
-
+ 
   const [error, setError] = useState<string | null>(null);
   const [formValues, setFormValues] = useState<any>({});
   const [datePickerVisible, setDatePickerVisible] = useState(false);
@@ -78,7 +78,8 @@ const PageScreen = () => {
   });
 
   const route = useRoute<RouteProp<PageRouteParams, 'PageScreen'>>();
-  const { item, title, id, isFromNew, url }: any = route.params;
+  const { item, title, id, isFromNew, url, pageTitle }: any = route.params;
+    const authUser = item?.authuser;
 
   const validateForm = useCallback(() => {
     const validationErrors: Record<string, string> = {};
@@ -105,12 +106,12 @@ const PageScreen = () => {
           numberOfLines={1}
           style={{ maxWidth: 180, fontSize: 18, fontWeight: '700', color: '#fff' }}
         >
-          {isFromNew ? 'New Data ( New ) ' : title + ' ( Edit )' || 'Details'}
+          {isFromNew ? `${pageTitle} ( New ) ` : title + ' ( Edit )' || 'Details'}
         </Text>
       ),
       headerRight: () => (
         <>
-          {controls.length > 0 && (
+          {!authUser && controls.length > 0 && (
             <ERPIcon
               name="save-as"
               isLoading={actionSaveLoader}
@@ -177,27 +178,6 @@ const PageScreen = () => {
     actionLoader,
     actionSaveLoader,
   ]);
-
-  useEffect(() => {
-    let isMounted = true;
-    (async () => {
-      try {
-        const [storedLink] = await Promise.all([AsyncStorage.getItem('erp_link')]);
-
-        if (isMounted) {
-          let normalizedBase = (storedLink || '').replace(/\/+$/, '') + '';
-          normalizedBase = normalizedBase.replace(/\/devws\/?/, '/');
-          normalizedBase = normalizedBase.replace(/^https:\/\//i, 'http://');
-          setBaseLink(normalizedBase || '');
-        }
-      } catch (e) {
-        console.error('Error loading stored data:', e);
-      }
-    })();
-    return () => {
-      isMounted = false;
-    };
-  }, []);
 
   const fetchPageData = useCallback(async () => {
     try {
@@ -309,14 +289,15 @@ const PageScreen = () => {
         );
       }
       //test html 
-      else if(true) {
+      else if(item?.ctltype === 'HTML') {
         content = <HtmlRow item={item}/>
       }
       else if (item?.ctltype === 'IMAGE' && item?.field === 'signimg') {
         content = (
           <SignaturePad item={item} handleSignatureAttachment={handleSignatureAttachment} />
         );
-      } else if (item?.ctltype === 'IMAGE' || item?.ctltype === 'PHOTO') {
+      } 
+      else if (item?.ctltype === 'IMAGE' || item?.ctltype === 'PHOTO') {
         content = (
           <Media
             baseLink={baseLink}
@@ -357,7 +338,8 @@ const PageScreen = () => {
         content = (
           <DateRow item={item} errors={errors} value={value} showDatePicker={showDatePicker} />
         );
-      } else if (item?.ctltype === 'DATETIME') {
+      } 
+      else if (item?.ctltype === 'DATETIME') {
         content = (
           <DateTimeRow
             item={item}
@@ -366,7 +348,8 @@ const PageScreen = () => {
             showDateTimePicker={showDateTimePicker}
           />
         );
-      } else {
+      } 
+      else {
         content = (
           <Input
             onFocus={() => flatListRef.current?.scrollToIndex({ index, animated: true })}

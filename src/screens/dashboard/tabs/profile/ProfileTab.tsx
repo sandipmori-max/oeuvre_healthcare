@@ -1,5 +1,5 @@
-import React, { useEffect, useLayoutEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, Image } from 'react-native';
+import React, { useLayoutEffect, useState } from 'react';
+import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
 
 import AccountSwitcher from './components/AccountSwitcher';
 import { styles } from './profile_style';
@@ -9,41 +9,21 @@ import { firstLetterUpperCase, formatDateHr } from '../../../../utils/helpers';
 import AddAccountScreen from '../../add_account/AddAccountScreen';
 import ERPIcon from '../../../../components/icon/ERPIcon';
 import MaterialIcons from '@react-native-vector-icons/material-icons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import FastImage from 'react-native-fast-image';
+import { useBaseLink } from '../../../../hooks/useBaseLink';
 
 const ProfileTab = () => {
   const navigation = useNavigation<any>();
   const { user, accounts } = useAppSelector(state => state?.auth);
   const [showAccountSwitcher, setShowAccountSwitcher] = useState(false);
   const [showAddAccount, setShowAddAccount] = useState(false);
-  const [baseLink, setBaseLink] = useState<string>('');
+  const baseLink = useBaseLink();
 
   const handleAddAccount = () => {
     setShowAccountSwitcher(false);
     setShowAddAccount(true);
   };
 
-  useEffect(() => {
-    let isMounted = true;
-    (async () => {
-      try {
-        const [storedLink] = await Promise.all([AsyncStorage.getItem('erp_link')]);
-
-        if (isMounted) {
-          let normalizedBase = (storedLink || '').replace(/\/+$/, '') + '';
-          normalizedBase = normalizedBase.replace(/\/devws\/?/, '/');
-          normalizedBase = normalizedBase.replace(/^https:\/\//i, 'http://');
-          setBaseLink(normalizedBase || '');
-        }
-      } catch (e) {
-        console.error('Error loading stored data:', e);
-      }
-    })();
-    return () => {
-      isMounted = false;
-    };
-  }, []);
   const activeAccount = accounts.find(acc => acc.user.id === user?.id);
 
   useLayoutEffect(() => {
@@ -96,7 +76,9 @@ const ProfileTab = () => {
               <View style={styles.profileAvatar}>
                 <FastImage
                   source={{
-                    uri: `${baseLink}/FileUpload/1/UserMaster/${user?.id}/profileimage.jpeg?ts=${new Date().getTime()}`,
+                    uri: `${baseLink}/FileUpload/1/UserMaster/${
+                      user?.id
+                    }/profileimage.jpeg?ts=${new Date().getTime()}`,
                     priority: FastImage.priority.normal,
                     cache: FastImage.cacheControl.web,
                   }}

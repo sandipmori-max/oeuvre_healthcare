@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, {  useState } from 'react';
 import { View, Text, TouchableOpacity, Modal, FlatList, Image } from 'react-native';
 import { styles } from './components_style';
 import { useAppDispatch, useAppSelector } from '../../../../../store/hooks';
@@ -11,12 +11,12 @@ import { ERP_ICON } from '../../../../../assets';
 import { useApi } from '../../../../../hooks/useApi';
 import {
   formatDateHr,
-  formatDateMonthDateYear,
   formatTimeTo12Hour,
   isTokenValid,
 } from '../../../../../utils/helpers';
 import MaterialIcons from '@react-native-vector-icons/material-icons';
 import FastImage from 'react-native-fast-image';
+import { useBaseLink } from '../../../../../hooks/useBaseLink';
 
 interface AccountSwitcherProps {
   visible: boolean;
@@ -37,28 +37,7 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
     type: 'info' as 'error' | 'success' | 'info',
   });
 
-  const [baseLink, setBaseLink] = useState<string>('');
-
-  useEffect(() => {
-    let isMounted = true;
-    (async () => {
-      try {
-        const [storedLink] = await Promise.all([AsyncStorage.getItem('erp_link')]);
-
-        if (isMounted) {
-          let normalizedBase = (storedLink || '').replace(/\/+$/, '') + '';
-          normalizedBase = normalizedBase.replace(/\/devws\/?/, '/');
-          normalizedBase = normalizedBase.replace(/^https:\/\//i, 'http://');
-          setBaseLink(normalizedBase || '');
-        }
-      } catch (e) {
-        console.error('Error loading stored data:', e);
-      }
-    })();
-    return () => {
-      isMounted = false;
-    };
-  }, []);
+  const baseLink = useBaseLink();
 
   const handleSwitchAccount = (accountId: string) => {
     if (accountId !== activeAccountId) {
@@ -85,6 +64,9 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
   };
 
   const renderAccount = ({ item }: { item: Account }) => {
+    console.log("🚀 ~ renderAccount ~ item:", `${baseLink}/FileUpload/1/UserMaster/${
+                item?.user?.id
+              }/profileimage.jpeg?ts=${new Date().getTime()}`)
     const isActive = item?.id.toString() === activeAccountId?.toString();
     const lastLogin = formatDateHr(item?.lastLoginAt, false);
     const lastLoginHr = formatTimeTo12Hour(item?.lastLoginAt);
@@ -119,13 +101,15 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
       >
         <View style={styles.accountContent}>
           <FastImage
-  source={{
-    uri: `${baseLink}/FileUpload/1/UserMaster/${item?.user?.id}/profileimage.jpeg?ts=${new Date().getTime()}`,
-    priority: FastImage.priority.normal,
-    cache: FastImage.cacheControl.reload,
-  }}
-  style={styles.avatar}
-/>
+            source={{
+              uri: `${baseLink}/FileUpload/1/UserMaster/${
+                item?.user?.id
+              }/profileimage.jpeg?ts=${new Date().getTime()}`,
+              priority: FastImage.priority.normal,
+              cache: FastImage.cacheControl.reload,
+            }}
+            style={styles.avatar}
+          />
 
           <View style={styles.accountInfo}>
             <Text style={[styles.accountName, isActive && styles.activeText]}>

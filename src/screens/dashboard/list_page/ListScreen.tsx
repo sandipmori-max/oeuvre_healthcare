@@ -292,8 +292,8 @@ const ListScreen = () => {
     }, [getCurrentMonthRange, fetchListData]),
   );
 
-  const handleItemPressed = (item, page) => { 
-    navigation.navigate('Page', { item, title: page, isFromNew: true , url: pageName});
+  const handleItemPressed = (item, page, pageTitle = '') => { 
+    navigation.navigate('Page', { item, title: page, isFromNew: true , url: pageName, pageTitle : pageTitle});
   };
 
   const handleActionButtonPressed = (actionValue, label, color, id) => {
@@ -427,7 +427,7 @@ const ListScreen = () => {
         <TouchableOpacity
           style={styles.addButton}
           onPress={() => {
-            handleItemPressed({}, pageParamsName)
+            handleItemPressed({}, pageParamsName, pageTitle)
           }}
         >
           <MaterialIcons size={32} name='add' color={'#fff'}/>
