@@ -3,9 +3,6 @@ import SQLite from 'react-native-sqlite-storage';
 SQLite.enablePromise(true);
 
 const ERP_DB_NAME = 'DevERP.db';
-const ERP_DB_VERSION = '1.0';
-const ERP_DB_DISPLAYNAME = 'DevERP Database';
-const ERP_DB_SIZE = 200000;
 const ERP_TABLE = {
   ERP_ACCOUNTS: 'erp_accounts',
   ERP_META: 'meta',
@@ -43,7 +40,6 @@ const ERP_QUERY_BOOKMARKS_TABLE_CREATE = `
   );
 `;
 
-
 export const createAccountsTable = async db => {
   try {
     console.log('🔍 createAccountsTable called');
@@ -54,10 +50,6 @@ export const createAccountsTable = async db => {
     console.error('Error createAccountsTable:', error);
   }
 };
-
-// =============================
-// PIN MANAGEMENT HELPERS
-// =============================
 
 const META_KEYS = {
   PIN_ENABLED: 'pin_enabled',
@@ -119,10 +111,6 @@ export const getPinCode = async (db) => {
     return null;
   }
 };
-
-// =============================
-// (Your existing account + bookmark code remains same below)
-// =============================
 
 export const insertAccount = async (db, account) => {
   try {
@@ -254,7 +242,6 @@ export const insertOrUpdateBookmark = async (db, id, userId, isBookmarked) => {
   }
 };
 
-
 export const getBookmarks = async (db, userId) => {
   try {
     const results = await db.executeSql(
@@ -277,11 +264,30 @@ export const getBookmarks = async (db, userId) => {
   }
 };
 
-
 export const removeBookmark = async (db, id) => {
   try {
     await db.executeSql(`DELETE FROM ${ERP_TABLE.ERP_BOOKMARKS} WHERE id = ?`, [id]);
   } catch (error) {
     console.error("Error removeBookmark:", error);
+  }
+};
+
+export const logoutUser = async (db, accountId) => {
+  try {
+    await removeAccount(db, accountId);
+    const remainingAccounts = await getAccounts(db);
+    if (remainingAccounts.length === 0) {
+      console.log("✅ All accounts removed. No active user.");
+      return null;
+    }
+
+    const newActive = remainingAccounts[0];
+    await updateAccountActive(db, newActive.id);
+
+    console.log("✅ Logout done. New active user:", newActive.id);
+    return newActive;
+  } catch (error) {
+    console.error("Error logoutUser:", error);
+    return null;
   }
 };
