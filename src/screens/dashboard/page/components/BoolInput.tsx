@@ -8,7 +8,6 @@ type BoolInputProps = {
 };
 
 const BoolInput = ({ value, onChange, label }: BoolInputProps) => {
-  console.log("🚀 ~ BoolInput ~ value:", value)
   return (
     <View style={{  marginBottom: 10 }}>
       {label && <Text style={{ marginBottom: 4, fontWeight: '600' }}>{label}</Text>}

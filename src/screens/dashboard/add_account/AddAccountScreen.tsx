@@ -42,7 +42,6 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
   useEffect(() => {
     const fetchDeviceName = async () => {
       const name = await DeviceInfo.getDeviceName();
-      console.log('Device Name:', name);
       setDeviceId(name);
       AsyncStorage.setItem('device', name)
     };
@@ -71,11 +70,9 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
     password: string;
   }) => {
     try {
-
       DevERPService.setDevice(deviceId);
-
       setLoader(true);
-      const userExists = accounts?.some(acc => acc?.user.name === values.user);
+      const userExists = accounts?.some(acc => acc?.user?.name === values?.user);
       if (userExists) {
         setAlertConfig({
           title: 'Error',
@@ -86,7 +83,7 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
         return;
       }
       const validation = await validateCompanyCode(() =>
-        DevERPService.validateCompanyCode(values.company_code),
+        DevERPService.validateCompanyCode(values?.company_code),
       );
       if (!validation?.isValid) {
         return;
@@ -95,8 +92,8 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
 
       const loginResult = await loginWithERP(() =>
         DevERPService.loginToERP({
-          user: values.user,
-          pass: values.password,
+          user: values?.user,
+          pass: values?.password,
           firebaseid: currentFcmToken,
         }),
       );

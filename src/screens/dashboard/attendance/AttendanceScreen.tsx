@@ -127,7 +127,6 @@ const AttendanceScreen = () => {
     dispatch(getLastPunchInThunk())
       .unwrap()
       .then(res => {
-        console.log('✅ Last Punch-In Response:', res);
         setResData(res);
         setIsLoading(false);
         setActionLoader(false);
@@ -137,7 +136,6 @@ const AttendanceScreen = () => {
         setIsLoading(false);
         setActionLoader(false);
         setError(err);
-        console.log('❌ Error fetching last punch-in:', err);
       });
   };
   useEffect(() => {

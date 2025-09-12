@@ -85,7 +85,6 @@ apiClient.interceptors.request.use(
     }
 
     const token = await AsyncStorage.getItem("erp_token");
-    console.log("🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀 ~ api base --------- token:", token)
     if (token) {
       config.headers = {
         ...config.headers,

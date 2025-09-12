@@ -8,14 +8,12 @@ import MaterialIcons from '@react-native-vector-icons/material-icons';
 import FullViewLoader from '../../../../components/loader/FullViewLoader';
 
 const CustomPicker = ({ label, selectedValue, onValueChange, item, errors, dtext }: any) => {
-  console.log("🚀 ~ CustomPicker ------------>>>>>------------------ ~ item:", item)
   const [open, setOpen] = useState(false);
   const [options, setOptions] = useState<any[]>([]);
   const dispatch = useAppDispatch();
   const [loader, setLoader] = useState(false);
 
   const [selectedOption, setSelectedOption] = useState('');
-  console.log('🚀 ~ CustomPicker ~ selectedOption:', selectedOption);
 
   useEffect(() => {
     setSelectedOption(dtext);

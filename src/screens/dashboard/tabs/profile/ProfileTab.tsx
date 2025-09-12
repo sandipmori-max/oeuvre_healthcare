@@ -15,7 +15,6 @@ import FastImage from 'react-native-fast-image';
 const ProfileTab = () => {
   const navigation = useNavigation<any>();
   const { user, accounts } = useAppSelector(state => state?.auth);
-  console.log('🚀 ~ ProfileTab ~ user:', user);
   const [showAccountSwitcher, setShowAccountSwitcher] = useState(false);
   const [showAddAccount, setShowAddAccount] = useState(false);
   const [baseLink, setBaseLink] = useState<string>('');

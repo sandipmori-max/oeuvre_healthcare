@@ -47,8 +47,8 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
 
         if (isMounted) {
           let normalizedBase = (storedLink || '').replace(/\/+$/, '') + '';
-          normalizedBase = normalizedBase.replace(/\/devws\/?/, '/');
-          normalizedBase = normalizedBase.replace(/^https:\/\//i, 'http://');
+          normalizedBase = normalizedBase?.replace(/\/devws\/?/, '/');
+          normalizedBase = normalizedBase?.replace(/^https:\/\//i, 'http://');
           setBaseLink(normalizedBase || '');
         }
       } catch (e) {
@@ -71,7 +71,7 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
         includeBase64: true,
       },
       response => {
-        if (response.didCancel || response.errorCode) {
+        if (response?.didCancel || response?.errorCode) {
           setLocationLoading(false);
           setBlockAction(false);
           return;
@@ -85,7 +85,7 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
             'imageBase64',
             `${
               resData?.success === 1 || resData?.success === '1' ? 'punchOut.jpeg' : 'punchIn.jpeg'
-            }; data:${asset.type};base64,${asset.base64}`,
+            }; data:${asset?.type};base64,${asset?.base64}`,
           );
         }
         setStatusImage(photoUri);
@@ -120,7 +120,7 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
     const getLocationWithRetry = () => {
       Geolocation.getCurrentPosition(
         position => {
-          const { latitude, longitude } = position.coords;
+          const { latitude, longitude } = position?.coords;
           setUserLocation({ latitude, longitude });
           setFieldValue('latitude', String(latitude));
           setFieldValue('longitude', String(longitude));
@@ -129,7 +129,7 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
         error => {
           setAlertConfig({
             title: t('errors.locationError'),
-            message: error.message || 'Unable to fetch location',
+            message: error?.message || 'Unable to fetch location',
             type: 'error',
           });
           setAlertVisible(true);
@@ -151,8 +151,8 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
       <Formik
         initialValues={{
           name: user?.name,
-          latitude: userLocation ? String(userLocation.latitude) : '',
-          longitude: userLocation ? String(userLocation.longitude) : '',
+          latitude: userLocation ? String(userLocation?.latitude) : '',
+          longitude: userLocation ? String(userLocation?.longitude) : '',
           remark: '',
           dateTime: new Date().toISOString(),
           imageBase64: '',
@@ -224,7 +224,7 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
                     ]}
                   >
                     <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 26 }}>
-                      {user?.name ? user.name.substring(0, 2).toUpperCase() : ''}
+                      {user?.name ? user?.name.substring(0, 2).toUpperCase() : ''}
                     </Text>
                   </View>
                 )}
@@ -236,11 +236,11 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
                 <Text style={styles.label}>{t('attendance.employeeName')}</Text>
                 <TextInput
                   style={[styles.input, styles.inputReadonly]}
-                  value={values.name}
+                  value={values?.name}
                   editable={false}
                 />
-                {touched.name && errors.name ? (
-                  <Text style={styles.errorText}>{errors.name}</Text>
+                {touched?.name && errors?.name ? (
+                  <Text style={styles.errorText}>{errors?.name}</Text>
                 ) : null}
               </View>
 
@@ -248,7 +248,7 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
                 <Text style={styles.label}>{t('attendance.remark')}</Text>
                 <TextInput
                   style={[styles.input, { minHeight: 100, textAlignVertical: 'top' }]}
-                  value={values.remark}
+                  value={values?.remark}
                   onChangeText={text => setFieldValue('remark', text)}
                   placeholder={t('attendance.enterRemark')}
                   multiline
@@ -291,12 +291,12 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
 
       <CustomAlert
         visible={alertVisible}
-        title={alertConfig.title}
-        message={alertConfig.message}
-        type={alertConfig.type}
+        title={alertConfig?.title}
+        message={alertConfig?.message}
+        type={alertConfig?.type}
         onClose={() => {
           if (attendanceDone) {
-            navigation.goBack();
+            navigation?.goBack();
             setAlertVisible(false);
           } else {
             setAlertVisible(false);

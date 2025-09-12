@@ -40,11 +40,11 @@ const LoginScreen = ({ navigation, route }: any) => {
     const fetchDeviceName = async () => {
       const name = await DeviceInfo.getDeviceName();
       setDeviceId(name);
-      AsyncStorage.setItem('device', name)
+      AsyncStorage.setItem('device', name);
     };
     fetchDeviceName();
 
-    const keyboardDidShow = Keyboard.addListener('keyboardDidShow', (e) => {
+    const keyboardDidShow = Keyboard.addListener('keyboardDidShow', e => {
       setKeyboardHeight(e.endCoordinates.height + 10);
     });
     const keyboardDidHide = Keyboard.addListener('keyboardDidHide', () => {
@@ -88,7 +88,7 @@ const LoginScreen = ({ navigation, route }: any) => {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{
             flexGrow: 1,
-            paddingBottom: keyboardHeight/2 || 20,
+            paddingBottom: keyboardHeight / 2 || 20,
           }}
           renderItem={() => (
             <>
@@ -118,7 +118,8 @@ const LoginScreen = ({ navigation, route }: any) => {
                 message={alertConfig.message}
                 type={alertConfig.type}
                 onClose={() => setAlertVisible(false)}
-                actionLoader={undefined}              />
+                actionLoader={undefined}
+              />
             </>
           )}
         />

@@ -35,6 +35,7 @@ import BoolInput from './components/BoolInput';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import SignaturePad from './components/SignaturePad';
 import DateTimeRow from './components/Date';
+import HtmlRow from './components/HtmlRow';
 
 type PageRouteParams = { PageScreen: { item: any } };
 
@@ -42,19 +43,16 @@ const PageScreen = () => {
   const navigation = useNavigation();
   const dispatch = useAppDispatch();
   const { pageError } = useAppSelector(state => state.auth);
-  console.log('🚀 ~ PageScreen ~ -----------------------------pageError:', pageError);
   const flatListRef = useRef<FlatList>(null);
 
   const [loadingPageId, setLoadingPageId] = useState<string | null>(null);
   const [controls, setControls] = useState<any[]>([]);
-  console.log('🚀 ~ PageScreen ~ controls:-------', controls);
   const [errorsList, setErrorsList] = useState<string[]>([]);
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [baseLink, setBaseLink] = useState<string>('');
 
   const [error, setError] = useState<string | null>(null);
   const [formValues, setFormValues] = useState<any>({});
-  console.log('🚀 ~ PageScreen ~ formValues:--------', formValues);
   const [datePickerVisible, setDatePickerVisible] = useState(false);
 
   const [dateTimePickerVisible, setDateTimePickerVisible] = useState(false);
@@ -81,7 +79,6 @@ const PageScreen = () => {
 
   const route = useRoute<RouteProp<PageRouteParams, 'PageScreen'>>();
   const { item, title, id, isFromNew, url }: any = route.params;
-  console.log('🚀 ~ -----------------------------------------PageScreen ~ url:', url);
 
   const validateForm = useCallback(() => {
     const validationErrors: Record<string, string> = {};
@@ -255,28 +252,23 @@ const PageScreen = () => {
   }, [fetchPageData]);
 
   const handleAttachment = (base64: string, val: any) => {
-    console.log('🚀 ~ handleAttachment ~ val:', val);
-    console.log('🚀 ~ handleAttachment ~ base64:', base64);
     setFormValues(prev => {
       return { ...prev, [val]: base64 };
     });
   };
 
   const handleSignatureAttachment = (base64: string, val: any) => {
-    console.log('🚀 ~ handleSignatureAttachment ~ base64:', base64);
     setFormValues(prev => {
       return { ...prev, [val]: base64 };
     });
   };
 
-  // show
   const showDateTimePicker = (field: string, date: any) => {
     setActiveDateTimeField(field);
     setActiveDateTime(date);
     setDateTimePickerVisible(true);
   };
 
-  // hide
   const hideDateTimePicker = () => {
     setDateTimePickerVisible(false);
     setActiveDateTimeField(null);
@@ -291,7 +283,6 @@ const PageScreen = () => {
 
   const renderItem = useCallback(
     ({ item, index }: { item: any; index: number }) => {
-      console.log('🚀 ~ item:--------------------------', item);
       const setValue = (val: any) => {
         if (typeof val === 'object' && val !== null) {
           setFormValues(prev => ({ ...prev, ...val }));
@@ -316,7 +307,12 @@ const PageScreen = () => {
             onChange={val => setValue({ [item.field]: val })}
           />
         );
-      } else if (item?.ctltype === 'IMAGE' && item?.field === 'signimg') {
+      }
+      //test html 
+      else if(true) {
+        content = <HtmlRow item={item}/>
+      }
+      else if (item?.ctltype === 'IMAGE' && item?.field === 'signimg') {
         content = (
           <SignaturePad item={item} handleSignatureAttachment={handleSignatureAttachment} />
         );

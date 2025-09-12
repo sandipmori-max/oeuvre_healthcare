@@ -32,7 +32,6 @@ const EntryTab = () => {
   const { error, isAuthenticated, activeToken } = useAppSelector(state => state.auth);
   const { menu, isMenuLoading } = useAppSelector(state => state.auth);
   const allList = menu?.filter(item => item?.isReport === 'A') ?? [];
-  console.log('🚀 ~ EntryTab ~ allList:', allList);
   const [isRefresh, setIsRefresh] = useState<boolean>(false);
   const { user } = useAppSelector(state => state?.auth);
 
@@ -103,8 +102,6 @@ const EntryTab = () => {
         style={[styles.card, { backgroundColor, flexDirection: isHorizontal ? 'row' : 'column' }]}
         activeOpacity={0.7}
         onPress={() => {
-          console.log('🚀 ~ renderItem ~ backgroundColor:', item?.url);
-
           if (item?.url.includes('.') || item?.url.includes('?') || item?.url.includes('/')) {
             navigation.navigate('Web', { item });
           } else {

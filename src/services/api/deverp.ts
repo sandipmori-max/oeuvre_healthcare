@@ -34,12 +34,8 @@ class DevERPService {
     }
 
     const storedToken = await AsyncStorage.getItem('erp_token');
-    console.log('🚀 ~ DevERPService ~ ensureAuthToken ~ storedToken:', storedToken);
     const storedTokenValidTill = await AsyncStorage.getItem('erp_token_valid_till');
-    console.log(
-      '🚀 ~ DevERPService ~ ensureAuthToken ~ storedTokenValidTill:',
-      storedTokenValidTill,
-    );
+   
 
     if (storedToken && storedTokenValidTill && new Date(storedTokenValidTill) > new Date()) {
       this.token = storedToken;
@@ -52,10 +48,7 @@ class DevERPService {
 
   private async apiCall<T>(endpoint: string, payload: any): Promise<T> {
     try {
-      console.log(
-        '🚀 -🚀- -🚀- 🚀 - 🚀- 🚀 ~ DevERPService ~ apiCall ~ payload--------------------:',
-        `${payload}`,
-      );
+      
       await this.checkNetwork();
       await this.ensureAuthToken();
 
@@ -99,10 +92,7 @@ class DevERPService {
   }
 
   async validateCompanyCode(code: string) {
-    console.log(
-      '🚀🚀🚀🚀🚀🚀🚀 ~ DevERPService ~ validateCompanyCode ~ code:----------------------------------',
-      code,
-    );
+     
     try {
       const response = await this.getAppLink(code);
       console.log('🚀 ~ DevERPService ~ validateCompanyCode ~ response:', response);

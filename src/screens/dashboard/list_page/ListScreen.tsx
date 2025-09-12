@@ -26,12 +26,10 @@ const ListScreen = () => {
     error: actionError,
     response: actionResponse,
   } = useAppSelector(state => state.page);
-    console.log("🚀 ~ ListScreen ~ actionError:", actionError)
 
   const [loadingListId, setLoadingListId] = useState<string | null>(null);
   const [listData, setListData] = useState<any[]>([]);
   const [configData, setConfigData] = useState<any[]>([]);
-  console.log('🚀 ~ ListScreen ~ configData:', configData);
 
   const [error, setError] = useState<string | null>(null);
 
@@ -62,12 +60,10 @@ const ListScreen = () => {
 
   const route = useRoute<RouteProp<ListRouteParams, 'List'>>();
   const { item } = route.params;
-  console.log("🚀-------- ~ ListScreen ~ item:", item)
 
   const pageTitle = item?.title || item?.name || 'List Data';
   const pageParamsName =   item?.name || 'List Data';
   const pageName = item?.url;
-  console.log("🚀 ~ ListScreen ~ pageName:----------------------------------", pageName )
 
   const totalAmount = filteredData?.reduce((sum, item) => {
     const amount = parseFloat(item?.amount) || 0;
@@ -297,12 +293,10 @@ const ListScreen = () => {
   );
 
   const handleItemPressed = (item, page) => { 
-    console.log("🚀 ~ handleItemPressed ~ page-----/-/-/-/-/-/-/-/-/-:", pageName)
     navigation.navigate('Page', { item, title: page, isFromNew: true , url: pageName});
   };
 
   const handleActionButtonPressed = (actionValue, label, color, id) => {
-    console.log('🚀 ~ handleActionButtonPressed ~ actionValue:', actionValue);
     setAlertConfig({
       title: label,
       message: `Are you sure you want to ${label.toLowerCase()} ?`,

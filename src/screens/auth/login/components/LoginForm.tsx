@@ -12,8 +12,6 @@ import useTranslations from '../../../../hooks/useTranslations';
 import ERPTextInput from '../../../../components/input/ERPTextInput';
 import ERPButton from '../../../../components/button/ERPButton';
 import useFcmToken from '../../../../hooks/useFcmToken';
-import { generateGUID } from '../../../../utils/helpers';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const LoginForm: React.FC<LoginFormProps> = ({
   deviceId,
@@ -24,16 +22,23 @@ const LoginForm: React.FC<LoginFormProps> = ({
   const { t } = useTranslations();
   const { token: fcmToken } = useFcmToken();
 
-  const { execute: validateCompanyCode, loading: validationLoading, error: validationError } =
-    useApi();
+  const {
+    execute: validateCompanyCode,
+    loading: validationLoading,
+    error: validationError,
+  } = useApi();
   const { execute: loginWithERP, loading: erpLoginLoading, error: erpLoginError } = useApi();
 
-  const fadeAnims = [useRef(new Animated.Value(0)).current, useRef(new Animated.Value(0)).current, useRef(new Animated.Value(0)).current];
+  const fadeAnims = [
+    useRef(new Animated.Value(0)).current,
+    useRef(new Animated.Value(0)).current,
+    useRef(new Animated.Value(0)).current,
+  ];
   const buttonScale = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
-    // staggered fade-in for inputs
-    Animated.stagger(200,
+    Animated.stagger(
+      200,
       fadeAnims.map(anim =>
         Animated.timing(anim, {
           toValue: 1,
@@ -81,15 +86,20 @@ const LoginForm: React.FC<LoginFormProps> = ({
 
       const loginResult = await loginWithERP(() =>
         DevERPService.loginToERP({
-          user: values.user,
-          pass: values.password,
+          user: values?.user,
+          pass: values?.password,
           firebaseid: currentFcmToken || '',
         }),
       );
 
       if (loginResult?.success === 1) {
         await DevERPService.getAuth();
-        await onLoginSuccess(values.company_code, values.password, { user: values.user, name: values.user }, loginResult);
+        await onLoginSuccess(
+          values?.company_code,
+          values?.password,
+          { user: values?.user, name: values?.user },
+          loginResult,
+        );
       } else {
         showAlert({
           title: t('auth.error'),
@@ -119,11 +129,29 @@ const LoginForm: React.FC<LoginFormProps> = ({
             {['company_code', 'user', 'password'].map((field, index) => (
               <Animated.View
                 key={field}
-                style={{ opacity: fadeAnims[index], transform: [{ translateY: fadeAnims[index].interpolate({ inputRange: [0, 1], outputRange: [20, 0] }) }] }}
+                style={{
+                  opacity: fadeAnims[index],
+                  transform: [
+                    {
+                      translateY: fadeAnims[index].interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [20, 0],
+                      }),
+                    },
+                  ],
+                }}
               >
                 <ERPTextInput
                   label={t(`auth.${field === 'company_code' ? 'companyCode' : field}`)}
-                  placeholder={t(`auth.${field === 'company_code' ? 'enterCompanyCode' : field === 'user' ? 'enterUser' : 'enterPassword'}`)}
+                  placeholder={t(
+                    `auth.${
+                      field === 'company_code'
+                        ? 'enterCompanyCode'
+                        : field === 'user'
+                        ? 'enterUser'
+                        : 'enterPassword'
+                    }`,
+                  )}
                   placeholderTextColor="#999"
                   autoCapitalize="none"
                   secureTextEntry={field === 'password'}
