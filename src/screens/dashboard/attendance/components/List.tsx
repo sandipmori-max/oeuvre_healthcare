@@ -88,7 +88,7 @@ const List = ({ selectedMonth, showFilter, fromDate, toDate }: any) => {
   const baseLink = useBaseLink();
 
   const normalizeDate = (dateStr: string) => {
-    const [day, monthStr, year] = dateStr.split(' ');
+    const [day, monthStr, year] = dateStr && dateStr.split(' ');
     const monthMap: Record<string, string> = {
       Jan: '01',
       Feb: '02',
@@ -228,18 +228,19 @@ const List = ({ selectedMonth, showFilter, fromDate, toDate }: any) => {
     );
   }
 
-  const markedDates = listData.reduce((acc, item) => {
-    const dateStr = normalizeDate(item.date);
+  const markedDates =listData.length > 0 && listData.reduce((acc, item) => {
+    console.log("🚀 ~ item:------------", item)
+    const dateStr = item?.date &&  normalizeDate(item?.date);
     let color = ERP_COLOR_CODE.ERP_APP_COLOR;
 
-    if (item.status?.toLowerCase() === 'leave') {
+    if (item?.status?.toLowerCase() === 'leave') {
       color = '#f44336';
     } else if (
-      item.status?.toLowerCase() === 'leave_first_half' ||
-      item.status?.toLowerCase() === 'leave_second_half'
+      item?.status?.toLowerCase() === 'leave_first_half' ||
+      item?.status?.toLowerCase() === 'leave_second_half'
     ) {
       color = '#ff9800';
-    } else if (item.status?.toLowerCase() === 'working') {
+    } else if (item?.status?.toLowerCase() === 'working') {
       color = '#ccc';
     }
 
@@ -286,239 +287,251 @@ const List = ({ selectedMonth, showFilter, fromDate, toDate }: any) => {
         </ScrollView>
       )}
 
-      <FlatList
-        data={['calendar']}
-        showsVerticalScrollIndicator={false}
-        renderItem={() => (
-          <>
-            <View
-              {...panResponder.panHandlers}
-              style={{
-                flex: 1,
-                justifyContent: 'center',
-                alignContent: 'center',
-                alignItems: 'center',
-              }}
-            >
-              {currentView === 'pie' && listData.length > 0 && (
-                <View
-                  style={{
-                    justifyContent: 'space-around',
-                    padding: 16,
-                    alignItems: 'center',
-                    flexDirection: 'row',
-                    borderRadius: 8,
-                  }}
-                >
-                  <PieChart
-                    data={chartData}
-                    donut
-                    radius={90}
-                    innerRadius={80}
-                    centerLabelComponent={() => (
-                      <Text style={{ textAlign: 'center', fontSize: 18, fontWeight: '600' }}>
-                        {total + `\n`}Days
-                      </Text>
-                    )}
-                  />
-                  <View style={{ marginTop: 12, gap: 12, marginHorizontal: 20 }}>
-                    {chartData.map((c, i) => (
-                      <View key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+      {listData.length > 0 && (
+        <FlatList
+          data={['calendar']}
+          showsVerticalScrollIndicator={false}
+          renderItem={() => (
+            <>
+              <View
+                {...panResponder.panHandlers}
+                style={{
+                  flex: 1,
+                  justifyContent: 'center',
+                  alignContent: 'center',
+                  alignItems: 'center',
+                }}
+              >
+                {currentView === 'pie' && listData.length > 0 && (
+                  <View
+                    style={{
+                      justifyContent: 'space-around',
+                      padding: 16,
+                      alignItems: 'center',
+                      flexDirection: 'row',
+                      borderRadius: 8,
+                    }}
+                  >
+                    <PieChart
+                      data={chartData}
+                      donut
+                      radius={90}
+                      innerRadius={80}
+                      centerLabelComponent={() => (
+                        <Text style={{ textAlign: 'center', fontSize: 18, fontWeight: '600' }}>
+                          {total + `\n`}Days
+                        </Text>
+                      )}
+                    />
+                    <View style={{ marginTop: 12, gap: 12, marginHorizontal: 20 }}>
+                      {chartData.map((c, i) => (
                         <View
-                          style={{
-                            width: 12,
-                            height: 12,
-                            borderRadius: 6,
-                            backgroundColor: c.color,
-                          }}
-                        />
-                        <Text>{`${c.text} (${c.value})`}</Text>
-                      </View>
-                    ))}
+                          key={i}
+                          style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}
+                        >
+                          <View
+                            style={{
+                              width: 12,
+                              height: 12,
+                              borderRadius: 6,
+                              backgroundColor: c.color,
+                            }}
+                          />
+                          <Text>{`${c.text} (${c.value})`}</Text>
+                        </View>
+                      ))}
+                    </View>
+                  </View>
+                )}
+
+                {currentView === 'calendar' && (
+                  <Calendar
+                    style={{
+                      width: Dimensions.get('window').width - 20,
+                      alignSelf: 'center',
+                      borderRadius: 8,
+                      elevation: 2,
+                    }}
+                    monthFormat={'MMMM yyyy'}
+                    hideExtraDays={false}
+                    firstDay={1}
+                    onDayPress={day => {
+                      const selectedData = listData.find(
+                        d => normalizeDate(d.date) === day.dateString,
+                      );
+                      Alert.alert(
+                        `Attendance on ${day.dateString}`,
+                        selectedData ? JSON.stringify(selectedData, null, 2) : 'No data',
+                      );
+                    }}
+                    markingType={'custom'}
+                    markedDates={markedDates}
+                    theme={{
+                      textDayFontWeight: '600',
+                      todayTextColor: ERP_COLOR_CODE.ERP_APP_COLOR,
+                      arrowColor: ERP_COLOR_CODE.ERP_APP_COLOR,
+                    }}
+                  />
+                )}
+              </View>
+
+              {!isLoading && (
+                <View style={{ flex: 1 }}>
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      justifyContent: 'center',
+                      marginVertical: 10,
+                      gap: 8,
+                    }}
+                  >
+                    <View
+                      style={{
+                        width: currentView === 'pie' ? 24 : 10,
+                        height: 10,
+                        borderRadius: 5,
+                        backgroundColor:
+                          currentView === 'pie' ? ERP_COLOR_CODE.ERP_APP_COLOR : '#ccc',
+                      }}
+                    />
+                    <View
+                      style={{
+                        width: currentView === 'calendar' ? 24 : 10,
+                        height: 10,
+                        borderRadius: 5,
+                        backgroundColor:
+                          currentView === 'calendar' ? ERP_COLOR_CODE.ERP_APP_COLOR : '#ccc',
+                      }}
+                    />
                   </View>
                 </View>
               )}
 
-              {currentView === 'calendar' && (
-                <Calendar
-                  style={{
-                    width: Dimensions.get('window').width - 20,
-                    alignSelf: 'center',
-                    borderRadius: 8,
-                    elevation: 2,
-                  }}
-                  monthFormat={'MMMM yyyy'}
-                  hideExtraDays={false}
-                  firstDay={1}
-                  onDayPress={day => {
-                    const selectedData = listData.find(
-                      d => normalizeDate(d.date) === day.dateString,
-                    );
-                    Alert.alert(
-                      `Attendance on ${day.dateString}`,
-                      selectedData ? JSON.stringify(selectedData, null, 2) : 'No data',
-                    );
-                  }}
-                  markingType={'custom'}
-                  markedDates={markedDates}
-                  theme={{
-                    textDayFontWeight: '600',
-                    todayTextColor: ERP_COLOR_CODE.ERP_APP_COLOR,
-                    arrowColor: ERP_COLOR_CODE.ERP_APP_COLOR,
-                  }}
-                />
-              )}
-            </View>
-
-            {!isLoading && (
-              <View style={{ flex: 1 }}>
+              {/* List */}
+              {isLoading ? (
                 <View
                   style={{
-                    flexDirection: 'row',
+                    height: Dimensions.get('screen').height,
+                    flex: 1,
                     justifyContent: 'center',
-                    marginVertical: 10,
-                    gap: 8,
+                    alignItems: 'center',
                   }}
                 >
-                  <View
-                    style={{
-                      width: currentView === 'pie' ? 24 : 10,
-                      height: 10,
-                      borderRadius: 5,
-                      backgroundColor:
-                        currentView === 'pie' ? ERP_COLOR_CODE.ERP_APP_COLOR : '#ccc',
-                    }}
-                  />
-                  <View
-                    style={{
-                      width: currentView === 'calendar' ? 24 : 10,
-                      height: 10,
-                      borderRadius: 5,
-                      backgroundColor:
-                        currentView === 'calendar' ? ERP_COLOR_CODE.ERP_APP_COLOR : '#ccc',
-                    }}
-                  />
+                  <FullViewLoader />
                 </View>
-              </View>
-            )}
+              ) : data.length === 0 ? (
+                <View
+                  style={{
+                    height: Dimensions.get('screen').height * 0.45,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}
+                >
+                  <NoData />
+                </View>
+              ) : (
+                <FlatList
+                  data={data}
+                  showsVerticalScrollIndicator={false}
+                  keyExtractor={(item, index) => item.id?.toString() || index.toString()}
+                  renderItem={({ item }) => {
+                    const isLeaveFull = item.status?.toLowerCase() === 'leave';
+                    const workedHours =
+                      !item.intime || !item.outtime ? 0 : getWorkedHours(item.intime, item.outtime);
+                    const isLessThanRequired = !isLeaveFull && workedHours < 8.5;
+                    const isLate = !isLeaveFull && item.intime && isLatePunchIn(item.intime);
 
-            {/* List */}
-            {isLoading ? (
-              <View style={{ 
-                height:   Dimensions.get('screen').height,
-                flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                <FullViewLoader />
-              </View>
-            ) : data.length === 0 ? (
-              <View
-                style={{
-                  height: Dimensions.get('screen').height * 0.45,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}
-              >
-                <NoData />
-              </View>
-            ) : (
-              <FlatList
-                data={data}
-                showsVerticalScrollIndicator={false}
-                keyExtractor={(item, index) => item.id?.toString() || index.toString()}
-                renderItem={({ item }) => {
-                  const isLeaveFull = item.status?.toLowerCase() === 'leave';
-                  const workedHours =
-                    !item.intime || !item.outtime ? 0 : getWorkedHours(item.intime, item.outtime);
-                  const isLessThanRequired = !isLeaveFull && workedHours < 8.5;
-                  const isLate = !isLeaveFull && item.intime && isLatePunchIn(item.intime);
-
-                  return (
-                    <View
-                      style={[
-                        styles.recordCard,
-                        {
-                          backgroundColor:
-                            item?.status?.toLowerCase() !== 'working' ? '#fff' : '#ccc',
-                          opacity: item?.status?.toLowerCase() === 'working' ? 0.5 : 1,
-                        },
-                      ]}
-                    >
-                      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                        {item.image && (
-                          <Image
-                            source={{ uri: baseLink + '/' + item.image }}
-                            style={styles.recordAvatar}
-                          />
-                        )}
-                        {item.image2 && (
-                          <Image
-                            source={{ uri: baseLink + '/' + item.image2 }}
-                            style={[
-                              styles.recordAvatar,
-                              { marginLeft: -32, borderWidth: 2, borderColor: '#fff' },
-                            ]}
-                          />
-                        )}
-                      </View>
-
-                      <View style={{ flex: 1, marginLeft: 12 }}>
-                        <View
-                          style={{
-                            flexDirection: 'row',
-                            justifyContent: 'space-between',
-                            marginBottom: 4,
-                          }}
-                        >
-                          <Text style={styles.recordName}>{item?.employee}</Text>
-                          <Text style={styles.recordDateTime}>{item?.date}</Text>
+                    return (
+                      <View
+                        style={[
+                          styles.recordCard,
+                          {
+                            backgroundColor:
+                              item?.status?.toLowerCase() !== 'working' ? '#fff' : '#ccc',
+                            opacity: item?.status?.toLowerCase() === 'working' ? 0.5 : 1,
+                          },
+                        ]}
+                      >
+                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                          {item.image && (
+                            <Image
+                              source={{ uri: baseLink + '/' + item.image }}
+                              style={styles.recordAvatar}
+                            />
+                          )}
+                          {item.image2 && (
+                            <Image
+                              source={{ uri: baseLink + '/' + item.image2 }}
+                              style={[
+                                styles.recordAvatar,
+                                { marginLeft: -32, borderWidth: 2, borderColor: '#fff' },
+                              ]}
+                            />
+                          )}
                         </View>
 
-                        {!isLeaveFull && (
+                        <View style={{ flex: 1, marginLeft: 12 }}>
                           <View
                             style={{
                               flexDirection: 'row',
                               justifyContent: 'space-between',
-                              alignItems: 'center',
+                              marginBottom: 4,
                             }}
                           >
-                            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                              <MaterialIcons color="#666" size={14} name="hourglass-bottom" />
-                              <Text style={styles.recordPunchTime}>{item?.intime || '--'}</Text>
-                            </View>
-                            {item?.status?.toLowerCase() !== 'working' && (
+                            <Text style={styles.recordName}>{item?.employee}</Text>
+                            <Text style={styles.recordDateTime}>{item?.date}</Text>
+                          </View>
+
+                          {!isLeaveFull && (
+                            <View
+                              style={{
+                                flexDirection: 'row',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                              }}
+                            >
                               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                                <MaterialIcons color="#666" size={14} name="query-builder" />
-                                <Text style={styles.recordPunchTime}>
-                                  {(workedHours - 1).toFixed(2)} hr
-                                </Text>
+                                <MaterialIcons color="#666" size={14} name="hourglass-bottom" />
+                                <Text style={styles.recordPunchTime}>{item?.intime || '--'}</Text>
                               </View>
-                            )}
+                              {item?.status?.toLowerCase() !== 'working' && (
+                                <View
+                                  style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}
+                                >
+                                  <MaterialIcons color="#666" size={14} name="query-builder" />
+                                  <Text style={styles.recordPunchTime}>
+                                    {(workedHours - 1).toFixed(2)} hr
+                                  </Text>
+                                </View>
+                              )}
 
-                            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                              <MaterialIcons color="#666" size={14} name="hourglass-top" />
-                              <Text style={styles.recordPunchTime}>{item?.outtime || '--'}</Text>
+                              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                                <MaterialIcons color="#666" size={14} name="hourglass-top" />
+                                <Text style={styles.recordPunchTime}>{item?.outtime || '--'}</Text>
+                              </View>
                             </View>
-                          </View>
-                        )}
+                          )}
 
-                        {isLeaveFull && <Text style={styles.statusBadgeRed}>Leave</Text>}
-                        {isLate && <Text style={styles.statusBadgeBlue}>Late</Text>}
-                        {item?.status?.toLowerCase() !== 'working' && isLessThanRequired && (
-                          <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                            <Text style={styles.statusBadgeGrey}>Less Hours</Text>
-                            <Text style={styles.statusBadgeGrey}>
-                              ({workedHours.toFixed(2)} hrs)
-                            </Text>
-                          </View>
-                        )}
+                          {isLeaveFull && <Text style={styles.statusBadgeRed}>Leave</Text>}
+                          {isLate && <Text style={styles.statusBadgeBlue}>Late</Text>}
+                          {item?.status?.toLowerCase() !== 'working' && isLessThanRequired && (
+                            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                              <Text style={styles.statusBadgeGrey}>Less Hours</Text>
+                              <Text style={styles.statusBadgeGrey}>
+                                ({workedHours.toFixed(2)} hrs)
+                              </Text>
+                            </View>
+                          )}
+                        </View>
                       </View>
-                    </View>
-                  );
-                }}
-              />
-            )}
-          </>
-        )}
-      />
+                    );
+                  }}
+                />
+              )}
+            </>
+          )}
+        />
+      )}
     </View>
   );
 };

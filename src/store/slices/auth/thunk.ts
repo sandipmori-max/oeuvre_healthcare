@@ -90,8 +90,8 @@ export const loginUserThunk = createAsyncThunk(
         ? newvalidTill
         : await AsyncStorage.getItem('erp_token_valid_till');
       console.log(
-        '🚀-🚀-🚀-🚀-🚀-🚀-v-v-🚀-🚀-🚀-🚀-🚀-🚀-🚀-🚀 ~ tokenValidTill:',
-        tokenValidTill,
+        '🚀-🚀-🚀-🚀-🚀-🚀-response-🚀-🚀-🚀-🚀-🚀-🚀-🚀-🚀 ~ tokenValidTill:',
+        response,
       );
 
       if (!token) {
@@ -205,6 +205,14 @@ export const switchAccountThunk = createAsyncThunk(
         }
       }
       await DevERPService.getAuth();
+        const updatedAccounts = await getAccounts(db);
+      const updatedActiveAccount = await getActiveAccount(db);
+
+      return {
+        accounts: updatedAccounts,
+        activeAccountId: updatedActiveAccount?.id || null,
+        user: updatedActiveAccount?.user || null,
+      };
     } catch (error) {
       console.error('Error switching account:', error);
       return rejectWithValue('Failed to switch account');

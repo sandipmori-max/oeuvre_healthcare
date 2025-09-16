@@ -87,9 +87,9 @@ const ProfileTab = () => {
               </View>
               <View style={styles.profileInfo}>
                 <Text style={styles.profileName}>{firstLetterUpperCase(user?.name)}</Text>
-                <Text style={styles.profileEmail}>{user?.company_code}</Text>
+                <Text style={styles.profileEmail}>{user?.companyName}</Text>
                 <Text style={styles.accountType}>
-                  {(user?.accountType?.toUpperCase() || 'PERSONAL') + ' ACCOUNT'}
+                  {(user?.rolename)}
                 </Text>
               </View>
               <TouchableOpacity
