@@ -1,13 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  Modal,
-  Image,
-  FlatList,
-} from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Modal, Image, FlatList } from 'react-native';
 import { Formik } from 'formik';
 
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
@@ -30,7 +22,7 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
   const dispatch = useAppDispatch();
 
   const { execute: validateCompanyCode, execute: loginWithERP } = useApi();
-  const { accounts } = useAppSelector(state => state.auth);
+  const { accounts, user } = useAppSelector(state => state.auth);
   const { token: fcmToken } = useFcmToken();
   const [deviceId, setDeviceId] = useState<string>('');
   const [showPassword, setShowPassword] = useState(false);
@@ -43,7 +35,7 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
     const fetchDeviceName = async () => {
       const name = await DeviceInfo.getDeviceName();
       setDeviceId(name);
-      AsyncStorage.setItem('device', name)
+      AsyncStorage.setItem('device', name);
     };
 
     fetchDeviceName();
@@ -85,7 +77,7 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
       const validation = await validateCompanyCode(() =>
         DevERPService.validateCompanyCode(values?.company_code),
       );
-      console.log("🚀 ~ handleAddAccount ~ validation:", validation)
+      console.log('🚀 ~ handleAddAccount ~ validation:', validation);
       if (!validation?.isValid) {
         return;
       }
@@ -98,8 +90,26 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
           firebaseid: currentFcmToken,
         }),
       );
+      console.log('🚀 ~ handleAddAccount ~ l222222222222222oginResult:', loginResult);
+      if (loginResult?.success === '0' || loginResult?.success === 0) {
+        const validation = await validateCompanyCode(() =>
+          DevERPService.validateCompanyCode(user?.company_code),
+        );
+        console.log('🚀 ~ handleAddAccount ~ ****----*****validation:', validation);
+        setAlertConfig({
+          title: 'Login failed',
+          message: loginResult?.message || 'Unable to login',
+          type: 'error',
+        });
+        setAlertVisible(true);
+        return;
+      }
+      console.log(
+        '🚀 ~ handleAddAccount ~ loginResult:-----+-+-+-+-+-+-+-+-+-+-+-----------',
+        loginResult,
+      );
 
-      if (!loginResult || loginResult?.success !== 1) {
+      if (loginResult?.success !== 1) {
         setAlertConfig({
           title: 'Login failed',
           message: loginResult?.message || 'Unable to login',
@@ -110,12 +120,12 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
       }
 
       DevERPService.setToken(loginResult?.token);
-       
+
       await DevERPService.getAuth();
       await AsyncStorage.setItem('erp_token', loginResult?.token || '');
       await AsyncStorage.setItem('auth_token', loginResult?.token || '');
       await AsyncStorage.setItem('erp_token_valid_till', loginResult?.token || '');
-      console.log("🚀 ~ handleAddAccount ~ ++++++++++++++:", validation)
+      console.log('🚀 ~ handleAddAccount ~ ++++++++++++++:', validation);
 
       dispatch(
         loginUserThunk({
@@ -126,7 +136,7 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
           isAddingAccount: true,
           user_credentials: { user: values?.user, name: values?.user },
           response: loginResult,
-          companyData :validation
+          companyData: validation,
         }),
       );
       setAlertConfig({ title: 'Success', message: 'Account added successfully', type: 'success' });
@@ -158,116 +168,117 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
           </TouchableOpacity>
           <Text style={styles.title}>Add Account</Text>
         </View>
-        <FlatList 
-        showsHorizontalScrollIndicator={false}
-        showsVerticalScrollIndicator={false}
-         data={['']}
-         renderItem={() =>{
-          return (
-            <>
-             <View style={styles.formContainer}>
-            <Image source={ERP_ICON.APP_LOGO} style={styles.logo} resizeMode="contain" />
+        <FlatList
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+          data={['']}
+          renderItem={() => {
+            return (
+              <>
+                <View style={styles.formContainer}>
+                  <Image source={ERP_ICON.APP_LOGO} style={styles.logo} resizeMode="contain" />
 
-            <Text style={styles.subtitle}>Sign in to add another account</Text>
+                  <Text style={styles.subtitle}>Sign in to add another account</Text>
 
-            <Formik
-              initialValues={{ company_code: '', user: '', password: '' }}
-              validationSchema={erp_add_account_validation_schema}
-              onSubmit={handleAddAccount}
-            >
-              {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (
-                <>
-                  <View style={styles.inputContainer}>
-                    <Text style={styles.inputLabel}>Company Code</Text>
-                    <TextInput
-                      style={styles.input}
-                      placeholder="Enter your company code"
-                      placeholderTextColor="#999"
-                      autoCapitalize="none"
-                      onChangeText={handleChange('company_code')}
-                      onBlur={handleBlur('company_code')}
-                      value={values?.company_code}
-                    />
-                    {touched?.company_code && errors?.company_code && (
-                      <Text style={styles.errorText}>{errors?.company_code}</Text>
-                    )}
-                  </View>
-
-                  <View style={styles.inputContainer}>
-                    <Text style={styles.inputLabel}>User name</Text>
-                    <TextInput
-                      style={styles.input}
-                      placeholder="Enter user name"
-                      placeholderTextColor="#999"
-                      autoCapitalize="none"
-                      onChangeText={handleChange('user')}
-                      onBlur={handleBlur('user')}
-                      value={values?.user}
-                    />
-                    {touched?.user && errors?.user && (
-                      <Text style={styles.errorText}>{errors?.user}</Text>
-                    )}
-                  </View>
-
-                  <View
-                    style={[
-                      styles.inputContainer,
-                      { justifyContent: 'space-between', alignContent: 'center' },
-                    ]}
+                  <Formik
+                    initialValues={{ company_code: '', user: '', password: '' }}
+                    validationSchema={erp_add_account_validation_schema}
+                    onSubmit={handleAddAccount}
                   >
-                    <Text style={styles.inputLabel}>Password</Text>
-                    <TextInput
-                      style={styles.input}
-                      placeholder="Password"
-                      secureTextEntry={showPassword}
-                      placeholderTextColor="#999"
-                      value={values?.password}
-                      onChangeText={handleChange('password')}
-                      onBlur={handleBlur('password')}
-                    ></TextInput>
-                    <View style={styles.iconWrapper}>
-                      <TouchableOpacity
-                        onPress={() => setShowPassword(s => !s)}
-                        style={styles.toggleButton}
-                        accessibilityLabel={showPassword ? 'Hide password' : 'Show password'}
-                      >
-                        <MaterialIcons
-                          name={showPassword ? 'visibility-off' : 'visibility'}
-                          color={'#000'}
-                          size={20}
-                        />
-                      </TouchableOpacity>
-                    </View>
+                    {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (
+                      <>
+                        <View style={styles.inputContainer}>
+                          <Text style={styles.inputLabel}>Company Code</Text>
+                          <TextInput
+                            style={styles.input}
+                            placeholder="Enter your company code"
+                            placeholderTextColor="#999"
+                            autoCapitalize="none"
+                            onChangeText={handleChange('company_code')}
+                            onBlur={handleBlur('company_code')}
+                            value={values?.company_code}
+                          />
+                          {touched?.company_code && errors?.company_code && (
+                            <Text style={styles.errorText}>{errors?.company_code}</Text>
+                          )}
+                        </View>
 
-                    {touched?.password && errors?.password && (
-                      <Text style={styles.errorText}>{errors?.password}</Text>
+                        <View style={styles.inputContainer}>
+                          <Text style={styles.inputLabel}>User name</Text>
+                          <TextInput
+                            style={styles.input}
+                            placeholder="Enter user name"
+                            placeholderTextColor="#999"
+                            autoCapitalize="none"
+                            onChangeText={handleChange('user')}
+                            onBlur={handleBlur('user')}
+                            value={values?.user}
+                          />
+                          {touched?.user && errors?.user && (
+                            <Text style={styles.errorText}>{errors?.user}</Text>
+                          )}
+                        </View>
+
+                        <View
+                          style={[
+                            styles.inputContainer,
+                            { justifyContent: 'space-between', alignContent: 'center' },
+                          ]}
+                        >
+                          <Text style={styles.inputLabel}>Password</Text>
+                          <TextInput
+                            style={styles.input}
+                            placeholder="Password"
+                            secureTextEntry={showPassword}
+                            placeholderTextColor="#999"
+                            value={values?.password}
+                            onChangeText={handleChange('password')}
+                            onBlur={handleBlur('password')}
+                          ></TextInput>
+                          <View style={styles.iconWrapper}>
+                            <TouchableOpacity
+                              onPress={() => setShowPassword(s => !s)}
+                              style={styles.toggleButton}
+                              accessibilityLabel={showPassword ? 'Hide password' : 'Show password'}
+                            >
+                              <MaterialIcons
+                                name={showPassword ? 'visibility-off' : 'visibility'}
+                                color={'#000'}
+                                size={20}
+                              />
+                            </TouchableOpacity>
+                          </View>
+
+                          {touched?.password && errors?.password && (
+                            <Text style={styles.errorText}>{errors?.password}</Text>
+                          )}
+                        </View>
+
+                        <TouchableOpacity
+                          style={[styles.addButton, loader && styles.disabledButton]}
+                          onPress={() => handleSubmit()}
+                          disabled={loader}
+                        >
+                          {loader ? (
+                            <Text style={styles.addButtonText}>Account adding...</Text>
+                          ) : (
+                            <Text style={styles.addButtonText}>Add Account</Text>
+                          )}
+                        </TouchableOpacity>
+                      </>
                     )}
-                  </View>
+                  </Formik>
 
-                  <TouchableOpacity
-                    style={[styles.addButton, loader && styles.disabledButton]}
-                    onPress={() => handleSubmit()}
-                    disabled={loader}
-                  >
-                    {loader ? (
-                      <Text style={styles.addButtonText}>Account adding...</Text>
-                    ) : (
-                      <Text style={styles.addButtonText}>Add Account</Text>
-                    )}
-                  </TouchableOpacity>
-                </>
-              )}
-            </Formik>
-
-            <Text style={styles.note}>
-              This account will be added to your list. You can switch between accounts anytime.
-            </Text>
-          </View>
-            </>
-          )
-         }}
+                  <Text style={styles.note}>
+                    This account will be added to your list. You can switch between accounts
+                    anytime.
+                  </Text>
+                </View>
+              </>
+            );
+          }}
         />
-        
+
         <CustomAlert
           visible={alertVisible}
           title={alertConfig.title}

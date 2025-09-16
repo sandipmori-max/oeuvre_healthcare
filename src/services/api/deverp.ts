@@ -129,12 +129,18 @@ class DevERPService {
     };
     console.log('🚀 ~ DevERPService ~ loginToERP ~ loginData---------:', loginData);
 
-    const response = await apiClient.post<LoginResponse>(
+    try {
+      const response = await apiClient.post<LoginResponse>(
       `${this.link}msp_api.aspx/setAppID`,
       loginData,
     );
     console.log('🚀 ~ DevERPService ~ loginToERP ~ response:************', response);
     return response.data;
+    } catch (error) {
+      console.log("🚀 ~ DevERPService ~ loginToERP ~ error:", error?.data?.message)
+       return { success: 0, message :  error?.data?.message.toString() };
+      
+    }
   }
 
   async getAuth(): Promise<string> {
