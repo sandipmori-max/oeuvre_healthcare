@@ -10,13 +10,15 @@ import ERPIcon from '../../../../components/icon/ERPIcon';
 import { PieChart } from 'react-native-gifted-charts';
 import { getERPDashboardThunk } from '../../../../store/slices/auth/thunk';
 import ErrorMessage from '../../../../components/error/Error';
+import { ERP_COLOR_CODE } from '../../../../utils/constants';
 const HomeScreen = () => {
   const navigation = useNavigation<any>();
   const dispatch = useAppDispatch();
 
-  const { dashboard, isDashboardLoading, isAuthenticated, error } = useAppSelector(
+  const { dashboard, isDashboardLoading, isAuthenticated, error, user } = useAppSelector(
     state => state.auth,
   );
+  console.log('🚀 ~ HomeScreen ~ user:', user);
   const [loadingPageId, setLoadingPageId] = useState<any>(null);
   const [isRefresh, setIsRefresh] = useState<boolean>(false);
 
@@ -184,6 +186,17 @@ const HomeScreen = () => {
 
   return (
     <View style={theme === 'dark' ? styles.containerDark : styles.container}>
+      <Text
+        style={{
+          color: 'white',
+          marginTop: 1,
+          backgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR,
+          padding: 12,
+          textAlign: 'center',
+        }}
+      >
+        {user?.companyName}
+      </Text>
       {isDashboardLoading ? (
         <FullViewLoader />
       ) : error ? (

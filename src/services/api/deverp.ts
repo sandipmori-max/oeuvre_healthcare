@@ -102,6 +102,7 @@ class DevERPService {
             appName: response?.name,
             appUrl: response?.link,
             message: 'Company code validated successfully',
+            response: response
           }
         : { isValid: false, message: 'Invalid company code' };
     } catch {
@@ -113,7 +114,7 @@ class DevERPService {
     user: string;
     pass: string;
     firebaseid?: string;
-  }): Promise<LoginResponse> {
+   }): Promise<LoginResponse> {
     await this.checkNetwork();
 
     this.link = (await AsyncStorage.getItem('erp_link')) || this.link;
@@ -148,11 +149,11 @@ class DevERPService {
     );
     console.log('🚀 ~ DevERPService ~ getAuth ~ response:', response);
 
-    if (String(response.data.success) !== '1')
-      throw new Error(response.data.message || 'Failed to get token');
+    if (String(response?.data.success) !== '1')
+      throw new Error(response?.data?.message || 'Failed to get token');
 
-    this.token = response.data.token || '';
-    this.tokenValidTill = response.data.validTill || '';
+    this.token = response?.data?.token || '';
+    this.tokenValidTill = response?.data?.validTill || '';
     await AsyncStorage.multiSet([
       ['erp_token', this.token],
       ['erp_token_valid_till', this.tokenValidTill],
@@ -173,8 +174,8 @@ class DevERPService {
         if (activeAccount) {
           const updatedUser = {
             ...activeAccount.user,
-            // token: this.token,
-            // tokenValidTill: this.tokenValidTill,
+            // token: response.data.token,
+            // tokenValidTill: response.data.validTill ,
           };
           await db.executeSql(`UPDATE erp_accounts SET user_json = ? WHERE id = ?`, [
             JSON.stringify(updatedUser),

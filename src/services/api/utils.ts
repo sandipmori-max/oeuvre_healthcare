@@ -51,6 +51,7 @@ export const retryApiCall = async <T>(
     try {
       return await apiCall();
     } catch (error) {
+      console.log("🚀 ~ retryApiCall ~ error:", error)
       lastError = error;
 
       if (isAuthError(error) || (error.response?.status >= 400 && error.response?.status < 500)) {

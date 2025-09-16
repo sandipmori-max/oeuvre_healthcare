@@ -19,6 +19,16 @@ export const getDBConnection = async () => {
   return db;
 };
 
+const ERP_QUERY_COMPANY_TABLE_CREATE = `
+  CREATE TABLE IF NOT EXISTS company_details (
+    id TEXT PRIMARY KEY NOT NULL,
+    name TEXT NOT NULL,
+    link TEXT NOT NULL,
+    createdAt TEXT,
+    updatedAt TEXT
+  );
+`;
+
 const ERP_QUERY_ACCOUNTS_TABLE_CREATE = `CREATE TABLE IF NOT EXISTS ${ERP_TABLE.ERP_ACCOUNTS} (
       id TEXT PRIMARY KEY NOT NULL,
       user_json TEXT NOT NULL,
@@ -39,6 +49,29 @@ const ERP_QUERY_BOOKMARKS_TABLE_CREATE = `
     PRIMARY KEY (id, userId)
   );
 `;
+
+export const createCompanyTable = async (db) => {
+  try {
+    await db.executeSql(ERP_QUERY_COMPANY_TABLE_CREATE);
+    console.log("🏢 createCompanyTable created successfully");
+  } catch (error) {
+    console.error("Error createCompanyTable:", error);
+  }
+};
+
+export const insertOrUpdateCompany = async (db, company) => {
+  try {
+    const now = new Date().toISOString();
+    await db.executeSql(
+      `INSERT OR REPLACE INTO company_details (id, name, link, createdAt, updatedAt)
+       VALUES (?, ?, ?, COALESCE((SELECT createdAt FROM company_details WHERE id = ?), ?), ?);`,
+      [company.id, company.name, company.link, company.id, now, now]
+    );
+    console.log("🏢 insertOrUpdateCompany:", company.id);
+  } catch (error) {
+    console.error("Error insertOrUpdateCompany:", error);
+  }
+};
 
 export const createAccountsTable = async db => {
   try {

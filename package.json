@@ -8,6 +8,7 @@
     "lint": "eslint .",
     "start": "react-native start",
     "test": "jest",
+    "bundle-android": "cd android && gradlew --stop && gradlew clean && gradlew generateCodegenArtifactsFromSchema && gradlew app:bundleRelease",
     "build-android": "cd android && gradlew --stop && gradlew clean && gradlew generateCodegenArtifactsFromSchema && gradlew app:assembleRelease"
   },
   "dependencies": {

@@ -235,6 +235,7 @@ const authSlice = createSlice({
             title: menu?.Title || '',
             isReport: menu?.IsReport,
           }));
+          state.error = null;
         } catch (error) {
           state.menu = [];
         }
@@ -292,6 +293,7 @@ const authSlice = createSlice({
             footer: item?.footer || '',
           }));
           state.isDashboardLoading = false;
+          state.error = null;
         } catch (error) {
           console.error('Error parsing dashboard data:', error);
           state.dashboard = [];

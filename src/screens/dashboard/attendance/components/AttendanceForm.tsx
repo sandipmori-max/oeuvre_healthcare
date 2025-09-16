@@ -165,6 +165,11 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
               setAlertVisible(true);
               setLocationLoading(false);
               setBlockAction(false);
+
+              setTimeout(() => {
+                 navigation?.goBack();
+                setAlertVisible(false);
+              }, 1000)
             })
             .catch(err => {
               setAttendanceDone(false);
