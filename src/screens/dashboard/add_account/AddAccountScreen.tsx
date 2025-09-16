@@ -85,6 +85,7 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
       const validation = await validateCompanyCode(() =>
         DevERPService.validateCompanyCode(values?.company_code),
       );
+      console.log("🚀 ~ handleAddAccount ~ validation:", validation)
       if (!validation?.isValid) {
         return;
       }
@@ -114,6 +115,7 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
       await AsyncStorage.setItem('erp_token', loginResult?.token || '');
       await AsyncStorage.setItem('auth_token', loginResult?.token || '');
       await AsyncStorage.setItem('erp_token_valid_till', loginResult?.token || '');
+      console.log("🚀 ~ handleAddAccount ~ ++++++++++++++:", validation)
 
       dispatch(
         loginUserThunk({
@@ -124,6 +126,7 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
           isAddingAccount: true,
           user_credentials: { user: values?.user, name: values?.user },
           response: loginResult,
+          companyData :validation
         }),
       );
       setAlertConfig({ title: 'Success', message: 'Account added successfully', type: 'success' });

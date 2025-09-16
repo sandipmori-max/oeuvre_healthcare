@@ -56,61 +56,8 @@ const RootNavigator = () => {
     message: '',
     type: 'info' as 'error' | 'success' | 'info',
   });
-
-  const [hasSyncedDisabledLocation, setHasSyncedDisabledLocation] = useState(false);
-
-  const lastSyncedLocationRef = useRef<{ lat: number; lng: number } | null>(null);
-
-  const RADIUS_FEET = 30;
-  const FEET_TO_METERS = 0.3048;
-  // const RADIUS_IN_METERS = RADIUS_FEET * FEET_TO_METERS;
-
-  // const requestLocationPermission = async () => {
-  //   if (Platform.OS === 'android') {
-  //     const granted = await PermissionsAndroid.request(
-  //       PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-  //       {
-  //         title: 'Location Permission',
-  //         message: 'We need access to your location to sync with ERP',
-  //         buttonPositive: 'OK',
-  //       },
-  //     );
-  //     return granted === PermissionsAndroid.RESULTS.GRANTED;
-  //   }
-  //   return true;
-  // };
-
-  // const getCurrentLocation = (): Promise<{ lat: number; lng: number }> => {
-  //   return new Promise((resolve, reject) => {
-  //     Geolocation.getCurrentPosition(
-  //       position => {
-  //         const { latitude, longitude } = position.coords;
-  //         resolve({ lat: latitude, lng: longitude });
-  //       },
-  //       error => reject(error),
-  //       {
-  //         enableHighAccuracy: false,
-  //         timeout: 15000,
-  //         maximumAge: 10000,
-  //       },
-  //     );
-  //   });
-  // };
-
-  // const getDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
-  //   const R = 6371000;
-  //   const toRad = (value: number) => (value * Math.PI) / 180;
-
-  //   const dLat = toRad(lat2 - lat1);
-  //   const dLon = toRad(lon2 - lon1);
-
-  //   const a =
-  //     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-  //     Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
-
-  //   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  //   return R * c;
-  // };
+ 
+ 
 
 const app_id = generateGUID();
 
@@ -122,6 +69,8 @@ useEffect(() => {
       appid = app_id;
       await AsyncStorage.setItem('appid', appid);
     }
+    console.log("🚀 ~ fetchDeviceName ~ appid:", appid)
+
     setDeviceId(name);
     await AsyncStorage.setItem('device', name);
     DevERPService.initialize();
@@ -134,116 +83,7 @@ useEffect(() => {
   fetchDeviceName();
 }, [dispatch]);
 
-
-  // useEffect(() => {
-  //   const checkLocation = async () => {
-  //     //checkBatteryOptimization();
-  //     const enabled = await DeviceInfo.isLocationEnabled();
-
-  //     if (locationEnabled === null) {
-  //       if (!enabled) {
-  //         setAlertConfig({
-  //           title: 'Location Status',
-  //           message:
-  //             'To continue using our services, please enable location access. Without location permissions, you won’t be able to use this app',
-  //           type: 'error',
-  //         });
-  //         setAlertVisible(true);
-  //       }
-  //       setLocationEnabled(enabled);
-  //       return;
-  //     }
-
-  //     if (enabled !== locationEnabled) {
-  //       setAlertConfig({
-  //         title: 'Location Status',
-  //         message: enabled
-  //           ? `Location is now enabled`
-  //           : 'To continue using our services, please enable location access. Without location permissions, you won’t be able to use this app',
-  //         type: enabled ? 'success' : 'error',
-  //       });
-  //       setAlertVisible(true);
-  //     }
-
-  //     setModalClose(enabled);
-  //     setLocationEnabled(enabled);
-
-  //     if (isAuthenticated) {
-  //       if (enabled) {
-  //         setHasSyncedDisabledLocation(false);
-
-  //         const hasPermission = await requestLocationPermission();
-  //         if (!hasPermission) return;
-
-  //         try {
-  //           const newLocation = await getCurrentLocation();
-  //           console.log('🚀 ~ checkLocation ~ newLocation:', newLocation);
-
-  //           if (lastSyncedLocationRef.current) {
-  //             const distance = getDistance(
-  //               lastSyncedLocationRef.current.lat,
-  //               lastSyncedLocationRef.current.lng,
-  //               newLocation.lat,
-  //               newLocation.lng,
-  //             );
-
-  //             console.log(
-  //               `📏 Distance from circle center: ${distance.toFixed(
-  //                 2,
-  //               )}m (Threshold: ${RADIUS_IN_METERS}m)`,
-  //             );
-
-  //             if (distance < RADIUS_IN_METERS) {
-  //               console.log(`⏸ Inside ${RADIUS_FEET}ft circle — skipping sync`);
-  //               return;
-  //             }
-  //           }
-
-  //           lastSyncedLocationRef.current = newLocation;
-
-  //           if (accounts.length > 0) {
-  //             if (Platform.OS === 'android') {
-  //               requestLocationPermissions().then(granted => {
-  //                 if (granted && isAuthenticated) {
-  //                   const tokens = accounts?.map(u => u.user.token);
-  //                   NativeModules.LocationModule.setUserTokens(tokens);
-  //                   NativeModules.LocationModule?.startService?.();
-  //                 }
-  //               });
-  //             }
-  //           }
-  //         } catch (err) {
-  //           console.log('Location fetch error:', err);
-  //         }
-  //       } else {
-  //         if (!hasSyncedDisabledLocation) {
-  //           console.log('📍 Location is disabled - syncing once');
-  //           const location = 'disabled';
-
-  //           accounts.forEach(u => {
-  //             if (isTokenValid(u?.user?.tokenValidTill || '')) {
-  //               dispatch(
-  //                 syncLocationThunk({
-  //                   token: u?.user?.token || '',
-  //                   location,
-  //                 }),
-  //               );
-  //             }
-  //           });
-
-  //           setHasSyncedDisabledLocation(true);
-  //         }
-  //       }
-  //     }
-  //   };
-
-  //   checkLocation();
-
-  //   const interval = setInterval(checkLocation, 18000);
-  //   return () => clearInterval(interval);
-  // }, [locationEnabled, accounts, dispatch, isAuthenticated, hasSyncedDisabledLocation]);
-  // console.log('🚀 ~ RootNavigator ~ granted:', accounts);
-
+ 
   if (isLoading) {
     return <FullViewLoader />;
   }

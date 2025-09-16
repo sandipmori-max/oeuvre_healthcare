@@ -1,4 +1,4 @@
-import React, {  useState } from 'react';
+import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, Modal, FlatList, Image } from 'react-native';
 import { styles } from './components_style';
 import { useAppDispatch, useAppSelector } from '../../../../../store/hooks';
@@ -9,11 +9,7 @@ import { DevERPService } from '../../../../../services/api';
 import CustomAlert from '../../../../../components/alert/CustomAlert';
 import { ERP_ICON } from '../../../../../assets';
 import { useApi } from '../../../../../hooks/useApi';
-import {
-  formatDateHr,
-  formatTimeTo12Hour,
-  isTokenValid,
-} from '../../../../../utils/helpers';
+import { formatDateHr, formatTimeTo12Hour, isTokenValid } from '../../../../../utils/helpers';
 import MaterialIcons from '@react-native-vector-icons/material-icons';
 import FastImage from 'react-native-fast-image';
 import { useBaseLink } from '../../../../../hooks/useBaseLink';
@@ -63,12 +59,18 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
     setAlertVisible(true);
   };
 
-  const renderAccount = ({ item }: { item: Account }) => {
-     
+  const renderAccount = ({ item }: { item: any }) => {
     const isActive = item?.id.toString() === activeAccountId?.toString();
     const lastLogin = formatDateHr(item?.lastLoginAt, false);
     const lastLoginHr = formatTimeTo12Hour(item?.lastLoginAt);
+   
+    let normalizedBase = (item?.user?.companyLink || '').replace(/\/+$/, '');
+    normalizedBase = normalizedBase.replace(/\/devws\/?/, '/');
+    normalizedBase = normalizedBase.replace(/^https:\/\//i, 'http://');
 
+     console.log('🚀 ~-------- renderAccount ~ lastLoginHr:---------->>>',`${normalizedBase}/FileUpload/1/UserMaster/${
+                item?.user?.id
+              }/profileimage.jpeg?ts=${new Date().getTime()}`);
     return (
       <TouchableOpacity
         style={[styles.accountItem, isActive && styles.activeAccount]}
@@ -100,7 +102,7 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
         <View style={styles.accountContent}>
           <FastImage
             source={{
-              uri: `${baseLink}/FileUpload/1/UserMaster/${
+              uri: `${normalizedBase}/FileUpload/1/UserMaster/${
                 item?.user?.id
               }/profileimage.jpeg?ts=${new Date().getTime()}`,
               priority: FastImage.priority.normal,
@@ -114,7 +116,7 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
               {item?.user?.name.charAt(0).toUpperCase() + item?.user?.name.slice(1)}
             </Text>
             <Text style={[styles.accountEmail, isActive && styles.activeText]}>
-              {item?.user?.company_code}
+              {item?.user?.companyName}
             </Text>
             <View
               style={{

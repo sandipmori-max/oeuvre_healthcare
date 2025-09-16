@@ -4,6 +4,7 @@ import { styles } from '../page_style';
 import { ERP_COLOR_CODE } from '../../../../utils/constants';
 
 const Input = ({ item, errors, value, setValue, onFocus }: any) => {
+  console.log("🚀 ~ Input ~ item:", item?.ctltype)
   return (
     <View style={{ marginBottom: 16 }}>
       <View style={{ flexDirection: 'row' }}>

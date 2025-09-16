@@ -76,8 +76,9 @@ const LoginForm: React.FC<LoginFormProps> = ({
   const handleLoginSubmit = async (values: typeof initialFormValues) => {
     try {
       const companyValidation = await validateCompanyCode(() =>
-        DevERPService.validateCompanyCode(values.company_code),
+        DevERPService.validateCompanyCode(values.company_code,),
       );
+      console.log("🚀 ~ handleLoginSubmit ~ companyValidation:", companyValidation)
       if (!companyValidation?.isValid) return;
 
       const currentFcmToken = fcmToken || (await getMessaging().getToken());
@@ -99,6 +100,8 @@ const LoginForm: React.FC<LoginFormProps> = ({
           values?.password,
           { user: values?.user, name: values?.user },
           loginResult,
+          companyValidation
+
         );
       } else {
         showAlert({

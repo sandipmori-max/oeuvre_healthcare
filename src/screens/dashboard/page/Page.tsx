@@ -111,6 +111,19 @@ const PageScreen = () => {
       ),
       headerRight: () => (
         <>
+          {!isFromNew && (
+            <ERPIcon
+              name="refresh"
+              isLoading={actionLoader}
+              onPress={() => {
+                setActionLoader(true);
+                fetchPageData();
+                setErrors({});
+                setErrorsList([]);
+              }}
+            />
+          )}
+
           {!authUser && controls.length > 0 && (
             <ERPIcon
               name="save-as"
@@ -136,6 +149,10 @@ const PageScreen = () => {
                     });
                     setAlertVisible(true);
                     setGoBack(true);
+                    setTimeout(() => {
+                      setAlertVisible(false);
+                      navigation.goBack();
+                    }, 1500);
                   } catch (err: any) {
                     setLoader(false);
 
@@ -146,22 +163,14 @@ const PageScreen = () => {
                     });
                     setAlertVisible(true);
                     setGoBack(false);
+
+                    
                   }
                 }
                 setActionSaveLoader(false);
               }}
             />
           )}
-          <ERPIcon
-            name="refresh"
-            isLoading={actionLoader}
-            onPress={() => {
-              setActionLoader(true);
-              fetchPageData();
-              setErrors({});
-              setErrorsList([]);
-            }}
-          />
         </>
       ),
     });

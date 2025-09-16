@@ -17,6 +17,8 @@ import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 import { ERP_ICON } from '../../../../assets';
 
 const Media = ({ item, handleAttachment, infoData, baseLink, isFromNew }: any) => {
+  console.log("🚀 ~ Media ~ item:", item)
+  console.log("🚀 ~ Media ~ baseLink:", baseLink)
   const [imageUri, setImageUri] = useState<string | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [pickerModalVisible, setPickerModalVisible] = useState(false);

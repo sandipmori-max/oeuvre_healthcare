@@ -62,9 +62,10 @@ const LoginScreen = ({ navigation, route }: any) => {
     password: string,
     user_credentials: { user: string; name?: string },
     response: any,
+    companyData: any
   ) => {
     dispatch(
-      loginUserThunk({ company_code, password, isAddingAccount, user_credentials, response }),
+      loginUserThunk({ company_code, password, isAddingAccount, user_credentials, response , companyData}),
     );
   };
 
