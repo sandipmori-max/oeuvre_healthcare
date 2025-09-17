@@ -55,6 +55,12 @@ const EntryTab = () => {
       headerRight: () => (
         <>
           <ERPIcon
+            name="refresh"
+            onPress={() => {
+              setIsRefresh(!isRefresh);
+            }}
+          />
+          <ERPIcon
             name={!isHorizontal ? 'list' : 'apps'}
             onPress={() => setIsHorizontal(prev => !prev)}
           />
@@ -62,13 +68,6 @@ const EntryTab = () => {
           <ERPIcon
             name={showBookmarksOnly ? 'star' : 'allout'}
             onPress={() => setShowBookmarksOnly(prev => !prev)}
-          />
-
-          <ERPIcon
-            name="refresh"
-            onPress={() => {
-              setIsRefresh(!isRefresh);
-            }}
           />
         </>
       ),

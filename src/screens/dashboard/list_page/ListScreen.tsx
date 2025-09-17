@@ -319,10 +319,10 @@ const ListScreen = () => {
         <View>
           <View style={styles.searchContainer}>
             <View style={styles.searchInputContainer}>
-              <Text style={styles.searchIcon}>🔍</Text>
+              <MaterialIcons size={24} name='search'/>
               <TextInput
                 style={styles.searchInput}
-                placeholder="Search in list..."
+                placeholder={`Search ${pageTitle.toLowerCase()} in list...`}
                 value={searchQuery}
                 onChangeText={handleSearchChange}
                 placeholderTextColor="#6C757D"

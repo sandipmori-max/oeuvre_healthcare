@@ -9,12 +9,13 @@ import {
 } from 'react-native';
 import React, { useEffect, useLayoutEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
-import { useAppSelector } from '../../../../store/hooks';
+import { useAppDispatch, useAppSelector } from '../../../../store/hooks';
 import NoData from '../../../../components/no_data/NoData';
 import FullViewLoader from '../../../../components/loader/FullViewLoader';
-import { styles } from './report_style';
 import { ERP_ICON } from '../../../../assets';
 import ERPIcon from '../../../../components/icon/ERPIcon';
+import { getERPDashboardThunk, getERPMenuThunk } from '../../../../store/slices/auth/thunk';
+import { styles } from '../entry/entry_style';
 import {
   createBookmarksTable,
   getBookmarks,
@@ -27,8 +28,11 @@ const accentColors = ['#dbe0f5ff', '#c8f3edff', '#faf1e0ff', '#f0e1e1ff', '#f2e3
 
 const ReportTab = () => {
   const navigation = useNavigation<any>();
-  const { menu, isMenuLoading, error } = useAppSelector(state => state.auth);
+  const dispatch = useAppDispatch();
+  const { error, isAuthenticated, activeToken } = useAppSelector(state => state.auth);
+  const { menu, isMenuLoading } = useAppSelector(state => state.auth);
   const allList = menu?.filter(item => item?.isReport === 'R') ?? [];
+  const [isRefresh, setIsRefresh] = useState<boolean>(false);
   const { user } = useAppSelector(state => state?.auth);
 
   const [isHorizontal, setIsHorizontal] = useState(false);
@@ -42,6 +46,7 @@ const ReportTab = () => {
       const db = await getDBConnection();
       await createBookmarksTable(db);
       const saved = await getBookmarks(db, user?.id);
+      
       setBookmarks(saved);
     })();
   }, []);
@@ -58,6 +63,12 @@ const ReportTab = () => {
     navigation.setOptions({
       headerRight: () => (
         <>
+         <ERPIcon
+            name="refresh"
+            onPress={() => {
+              setIsRefresh(!isRefresh);
+            }}
+          />
           <ERPIcon
             name={!isHorizontal ? 'list' : 'apps'}
             onPress={() => setIsHorizontal(prev => !prev)}
@@ -68,7 +79,7 @@ const ReportTab = () => {
             onPress={() => setShowBookmarksOnly(prev => !prev)}
           />
 
-          <ERPIcon name="refresh" />
+         
         </>
       ),
       headerLeft: () => (
@@ -77,8 +88,13 @@ const ReportTab = () => {
         </>
       ),
     });
-  }, [navigation, showBookmarksOnly, isHorizontal]);
+  }, [navigation, showBookmarksOnly, isHorizontal, isRefresh]);
 
+  useEffect(() => {
+    if (isAuthenticated) {
+      dispatch(getERPMenuThunk());
+    }
+  }, [isAuthenticated, dispatch, activeToken, isRefresh]);
   const renderItem = ({ item, index }: any) => {
     const backgroundColor = accentColors[index % accentColors.length];
 
@@ -155,20 +171,21 @@ const ReportTab = () => {
       </View>
     );
   }
-
-  if(list.length === 0){
-    return(<>
-     <View
-              style={{
-                flex: 1,
-                justifyContent: 'center',
-                alignItems: 'center',
-                backgroundColor: '#fff',
-              }}
-            >
-              <NoData />
-            </View>
-    </>)
+  if (list.length === 0) {
+    return (
+      <>
+        <View
+          style={{
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: '#fff',
+          }}
+        >
+          <NoData />
+        </View>
+      </>
+    );
   }
   return (
     <>
@@ -181,11 +198,9 @@ const ReportTab = () => {
         columnWrapperStyle={!isHorizontal ? styles.columnWrapper : undefined}
         renderItem={renderItem}
         showsVerticalScrollIndicator={false}
-         
       />
     </>
   );
 };
 
 export default ReportTab;
- 

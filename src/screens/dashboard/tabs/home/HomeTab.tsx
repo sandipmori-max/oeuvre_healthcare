@@ -29,10 +29,7 @@ const HomeScreen = () => {
     navigation.setOptions({
       headerRight: () => (
         <>
-          <ERPIcon
-            name={!isHorizontal ? 'list' : 'apps'}
-            onPress={() => setIsHorizontal(prev => !prev)}
-          />
+        
 
           <ERPIcon
             name="refresh"
@@ -45,6 +42,10 @@ const HomeScreen = () => {
               }, 100);
             }}
             isLoading={actionLoader}
+          />
+            <ERPIcon
+            name={!isHorizontal ? 'list' : 'apps'}
+            onPress={() => setIsHorizontal(prev => !prev)}
           />
         </>
       ),
