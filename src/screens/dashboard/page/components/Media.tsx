@@ -17,8 +17,6 @@ import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 import { ERP_ICON } from '../../../../assets';
 
 const Media = ({ item, handleAttachment, infoData, baseLink, isFromNew }: any) => {
-  console.log("🚀 ~ Media ~ item:", item)
-  console.log("🚀 ~ Media ~ baseLink:", baseLink)
   const [imageUri, setImageUri] = useState<string | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [pickerModalVisible, setPickerModalVisible] = useState(false);
@@ -26,6 +24,7 @@ const Media = ({ item, handleAttachment, infoData, baseLink, isFromNew }: any) =
   const [loadingSmall, setLoadingSmall] = useState(false);
   const [loadingLarge, setLoadingLarge] = useState(false);
   const [cacheBuster, setCacheBuster] = useState(Date.now());
+  const [imageScale, setImageScale] = useState(1); // for zooming
 
   // 🔹 helper to build image URL
   const getImageUri = (type: 'small' | 'large') => {
@@ -34,8 +33,6 @@ const Media = ({ item, handleAttachment, infoData, baseLink, isFromNew }: any) =
       `${baseLink}fileupload/1/${infoData?.tableName}/${infoData?.id}/${
         type === 'small' ? `d_${item?.text}` : item?.text
       }`;
-
-      console.log('base', base)
     return `${base}?cb=${cacheBuster}`;
   };
 
@@ -123,10 +120,7 @@ const Media = ({ item, handleAttachment, infoData, baseLink, isFromNew }: any) =
       <View style={styles.imageWrapper}>
         <TouchableOpacity
           onPress={() => {
-            if (isFromNew) {
-              return;
-            }
-
+            if (isFromNew) return;
             setModalVisible(true);
           }}
         >
@@ -134,34 +128,18 @@ const Media = ({ item, handleAttachment, infoData, baseLink, isFromNew }: any) =
             {loadingSmall && (
               <ActivityIndicator style={StyleSheet.absoluteFill} size="small" color="#000" />
             )}
-            <View style={{ width: 100, height: 100 }}>
-              {loadingSmall && (
-                <ActivityIndicator style={StyleSheet.absoluteFill} size="small" color="#000" />
-              )}
-
-              {isFromNew ? (
-                <Image
-                  source={
-                    imageUri
-                      ? { uri: imageUri }
-                      : !isFromNew
-                      ? { uri: getImageUri('small') }
-                      : ERP_ICON.APP_LOGO
-                  }
-                  style={styles.imageThumb}
-                  resizeMode="contain"
-                />
-              ) : (
-                <Image
-                  key={item.field}
-                  source={imageUri ? { uri: imageUri } : { uri: getImageUri('small') }}
-                  style={styles.imageThumb}
-                  onLoadStart={() => !imageUri && setLoadingSmall(true)}
-                  onLoadEnd={() => setLoadingSmall(false)}
-                  resizeMode="cover"
-                />
-              )}
-            </View>
+            <Image
+              key={item.field}
+              source={
+                imageUri
+                  ? { uri: imageUri }
+                  : { uri: getImageUri('small') }
+              }
+              style={styles.imageThumb}
+              onLoadStart={() => !imageUri && setLoadingSmall(true)}
+              onLoadEnd={() => setLoadingSmall(false)}
+              resizeMode="cover"
+            />
           </View>
         </TouchableOpacity>
 
@@ -170,33 +148,61 @@ const Media = ({ item, handleAttachment, infoData, baseLink, isFromNew }: any) =
         </TouchableOpacity>
       </View>
 
-      {/* Preview Modal */}
+      {/* Fullscreen Preview Modal with Zoom */}
       <Modal
         animationType="slide"
         transparent={true}
         visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
+        onRequestClose={() => {
+          setImageScale(1);
+          setModalVisible(false);
+        }}
       >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>{item?.fieldtitle || 'Preview'}</Text>
-              <TouchableOpacity onPress={() => setModalVisible(false)}>
-                <MaterialIcons name="close" size={24} color="#000" />
-              </TouchableOpacity>
-            </View>
+        <View style={styles.fullscreenModalOverlay}>
+          <View style={styles.fullscreenModalContent}>
+            {/* Close button */}
+            <TouchableOpacity
+              style={styles.closeBtn}
+              onPress={() => {
+                setImageScale(1);
+                setModalVisible(false);
+              }}
+            >
+              <MaterialIcons name="close" size={30} color="#fff" />
+            </TouchableOpacity>
 
-            <View style={{ width: '100%', height: 300 }}>
-              {loadingLarge && (
-                <ActivityIndicator style={StyleSheet.absoluteFill} size="large" color="#000" />
-              )}
-              <Image
-                source={{ uri: getImageUri('large') }}
-                style={styles.modalImage}
-                resizeMode="contain"
-                onLoadStart={() => setLoadingLarge(true)}
-                onLoadEnd={() => setLoadingLarge(false)}
+            {loadingLarge && (
+              <ActivityIndicator
+                style={StyleSheet.absoluteFill}
+                size="large"
+                color="#fff"
               />
+            )}
+
+            {/* Image with scale */}
+            <Image
+              source={{ uri: getImageUri('large') }}
+              style={[styles.fullscreenImage, { transform: [{ scale: imageScale }] }]}
+              resizeMode="contain"
+              onLoadStart={() => setLoadingLarge(true)}
+              onLoadEnd={() => setLoadingLarge(false)}
+            />
+
+            {/* Zoom buttons */}
+            <View style={styles.zoomButtons}>
+              <TouchableOpacity
+                style={styles.zoomBtn}
+                onPress={() => setImageScale(prev => Math.min(prev + 0.2, 3))}
+              >
+                <MaterialIcons name="zoom-in" size={30} color="#fff" />
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.zoomBtn}
+                onPress={() => setImageScale(prev => Math.max(prev - 0.2, 1))}
+              >
+                <MaterialIcons name="zoom-out" size={30} color="#fff" />
+              </TouchableOpacity>
             </View>
           </View>
         </View>
@@ -243,16 +249,12 @@ const Media = ({ item, handleAttachment, infoData, baseLink, isFromNew }: any) =
 const styles = StyleSheet.create({
   imageWrapper: {
     width: '100%',
-    alignContent: 'center',
-    justifyContent: 'center',
-    alignItems: 'center',
     marginVertical: 4,
   },
   imageThumb: {
     borderWidth: 1,
     width: 100,
     height: 100,
-    borderRadius: 80,
   },
   editBtn: {
     height: 36,
@@ -260,11 +262,11 @@ const styles = StyleSheet.create({
     borderRadius: 36,
     backgroundColor: '#fff',
     position: 'absolute',
-    bottom: 0,
+    bottom: 28,
     justifyContent: 'center',
     alignContent: 'center',
     alignItems: 'center',
-    left: Dimensions.get('screen').width / 2,
+    left: Dimensions.get('screen').width / 4.98,
     borderWidth: 1,
   },
   modalOverlay: {
@@ -291,11 +293,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
   },
-  modalImage: {
-    width: '100%',
-    height: 300,
-    borderRadius: 12,
-  },
   optionRow: {
     flexDirection: 'row',
     justifyContent: 'space-evenly',
@@ -315,6 +312,43 @@ const styles = StyleSheet.create({
     marginTop: 6,
     fontSize: 14,
     fontWeight: '500',
+  },
+
+  // Fullscreen modal styles
+  fullscreenModalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.95)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  fullscreenModalContent: {
+    flex: 1,
+    width: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  fullscreenImage: {
+    width: '100%',
+    height: '100%',
+  },
+  closeBtn: {
+    position: 'absolute',
+    top: 40,
+    right: 20,
+    zIndex: 10,
+  },
+  zoomButtons: {
+    position: 'absolute',
+    bottom: 40,
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    width: '40%',
+    alignSelf: 'center',
+  },
+  zoomBtn: {
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    padding: 10,
+    borderRadius: 50,
   },
 });
 
