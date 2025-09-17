@@ -9,15 +9,98 @@ const ERP_TABLE = {
   ERP_BOOKMARKS: 'erp_bookmarks',
 };
 
+// =====================
+// 🚀 MIGRATIONS SUPPORT
+// =====================
+
+const ERP_QUERY_SCHEMA_TABLE_CREATE = `
+  CREATE TABLE IF NOT EXISTS schema_version (
+    version INTEGER PRIMARY KEY
+  );
+`;
+
+const getSchemaVersion = async (db) => {
+  await db.executeSql(ERP_QUERY_SCHEMA_TABLE_CREATE);
+  const results = await db.executeSql(
+    `SELECT version FROM schema_version ORDER BY version DESC LIMIT 1`,
+  );
+  if (results[0].rows.length > 0) {
+    return results[0].rows.item(0).version;
+  }
+  return 0;
+};
+
+const setSchemaVersion = async (db, version) => {
+  await db.executeSql(
+    `INSERT OR REPLACE INTO schema_version (version) VALUES (?)`,
+    [version],
+  );
+};
+
+// 👉 Define all schema migrations here
+const migrations = [
+  {
+    version: 1,
+    run: async (db) => {
+      // Example: add a column to accounts
+      try {
+        await db.executeSql(
+          `ALTER TABLE ${ERP_TABLE.ERP_ACCOUNTS} ADD COLUMN profilePicture TEXT;`,
+        );
+        console.log("🆕 Migration v1 applied: profilePicture column added");
+      } catch (err) {
+        console.log("⚠️ Migration v1 skipped (maybe already applied):", err.message);
+      }
+    },
+  },
+  {
+    version: 2,
+    run: async (db) => {
+      // Example: add a new notifications table
+      await db.executeSql(`
+        CREATE TABLE IF NOT EXISTS notifications (
+          id TEXT PRIMARY KEY,
+          title TEXT,
+          message TEXT,
+          createdAt TEXT
+        );
+      `);
+      console.log("🆕 Migration v2 applied: notifications table created");
+    },
+  },
+];
+
+const migrateDatabase = async (db) => {
+  const currentVersion = await getSchemaVersion(db);
+  console.log("📦 Current DB schema version:", currentVersion);
+
+  for (const migration of migrations) {
+    if (migration.version > currentVersion) {
+      console.log(`🚀 Running migration v${migration.version}`);
+      await migration.run(db);
+      await setSchemaVersion(db, migration.version);
+    }
+  }
+};
+
+// =====================
+// 🚀 DB CONNECTION
+// =====================
+
 export const getDBConnection = async () => {
   console.log('🔍 getDBConnection called');
-  const db = SQLite.openDatabase({
+  const db = await SQLite.openDatabase({
     name: ERP_DB_NAME,
     location: 'default',
   });
+  await migrateDatabase(db); // run migrations automatically
   console.log('🔍 getDBConnection completed, db object:', db);
   return db;
 };
+
+// =====================
+// 🚀 QUERIES
+// =====================
 
 const ERP_QUERY_COMPANY_TABLE_CREATE = `
   CREATE TABLE IF NOT EXISTS company_details (
@@ -49,6 +132,10 @@ const ERP_QUERY_BOOKMARKS_TABLE_CREATE = `
     PRIMARY KEY (id, userId)
   );
 `;
+
+// =====================
+// 🚀 TABLE CREATION
+// =====================
 
 export const createCompanyTable = async (db) => {
   try {
@@ -121,6 +208,7 @@ export const setPinCode = async (db, pin) => {
   try {
     await db.executeSql(
       `INSERT OR REPLACE INTO ${ERP_TABLE.ERP_META} (key, value) VALUES (?, ?)`,
+
       [META_KEYS.PIN_CODE, pin]
     );
     console.log('🔐 setPinCode: saved');
@@ -268,6 +356,7 @@ export const insertOrUpdateBookmark = async (db, id, userId, isBookmarked) => {
   try {
     await db.executeSql(
       `INSERT OR REPLACE INTO ${ERP_TABLE.ERP_BOOKMARKS} (id, userId, isBookmarked) VALUES (?, ?, ?)`,
+
       [id, userId, isBookmarked ? 1 : 0]
     );
   } catch (error) {
