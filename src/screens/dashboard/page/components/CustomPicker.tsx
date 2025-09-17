@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState, useRef } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { useAppDispatch } from '../../../../store/hooks';
 import { styles } from '../page_style';
@@ -12,36 +12,46 @@ const CustomPicker = ({ label, selectedValue, onValueChange, item, errors, dtext
   const [options, setOptions] = useState<any[]>([]);
   const dispatch = useAppDispatch();
   const [loader, setLoader] = useState(false);
-
   const [selectedOption, setSelectedOption] = useState('');
+  
+  // Cache for storing options per dtlid
+  const optionsCache = useRef<{ [key: string]: any[] }>({});
 
   useEffect(() => {
     setSelectedOption(dtext);
   }, [dtext]);
 
-const handleOpen = useCallback(async () => {
-  if (open) {
-    setOpen(false);
-    return;
-  }
+  const handleOpen = useCallback(async () => {
+    if (open) {
+      setOpen(false);
+      return;
+    }
 
-  setOpen(true);
-  setLoader(true);
+    setOpen(true);
 
-  try {
-    const res = await dispatch(
-      getDDLThunk({ dtlid: item?.dtlid, where: item?.ddlwhere }),
-    ).unwrap();
-    setOptions(res?.data ?? []);
-  } catch (e) {
-    setOptions([]);
-  } finally {
-    setTimeout(() =>{
+    // Check cache first
+    if (item?.dtlid && optionsCache.current[item.dtlid]) {
+      setOptions(optionsCache.current[item.dtlid]);
+      return;
+    }
+
+    setLoader(true);
+    try {
+      const res = await dispatch(
+        getDDLThunk({ dtlid: item?.dtlid, where: item?.ddlwhere }),
+      ).unwrap();
+
+      const data = res?.data ?? [];
+      setOptions(data);
+
+      // Store in cache
+      if (item?.dtlid) optionsCache.current[item.dtlid] = data;
+    } catch (e) {
+      setOptions([]);
+    } finally {
       setLoader(false);
-    }, 1000)
-  }
-}, [dispatch, item?.dtlid, item?.ddlwhere, open]);
-
+    }
+  }, [dispatch, item?.dtlid, item?.ddlwhere, open]);
 
   return (
     <View style={{ marginBottom: 16 }}>
@@ -54,9 +64,7 @@ const handleOpen = useCallback(async () => {
       <TouchableOpacity
         style={[styles.pickerBox, item?.disabled === '1' && styles.disabledBox]}
         onPress={() => {
-          if(item?.disabled !== '1'){
-           handleOpen();
-          }
+          if (item?.disabled !== '1') handleOpen();
         }}
         activeOpacity={0.7}
       >
@@ -69,63 +77,52 @@ const handleOpen = useCallback(async () => {
       {open && (
         <View style={styles.dropdownCard}>
           {loader ? (
-            <>
-              {' '}
-              <FullViewLoader />
-            </>
+            <FullViewLoader />
           ) : (
-            <>
-              {' '}
-              {options.length > 0 ? (
-                options.map((opt: any, i: number) => (
-                  <TouchableOpacity
-                    key={i}
-                    style={[
-                      styles.option,
-                      {
-                        backgroundColor:
-                          selectedOption === opt?.name
-                            ? ERP_COLOR_CODE.ERP_APP_COLOR
-                            : ERP_COLOR_CODE.ERP_WHITE,
-                      },
-                    ]}
-                    onPress={() => {
-                      onValueChange(opt?.value);
-                      setOpen(false);
-                      setSelectedOption(opt?.name);
-                    }}
-                  >
-                    <Text
-                      style={{
-                        color:
-                          selectedOption === opt?.name
-                            ? ERP_COLOR_CODE.ERP_WHITE
-                            : ERP_COLOR_CODE.ERP_BLACK,
-                      }}
-                    >
-                      {opt?.name}
-                    </Text>
-                  </TouchableOpacity>
-                ))
-              ) : (
-                <View
-                  style={{
-                    marginVertical: 12,
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    height: 100,
+            options.length > 0 ? (
+              options.map((opt: any, i: number) => (
+                <TouchableOpacity
+                  key={i}
+                  style={[
+                    styles.option,
+                    {
+                      backgroundColor:
+                        selectedOption === opt?.name
+                          ? ERP_COLOR_CODE.ERP_APP_COLOR
+                          : ERP_COLOR_CODE.ERP_WHITE,
+                    },
+                  ]}
+                  onPress={() => {
+                    onValueChange(opt?.value);
+                    setOpen(false);
+                    setSelectedOption(opt?.name);
                   }}
                 >
-                  <Text>No data</Text>
-                </View>
-              )}
-            </>
+                  <Text
+                    style={{
+                      color:
+                        selectedOption === opt?.name
+                          ? ERP_COLOR_CODE.ERP_WHITE
+                          : ERP_COLOR_CODE.ERP_BLACK,
+                    }}
+                  >
+                    {opt?.name}
+                  </Text>
+                </TouchableOpacity>
+              ))
+            ) : (
+              <View style={{ marginVertical: 12, justifyContent: 'center', alignItems: 'center', height: 100 }}>
+                <Text>No data</Text>
+              </View>
+            )
           )}
         </View>
       )}
 
       {errors[item.field] && (
-        <Text style={{ color: ERP_COLOR_CODE.ERP_ERROR, marginTop: 4 }}>{errors[item.field]}</Text>
+        <Text style={{ color: ERP_COLOR_CODE.ERP_ERROR, marginTop: 4 }}>
+          {errors[item.field]}
+        </Text>
       )}
     </View>
   );

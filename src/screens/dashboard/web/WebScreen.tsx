@@ -47,10 +47,11 @@ const WebScreen = () => {
     navigation.setOptions({
       title: isFromChart ? 'Dashboard' : item?.title || t('webScreen.details'),
       headerRight: () => (
-        <ERPIcon
-          name={isHidden ? 'visibility': 'visibility-off'}
-          onPress={toggleDiv}
-        />
+        <>
+          <ERPIcon name={'refresh'} />
+          <ERPIcon name={'search'} />
+          <ERPIcon name={isHidden ? 'visibility' : 'visibility-off'} onPress={toggleDiv} />
+        </>
       ),
     });
   }, [navigation, item?.title, t, isHidden]);
@@ -70,7 +71,7 @@ const WebScreen = () => {
     return `${fullUrl}${separator}&token=${token}`;
   }, [baseLink, item?.url, token]);
 
-  console.log("🚀 ~ targetUrl btnNew:", targetUrl)
+  console.log('🚀 ~ targetUrl btnNew:', targetUrl);
   if ((!isFromChart && !targetUrl) || (isFromChart && !url)) {
     return (
       <SafeAreaView style={styles.container}>
