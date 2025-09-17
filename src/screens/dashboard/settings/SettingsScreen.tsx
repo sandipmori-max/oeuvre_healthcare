@@ -97,40 +97,19 @@ const SettingsScreen = () => {
         type: 'navigate',
         value: true,
       },
+      
+     
       {
         id: '5',
-        title: t('settings.twoFactorAuth'),
-        subtitle: t('settings.extraSecurityLayer'),
-        icon: 'lock-person',
-        type: 'navigate',
-        action: '2FA',
-      },
-      {
-        id: '6',
-        title: t('settings.changePassword'),
-        subtitle: t('settings.updatePassword'),
-        icon: 'key',
-        type: 'navigate',
-        action: 'ChangePassword',
-      },
-      {
-        id: '7',
         title: t('settings.privacySettings'),
         subtitle: t('settings.managePrivacy'),
         icon: 'security',
         type: 'navigate',
         action: 'Privacy',
       },
+     
       {
-        id: '8',
-        title: t('settings.dataStorage'),
-        subtitle: t('settings.manageDataUsage'),
-        icon: 'storage',
-        type: 'navigate',
-        action: 'Storage',
-      },
-      {
-        id: '9',
+        id: '6',
         title: t('settings.language'),
         subtitle: getCurrentLanguage(),
         icon: 'language',
@@ -138,7 +117,7 @@ const SettingsScreen = () => {
         action: 'Language',
       },
       {
-        id: '10',
+        id: '7',
         title: t('settings.aboutApp'),
         subtitle: `${t('common.version')} 1.0.0`,
         icon: 'info',
@@ -146,7 +125,7 @@ const SettingsScreen = () => {
         action: 'About',
       },
       {
-        id: '11',
+        id: '8',
         title: t('settings.helpSupport'),
         subtitle: t('settings.getHelp'),
         icon: 'help',
@@ -154,7 +133,7 @@ const SettingsScreen = () => {
         action: 'Support',
       },
       {
-        id: '12',
+        id: '9',
         title: t('settings.logout'),
         subtitle: t('settings.signOut'),
         icon: 'logout',
@@ -309,7 +288,7 @@ const SettingsScreen = () => {
           <Text style={styles.sectionTitle}>{t('settings.security')}</Text>
           <FlatList
             data={settings.filter(
-              item => item.id === '4' || item.id === '5' || item.id === '6' || item.id === '7',
+              item => item.id === '4' || item.id === '5'  
             )}
             renderItem={renderSettingItem}
             keyExtractor={item => item.id}
@@ -321,7 +300,7 @@ const SettingsScreen = () => {
           <Text style={styles.sectionTitle}>{t('settings.general')}</Text>
           <FlatList
             data={settings.filter(
-              item => item.id === '8' || item.id === '9' || item.id === '10' || item.id === '11',
+              item => item.id === '6' || item.id === '7' || item.id === '8'
             )}
             renderItem={renderSettingItem}
             keyExtractor={item => item.id}
@@ -332,7 +311,7 @@ const SettingsScreen = () => {
         <View style={styles.sectionContainer}>
           <Text style={styles.sectionTitle}>{t('settings.account')}</Text>
           <FlatList
-            data={settings.filter(item => item.id === '12')}
+            data={settings.filter(item => item.id === '9')}
             renderItem={renderSettingItem}
             keyExtractor={item => item.id}
             scrollEnabled={false}

@@ -3,7 +3,7 @@ import { StyleSheet } from 'react-native';
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#fff',
   },
   header: {
     flexDirection: 'row',
@@ -85,14 +85,11 @@ export const styles = StyleSheet.create({
   sectionContainer: {
     backgroundColor: '#fff',
     marginHorizontal: 16,
-    marginVertical: 16,
+    marginVertical: 8,
     borderRadius: 12,
     overflow: 'hidden',
-    elevation: 1,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
+    borderWidth: 1,
+    borderColor: '#ccc'
   },
   sectionTitle: {
     fontSize: 16,

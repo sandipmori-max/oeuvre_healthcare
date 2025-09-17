@@ -18,7 +18,6 @@ const HomeScreen = () => {
   const { dashboard, isDashboardLoading, isAuthenticated, error, user } = useAppSelector(
     state => state.auth,
   );
-  console.log('🚀 ~ HomeScreen ~ user:', user);
   const [loadingPageId, setLoadingPageId] = useState<any>(null);
   const [isRefresh, setIsRefresh] = useState<boolean>(false);
 
