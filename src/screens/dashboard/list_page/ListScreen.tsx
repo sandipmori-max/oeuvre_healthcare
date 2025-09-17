@@ -17,7 +17,6 @@ import CustomAlert from '../../../components/alert/CustomAlert';
 import { handlePageActionThunk } from '../../../store/slices/page/thunk';
 import MaterialIcons from '@react-native-vector-icons/material-icons';
 
-
 const ListScreen = () => {
   const navigation = useNavigation();
   const dispatch = useAppDispatch();
@@ -40,7 +39,7 @@ const ListScreen = () => {
   const [filteredData, setFilteredData] = useState<any[]>([]);
   const [alertVisible, setAlertVisible] = useState(false);
   const [actionLoaders, setActionLoader] = useState(false);
-  const [parsedError, setParsedError] = useState<any>() 
+  const [parsedError, setParsedError] = useState<any>();
 
   const [alertConfig, setAlertConfig] = useState({
     title: '',
@@ -48,7 +47,7 @@ const ListScreen = () => {
     type: 'info' as 'error' | 'success' | 'info',
     actionValue: '',
     color: '#000',
-    id: 0
+    id: 0,
   });
 
   const [fromDate, setFromDate] = useState<string>('');
@@ -62,7 +61,7 @@ const ListScreen = () => {
   const { item } = route.params;
 
   const pageTitle = item?.title || item?.name || 'List Data';
-  const pageParamsName =   item?.name || 'List Data';
+  const pageParamsName = item?.name || 'List Data';
   const pageName = item?.url;
 
   const totalAmount = filteredData?.reduce((sum, item) => {
@@ -80,6 +79,14 @@ const ListScreen = () => {
       headerRight: () => (
         <>
           <ERPIcon
+            name="refresh"
+            onPress={() => {
+              setActionLoader(true);
+              onRefresh();
+            }}
+            isLoading={actionLoaders}
+          />
+          <ERPIcon
             name={isTableView ? 'list' : 'apps'}
             onPress={() => {
               setIsTableView(!isTableView);
@@ -91,15 +98,6 @@ const ListScreen = () => {
             onPress={() => {
               setIsFilterVisible(!isFilterVisible);
             }}
-          />
-
-          <ERPIcon
-            name="refresh"
-            onPress={() => {
-              setActionLoader(true);
-              onRefresh();
-            }}
-            isLoading={actionLoaders}
           />
         </>
       ),
@@ -236,7 +234,7 @@ const ListScreen = () => {
           }),
         ).unwrap();
         const parsed = typeof raw === 'string' ? JSON.parse(raw) : raw;
-        console.log("🚀 ~ parsed--------:", parsed)
+        console.log('🚀 ~ parsed--------:', parsed);
         let dataArray = [];
         let configArray = [];
 
@@ -262,7 +260,7 @@ const ListScreen = () => {
       } catch (e: any) {
         console.log('Failed to load list data:', e);
         setError(e || 'Failed to load list data');
-        setParsedError(e)
+        setParsedError(e);
       } finally {
         setLoadingListId(null);
         setTimeout(() => {
@@ -292,8 +290,14 @@ const ListScreen = () => {
     }, [getCurrentMonthRange, fetchListData]),
   );
 
-  const handleItemPressed = (item, page, pageTitle = '') => { 
-    navigation.navigate('Page', { item, title: page, isFromNew: true , url: pageName, pageTitle : pageTitle});
+  const handleItemPressed = (item, page, pageTitle = '') => {
+    navigation.navigate('Page', {
+      item,
+      title: page,
+      isFromNew: true,
+      url: pageName,
+      pageTitle: pageTitle,
+    });
   };
 
   const handleActionButtonPressed = (actionValue, label, color, id) => {
@@ -303,23 +307,25 @@ const ListScreen = () => {
       type: 'info',
       actionValue: actionValue,
       color: color,
-      id: id
+      id: id,
     });
     setAlertVisible(true);
   };
 
-   if(parsedError){
-      return <View style={{flex: 1, }}>
+  if (parsedError) {
+    return (
+      <View style={{ flex: 1 }}>
         <Text>{JSON.stringify(parsedError)}</Text>
       </View>
-    }
+    );
+  }
   return (
     <View style={styles.container}>
       {isFilterVisible && (
         <View>
           <View style={styles.searchContainer}>
             <View style={styles.searchInputContainer}>
-              <MaterialIcons size={24} name='search'/>
+              <MaterialIcons size={24} name="search" />
               <TextInput
                 style={styles.searchInput}
                 placeholder={`Search ${pageTitle.toLowerCase()} in list...`}
@@ -371,13 +377,11 @@ const ListScreen = () => {
               onChange={handleDateChange}
               minimumDate={
                 showDatePicker?.type === 'to' && fromDate
-                  ? parseCustomDate(fromDate) 
-                  : new Date(new Date().getFullYear(), 0, 1) 
+                  ? parseCustomDate(fromDate)
+                  : new Date(new Date().getFullYear(), 0, 1)
               }
               maximumDate={
-                showDatePicker?.type === 'from' && toDate
-                  ? parseCustomDate(toDate) 
-                  : new Date()
+                showDatePicker?.type === 'from' && toDate ? parseCustomDate(toDate) : new Date()
               }
             />
           )}
@@ -427,13 +431,12 @@ const ListScreen = () => {
         <TouchableOpacity
           style={styles.addButton}
           onPress={() => {
-            handleItemPressed({}, pageParamsName, pageTitle)
+            handleItemPressed({}, pageParamsName, pageTitle);
           }}
         >
-          <MaterialIcons size={32} name='add' color={'#fff'}/>
+          <MaterialIcons size={32} name="add" color={'#fff'} />
         </TouchableOpacity>
       )}
-      
 
       <CustomAlert
         visible={alertVisible}
