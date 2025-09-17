@@ -1,5 +1,5 @@
 import MaterialIcons from '@react-native-vector-icons/material-icons';
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import {
   View,
   Image,
@@ -11,10 +11,15 @@ import {
   Modal,
   StyleSheet,
   ActivityIndicator,
+  Animated,
+  PanResponder,
 } from 'react-native';
 import { launchCamera, launchImageLibrary, Asset } from 'react-native-image-picker';
 import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 import { ERP_ICON } from '../../../../assets';
+
+const screenWidth = Dimensions.get('window').width;
+const screenHeight = Dimensions.get('window').height;
 
 const Media = ({ item, handleAttachment, infoData, baseLink, isFromNew }: any) => {
   const [imageUri, setImageUri] = useState<string | null>(null);
@@ -24,9 +29,15 @@ const Media = ({ item, handleAttachment, infoData, baseLink, isFromNew }: any) =
   const [loadingSmall, setLoadingSmall] = useState(false);
   const [loadingLarge, setLoadingLarge] = useState(false);
   const [cacheBuster, setCacheBuster] = useState(Date.now());
-  const [imageScale, setImageScale] = useState(1); // for zooming
 
-  // 🔹 helper to build image URL
+  // Animated values for zoom & pan
+  const scale = useRef(new Animated.Value(1)).current;
+  const translateX = useRef(new Animated.Value(0)).current;
+  const translateY = useRef(new Animated.Value(0)).current;
+  const lastScale = useRef(1);
+  const lastTranslate = useRef({ x: 0, y: 0 });
+
+  // Helper to build image URL
   const getImageUri = (type: 'small' | 'large') => {
     const base =
       imageUri ||
@@ -114,6 +125,46 @@ const Media = ({ item, handleAttachment, infoData, baseLink, isFromNew }: any) =
     setPickerModalVisible(true);
   };
 
+  // PanResponder for zoom & pan
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: () => true,
+      onPanResponderMove: (evt, gesture) => {
+        if (gesture.numberActiveTouches === 1) {
+          // pan
+          translateX.setValue(lastTranslate.current.x + gesture.dx);
+          translateY.setValue(lastTranslate.current.y + gesture.dy);
+        } else if (gesture.numberActiveTouches === 2) {
+          // pinch
+          const touches = evt.nativeEvent.touches;
+          const dx = touches[0].pageX - touches[1].pageX;
+          const dy = touches[0].pageY - touches[1].pageY;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          if (!lastScale.currentDistance) lastScale.currentDistance = distance;
+          const scaleFactor = distance / lastScale.currentDistance;
+          scale.setValue(Math.max(1, Math.min(3, lastScale.current * scaleFactor)));
+        }
+      },
+      onPanResponderRelease: (_, gesture) => {
+        lastTranslate.current.x += gesture.dx;
+        lastTranslate.current.y += gesture.dy;
+        lastScale.current = scale.__getValue();
+        lastScale.currentDistance = undefined;
+      },
+    }),
+  ).current;
+
+  const zoomIn = () => {
+    scale.setValue(Math.min(3, scale.__getValue() + 0.2));
+    lastScale.current = scale.__getValue();
+  };
+
+  const zoomOut = () => {
+    scale.setValue(Math.max(1, scale.__getValue() - 0.2));
+    lastScale.current = scale.__getValue();
+  };
+
   return (
     <>
       <Text style={{ fontWeight: '600', marginBottom: 4 }}>{item?.fieldtitle}</Text>
@@ -130,11 +181,7 @@ const Media = ({ item, handleAttachment, infoData, baseLink, isFromNew }: any) =
             )}
             <Image
               key={item.field}
-              source={
-                imageUri
-                  ? { uri: imageUri }
-                  : { uri: getImageUri('small') }
-              }
+              source={imageUri ? { uri: imageUri } : { uri: getImageUri('small') }}
               style={styles.imageThumb}
               onLoadStart={() => !imageUri && setLoadingSmall(true)}
               onLoadEnd={() => setLoadingSmall(false)}
@@ -148,23 +195,29 @@ const Media = ({ item, handleAttachment, infoData, baseLink, isFromNew }: any) =
         </TouchableOpacity>
       </View>
 
-      {/* Fullscreen Preview Modal with Zoom */}
       <Modal
         animationType="slide"
         transparent={true}
         visible={modalVisible}
         onRequestClose={() => {
-          setImageScale(1);
+          scale.setValue(1);
+          translateX.setValue(0);
+          translateY.setValue(0);
+          lastTranslate.current = { x: 0, y: 0 };
+          lastScale.current = 1;
           setModalVisible(false);
         }}
       >
         <View style={styles.fullscreenModalOverlay}>
           <View style={styles.fullscreenModalContent}>
-            {/* Close button */}
             <TouchableOpacity
               style={styles.closeBtn}
               onPress={() => {
-                setImageScale(1);
+                scale.setValue(1);
+                translateX.setValue(0);
+                translateY.setValue(0);
+                lastTranslate.current = { x: 0, y: 0 };
+                lastScale.current = 1;
                 setModalVisible(false);
               }}
             >
@@ -172,36 +225,33 @@ const Media = ({ item, handleAttachment, infoData, baseLink, isFromNew }: any) =
             </TouchableOpacity>
 
             {loadingLarge && (
-              <ActivityIndicator
-                style={StyleSheet.absoluteFill}
-                size="large"
-                color="#fff"
-              />
+              <ActivityIndicator style={StyleSheet.absoluteFill} size="large" color="#fff" />
             )}
 
-            {/* Image with scale */}
-            <Image
-              source={{ uri: getImageUri('large') }}
-              style={[styles.fullscreenImage, { transform: [{ scale: imageScale }] }]}
-              resizeMode="contain"
-              onLoadStart={() => setLoadingLarge(true)}
-              onLoadEnd={() => setLoadingLarge(false)}
-            />
+            <Animated.View
+              style={{
+                width: '100%',
+                height: '100%',
+                transform: [{ scale }, { translateX }, { translateY }],
+              }}
+              {...panResponder.panHandlers}
+            >
+              <Image
+                source={{ uri: getImageUri('large') }}
+                style={styles.fullscreenImage}
+                resizeMode="contain"
+                onLoadStart={() => setLoadingLarge(true)}
+                onLoadEnd={() => setLoadingLarge(false)}
+              />
+            </Animated.View>
 
-            {/* Zoom buttons */}
-            <View style={styles.zoomButtons}>
-              <TouchableOpacity
-                style={styles.zoomBtn}
-                onPress={() => setImageScale(prev => Math.min(prev + 0.2, 3))}
-              >
-                <MaterialIcons name="zoom-in" size={30} color="#fff" />
+            {/* Zoom In / Zoom Out buttons */}
+            <View style={styles.zoomControls}>
+              <TouchableOpacity style={styles.zoomBtn} onPress={zoomIn}>
+                <MaterialIcons name="zoom-in" size={28} color="#000" />
               </TouchableOpacity>
-
-              <TouchableOpacity
-                style={styles.zoomBtn}
-                onPress={() => setImageScale(prev => Math.max(prev - 0.2, 1))}
-              >
-                <MaterialIcons name="zoom-out" size={30} color="#fff" />
+              <TouchableOpacity style={styles.zoomBtn} onPress={zoomOut}>
+                <MaterialIcons name="zoom-out" size={28} color="#000" />
               </TouchableOpacity>
             </View>
           </View>
@@ -249,6 +299,9 @@ const Media = ({ item, handleAttachment, infoData, baseLink, isFromNew }: any) =
 const styles = StyleSheet.create({
   imageWrapper: {
     width: '100%',
+    alignContent: 'center',
+    justifyContent: 'center',
+    alignItems: 'center',
     marginVertical: 4,
   },
   imageThumb: {
@@ -266,7 +319,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignContent: 'center',
     alignItems: 'center',
-    left: Dimensions.get('screen').width / 4.98,
+    left: Dimensions.get('screen').width / 1.88,
     borderWidth: 1,
   },
   modalOverlay: {
@@ -313,8 +366,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '500',
   },
-
-  // Fullscreen modal styles
   fullscreenModalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.95)',
@@ -337,18 +388,24 @@ const styles = StyleSheet.create({
     right: 20,
     zIndex: 10,
   },
-  zoomButtons: {
+  zoomControls: {
     position: 'absolute',
     bottom: 40,
     flexDirection: 'row',
     justifyContent: 'space-around',
-    width: '40%',
-    alignSelf: 'center',
+    width: '30%',
   },
   zoomBtn: {
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    padding: 10,
-    borderRadius: 50,
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: '#fff',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  zoomText: {
+    fontSize: 24,
+    fontWeight: 'bold',
   },
 });
 
