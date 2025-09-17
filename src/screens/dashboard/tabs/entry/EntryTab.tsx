@@ -164,7 +164,7 @@ const EntryTab = () => {
           flex: 1,
           justifyContent: 'center',
           alignItems: 'center',
-          backgroundColor: 'white',
+          backgroundColor: '#fff',
         }}
       >
         <ErrorMessage message={error} />{' '}
@@ -188,7 +188,7 @@ const EntryTab = () => {
     );
   }
   return (
-    <>
+    <View style={{ flex: 1, width: '100%', backgroundColor: '#fff' }}>
       <FlatList
         key={`${isHorizontal}-${showBookmarksOnly}`}
         data={list}
@@ -199,7 +199,7 @@ const EntryTab = () => {
         renderItem={renderItem}
         showsVerticalScrollIndicator={false}
       />
-    </>
+    </View>
   );
 };
 
