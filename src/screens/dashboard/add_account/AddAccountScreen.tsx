@@ -228,7 +228,7 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
                           <Text style={styles.inputLabel}>Password</Text>
                           <TextInput
                             style={styles.input}
-                            placeholder="Password"
+                            placeholder="Enter your password"
                             secureTextEntry={showPassword}
                             placeholderTextColor="#999"
                             value={values?.password}

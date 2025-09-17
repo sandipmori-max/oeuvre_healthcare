@@ -114,6 +114,31 @@ const List = ({ selectedMonth, showFilter, fromDate, toDate }: any) => {
     const outDate = new Date(0, 0, 0, outH, outM);
     return (outDate.getTime() - inDate.getTime()) / 1000 / 60 / 60;
   };
+const getWorkedHours2 = (punchIn: string, punchOut: string) => {
+  if (!punchIn || !punchOut) return '0 hr 0 min';
+
+  const [inH, inM] = punchIn.split(':').map(Number);
+  const [outH, outM] = punchOut.split(':').map(Number);
+
+  if (isNaN(inH) || isNaN(inM) || isNaN(outH) || isNaN(outM)) {
+    return '0 hr 0 min';
+  }
+
+  const inDate = new Date(0, 0, 0, inH, inM);
+  const outDate = new Date(0, 0, 0, outH, outM);
+
+  let diffMs = outDate.getTime() - inDate.getTime();
+  if (diffMs <= 0) return '0 hr 0 min';
+
+  const totalMinutes = Math.floor(diffMs / 60000);
+
+  const minutesAfterBreak = Math.max(totalMinutes - 60, 0);
+
+  const hours = Math.floor(minutesAfterBreak / 60);
+  const mins = minutesAfterBreak % 60;
+
+  return `${hours}:${mins.toString().padStart(2, '0')}`;
+};
 
   const panResponder = PanResponder.create({
     onMoveShouldSetPanResponder: (_, gestureState) => {
@@ -177,6 +202,7 @@ const List = ({ selectedMonth, showFilter, fromDate, toDate }: any) => {
   }, [fromDate, toDate, fetchListData]);
 
   let data = listData.length > 0 ? [...listData] : [];
+  console.log("🚀 ~ List ~ data:", data)
   if (activeFilter !== 'all') {
     switch (activeFilter) {
       case 'leave':
@@ -500,7 +526,7 @@ const List = ({ selectedMonth, showFilter, fromDate, toDate }: any) => {
                                 >
                                   <MaterialIcons color="#666" size={14} name="query-builder" />
                                   <Text style={styles.recordPunchTime}>
-                                    {(workedHours - 1).toFixed(2)} hr
+                                    { getWorkedHours2(item?.intime, item?.outtime)}
                                   </Text>
                                 </View>
                               )}

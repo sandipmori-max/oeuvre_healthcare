@@ -1,6 +1,5 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { PermissionsAndroid, Platform, NativeModules, Alert , } from 'react-native';
-import { useAppDispatch, useAppSelector } from '../store/hooks';
+import React, { useEffect, useState } from 'react';
+ import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { checkAuthStateThunk } from '../store/slices/auth/thunk';
 import DevERPService from '../services/api/deverp';
 import AuthNavigator from './AuthNavigator';

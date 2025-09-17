@@ -11,7 +11,6 @@ import {
 } from '../../../utils/sqlite';
 import { Account, User } from './type';
 import { DevERPService } from '../../../services/api';
-import { isTokenValid } from '../../../utils/helpers';
 
 export const checkAuthStateThunk = createAsyncThunk(
   'auth/checkAuthState',
