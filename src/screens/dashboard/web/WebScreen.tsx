@@ -1,4 +1,4 @@
-import { Button, SafeAreaView, StatusBar, View } from 'react-native';
+import { SafeAreaView, StatusBar, Text, View } from 'react-native';
 import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import WebView from 'react-native-webview';
@@ -17,6 +17,7 @@ const WebScreen = () => {
   const { item, isFromChart } = route.params;
   const [token, setToken] = useState<string>('');
   const [isHidden, setIsHidden] = useState(false);
+  const [isReloading, setIsReloading] = useState(false);
   const webviewRef = useRef<WebView>(null);
   const baseLink = useBaseLink();
 
@@ -43,14 +44,33 @@ const WebScreen = () => {
     setIsHidden(prev => !prev);
   };
 
+  const reloadWebView = () => {
+    setIsReloading(true);
+    webviewRef.current?.reload();
+  };
+
   useLayoutEffect(() => {
     navigation.setOptions({
-      title: isFromChart ? 'Dashboard' : item?.title || t('webScreen.details'),
+      headerTitle: () => (
+        <Text
+          numberOfLines={1}
+          style={{ maxWidth: 180, fontSize: 18, fontWeight: '700', color: '#fff' }}
+        >
+          {isFromChart ? 'Dashboard' : item?.title || t('webScreen.details')}
+        </Text>
+      ),
       headerRight: () => (
         <>
-          <ERPIcon name={'refresh'} />
-          <ERPIcon name={'search'} />
-          <ERPIcon name={isHidden ? 'visibility' : 'visibility-off'} onPress={toggleDiv} />
+          {isFromChart || item?.title === 'Attendance Code' ? (
+            <>
+              <ERPIcon name={'refresh'} onPress={reloadWebView} />
+            </>
+          ) : (
+            <>
+              <ERPIcon name={'refresh'} onPress={reloadWebView} />
+              <ERPIcon name={'filter-alt'} onPress={toggleDiv} />
+            </>
+          )}
         </>
       ),
     });
@@ -72,6 +92,7 @@ const WebScreen = () => {
   }, [baseLink, item?.url, token]);
 
   console.log('🚀 ~ targetUrl btnNew:', targetUrl);
+
   if ((!isFromChart && !targetUrl) || (isFromChart && !url)) {
     return (
       <SafeAreaView style={styles.container}>
@@ -84,51 +105,71 @@ const WebScreen = () => {
     <SafeAreaView style={styles.container}>
       <StatusBar backgroundColor={ERP_COLOR_CODE.ERP_APP_COLOR} translucent={false} />
       {token ? (
-        <WebView
-          ref={webviewRef}
-          source={{ uri: isFromChart ? url : targetUrl }}
-          startInLoadingState={true}
-          javaScriptEnabled={true}
-          domStorageEnabled={true}
-          style={styles.webview}
-          showsHorizontalScrollIndicator={false}
-          showsVerticalScrollIndicator={false}
-          bounces={false}
-          scrollEnabled={true}
-          decelerationRate={0.998}
-          cacheEnabled={true}
-          cacheMode="LOAD_DEFAULT"
-          renderLoading={() => (
-            <View style={styles.webviewLoadingContainer}>
-              <View style={styles.webviewLoadingContent}>
-                <FullViewLoader />
+        <>
+          <WebView
+            ref={webviewRef}
+            source={{ uri: isFromChart ? url : targetUrl }}
+            startInLoadingState={true}
+            javaScriptEnabled={true}
+            domStorageEnabled={true}
+            style={styles.webview}
+            showsHorizontalScrollIndicator={false}
+            showsVerticalScrollIndicator={false}
+            bounces={false}
+            scrollEnabled={true}
+            decelerationRate={0.998}
+            cacheEnabled={true}
+            cacheMode="LOAD_DEFAULT"
+            renderLoading={() => (
+              <View style={styles.webviewLoadingContainer}>
+                <View style={styles.webviewLoadingContent}>
+                  <FullViewLoader />
+                </View>
               </View>
-            </View>
-          )}
-          allowsBackForwardNavigationGestures={true}
-          textZoom={100}
-          allowsLinkPreview={false}
-          onError={syntheticEvent => {
-            const { nativeEvent } = syntheticEvent;
-            console.warn('WebView error: ', nativeEvent);
-          }}
-          onLoadStart={() => console.log('WebView loading started')}
-          onLoadEnd={() => console.log('WebView loading finished')}
-          injectedJavaScript={`
-            (function() {
-              const allIds = Array.from(document.querySelectorAll('[id]')).map(el => el.id);
-              const allClasses = Array.from(document.querySelectorAll('[class]')).map(el => el.className);
-              window.ReactNativeWebView.postMessage(JSON.stringify({ ids: allIds, classes: allClasses }));
-            })();
-            true;
-          `}
-          onMessage={event => {
-            console.log('✅ WebView sent a message!');
-            const data = JSON.parse(event.nativeEvent.data);
-            console.log('All IDs:', data.ids);
-            console.log('All Classes:', data.classes);
-          }}
-        />
+            )}
+            allowsBackForwardNavigationGestures={true}
+            textZoom={100}
+            allowsLinkPreview={false}
+            onError={syntheticEvent => {
+              const { nativeEvent } = syntheticEvent;
+              console.warn('WebView error: -', nativeEvent);
+              setIsReloading(false);
+            }}
+            onLoadStart={() => {
+              console.log('WebView loading started');
+              setIsReloading(true);
+            }}
+            onLoadEnd={() => {
+              console.log('WebView loading finished');
+              setIsReloading(false);
+              const jsCode = `
+                (function() {
+                  const div = document.getElementById('divPage');
+                  if (div) {
+                    div.style.display = 'none';
+                  }
+                })();
+                true;
+              `;
+              webviewRef.current?.injectJavaScript(jsCode);
+              setIsHidden(true)
+            }}
+            injectedJavaScript={`
+              (function() {
+                const allIds = Array.from(document.querySelectorAll('[id]')).map(el => el.id);
+                const allClasses = Array.from(document.querySelectorAll('[class]')).map(el => el.className);
+                window.ReactNativeWebView.postMessage(JSON.stringify({ ids: allIds, classes: allClasses }));
+              })();
+              true;
+            `}
+            onMessage={event => {
+              console.log('✅ WebView sent a message!');
+              const data = JSON.parse(event.nativeEvent.data);
+              console.log('All IDs:', data.ids);
+              console.log('All Classes:', data.classes);
+            }}
+          />
+        </>
       ) : (
         <FullViewLoader />
       )}
