@@ -42,6 +42,7 @@ const apiClient: AxiosInstance = axios.create({
 });
 
 function unwrapString(value: any): any {
+  console.log("🚀 ~ unwrapString ~ value:", value)
   if (typeof value !== "string") return value;
 
   let current = value;
@@ -66,13 +67,18 @@ function deepClean(obj: any): any {
   } else if (obj !== null && typeof obj === "object") {
     const cleaned: any = {};
     for (const key in obj) {
-      cleaned[key] = deepClean(obj[key]);
+      if (["Data", "footer"].includes(key)) {
+        cleaned[key] = String(obj[key]);
+      } else {
+        cleaned[key] = deepClean(obj[key]);
+      }
     }
     return cleaned;
   } else {
     return unwrapString(obj);
   }
 }
+
 
 apiClient.interceptors.request.use(
   async (config: AxiosRequestConfig) => {
@@ -101,6 +107,7 @@ apiClient.interceptors.response.use(
     try {
       if (response.data && response.data.d) {
         let raw = response.data.d;
+        console.log("🚀 ~ raw:", raw)
 
         let parsedData: any;
 
@@ -117,8 +124,10 @@ apiClient.interceptors.response.use(
             parsedData = { message: raw };
           }
         }
+        console.log("🚀 ~ parsedData:", parsedData)
 
         const cleanedData = deepClean(parsedData);
+        console.log("🚀 ~ cleanedData:", cleanedData)
 
         if (String(cleanedData.success) !== "0") {
           return {
