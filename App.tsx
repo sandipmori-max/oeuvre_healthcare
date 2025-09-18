@@ -21,7 +21,13 @@ const App = () => {
   if (!isConnected) {
     return (
       <TranslationProvider>
-        <SafeAreaView edges={['top', 'left', 'right', 'bottom']} style={styles.safeArea}>
+        <StatusBar backgroundColor={ERP_COLOR_CODE.ERP_APP_COLOR} barStyle="light-content" />
+        <SafeAreaView edges={['top']} style={{ backgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR }} />
+
+        <SafeAreaView
+          edges={['top', 'left', 'right', 'bottom']}
+          style={styles.safeArea}
+        >
           <NoInternetScreen onRetry={() => {}} />
         </SafeAreaView>
       </TranslationProvider>
@@ -31,7 +37,13 @@ const App = () => {
   if (isSplashVisible) {
     return (
       <TranslationProvider>
-        <SafeAreaView edges={['top', 'left', 'right', 'bottom']} style={styles.safeArea}>
+        <StatusBar backgroundColor={ERP_COLOR_CODE.ERP_APP_COLOR} barStyle="light-content" />
+        <SafeAreaView edges={['top']} style={{ backgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR }} />
+
+        <SafeAreaView
+          edges={['top', 'left', 'right', 'bottom']}
+          style={styles.safeArea}
+        >
           <CustomSplashScreen onFinish={() => setSplashVisible(false)} />
         </SafeAreaView>
       </TranslationProvider>
@@ -42,7 +54,11 @@ const App = () => {
     <TranslationProvider>
       <Provider store={store}>
         <StatusBar backgroundColor={ERP_COLOR_CODE.ERP_APP_COLOR} barStyle="light-content" />
-        <SafeAreaView edges={['top', 'left', 'right', 'bottom']} style={styles.safeArea}>
+        <SafeAreaView edges={['top']} style={{ backgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR }} />
+        <SafeAreaView
+          edges={['left', 'right', 'bottom']}
+          style={styles.safeArea}
+        >
           <NavigationContainer>
             <RootNavigator />
           </NavigationContainer>
@@ -55,7 +71,7 @@ const App = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR,
+    backgroundColor: ERP_COLOR_CODE.ERP_WHITE,
   },
 });
 

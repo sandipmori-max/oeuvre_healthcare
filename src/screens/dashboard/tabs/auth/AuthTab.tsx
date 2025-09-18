@@ -14,7 +14,7 @@ import NoData from '../../../../components/no_data/NoData';
 import FullViewLoader from '../../../../components/loader/FullViewLoader';
 import { ERP_ICON } from '../../../../assets';
 import ERPIcon from '../../../../components/icon/ERPIcon';
-import { getERPDashboardThunk, getERPMenuThunk } from '../../../../store/slices/auth/thunk';
+import { getERPMenuThunk } from '../../../../store/slices/auth/thunk';
 import { styles } from '../entry/entry_style';
 import {
   createBookmarksTable,
