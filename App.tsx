@@ -1,33 +1,59 @@
-import React, { useState } from 'react';
-import { NavigationContainer } from '@react-navigation/native';
+import React, { useEffect, useState } from 'react';
+import { Alert, StatusBar, StyleSheet } from 'react-native';
 import { Provider } from 'react-redux';
-import { StatusBar, StyleSheet } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { store } from './src/store/store';
 import RootNavigator from './src/navigation/RootNavigator';
 import NoInternetScreen from './src/screens/noInternet/NoInternet';
-import useNetworkStatus from './src/hooks/useNetworkStatus';
 import CustomSplashScreen from './src/screens/splash/SplashScreen';
 import { TranslationProvider } from './src/components/TranslationProvider';
-
-import './src/i18n';
 import { ERP_COLOR_CODE } from './src/utils/constants';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import useNetworkStatus from './src/hooks/useNetworkStatus';
+
+import {
+  requestUserPermission,
+  onMessageListener,
+  setBackgroundMessageHandler,
+  onNotificationOpenedAppListener,
+  checkInitialNotification,
+} from './src/firebase/firebaseService';
 
 const App = () => {
   const isConnected = useNetworkStatus();
   const [isSplashVisible, setSplashVisible] = useState(true);
+
+  useEffect(() => {
+    requestUserPermission();
+    setBackgroundMessageHandler();
+    const unsubscribeForeground = onMessageListener(remoteMessage => {
+      Alert.alert(
+        remoteMessage.notification?.title ?? 'New Message',
+        remoteMessage.notification?.body ?? JSON.stringify(remoteMessage.data)
+      );
+    });
+
+    const unsubscribeBackground = onNotificationOpenedAppListener(remoteMessage => {
+      Alert.alert('App opened from background', JSON.stringify(remoteMessage.data));
+    });
+
+    checkInitialNotification(remoteMessage => {
+      Alert.alert('App opened from quit state', JSON.stringify(remoteMessage.data));
+    });
+
+    return () => {
+      unsubscribeForeground();
+      unsubscribeBackground();
+    };
+  }, []);
 
   if (!isConnected) {
     return (
       <TranslationProvider>
         <StatusBar backgroundColor={ERP_COLOR_CODE.ERP_APP_COLOR} barStyle="light-content" />
         <SafeAreaView edges={['top']} style={{ backgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR }} />
-
-        <SafeAreaView
-          edges={['top', 'left', 'right', 'bottom']}
-          style={styles.safeArea}
-        >
+        <SafeAreaView edges={['top', 'left', 'right', 'bottom']} style={styles.safeArea}>
           <NoInternetScreen onRetry={() => {}} />
         </SafeAreaView>
       </TranslationProvider>
@@ -39,11 +65,7 @@ const App = () => {
       <TranslationProvider>
         <StatusBar backgroundColor={ERP_COLOR_CODE.ERP_APP_COLOR} barStyle="light-content" />
         <SafeAreaView edges={['top']} style={{ backgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR }} />
-
-        <SafeAreaView
-          edges={['top', 'left', 'right', 'bottom']}
-          style={styles.safeArea}
-        >
+        <SafeAreaView edges={['top', 'left', 'right', 'bottom']} style={styles.safeArea}>
           <CustomSplashScreen onFinish={() => setSplashVisible(false)} />
         </SafeAreaView>
       </TranslationProvider>
@@ -55,10 +77,7 @@ const App = () => {
       <Provider store={store}>
         <StatusBar backgroundColor={ERP_COLOR_CODE.ERP_APP_COLOR} barStyle="light-content" />
         <SafeAreaView edges={['top']} style={{ backgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR }} />
-        <SafeAreaView
-          edges={['left', 'right', 'bottom']}
-          style={styles.safeArea}
-        >
+        <SafeAreaView edges={['left', 'right', 'bottom']} style={styles.safeArea}>
           <NavigationContainer>
             <RootNavigator />
           </NavigationContainer>
