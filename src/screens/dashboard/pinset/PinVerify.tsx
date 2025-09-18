@@ -62,7 +62,7 @@ const PinVerifyScreen = () => {
 
       setAlertConfig({
         title: 'Error verifying PIN',
-        message: error?.toString(),
+        message: error?.toString() || '',
         type: 'error',
       });
     }

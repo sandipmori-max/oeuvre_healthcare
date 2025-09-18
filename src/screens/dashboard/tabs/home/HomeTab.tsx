@@ -21,7 +21,7 @@ const HomeScreen = () => {
   const [loadingPageId, setLoadingPageId] = useState<any>(null);
   const [isRefresh, setIsRefresh] = useState<boolean>(false);
 
-  const theme = useAppSelector(state => state.theme);
+  const theme = useAppSelector(state => state?.theme);
   const [actionLoader, setActionLoader] = useState(false);
   const [isHorizontal, setIsHorizontal] = useState(false);
 
@@ -74,8 +74,8 @@ const HomeScreen = () => {
 
   const getInitials = (text?: string) => {
     if (!text) return '?';
-    const trimmed = text.trim();
-    if (trimmed.length === 0) return '?';
+    const trimmed = text?.trim();
+    if (trimmed?.length === 0) return '?';
     return trimmed.slice(0, 2).toUpperCase();
   };
 
@@ -87,9 +87,9 @@ const HomeScreen = () => {
       return item?.title !== 'Attendance Code' && item?.data !== '' && !isNaN(num) && num > 0;
     })
     .map((item, index) => ({
-      value: Number(item.data),
+      value: Number(item?.data),
       color: accentColors[index % accentColors.length],
-      text: item.title,
+      text: item?.title,
     }));
 
   const renderDashboardItem = ({ item, index }: any) => {
@@ -130,7 +130,7 @@ const HomeScreen = () => {
                     { backgroundColor: accentColors[index % accentColors.length] },
                   ]}
                 >
-                  <Text style={styles.iconText}>{getInitials(item.name)}</Text>
+                  <Text style={styles.iconText}>{getInitials(item?.name)}</Text>
                 </View>
                 <View style={styles.headerTextWrap}>
                   <Text

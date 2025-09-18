@@ -24,7 +24,7 @@ const ProfileTab = () => {
     setShowAddAccount(true);
   };
 
-  const activeAccount = accounts.find(acc => acc.user.id === user?.id);
+  const activeAccount = accounts?.find(acc => acc?.user?.id === user?.id);
 
   useLayoutEffect(() => {
     navigation.setOptions({

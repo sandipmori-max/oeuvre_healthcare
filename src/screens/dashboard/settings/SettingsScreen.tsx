@@ -13,8 +13,7 @@ import { useNavigation } from '@react-navigation/native';
 import { styles } from './settings_style';
 import CustomAlert from '../../../components/alert/CustomAlert';
 import useTranslations from '../../../hooks/useTranslations';
-import { useAppDispatch, useAppSelector } from '../../../store/hooks';
-import { toggleTheme } from '../../../store/slices/theme/themeSlice';
+import { useAppDispatch } from '../../../store/hooks';
 import MaterialIcons from '@react-native-vector-icons/material-icons';
 import {
   logoutUserThunk,
@@ -53,11 +52,9 @@ const SettingsScreen = () => {
   const [alertVisible, setAlertVisible] = useState(false);
   const [languageModalVisible, setLanguageModalVisible] = useState(false);
   const [currentLanguage, setCurrentLanguage] = useState(getCurrentLanguage());
-  const [languages, setLanguages] = useState<LanguageOption[]>(getAvailableLanguages());
-  const { user, activeAccountId } = useAppSelector(state => state.auth);
+  const [languages] = useState<LanguageOption[]>(getAvailableLanguages());
   const { execute: validateCompanyCode } = useApi();
 
-  const theme = useAppSelector(state => state.theme);
   const dispatch = useAppDispatch();
 
   const [alertConfig, setAlertConfig] = useState({
@@ -148,40 +145,40 @@ const SettingsScreen = () => {
 
   const handleToggle = (id: string) => {
     setSettings(prevSettings =>
-      prevSettings.map(setting =>
+      prevSettings?.map(setting =>
         setting.id === id ? { ...setting, value: !setting.value } : setting,
       ),
     );
   };
 
   const handleAction = (item: SettingItem) => {
-    switch (item.type) {
+    switch (item?.type) {
       case 'navigate':
-        if (item.action === 'Language') {
+        if (item?.action === 'Language') {
           setLanguageModalVisible(true);
-        } else if (item.title === t('settings.biometricAuth')) {
+        } else if (item?.title === t('settings.biometricAuth')) {
           navigation.navigate('PinSet');
-        } else if (item.action) {
+        } else if (item?.action) {
           setAlertConfig({
             title: t('common.navigate'),
-            message: `${t('common.navigate')} to ${item.action} functionality would go here`,
+            message: `${t('common.navigate')} to ${item?.action} functionality would go here`,
             type: 'info',
           });
           setAlertVisible(true);
         }
         break;
       case 'action':
-        if (item.action === 'Logout') {
+        if (item?.action === 'Logout') {
           setAlertConfig({
             title: t('settings.logout'),
             message: t('settings.logoutConfirm'),
             type: 'error',
           });
           setAlertVisible(true);
-        } else if (item.action) {
+        } else if (item?.action) {
           setAlertConfig({
             title: t('common.action'),
-            message: `${item.action} functionality would go here`,
+            message: `${item?.action} functionality would go here`,
             type: 'info',
           });
           setAlertVisible(true);
@@ -214,8 +211,8 @@ const SettingsScreen = () => {
           <MaterialIcons name={item?.icon} color={'#000'} size={22} />
         </View>
         <View style={styles.settingInfo}>
-          <Text style={styles.settingTitle}>{item.title}</Text>
-          <Text style={styles.settingSubtitle}>{item.subtitle}</Text>
+          <Text style={styles.settingTitle}>{item?.title}</Text>
+          <Text style={styles.settingSubtitle}>{item?.subtitle}</Text>
         </View>
         {item.type === 'toggle' ? (
           <Switch
@@ -260,14 +257,12 @@ const SettingsScreen = () => {
 
   return (
     <View style={styles.container}>
-      {/* Scrollable Content */}
-      <ScrollView
+       <ScrollView
         style={styles.scrollContainer}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
-        {/* Settings Sections */}
         <View style={styles.sectionContainer}>
           <Text style={styles.sectionTitle}>{t('settings.notifications')}</Text>
           <FlatList
@@ -364,23 +359,22 @@ const SettingsScreen = () => {
 
           const activeUser = await getActiveAccount(db);
           if (activeUser) {
-            // 🔑 logoutUser now returns new active user (or null if none remain)
-            const newActiveUser = await logoutUser(db, activeUser.id);
+            const newActiveUser = await logoutUser(db, activeUser?.id);
 
             if (newActiveUser) {
-              await DevERPService.setToken(newActiveUser.user?.token || '');
-              await AsyncStorage.setItem('erp_token', newActiveUser.user?.token || '');
-              await AsyncStorage.setItem('auth_token', newActiveUser.user?.token || '');
-              await AsyncStorage.setItem('erp_token_valid_till', newActiveUser.user?.token || '');
+              DevERPService.setToken(newActiveUser?.user?.token || '');
+              await AsyncStorage.setItem('erp_token', newActiveUser?.user?.token || '');
+              await AsyncStorage.setItem('auth_token', newActiveUser?.user?.token || '');
+              await AsyncStorage.setItem('erp_token_valid_till', newActiveUser?.user?.token || '');
 
               const validation = await validateCompanyCode(() =>
-                DevERPService.validateCompanyCode(newActiveUser.user?.company_code),
+                DevERPService.validateCompanyCode(newActiveUser?.user?.company_code),
               );
               if (!validation?.isValid) {
                 return;
               }
 
-              dispatch(switchAccountThunk(newActiveUser.id));
+              dispatch(switchAccountThunk(newActiveUser?.id));
             } else {
               dispatch(logoutUserThunk());
             }

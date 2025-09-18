@@ -2,7 +2,6 @@ import React, { useState, useEffect, useLayoutEffect, useCallback } from 'react'
 import {
   View,
   Platform,
-  FlatList,
   Text,
   TouchableOpacity,
   Alert,

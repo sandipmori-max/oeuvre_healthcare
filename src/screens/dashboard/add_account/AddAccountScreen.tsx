@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, Keyboard , TouchableOpacity, Modal, Image, FlatList } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Modal, Image, FlatList } from 'react-native';
 import { Formik } from 'formik';
 
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
@@ -22,10 +22,21 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
   const dispatch = useAppDispatch();
 
   const { execute: validateCompanyCode, execute: loginWithERP } = useApi();
+  
   const { accounts, user } = useAppSelector(state => state.auth);
+  
   const { token: fcmToken } = useFcmToken();
+
   const [deviceId, setDeviceId] = useState<string>('');
   const [showPassword, setShowPassword] = useState(false);
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [loader, setLoader] = useState(false);
+  const [alertConfig, setAlertConfig] = useState({
+    title: '',
+    message: '',
+    type: 'info' as 'error' | 'success' | 'info',
+  });
+
 
   useEffect(() => {
     setLoader(false);
@@ -40,14 +51,6 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
 
     fetchDeviceName();
   }, []);
-
-  const [alertVisible, setAlertVisible] = useState(false);
-  const [loader, setLoader] = useState(false);
-  const [alertConfig, setAlertConfig] = useState({
-    title: '',
-    message: '',
-    type: 'info' as 'error' | 'success' | 'info',
-  });
 
   const handleClose = () => {
     setLoader(false);

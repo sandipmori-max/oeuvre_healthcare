@@ -43,8 +43,6 @@ const CustomPicker = ({ label, selectedValue, onValueChange, item, errors, dtext
 
       const data = res?.data ?? [];
       setOptions(data);
-
-      // Store in cache
       if (item?.dtlid) optionsCache.current[item.dtlid] = data;
     } catch (e) {
       setOptions([]);
@@ -119,9 +117,9 @@ const CustomPicker = ({ label, selectedValue, onValueChange, item, errors, dtext
         </View>
       )}
 
-      {errors[item.field] && (
+      {errors[item?.field] && (
         <Text style={{ color: ERP_COLOR_CODE.ERP_ERROR, marginTop: 4 }}>
-          {errors[item.field]}
+          {errors[item?.field]}
         </Text>
       )}
     </View>

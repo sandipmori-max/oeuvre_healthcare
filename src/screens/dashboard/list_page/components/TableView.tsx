@@ -16,20 +16,21 @@ const TableView = ({
 }: any) => {
   const screenWidth = Dimensions.get('window').width;
   const navigation = useNavigation();
+
   const getButtonMeta = (key: string) => {
     if (!key || !configData?.length) return { label: 'Action', color: '#007BFF' };
-    const configItem = configData.find(cfg => cfg.datafield?.toLowerCase() === key.toLowerCase());
+    const configItem = configData?.find(cfg => cfg?.datafield?.toLowerCase() === key?.toLowerCase());
     return {
       label: configItem?.headertext || 'Action',
       color: configItem?.colorcode || '#007BFF',
     };
   };
 
-  const allKeys = filteredData && filteredData.length > 0 ? Object.keys(filteredData[0]) : [];
+  const allKeys = filteredData && filteredData?.length > 0 ? Object.keys(filteredData[0]) : [];
 
   function splitInto4Columns(keys: string[]): Record<string, string[]> {
     const result: Record<string, string[]> = { clm1: [], clm2: [], clm3: [], clm4: [] };
-    const filteredKeys = keys.filter(key => !key.startsWith('btn_'));
+    const filteredKeys = keys?.filter(key => !key.startsWith('btn_'));
     const firstFour = filteredKeys.slice(0, 4);
     const rest = filteredKeys.slice(4);
 
@@ -140,9 +141,9 @@ const TableView = ({
             minWidth: 120,
           }}
         >
-          {btnKeys.length > 0 && (
+          {btnKeys?.length > 0 && (
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginTop: 14, gap: 8 }}>
-              {btnKeys.map((key, idx) => {
+              {btnKeys?.map((key, idx) => {
                 const actionValue = item[key];
                 const authUser = item['authuser'];
                 const { label, color } = getButtonMeta(key);
@@ -173,7 +174,7 @@ const TableView = ({
       </TouchableOpacity>
     );
   };
-  if (!loadingListId && filteredData.length === 0) {
+  if (!loadingListId && filteredData?.length === 0) {
     return (
       <>
         <View
@@ -199,9 +200,7 @@ const TableView = ({
         data={['']}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
-        // ListHeaderComponent={() => {
-        //   return <TableHeader />;
-        // }}
+      
         renderItem={() => {
           return (
             <FlatList
@@ -216,7 +215,7 @@ const TableView = ({
         }}
       ></FlatList>
 
-      {filteredData.length > 0 && totalAmount > 0 ? (
+      {filteredData?.length > 0 && totalAmount > 0 ? (
         <View
           style={{
             marginTop: 6,
@@ -237,7 +236,7 @@ const TableView = ({
               marginTop: 2,
             }}
           >
-            ₹ {totalAmount.toFixed(2)}
+            ₹ {totalAmount?.toFixed(2)}
           </Text>
         </View>
       ) : null}

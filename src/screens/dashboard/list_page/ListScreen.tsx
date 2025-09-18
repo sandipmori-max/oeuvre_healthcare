@@ -58,7 +58,7 @@ const ListScreen = () => {
   }>(null);
 
   const route = useRoute<RouteProp<ListRouteParams, 'List'>>();
-  const { item } = route.params;
+  const { item } = route?.params;
 
   const pageTitle = item?.title || item?.name || 'List Data';
   const pageParamsName = item?.name || 'List Data';
@@ -130,14 +130,14 @@ const ListScreen = () => {
             return;
           }
 
-          const keySearchMatch = trimmedQuery.match(/^(\w+):(.+)$/);
+          const keySearchMatch = trimmedQuery?.match(/^(\w+):(.+)$/);
           let filtered;
 
           if (keySearchMatch) {
             const [, key, value] = keySearchMatch;
             const lowerValue = value.trim().toLowerCase();
 
-            filtered = data.filter(item => {
+            filtered = data?.filter(item => {
               const fieldValue = item[key];
               if (!fieldValue) return false;
 
@@ -147,7 +147,7 @@ const ListScreen = () => {
               return stringValue.toLowerCase().includes(lowerValue);
             });
           } else {
-            filtered = data.filter(item => {
+            filtered = data?.filter(item => {
               const allValues = Object.values(item)
                 .map(val => {
                   if (typeof val === 'object' && val !== null) return JSON.stringify(val);
@@ -156,7 +156,7 @@ const ListScreen = () => {
                 })
                 .join(' ')
                 .toLowerCase();
-              return allValues.includes(trimmedQuery.toLowerCase());
+              return allValues?.includes(trimmedQuery?.toLowerCase());
             });
           }
           setFilteredData(filtered);
@@ -185,7 +185,7 @@ const ListScreen = () => {
   };
 
   const handleDateChange = (event: any, selectedDate?: Date) => {
-    if (event.type === 'dismissed' || !selectedDate) {
+    if (event?.type === 'dismissed' || !selectedDate) {
       setShowDatePicker(null);
       return;
     }
