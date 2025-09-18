@@ -1,5 +1,5 @@
 import React, { useCallback, useLayoutEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, ActivityIndicator, FlatList, StatusBar } from 'react-native';
+import { View, Text, TouchableOpacity, ActivityIndicator, FlatList } from 'react-native';
 
 import { styles } from './home_style';
 import { useAppDispatch, useAppSelector } from '../../../../store/hooks';
@@ -185,15 +185,18 @@ const HomeScreen = () => {
   return (
     <View style={theme === 'dark' ? styles.containerDark : styles.container}>
       <Text
+        numberOfLines={1}
         style={{
           color: 'white',
           marginTop: 1,
           backgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR,
           padding: 12,
           textAlign: 'center',
+          borderBottomRightRadius: 24,
+          borderBottomLeftRadius: 24
         }}
       >
-        {user?.companyName}
+        {user?.companyName || ''}
       </Text>
       {isDashboardLoading ? (
         <FullViewLoader />
@@ -258,7 +261,7 @@ const HomeScreen = () => {
 
                   {/* Legend */}
                   <View style={{ justifyContent: 'center', marginTop: 16 }}>
-                    {pieChartData.map((item, idx) => (
+                    {pieChartData?.map((item, idx) => (
                       <View
                         key={idx}
                         style={{
@@ -278,7 +281,7 @@ const HomeScreen = () => {
                           }}
                         />
                         <Text style={{ fontSize: 14, color: '#444' }}>
-                          {item.text}: {item.value}
+                          {item?.text}: {item?.value}
                         </Text>
                       </View>
                     ))}

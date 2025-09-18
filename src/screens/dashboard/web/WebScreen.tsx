@@ -142,17 +142,17 @@ const WebScreen = () => {
             onLoadEnd={() => {
               console.log('WebView loading finished');
               setIsReloading(false);
-              const jsCode = `
-                (function() {
-                  const div = document.getElementById('divPage');
-                  if (div) {
-                    div.style.display = 'none';
-                  }
-                })();
-                true;
-              `;
-              webviewRef.current?.injectJavaScript(jsCode);
-              setIsHidden(true)
+              // const jsCode = `
+              //   (function() {
+              //     const div = document.getElementById('divPage');
+              //     if (div) {
+              //       div.style.display = 'none';
+              //     }
+              //   })();
+              //   true;
+              // `;
+              // webviewRef.current?.injectJavaScript(jsCode);
+              // setIsHidden(true)
             }}
             injectedJavaScript={`
               (function() {
