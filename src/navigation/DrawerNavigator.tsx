@@ -18,6 +18,8 @@ const DrawerNavigator = () => {
   const theme = useAppSelector(state => state.theme);
 
   return (
+  <>
+    
     <Drawer.Navigator
       initialRouteName="Home"
       drawerContent={props => <CustomDrawerContent {...props} />}
@@ -55,6 +57,7 @@ const DrawerNavigator = () => {
         options={{ title: t('navigation.privacyPolicy') }}
       />
     </Drawer.Navigator>
+  </>
   );
 };
 

@@ -16,7 +16,11 @@ import useTranslations from '../../../hooks/useTranslations';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { toggleTheme } from '../../../store/slices/theme/themeSlice';
 import MaterialIcons from '@react-native-vector-icons/material-icons';
-import { logoutUserThunk, removeAccountThunk, switchAccountThunk } from '../../../store/slices/auth/thunk';
+import {
+  logoutUserThunk,
+  removeAccountThunk,
+  switchAccountThunk,
+} from '../../../store/slices/auth/thunk';
 import { ERP_COLOR_CODE } from '../../../utils/constants';
 import {
   createAccountsTable,
@@ -97,8 +101,7 @@ const SettingsScreen = () => {
         type: 'navigate',
         value: true,
       },
-      
-     
+
       {
         id: '5',
         title: t('settings.privacySettings'),
@@ -107,7 +110,7 @@ const SettingsScreen = () => {
         type: 'navigate',
         action: 'Privacy',
       },
-     
+
       {
         id: '6',
         title: t('settings.language'),
@@ -260,6 +263,7 @@ const SettingsScreen = () => {
       {/* Scrollable Content */}
       <ScrollView
         style={styles.scrollContainer}
+        keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
@@ -267,6 +271,7 @@ const SettingsScreen = () => {
         <View style={styles.sectionContainer}>
           <Text style={styles.sectionTitle}>{t('settings.notifications')}</Text>
           <FlatList
+            keyboardShouldPersistTaps="handled"
             data={settings.filter(item => item.id === '1' || item.id === '2')}
             renderItem={renderSettingItem}
             keyExtractor={item => item.id}
@@ -277,6 +282,7 @@ const SettingsScreen = () => {
         <View style={styles.sectionContainer}>
           <Text style={styles.sectionTitle}>{t('settings.appearance')}</Text>
           <FlatList
+            keyboardShouldPersistTaps="handled"
             data={settings.filter(item => item.id === '3')}
             renderItem={renderSettingItem}
             keyExtractor={item => item.id}
@@ -287,9 +293,8 @@ const SettingsScreen = () => {
         <View style={styles.sectionContainer}>
           <Text style={styles.sectionTitle}>{t('settings.security')}</Text>
           <FlatList
-            data={settings.filter(
-              item => item.id === '4' || item.id === '5'  
-            )}
+            keyboardShouldPersistTaps="handled"
+            data={settings.filter(item => item.id === '4' || item.id === '5')}
             renderItem={renderSettingItem}
             keyExtractor={item => item.id}
             scrollEnabled={false}
@@ -299,9 +304,8 @@ const SettingsScreen = () => {
         <View style={styles.sectionContainer}>
           <Text style={styles.sectionTitle}>{t('settings.general')}</Text>
           <FlatList
-            data={settings.filter(
-              item => item.id === '6' || item.id === '7' || item.id === '8'
-            )}
+            keyboardShouldPersistTaps="handled"
+            data={settings.filter(item => item.id === '6' || item.id === '7' || item.id === '8')}
             renderItem={renderSettingItem}
             keyExtractor={item => item.id}
             scrollEnabled={false}
@@ -311,6 +315,7 @@ const SettingsScreen = () => {
         <View style={styles.sectionContainer}>
           <Text style={styles.sectionTitle}>{t('settings.account')}</Text>
           <FlatList
+            keyboardShouldPersistTaps="handled"
             data={settings.filter(item => item.id === '9')}
             renderItem={renderSettingItem}
             keyExtractor={item => item.id}
@@ -337,6 +342,7 @@ const SettingsScreen = () => {
             </View>
             <FlatList
               data={languages}
+              keyboardShouldPersistTaps="handled"
               renderItem={renderLanguageOption}
               keyExtractor={item => item.code}
               style={languageStyles.languageList}
@@ -362,7 +368,7 @@ const SettingsScreen = () => {
             const newActiveUser = await logoutUser(db, activeUser.id);
 
             if (newActiveUser) {
-               await DevERPService.setToken(newActiveUser.user?.token || '');
+              await DevERPService.setToken(newActiveUser.user?.token || '');
               await AsyncStorage.setItem('erp_token', newActiveUser.user?.token || '');
               await AsyncStorage.setItem('auth_token', newActiveUser.user?.token || '');
               await AsyncStorage.setItem('erp_token_valid_till', newActiveUser.user?.token || '');
@@ -376,7 +382,7 @@ const SettingsScreen = () => {
 
               dispatch(switchAccountThunk(newActiveUser.id));
             } else {
-              dispatch(logoutUserThunk())
+              dispatch(logoutUserThunk());
             }
           }
         }}

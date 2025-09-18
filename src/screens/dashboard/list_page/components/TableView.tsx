@@ -198,12 +198,14 @@ const TableView = ({
       <FlatList
         data={['']}
         showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
         // ListHeaderComponent={() => {
         //   return <TableHeader />;
         // }}
         renderItem={() => {
           return (
             <FlatList
+              keyboardShouldPersistTaps="handled"
               showsVerticalScrollIndicator={false}
               data={filteredData}
               keyExtractor={(item, idx) => String(item?.id || idx)}

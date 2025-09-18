@@ -189,6 +189,7 @@ const EntryTab = () => {
     <>
       <FlatList
         key={`${isHorizontal}-${showBookmarksOnly}`}
+        keyboardShouldPersistTaps="handled"
         data={list}
         keyExtractor={item => item?.id}
         numColumns={isHorizontal ? 1 : 2}

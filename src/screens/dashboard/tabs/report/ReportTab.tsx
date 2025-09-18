@@ -46,7 +46,7 @@ const ReportTab = () => {
       const db = await getDBConnection();
       await createBookmarksTable(db);
       const saved = await getBookmarks(db, user?.id);
-      
+
       setBookmarks(saved);
     })();
   }, []);
@@ -63,7 +63,7 @@ const ReportTab = () => {
     navigation.setOptions({
       headerRight: () => (
         <>
-         <ERPIcon
+          <ERPIcon
             name="refresh"
             onPress={() => {
               setIsRefresh(!isRefresh);
@@ -78,8 +78,6 @@ const ReportTab = () => {
             name={showBookmarksOnly ? 'star' : 'allout'}
             onPress={() => setShowBookmarksOnly(prev => !prev)}
           />
-
-         
         </>
       ),
       headerLeft: () => (
@@ -191,6 +189,7 @@ const ReportTab = () => {
     <>
       <FlatList
         key={`${isHorizontal}-${showBookmarksOnly}`}
+        keyboardShouldPersistTaps="handled"
         data={list}
         keyExtractor={item => item?.id}
         numColumns={isHorizontal ? 1 : 2}

@@ -62,10 +62,17 @@ const LoginScreen = ({ navigation, route }: any) => {
     password: string,
     user_credentials: { user: string; name?: string },
     response: any,
-    companyData: any
+    companyData: any,
   ) => {
     dispatch(
-      loginUserThunk({ company_code, password, isAddingAccount, user_credentials, response , companyData}),
+      loginUserThunk({
+        company_code,
+        password,
+        isAddingAccount,
+        user_credentials,
+        response,
+        companyData,
+      }),
     );
   };
 
@@ -87,6 +94,7 @@ const LoginScreen = ({ navigation, route }: any) => {
         <FlatList
           data={['']}
           showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
           contentContainerStyle={{
             flexGrow: 1,
             paddingBottom: keyboardHeight / 2 || 20,

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Modal, Image, FlatList } from 'react-native';
+import { View, Text, TextInput, Keyboard , TouchableOpacity, Modal, Image, FlatList } from 'react-native';
 import { Formik } from 'formik';
 
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
@@ -79,6 +79,7 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
       );
       console.log('🚀 ~ handleAddAccount ~ validation:', validation);
       if (!validation?.isValid) {
+        setLoader(false)
         return;
       }
       const currentFcmToken = fcmToken || (await getMessaging().getToken());
@@ -171,6 +172,7 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
         <FlatList
           showsHorizontalScrollIndicator={false}
           showsVerticalScrollIndicator={false}
+           keyboardShouldPersistTaps="handled"
           data={['']}
           renderItem={() => {
             return (
@@ -256,7 +258,8 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
 
                         <TouchableOpacity
                           style={[styles.addButton, loader && styles.disabledButton]}
-                          onPress={() => handleSubmit()}
+                          onPress={() => {
+                             handleSubmit()}}
                           disabled={loader}
                         >
                           {loader ? (
