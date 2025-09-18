@@ -8,8 +8,8 @@ const Input = ({ item, errors, value, setValue, onFocus }: any) => {
   return (
     <View style={{ marginBottom: 16 }}>
       <View style={{ flexDirection: 'row' }}>
-        <Text style={styles.label}>{item.fieldtitle}</Text>
-        {item?.fieldtitle !== item?.tooltip && <Text> - ( {item.tooltip} )</Text>}
+        <Text style={styles.label}>{item?.fieldtitle}</Text>
+        {item?.fieldtitle !== item?.tooltip && <Text> - ( {item?.tooltip} )</Text>}
         {item?.mandatory === '1' && <Text style={{ color: ERP_COLOR_CODE.ERP_ERROR }}>*</Text>}
       </View>
       <TextInput

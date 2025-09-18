@@ -29,17 +29,17 @@ const accentColors = ['#dbe0f5ff', '#c8f3edff', '#faf1e0ff', '#f0e1e1ff', '#f2e3
 const EntryTab = () => {
   const navigation = useNavigation<any>();
   const dispatch = useAppDispatch();
-  const { error, isAuthenticated, activeToken } = useAppSelector(state => state.auth);
-  const { menu, isMenuLoading } = useAppSelector(state => state.auth);
+  const { error, isAuthenticated, activeToken, menu, isMenuLoading, user } = useAppSelector(
+    state => state.auth,
+  );
   const allList = menu?.filter(item => item?.isReport === 'A') ?? [];
   const [isRefresh, setIsRefresh] = useState<boolean>(false);
-  const { user } = useAppSelector(state => state?.auth);
 
   const [isHorizontal, setIsHorizontal] = useState(false);
   const [bookmarks, setBookmarks] = useState<{ [key: string]: boolean }>({});
   const [showBookmarksOnly, setShowBookmarksOnly] = useState(false);
 
-  const list = showBookmarksOnly ? allList.filter(item => bookmarks[item.id]) : allList;
+  const list = showBookmarksOnly ? allList?.filter(item => bookmarks[item?.id]) : allList;
 
   useEffect(() => {
     (async () => {
@@ -109,11 +109,11 @@ const EntryTab = () => {
         }}
       >
         <TouchableOpacity
-          onPress={() => toggleBookmark(item.id)}
+          onPress={() => toggleBookmark(item?.id)}
           style={{ position: 'absolute', top: 0, right: 0, zIndex: 1 }}
         >
           <Image
-            source={bookmarks[item.id] ? ERP_ICON.BOOK_MARK_DONE : ERP_ICON.BOOK_MARK}
+            source={bookmarks[item?.id] ? ERP_ICON.BOOK_MARK_DONE : ERP_ICON.BOOK_MARK}
             style={styles.icon}
           />
         </TouchableOpacity>
@@ -122,8 +122,8 @@ const EntryTab = () => {
           <Text style={styles.iconText}>
             {item?.icon !== ''
               ? item?.icon
-              : item.name
-              ? item.name
+              : item?.name
+              ? item?.name
                   .trim()
                   .split(' ')
                   .slice(0, 2)
@@ -140,8 +140,8 @@ const EntryTab = () => {
             alignItems: isHorizontal ? 'flex-start' : 'center',
           }}
         >
-          <Text style={styles.title}>{item.name}</Text>
-          <Text style={styles.subtitle}>{item.title}</Text>
+          <Text style={styles.title}>{item?.name}</Text>
+          <Text style={styles.subtitle}>{item?.title}</Text>
         </View>
       </TouchableOpacity>
     );

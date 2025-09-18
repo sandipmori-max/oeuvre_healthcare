@@ -1,6 +1,11 @@
 import React from 'react';
-import { SafeAreaView, StyleSheet, Platform, StatusBar } from 'react-native';
+import {
+  SafeAreaView,
+  StyleSheet,
+  View,
+} from 'react-native';
 import { WebView } from 'react-native-webview';
+import FullViewLoader from '../../../components/loader/FullViewLoader';
 
 const PrivacyPolicyScreen = () => {
   return (
@@ -11,6 +16,11 @@ const PrivacyPolicyScreen = () => {
         javaScriptEnabled={true}
         domStorageEnabled={true}
         style={styles.webview}
+        renderLoading={() => (
+          <View style={styles.loaderContainer}>
+            <FullViewLoader />
+          </View>
+        )}
       />
     </SafeAreaView>
   );
@@ -19,10 +29,15 @@ const PrivacyPolicyScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
   },
   webview: {
     flex: 1,
+  },
+  loaderContainer: {
+    ...StyleSheet.absoluteFillObject,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#fff', 
   },
 });
 

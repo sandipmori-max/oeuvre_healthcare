@@ -24,7 +24,7 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
   const dispatch = useAppDispatch();
   const { execute: validateCompanyCode } = useApi();
 
-  const { accounts, activeAccountId } = useAppSelector(state => state.auth);
+  const { accounts, activeAccountId } = useAppSelector(state => state?.auth);
   const [alertVisible, setAlertVisible] = useState(false);
   const [selectedAccount, setSelectedAccount] = useState<any>(null);
   const [alertConfig, setAlertConfig] = useState({
@@ -32,8 +32,6 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
     message: '',
     type: 'info' as 'error' | 'success' | 'info',
   });
-
-  const baseLink = useBaseLink();
 
   const handleSwitchAccount = (accountId: string) => {
     if (accountId !== activeAccountId) {
@@ -68,15 +66,12 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
     normalizedBase = normalizedBase.replace(/\/devws\/?/, '/');
     normalizedBase = normalizedBase.replace(/^https:\/\//i, 'http://');
 
-     console.log('🚀 ~-------- renderAccount ~ lastLoginHr:---------->>>',`${normalizedBase}/FileUpload/1/UserMaster/${
-                item?.user?.id
-              }/profileimage.jpeg?ts=${new Date().getTime()}`);
     return (
       <TouchableOpacity
         style={[styles.accountItem, isActive && styles.activeAccount]}
         onPress={async () => {
           if (isTokenValid(item?.user?.tokenValidTill)) {
-            await DevERPService.setToken(item?.user?.token || '');
+            DevERPService.setToken(item?.user?.token || '');
             await AsyncStorage.setItem('erp_token', item?.user?.token || '');
             await AsyncStorage.setItem('auth_token', item?.user?.token || '');
             await AsyncStorage.setItem('erp_token_valid_till', item?.user?.token || '');

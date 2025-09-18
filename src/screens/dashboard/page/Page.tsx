@@ -2,16 +2,7 @@
 /* eslint-disable react/no-unstable-nested-components */
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
-import {
-  Text,
-  View,
-  FlatList,
-  StyleSheet,
-  ScrollView,
-  Dimensions,
-  Keyboard,
-  Platform,
-} from 'react-native';
+import { Text, View, FlatList, StyleSheet, Dimensions, Keyboard, Platform } from 'react-native';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import Animated, { FadeInUp, Layout } from 'react-native-reanimated';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
@@ -42,7 +33,6 @@ type PageRouteParams = { PageScreen: { item: any } };
 const PageScreen = () => {
   const navigation = useNavigation();
   const dispatch = useAppDispatch();
-  const { pageError } = useAppSelector(state => state.auth);
   const flatListRef = useRef<FlatList>(null);
   const baseLink = useBaseLink();
 
@@ -78,7 +68,7 @@ const PageScreen = () => {
   });
 
   const route = useRoute<RouteProp<PageRouteParams, 'PageScreen'>>();
-  const { item, title, id, isFromNew, url, pageTitle }: any = route.params;
+  const { item, title, id, isFromNew, url, pageTitle }: any = route?.params;
   const authUser = item?.authuser;
 
   const validateForm = useCallback(() => {
@@ -86,17 +76,17 @@ const PageScreen = () => {
     const errorMessages: string[] = [];
 
     controls.forEach(ctrl => {
-      if (ctrl.mandatory === '1' && !formValues[ctrl.field]) {
-        validationErrors[ctrl.field] = `${ctrl.fieldtitle || ctrl.field} is required`;
-        errorMessages.push(`${ctrl.fieldtitle || ctrl.field} is required`);
+      if (ctrl?.mandatory === '1' && !formValues[ctrl?.field]) {
+        validationErrors[ctrl.field] = `${ctrl?.fieldtitle || ctrl?.field} is required`;
+        errorMessages.push(`${ctrl?.fieldtitle || ctrl?.field} is required`);
       }
     });
 
     setErrors(validationErrors);
     setErrorsList(errorMessages);
-    if (errorMessages.length > 0) setShowErrorModal(true);
+    if (errorMessages?.length > 0) setShowErrorModal(true);
 
-    return errorMessages.length === 0;
+    return errorMessages?.length === 0;
   }, [controls, formValues]);
 
   useLayoutEffect(() => {
@@ -132,8 +122,8 @@ const PageScreen = () => {
                 setActionSaveLoader(true);
                 if (validateForm()) {
                   const submitValues: Record<string, any> = {};
-                  controls.forEach(f => {
-                    if (f.refcol !== '1') submitValues[f.field] = formValues[f.field];
+                  controls?.forEach(f => {
+                    if (f.refcol !== '1') submitValues[f?.field] = formValues[f?.field];
                   });
                   try {
                     setLoader(true);
@@ -163,8 +153,6 @@ const PageScreen = () => {
                     });
                     setAlertVisible(true);
                     setGoBack(false);
-
-                    
                   }
                 }
                 setActionSaveLoader(false);
@@ -199,19 +187,19 @@ const PageScreen = () => {
 
       if (!isFromNew) {
         setInfoData({
-          id: id.toString(),
+          id: id?.toString(),
           tableName: parsed?.table,
           title: parsed?.title,
         });
       }
 
-      const pageControls = Array.isArray(parsed?.pagectl) ? parsed.pagectl : [];
+      const pageControls = Array.isArray(parsed?.pagectl) ? parsed?.pagectl : [];
 
-      const normalizedControls = pageControls.map(c => ({
+      const normalizedControls = pageControls?.map(c => ({
         ...c,
-        disabled: String(c.disabled ?? '0'),
-        visible: String(c.visible ?? '1'),
-        mandatory: String(c.mandatory ?? '0'),
+        disabled: String(c?.disabled ?? '0'),
+        visible: String(c?.visible ?? '1'),
+        mandatory: String(c?.mandatory ?? '0'),
       }));
 
       setControls(normalizedControls);
@@ -219,8 +207,8 @@ const PageScreen = () => {
       setFormValues(prev => {
         const merged: any = { ...prev };
         normalizedControls.forEach(c => {
-          if (merged[c.field] === undefined) {
-            merged[c.field] = c.text ?? '';
+          if (merged[c?.field] === undefined) {
+            merged[c?.field] = c?.text ?? '';
           }
         });
         return merged;
@@ -277,7 +265,7 @@ const PageScreen = () => {
         if (typeof val === 'object' && val !== null) {
           setFormValues(prev => ({ ...prev, ...val }));
         } else {
-          setFormValues(prev => ({ ...prev, [item.field]: val }));
+          setFormValues(prev => ({ ...prev, [item?.field]: val }));
         }
         setErrors(prev => ({ ...prev, [item?.field]: '' }));
       };
@@ -294,7 +282,7 @@ const PageScreen = () => {
           <BoolInput
             label={item?.fieldtitle}
             value={boolVal}
-            onChange={val => setValue({ [item.field]: val })}
+            onChange={val => setValue({ [item?.field]: val })}
           />
         );
       }
@@ -425,7 +413,7 @@ const PageScreen = () => {
         <FullViewLoader />
       ) : !!error ? (
         <ErrorMessage message={error} />
-      ) : controls.length > 0 ? (
+      ) : controls?.length > 0 ? (
         <>
           <View
             style={{

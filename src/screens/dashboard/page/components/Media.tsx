@@ -18,9 +18,6 @@ import { launchCamera, launchImageLibrary, Asset } from 'react-native-image-pick
 import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 import { ERP_ICON } from '../../../../assets';
 
-const screenWidth = Dimensions.get('window').width;
-const screenHeight = Dimensions.get('window').height;
-
 const Media = ({ item, handleAttachment, infoData, baseLink, isFromNew }: any) => {
   const [imageUri, setImageUri] = useState<string | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
@@ -30,15 +27,13 @@ const Media = ({ item, handleAttachment, infoData, baseLink, isFromNew }: any) =
   const [loadingLarge, setLoadingLarge] = useState(false);
   const [cacheBuster, setCacheBuster] = useState(Date.now());
 
-  // Animated values for zoom & pan
-  const scale = useRef(new Animated.Value(1)).current;
+   const scale = useRef(new Animated.Value(1)).current;
   const translateX = useRef(new Animated.Value(0)).current;
   const translateY = useRef(new Animated.Value(0)).current;
   const lastScale = useRef(1);
   const lastTranslate = useRef({ x: 0, y: 0 });
 
-  // Helper to build image URL
-  const getImageUri = (type: 'small' | 'large') => {
+   const getImageUri = (type: 'small' | 'large') => {
     const base =
       imageUri ||
       `${baseLink}fileupload/1/${infoData?.tableName}/${infoData?.id}/${
@@ -125,19 +120,16 @@ const Media = ({ item, handleAttachment, infoData, baseLink, isFromNew }: any) =
     setPickerModalVisible(true);
   };
 
-  // PanResponder for zoom & pan
-  const panResponder = useRef(
+   const panResponder = useRef(
     PanResponder.create({
       onStartShouldSetPanResponder: () => true,
       onMoveShouldSetPanResponder: () => true,
       onPanResponderMove: (evt, gesture) => {
         if (gesture.numberActiveTouches === 1) {
-          // pan
-          translateX.setValue(lastTranslate.current.x + gesture.dx);
+           translateX.setValue(lastTranslate.current.x + gesture.dx);
           translateY.setValue(lastTranslate.current.y + gesture.dy);
         } else if (gesture.numberActiveTouches === 2) {
-          // pinch
-          const touches = evt.nativeEvent.touches;
+           const touches = evt.nativeEvent.touches;
           const dx = touches[0].pageX - touches[1].pageX;
           const dy = touches[0].pageY - touches[1].pageY;
           const distance = Math.sqrt(dx * dx + dy * dy);
@@ -179,7 +171,7 @@ const Media = ({ item, handleAttachment, infoData, baseLink, isFromNew }: any) =
             isFromNew ? <>
             
             <Image
-              key={item.field}
+              key={item?.field}
               source={imageUri ? { uri: imageUri } : ERP_ICON.APP_LOGO }
               style={styles.imageThumb}
               onLoadStart={() => !imageUri && setLoadingSmall(true)}
@@ -262,8 +254,7 @@ const Media = ({ item, handleAttachment, infoData, baseLink, isFromNew }: any) =
               />
             </Animated.View>
 
-            {/* Zoom In / Zoom Out buttons */}
-            <View style={styles.zoomControls}>
+             <View style={styles.zoomControls}>
               <TouchableOpacity style={styles.zoomBtn} onPress={zoomIn}>
                 <MaterialIcons name="zoom-in" size={28} color="#000" />
               </TouchableOpacity>
@@ -275,8 +266,7 @@ const Media = ({ item, handleAttachment, infoData, baseLink, isFromNew }: any) =
         </View>
       </Modal>
 
-      {/* Picker Modal */}
-      <Modal
+       <Modal
         animationType="slide"
         transparent={true}
         visible={pickerModalVisible}
@@ -301,8 +291,8 @@ const Media = ({ item, handleAttachment, infoData, baseLink, isFromNew }: any) =
                     await option.onPress();
                   }}
                 >
-                  <MaterialIcons name={option.icon} size={36} color="#000" />
-                  <Text style={styles.optionLabel}>{option.text}</Text>
+                  <MaterialIcons name={option?.icon} size={36} color="#000" />
+                  <Text style={styles.optionLabel}>{option?.text}</Text>
                 </TouchableOpacity>
               ))}
             </View>

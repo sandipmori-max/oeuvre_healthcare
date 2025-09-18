@@ -18,45 +18,34 @@ import { useBaseLink } from '../../../../hooks/useBaseLink';
 const SignaturePad: React.FC = ({ item, handleSignatureAttachment, infoData }: any) => {
   const signatureRef = useRef<SignatureViewRef>(null);
   const [modalVisible, setModalVisible] = useState(false);
-  const [hasSignature, setHasSignature] = useState(false);
-  const [savedSignature, setSavedSignature] = useState<string | null>(null);
+   const [savedSignature, setSavedSignature] = useState<string | null>(null);
   const [imageUri, setImageUri] = useState<string | null>(null);
   const baseLink = useBaseLink();
   const [cacheBuster, setCacheBuster] = useState(Date.now());
 
-  // Called when user saves signature
   const handleSignature = (signature: string) => {
-    setSavedSignature(signature); // save base64
-    setImageUri(signature); // 🔑 show immediately in <Image>
+    setSavedSignature(signature);
+    setImageUri(signature);
 
-    // pass back to parent
     handleSignatureAttachment(`${item?.field}.jpeg; ${signature}`, item?.field);
 
-    // update cache buster for server reload
     setCacheBuster(Date.now());
 
     setModalVisible(false);
-    setHasSignature(false);
-  };
+   };
 
-  // Clear signature
   const handleClear = () => {
     signatureRef.current?.clearSignature();
-    setHasSignature(false);
-    setSavedSignature(null);
+     setSavedSignature(null);
     setImageUri(null);
   };
 
-  // Save signature manually
   const handleSave = () => {
     signatureRef.current?.readSignature();
   };
 
   const getImageUri = (type: 'small' | 'large') => {
-    // If user just signed → show base64 preview
     if (imageUri) return imageUri;
-
-    // Else load from server
     const base = `${baseLink}fileupload/1/${infoData?.tableName}/${infoData?.id}/${
       type === 'small' ? `d_${item?.text}` : item?.text
     }`;
@@ -135,8 +124,7 @@ const SignaturePad: React.FC = ({ item, handleSignatureAttachment, infoData }: a
               ref={signatureRef}
               onOK={handleSignature}
               onEmpty={() => Alert.alert('Please provide a signature')}
-              onBegin={() => setHasSignature(true)}
-              descriptionText="Sign here"
+               descriptionText="Sign here"
               clearText="Clear"
               confirmText="Save"
               autoClear={false}

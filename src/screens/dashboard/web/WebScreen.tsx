@@ -40,13 +40,13 @@ const WebScreen = () => {
       })();
       true;
     `;
-    webviewRef.current?.injectJavaScript(jsCode);
+    webviewRef?.current?.injectJavaScript(jsCode);
     setIsHidden(prev => !prev);
   };
 
   const reloadWebView = () => {
     setIsReloading(true);
-    webviewRef.current?.reload();
+    webviewRef?.current?.reload();
   };
 
   useLayoutEffect(() => {
@@ -80,14 +80,14 @@ const WebScreen = () => {
     const itemUrl = item?.url || '';
     if (!itemUrl || !token) return '';
     if (/^https?:\/\//i.test(itemUrl)) {
-      const baseUrl = itemUrl.replace(/^https:\/\//i, 'http://');
-      const separator = baseUrl.includes('?') ? '&' : '?';
+      const baseUrl = itemUrl?.replace(/^https:\/\//i, 'http://');
+      const separator = baseUrl?.includes('?') ? '&' : '?';
       return `${baseUrl}${separator}token=${token}`;
     }
 
-    const cleanedPath = itemUrl.replace(/^\/+/, '');
+    const cleanedPath = itemUrl?.replace(/^\/+/, '');
     const fullUrl = baseLink + cleanedPath;
-    const separator = fullUrl.includes('?') ? '/' : '?';
+    const separator = fullUrl?.includes('?') ? '/' : '?';
     return `${fullUrl}${separator}&token=${token}`;
   }, [baseLink, item?.url, token]);
 

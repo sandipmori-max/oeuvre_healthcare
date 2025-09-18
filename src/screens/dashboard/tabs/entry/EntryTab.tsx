@@ -15,7 +15,7 @@ import FullViewLoader from '../../../../components/loader/FullViewLoader';
 import { styles } from './entry_style';
 import { ERP_ICON } from '../../../../assets';
 import ERPIcon from '../../../../components/icon/ERPIcon';
-import { getERPDashboardThunk, getERPMenuThunk } from '../../../../store/slices/auth/thunk';
+import { getERPMenuThunk } from '../../../../store/slices/auth/thunk';
 import {
   createBookmarksTable,
   getBookmarks,
@@ -31,7 +31,7 @@ const EntryTab = () => {
   const dispatch = useAppDispatch();
   const { user } = useAppSelector(state => state?.auth);
 
-  const { isLoading, isAuthenticated, activeToken, error } = useAppSelector(state => state.auth);
+  const { isAuthenticated, activeToken, error } = useAppSelector(state => state.auth);
   const { menu, isMenuLoading } = useAppSelector(state => state.auth);
   const allList = menu?.filter(item => item?.isReport === 'E') ?? [];
   const [isRefresh, setIsRefresh] = useState<boolean>(false);
@@ -40,7 +40,7 @@ const EntryTab = () => {
   const [bookmarks, setBookmarks] = useState<{ [key: string]: boolean }>({});
   const [showBookmarksOnly, setShowBookmarksOnly] = useState(false);
 
-  const list = showBookmarksOnly ? allList.filter(item => bookmarks[item.id]) : allList;
+  const list = showBookmarksOnly ? allList?.filter(item => bookmarks[item.id]) : allList;
 
   const toggleBookmark = async (id: string) => {
     const updated = !bookmarks[id];
@@ -114,7 +114,7 @@ const EntryTab = () => {
           style={{ position: 'absolute', top: 0, right: 0, zIndex: 1 }}
         >
           <Image
-            source={bookmarks[item.id] ? ERP_ICON.BOOK_MARK_DONE : ERP_ICON.BOOK_MARK}
+            source={bookmarks[item?.id] ? ERP_ICON.BOOK_MARK_DONE : ERP_ICON.BOOK_MARK}
             style={styles.icon}
           />
         </TouchableOpacity>
@@ -123,8 +123,8 @@ const EntryTab = () => {
           <Text style={styles.iconText}>
             {item?.icon !== ''
               ? item?.icon
-              : item.name
-              ? item.name
+              : item?.name
+              ? item?.name
                   .trim()
                   .split(' ')
                   .slice(0, 2)
@@ -141,8 +141,8 @@ const EntryTab = () => {
             alignItems: isHorizontal ? 'flex-start' : 'center',
           }}
         >
-          <Text style={styles.title}>{item.name}</Text>
-          <Text style={styles.subtitle}>{item.title}</Text>
+          <Text style={styles.title}>{item?.name}</Text>
+          <Text style={styles.subtitle}>{item?.title}</Text>
         </View>
       </TouchableOpacity>
     );

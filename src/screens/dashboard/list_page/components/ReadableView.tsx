@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 /* eslint-disable react-native/no-inline-styles */
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, Dimensions, FlatList, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
@@ -8,8 +8,6 @@ import { formatDateToDDMMMYYYY } from '../../../../utils/helpers';
 import { styles } from '../list_page_style';
 import NoData from '../../../../components/no_data/NoData';
 import { ERP_COLOR_CODE } from '../../../../utils/constants';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useBaseLink } from '../../../../hooks/useBaseLink';
 
 const ReadableView = ({
   configData,
@@ -22,7 +20,6 @@ const ReadableView = ({
 }: any) => {
   const navigation = useNavigation();
   const screenWidth = Dimensions.get('window').width;
-  const baseLink = useBaseLink();
 
   const getButtonMeta = (key: string) => {
     if (!key || !configData?.length) return { label: 'Action', color: '#007BFF' };
@@ -217,9 +214,9 @@ const ReadableView = ({
           )}
         </TouchableOpacity>
 
-        {btnKeys.length > 0 && (
+        {btnKeys?.length > 0 && (
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginTop: 6, gap: 1 }}>
-            {btnKeys.map((key, idx) => {
+            {btnKeys?.map((key, idx) => {
               const actionValue = item[key];
               const { label, color } = getButtonMeta(key);
               return (
@@ -252,7 +249,7 @@ const ReadableView = ({
     );
   };
 
-  if (!loadingListId && filteredData.length === 0) {
+  if (!loadingListId && filteredData?.length === 0) {
     return (
       <>
         <View
@@ -279,7 +276,7 @@ const ReadableView = ({
         renderItem={({ item, index }) => <RenderCard item={item} index={index} />}
         contentContainerStyle={styles.listContent}
       />
-      {filteredData.length > 0 && totalAmount > 0 ? (
+      {filteredData?.length > 0 && totalAmount > 0 ? (
         <View
           style={{
             marginTop: 6,
@@ -300,7 +297,7 @@ const ReadableView = ({
               marginTop: 2,
             }}
           >
-            ₹ {totalAmount.toFixed(2)}
+            ₹ {totalAmount?.toFixed(2)}
           </Text>
         </View>
       ) : null}

@@ -20,6 +20,7 @@ import { getERPListDataThunk } from '../../../../store/slices/auth/thunk';
 import FullViewLoader from '../../../../components/loader/FullViewLoader';
 import { useBaseLink } from '../../../../hooks/useBaseLink';
 import { Calendar } from 'react-native-calendars';
+import ErrorMessage from '../../../../components/error/Error';
 
 const FILTERS = [
   { key: 'all', label: 'All' },
@@ -79,12 +80,16 @@ const styles = StyleSheet.create({
 });
 
 const List = ({ selectedMonth, showFilter, fromDate, toDate }: any) => {
+
+  const dispatch = useAppDispatch();
+
   const [activeFilter, setActiveFilter] = useState('all');
   const [isLoading, setIsLoading] = useState(false);
   const [listData, setListData] = useState<any[]>([]);
   const [parsedError, setParsedError] = useState<any>();
-  const dispatch = useAppDispatch();
+
   const [currentView, setCurrentView] = useState<'pie' | 'calendar'>('pie');
+  
   const baseLink = useBaseLink();
 
   const normalizeDate = (dateStr: string) => {
@@ -114,6 +119,7 @@ const List = ({ selectedMonth, showFilter, fromDate, toDate }: any) => {
     const outDate = new Date(0, 0, 0, outH, outM);
     return (outDate.getTime() - inDate.getTime()) / 1000 / 60 / 60;
   };
+
   const getWorkedHours2 = (punchIn: string, punchOut: string) => {
     if (!punchIn || !punchOut) return '0 hr 0 min';
 
@@ -201,36 +207,36 @@ const List = ({ selectedMonth, showFilter, fromDate, toDate }: any) => {
     if (fromDate && toDate) fetchListData(fromDate, toDate);
   }, [fromDate, toDate, fetchListData]);
 
-  let data = listData.length > 0 ? [...listData] : [];
+  let data = listData?.length > 0 ? [...listData] : [];
   console.log('🚀 ~ List ~ data:', data);
   if (activeFilter !== 'all') {
     switch (activeFilter) {
       case 'leave':
-        data = data.filter(i => i.status?.toLowerCase() === 'leave');
+        data = data.filter(i => i?.status?.toLowerCase() === 'leave');
         break;
       case 'leave_first_half':
-        data = data.filter(i => i.status?.toLowerCase() === 'leave_first_half');
+        data = data.filter(i => i?.status?.toLowerCase() === 'leave_first_half');
         break;
       case 'leave_second_half':
-        data = data.filter(i => i.status?.toLowerCase() === 'leave_second_half');
+        data = data.filter(i => i?.status?.toLowerCase() === 'leave_second_half');
         break;
       case 'late':
-        data = data.filter(i => i.intime && isLatePunchIn(i.intime));
+        data = data.filter(i => i?.intime && isLatePunchIn(i?.intime));
         break;
       case 'after_830':
-        data = data.filter(i => i.intime && isAfter830(i.intime));
+        data = data.filter(i => i?.intime && isAfter830(i?.intime));
         break;
       case 'before_830':
-        data = data.filter(i => i.intime && isBefore830(i.intime));
+        data = data.filter(i => i?.intime && isBefore830(i?.intime));
         break;
     }
   }
 
-  const total = listData.length;
-  const leave = listData.filter(i => i.status?.toLowerCase() === 'leave').length;
-  const late = listData.filter(i => i.intime && isLatePunchIn(i.intime)).length;
-  const lessHours = listData.filter(
-    i => i.intime && i.outtime && getWorkedHours(i.intime, i.outtime) < 8.5,
+  const total = listData?.length;
+  const leave = listData?.filter(i => i?.status?.toLowerCase() === 'leave').length;
+  const late = listData?.filter(i => i?.intime && isLatePunchIn(i?.intime)).length;
+  const lessHours = listData?.filter(
+    i => i?.intime && i?.outtime && getWorkedHours(i?.intime, i?.outtime) < 8.5,
   ).length;
   const present = total - leave;
 
@@ -241,24 +247,19 @@ const List = ({ selectedMonth, showFilter, fromDate, toDate }: any) => {
     { value: lessHours, color: '#ff9800', text: 'Less Hrs' },
   ];
 
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = now.getMonth();
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
-
+    
   if (parsedError) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <Text>{JSON.stringify(parsedError)}</Text>
+        <ErrorMessage message={JSON.stringify(parsedError)}/>
       </View>
     );
   }
 
   const markedDates =
-    listData.length > 0 &&
-    listData.reduce((acc, item) => {
-      console.log('🚀 ~ item:------------', item);
-      const dateStr = item?.date && normalizeDate(item?.date);
+    listData?.length > 0 &&
+    listData?.reduce((acc, item) => {
+       const dateStr = item?.date && normalizeDate(item?.date);
       let color = ERP_COLOR_CODE.ERP_APP_COLOR;
 
       if (item?.status?.toLowerCase() === 'leave') {
@@ -296,7 +297,7 @@ const List = ({ selectedMonth, showFilter, fromDate, toDate }: any) => {
         >
           {FILTERS.map(filter => (
             <TouchableOpacity
-              key={filter.key}
+              key={filter?.key}
               onPress={() => setActiveFilter(filter.key)}
               style={[
                 { paddingVertical: 6, paddingHorizontal: 14, borderRadius: 4, borderWidth: 1 },
@@ -331,7 +332,7 @@ const List = ({ selectedMonth, showFilter, fromDate, toDate }: any) => {
                   alignItems: 'center',
                 }}
               >
-                {currentView === 'pie' && listData.length > 0 && (
+                {currentView === 'pie' && listData?.length > 0 && (
                   <View
                     style={{
                       justifyContent: 'space-around',
@@ -353,7 +354,7 @@ const List = ({ selectedMonth, showFilter, fromDate, toDate }: any) => {
                       )}
                     />
                     <View style={{ marginTop: 12, gap: 12, marginHorizontal: 20 }}>
-                      {chartData.map((c, i) => (
+                      {chartData?.map((c, i) => (
                         <View
                           key={i}
                           style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}
@@ -366,7 +367,7 @@ const List = ({ selectedMonth, showFilter, fromDate, toDate }: any) => {
                               backgroundColor: c.color,
                             }}
                           />
-                          <Text>{`${c.text} (${c.value})`}</Text>
+                          <Text>{`${c?.text} (${c?.value})`}</Text>
                         </View>
                       ))}
                     </View>
@@ -385,11 +386,11 @@ const List = ({ selectedMonth, showFilter, fromDate, toDate }: any) => {
                     hideExtraDays={false}
                     firstDay={1}
                     onDayPress={day => {
-                      const selectedData = listData.find(
-                        d => normalizeDate(d.date) === day.dateString,
+                      const selectedData = listData?.find(
+                        d => normalizeDate(d?.date) === day?.dateString,
                       );
                       Alert.alert(
-                        `Attendance on ${day.dateString}`,
+                        `Attendance on ${day?.dateString}`,
                         selectedData ? JSON.stringify(selectedData, null, 2) : 'No data',
                       );
                     }}
@@ -465,11 +466,11 @@ const List = ({ selectedMonth, showFilter, fromDate, toDate }: any) => {
                   showsVerticalScrollIndicator={false}
                   keyExtractor={(item, index) => item.id?.toString() || index.toString()}
                   renderItem={({ item }) => {
-                    const isLeaveFull = item.status?.toLowerCase() === 'leave';
+                    const isLeaveFull = item?.status?.toLowerCase() === 'leave';
                     const workedHours =
-                      !item.intime || !item.outtime ? 0 : getWorkedHours(item.intime, item.outtime);
+                      !item?.intime || !item?.outtime ? 0 : getWorkedHours(item?.intime, item?.outtime);
                     const isLessThanRequired = !isLeaveFull && workedHours < 8.5;
-                    const isLate = !isLeaveFull && item.intime && isLatePunchIn(item.intime);
+                    const isLate = !isLeaveFull && item?.intime && isLatePunchIn(item?.intime);
 
                     return (
                       <View
@@ -483,15 +484,15 @@ const List = ({ selectedMonth, showFilter, fromDate, toDate }: any) => {
                         ]}
                       >
                         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                          {item.image && (
+                          {item?.image && (
                             <Image
-                              source={{ uri: baseLink + '/' + item.image }}
+                              source={{ uri: baseLink + '/' + item?.image }}
                               style={styles.recordAvatar}
                             />
                           )}
-                          {item.image2 && (
+                          {item?.image2 && (
                             <Image
-                              source={{ uri: baseLink + '/' + item.image2 }}
+                              source={{ uri: baseLink + '/' + item?.image2 }}
                               style={[
                                 styles.recordAvatar,
                                 { marginLeft: -32, borderWidth: 2, borderColor: '#fff' },

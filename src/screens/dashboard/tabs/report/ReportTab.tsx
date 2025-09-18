@@ -1,12 +1,4 @@
-import {
-  Dimensions,
-  FlatList,
-  Image,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { FlatList, Image, Text, TouchableOpacity, View } from 'react-native';
 import React, { useEffect, useLayoutEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { useAppDispatch, useAppSelector } from '../../../../store/hooks';
@@ -14,7 +6,7 @@ import NoData from '../../../../components/no_data/NoData';
 import FullViewLoader from '../../../../components/loader/FullViewLoader';
 import { ERP_ICON } from '../../../../assets';
 import ERPIcon from '../../../../components/icon/ERPIcon';
-import { getERPDashboardThunk, getERPMenuThunk } from '../../../../store/slices/auth/thunk';
+import { getERPMenuThunk } from '../../../../store/slices/auth/thunk';
 import { styles } from '../entry/entry_style';
 import {
   createBookmarksTable,
@@ -39,14 +31,13 @@ const ReportTab = () => {
   const [bookmarks, setBookmarks] = useState<{ [key: string]: boolean }>({});
   const [showBookmarksOnly, setShowBookmarksOnly] = useState(false);
 
-  const list = showBookmarksOnly ? allList.filter(item => bookmarks[item.id]) : allList;
+  const list = showBookmarksOnly ? allList?.filter(item => bookmarks[item?.id]) : allList;
 
   useEffect(() => {
     (async () => {
       const db = await getDBConnection();
       await createBookmarksTable(db);
       const saved = await getBookmarks(db, user?.id);
-
       setBookmarks(saved);
     })();
   }, []);
@@ -54,7 +45,6 @@ const ReportTab = () => {
   const toggleBookmark = async (id: string) => {
     const updated = !bookmarks[id];
     setBookmarks(prev => ({ ...prev, [id]: updated }));
-
     const db = await getDBConnection();
     await insertOrUpdateBookmark(db, id, user?.id, updated);
   };
@@ -122,8 +112,8 @@ const ReportTab = () => {
           <Text style={styles.iconText}>
             {item?.icon !== ''
               ? item?.icon
-              : item.name
-              ? item.name
+              : item?.name
+              ? item?.name
                   .trim()
                   .split(' ')
                   .slice(0, 2)
@@ -140,8 +130,8 @@ const ReportTab = () => {
             alignItems: isHorizontal ? 'flex-start' : 'center',
           }}
         >
-          <Text style={styles.title}>{item.name}</Text>
-          <Text style={styles.subtitle}>{item.title}</Text>
+          <Text style={styles.title}>{item?.name}</Text>
+          <Text style={styles.subtitle}>{item?.title}</Text>
         </View>
       </TouchableOpacity>
     );

@@ -66,7 +66,7 @@ const AjaxPicker = ({ label, onValueChange, item, errors, dtext, formValues }: a
       [item?.dfield]:
         opt[`${item?.ddlfield.toLowerCase()}id`] ?? opt[`${item?.field}id`] ?? opt[item?.field],
 
-      [item.dfield || item.ddlfield.toLowerCase()]:
+      [item?.dfield || item?.ddlfield.toLowerCase()]:
         opt[item?.ddlfield.toLowerCase()] ?? opt[item?.dfield],
 
       ...result,
@@ -151,9 +151,9 @@ const AjaxPicker = ({ label, onValueChange, item, errors, dtext, formValues }: a
               <FullViewLoader />
             ) : (
               <ScrollView keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
-                {options.length > 0 ? (
-                  options.map((opt: any, i: number) => {
-                     const entries = Object.entries(opt).filter(
+                {options?.length > 0 ? (
+                  options?.map((opt: any, i: number) => {
+                    const entries = Object.entries(opt).filter(
                       ([key]) => !key.toLowerCase().includes('id'),
                     );
 
@@ -171,7 +171,7 @@ const AjaxPicker = ({ label, onValueChange, item, errors, dtext, formValues }: a
                             flexWrap: isGrid ? 'wrap' : 'nowrap',
                           }}
                         >
-                          {entries.map(([key, value], idx) => (
+                          {entries?.map(([key, value], idx) => (
                             <View
                               key={idx}
                               style={{
@@ -183,11 +183,11 @@ const AjaxPicker = ({ label, onValueChange, item, errors, dtext, formValues }: a
                               <Text
                                 style={{
                                   color:
-                                    key === label.toLowerCase()
+                                    key === label?.toLowerCase()
                                       ? ERP_COLOR_CODE.ERP_APP_COLOR
                                       : '#000',
-                                  fontSize: key === label.toLowerCase() ? 16 : 14,
-                                  fontWeight: key === label.toLowerCase() ? '700' : '400',
+                                  fontSize: key === label?.toLowerCase() ? 16 : 14,
+                                  fontWeight: key === label?.toLowerCase() ? '700' : '400',
                                 }}
                                 numberOfLines={1}
                                 ellipsizeMode="tail"
@@ -219,7 +219,7 @@ const AjaxPicker = ({ label, onValueChange, item, errors, dtext, formValues }: a
       </Modal>
 
       {errors[item.field] && (
-        <Text style={{ color: ERP_COLOR_CODE.ERP_ERROR, marginTop: 4 }}>{errors[item.field]}</Text>
+        <Text style={{ color: ERP_COLOR_CODE.ERP_ERROR, marginTop: 4 }}>{errors[item?.field]}</Text>
       )}
     </View>
   );
