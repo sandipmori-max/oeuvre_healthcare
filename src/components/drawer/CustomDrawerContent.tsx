@@ -18,7 +18,6 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
   const theme = useAppSelector(state => state.theme);
   const baseLink = useBaseLink();
 
- 
   const currentRoute = props.state.routeNames[props.state.index];
 
   return (
@@ -26,17 +25,17 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
       {...props}
       contentContainerStyle={{ flex: 1, backgroundColor: theme === 'dark' ? 'black' : 'white' }}
     >
-       
-      <View style={[styles.header,]}>
- 
-         <FastImage
-                  source={{
-                    uri: `${baseLink}/FileUpload/1/UserMaster/${user?.id}/profileimage.jpeg?ts=${new Date().getTime()}`,
-                    priority: FastImage.priority.normal,
-                    cache: FastImage.cacheControl.reload,
-                  }}
-                    style={styles.profileImage}
-                />
+      <View style={[styles.header]}>
+        <FastImage
+          source={{
+            uri: `${baseLink}/FileUpload/1/UserMaster/${
+              user?.id
+            }/profileimage.jpeg?ts=${new Date().getTime()}`,
+            priority: FastImage.priority.normal,
+            cache: FastImage.cacheControl.reload,
+          }}
+          style={styles.profileImage}
+        />
         <>
           <View style={{ height: 25, width: 100 }}></View>
           <Text style={[styles.username, { top: 8 }]}>
@@ -48,12 +47,12 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
             style={{
               top: 18,
               width: '100%',
-              marginVertical: 8, 
+              marginVertical: 8,
             }}
           >
             <View
-              style={{ 
-                flexDirection:'row',
+              style={{
+                flexDirection: 'row',
                 alignContent: 'center',
                 alignItems: 'center',
                 borderRadius: 8,
@@ -64,14 +63,14 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
               <Text style={styles.userPhone}>{user?.mobileno || ''}</Text>
             </View>
             <View
-              style={{ 
-                flexDirection:'row',
+              style={{
+                flexDirection: 'row',
 
                 alignContent: 'center',
                 alignItems: 'center',
                 borderRadius: 8,
                 padding: 6,
-                marginVertical: 4
+                marginVertical: 4,
               }}
             >
               <MaterialIcons name={'mail-outline'} color={'white'} size={14} />
@@ -81,8 +80,8 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
               </Text>
             </View>
             <View
-              style={{ 
-                flexDirection:'row',
+              style={{
+                flexDirection: 'row',
                 alignContent: 'center',
                 alignItems: 'center',
                 borderRadius: 8,
@@ -117,7 +116,11 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
               }}
             >
               <View style={styles.itemRow}>
-                <MaterialIcons name={`${item?.icon}`} color={isActive ? '#fff' : '#000'} size={20} />
+                <MaterialIcons
+                  name={`${item?.icon}`}
+                  color={isActive ? '#fff' : '#000'}
+                  size={20}
+                />
                 <Text
                   style={[
                     styles.itemLabel,
