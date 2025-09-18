@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { Provider } from 'react-redux';
-import { StatusBar, SafeAreaView, StyleSheet } from 'react-native';
+import { StatusBar, StyleSheet } from 'react-native';
 
 import { store } from './src/store/store';
 import RootNavigator from './src/navigation/RootNavigator';
@@ -12,6 +12,7 @@ import { TranslationProvider } from './src/components/TranslationProvider';
 
 import './src/i18n';
 import { ERP_COLOR_CODE } from './src/utils/constants';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const App = () => {
   const isConnected = useNetworkStatus();
@@ -20,7 +21,7 @@ const App = () => {
   if (!isConnected) {
     return (
       <TranslationProvider>
-        <SafeAreaView style={styles.safeArea}>
+        <SafeAreaView edges={['top', 'left', 'right', 'bottom']} style={styles.safeArea}>
           <NoInternetScreen onRetry={() => {}} />
         </SafeAreaView>
       </TranslationProvider>
@@ -30,7 +31,7 @@ const App = () => {
   if (isSplashVisible) {
     return (
       <TranslationProvider>
-        <SafeAreaView style={styles.safeArea}>
+        <SafeAreaView edges={['top', 'left', 'right', 'bottom']} style={styles.safeArea}>
           <CustomSplashScreen onFinish={() => setSplashVisible(false)} />
         </SafeAreaView>
       </TranslationProvider>
@@ -40,9 +41,9 @@ const App = () => {
   return (
     <TranslationProvider>
       <Provider store={store}>
-        <SafeAreaView style={styles.safeArea}>
+        <StatusBar backgroundColor={ERP_COLOR_CODE.ERP_APP_COLOR} barStyle="light-content" />
+        <SafeAreaView edges={['top', 'left', 'right', 'bottom']} style={styles.safeArea}>
           <NavigationContainer>
-            <StatusBar backgroundColor={ERP_COLOR_CODE.ERP_APP_COLOR} barStyle="light-content" />
             <RootNavigator />
           </NavigationContainer>
         </SafeAreaView>
@@ -54,7 +55,7 @@ const App = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR,
   },
 });
 

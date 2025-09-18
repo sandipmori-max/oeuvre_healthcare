@@ -94,7 +94,7 @@ const AjaxPicker = ({ label, onValueChange, item, errors, dtext, formValues }: a
         activeOpacity={0.7}
       >
         <Text style={{ color: selectedOption ? '#000' : '#888', flex: 1 }}>
-          {selectedOption ||  `Select ${label}`}
+          {selectedOption || `Select ${label}`}
         </Text>
         <MaterialIcons name={'arrow-drop-down'} size={24} color="#555" />
       </TouchableOpacity>
@@ -150,51 +150,56 @@ const AjaxPicker = ({ label, onValueChange, item, errors, dtext, formValues }: a
             {loader ? (
               <FullViewLoader />
             ) : (
-              <ScrollView showsVerticalScrollIndicator={false}>
+              <ScrollView keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
                 {options.length > 0 ? (
                   options.map((opt: any, i: number) => {
-  // filter out unwanted keys first
-  const entries = Object.entries(opt).filter(([key]) => !key.toLowerCase().includes('id'));
+                     const entries = Object.entries(opt).filter(
+                      ([key]) => !key.toLowerCase().includes('id'),
+                    );
 
-  const isGrid = entries.length >= 3; 
+                    const isGrid = entries.length >= 3;
 
-  return (
-    <TouchableOpacity
-      key={i}
-      style={[styles.option, { paddingVertical: 12 }]}
-      onPress={() => handleSelect(opt)}
-    >
-      <View style={{ flexDirection: isGrid ? 'row' : 'column', flexWrap: isGrid ? 'wrap' : 'nowrap' }}>
-        {entries.map(([key, value], idx) => (
-          <View
-            key={idx}
-            style={{
-              width: isGrid ? '33.33%' : '100%',
-              paddingVertical: 4,
-              paddingHorizontal: 6,
-            }}
-          >
-            <Text
-              style={{
-                color:
-                  key === label.toLowerCase()
-                    ? ERP_COLOR_CODE.ERP_APP_COLOR
-                    : '#000',
-                fontSize: key === label.toLowerCase() ? 16 : 14,
-                fontWeight: key === label.toLowerCase() ? '700' : '400',
-              }}
-              numberOfLines={1}
-              ellipsizeMode="tail"
-            >
-              {String(value)}
-            </Text>
-          </View>
-        ))}
-      </View>
-    </TouchableOpacity>
-  );
-}
-)
+                    return (
+                      <TouchableOpacity
+                        key={i}
+                        style={[styles.option, { paddingVertical: 12 }]}
+                        onPress={() => handleSelect(opt)}
+                      >
+                        <View
+                          style={{
+                            flexDirection: isGrid ? 'row' : 'column',
+                            flexWrap: isGrid ? 'wrap' : 'nowrap',
+                          }}
+                        >
+                          {entries.map(([key, value], idx) => (
+                            <View
+                              key={idx}
+                              style={{
+                                width: isGrid ? '33.33%' : '100%',
+                                paddingVertical: 4,
+                                paddingHorizontal: 6,
+                              }}
+                            >
+                              <Text
+                                style={{
+                                  color:
+                                    key === label.toLowerCase()
+                                      ? ERP_COLOR_CODE.ERP_APP_COLOR
+                                      : '#000',
+                                  fontSize: key === label.toLowerCase() ? 16 : 14,
+                                  fontWeight: key === label.toLowerCase() ? '700' : '400',
+                                }}
+                                numberOfLines={1}
+                                ellipsizeMode="tail"
+                              >
+                                {String(value)}
+                              </Text>
+                            </View>
+                          ))}
+                        </View>
+                      </TouchableOpacity>
+                    );
+                  })
                 ) : (
                   <View
                     style={{

@@ -272,6 +272,7 @@ const ReadableView = ({
     <View style={{ flex: 1 }}>
       <FlatList
         data={filteredData}
+        keyboardShouldPersistTaps="handled"
         showsHorizontalScrollIndicator={false}
         showsVerticalScrollIndicator={false}
         keyExtractor={(item, idx) => String(item?.id || idx)}

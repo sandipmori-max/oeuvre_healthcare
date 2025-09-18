@@ -31,7 +31,7 @@ const TABS: ('All' | 'Pending' | 'Approved' | 'Rejected')[] = [
   'Rejected',
 ];
 
-const LeaveListPage = ({ showFilter , onSelect }: any) => {
+const LeaveListPage = ({ showFilter, onSelect }: any) => {
   const [refreshing, setRefreshing] = useState(false);
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<'All' | 'Pending' | 'Approved' | 'Rejected'>('All');
@@ -154,7 +154,7 @@ const LeaveListPage = ({ showFilter , onSelect }: any) => {
 
   const renderItem = ({ item }: { item: LeaveRecord }) => (
     <TouchableOpacity
-     onPress={() => onSelect?.(item)}  
+      onPress={() => onSelect?.(item)}
       style={{
         backgroundColor: '#fff',
         marginVertical: 6,
@@ -243,6 +243,7 @@ const LeaveListPage = ({ showFilter , onSelect }: any) => {
     <View style={{ flex: 1, backgroundColor: '#F8F9FA' }}>
       <FlatList
         data={['']}
+        keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
         renderItem={() => {
           return (
@@ -348,7 +349,8 @@ const LeaveListPage = ({ showFilter , onSelect }: any) => {
                           paddingHorizontal: 14,
                           borderRadius: 8,
                           marginLeft: 12,
-                          backgroundColor: filter === tab ? ERP_COLOR_CODE.ERP_APP_COLOR : '#e0e0e0',
+                          backgroundColor:
+                            filter === tab ? ERP_COLOR_CODE.ERP_APP_COLOR : '#e0e0e0',
                         }}
                       >
                         <Text

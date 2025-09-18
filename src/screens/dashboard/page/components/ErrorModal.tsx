@@ -1,6 +1,6 @@
-import { FlatList, Modal, Text, TouchableOpacity, View } from "react-native";
-import { styles } from "../page_style";
-import MaterialIcons from "@react-native-vector-icons/material-icons";
+import { FlatList, Modal, Text, TouchableOpacity, View } from 'react-native';
+import { styles } from '../page_style';
+import MaterialIcons from '@react-native-vector-icons/material-icons';
 
 const ErrorModal = ({
   visible,
@@ -35,6 +35,7 @@ const ErrorModal = ({
           <View style={{ marginVertical: 14 }}>
             <FlatList
               data={errors}
+              keyboardShouldPersistTaps="handled"
               keyExtractor={(item, idx) => idx.toString()}
               renderItem={({ item }) => <Text style={styles.errorText}>• {item}</Text>}
             />

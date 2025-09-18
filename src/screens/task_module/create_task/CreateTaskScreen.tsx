@@ -130,6 +130,7 @@ const CreateTaskScreen = ({ onCreate }) => {
             {/* Options */}
             <FlatList
               data={dummyUsers}
+              keyboardShouldPersistTaps="handled"
               keyExtractor={item => item.id}
               renderItem={({ item }) => (
                 <TouchableOpacity style={styles.option} onPress={() => toggleUser(item.id)}>
@@ -184,7 +185,6 @@ const CreateTaskScreen = ({ onCreate }) => {
           ))}
         </View>
       </View>
- 
     </ScrollView>
   );
 };

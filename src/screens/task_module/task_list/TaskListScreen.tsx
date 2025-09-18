@@ -66,6 +66,7 @@ const TaskListScreen = ({ tasks, onSelectTask, showPicker, showFilter }) => {
   return (
     <FlatList
       data={['']}
+      keyboardShouldPersistTaps="handled"
       renderItem={() => {
         return (
           <View style={styles.container}>
@@ -144,6 +145,7 @@ const TaskListScreen = ({ tasks, onSelectTask, showPicker, showFilter }) => {
               <Text style={styles.noTask}>No tasks found</Text>
             ) : (
               <FlatList
+                keyboardShouldPersistTaps="handled"
                 showsVerticalScrollIndicator={false}
                 data={filteredTasks}
                 keyExtractor={item => item.id}

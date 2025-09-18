@@ -1,5 +1,5 @@
 import React, { useCallback, useLayoutEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, ActivityIndicator, FlatList } from 'react-native';
+import { View, Text, TouchableOpacity, ActivityIndicator, FlatList, StatusBar } from 'react-native';
 
 import { styles } from './home_style';
 import { useAppDispatch, useAppSelector } from '../../../../store/hooks';
@@ -29,8 +29,6 @@ const HomeScreen = () => {
     navigation.setOptions({
       headerRight: () => (
         <>
-        
-
           <ERPIcon
             name="refresh"
             onPress={() => {
@@ -43,7 +41,7 @@ const HomeScreen = () => {
             }}
             isLoading={actionLoader}
           />
-            <ERPIcon
+          <ERPIcon
             name={!isHorizontal ? 'list' : 'apps'}
             onPress={() => setIsHorizontal(prev => !prev)}
           />
@@ -292,6 +290,7 @@ const HomeScreen = () => {
               <View style={styles.dashboardSection}>
                 <FlatList
                   key={`${isHorizontal}`}
+                  keyboardShouldPersistTaps="handled"
                   data={dashboard}
                   keyExtractor={item => item?.id}
                   numColumns={isHorizontal ? 1 : 2}

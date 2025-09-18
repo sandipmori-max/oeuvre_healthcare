@@ -114,31 +114,31 @@ const List = ({ selectedMonth, showFilter, fromDate, toDate }: any) => {
     const outDate = new Date(0, 0, 0, outH, outM);
     return (outDate.getTime() - inDate.getTime()) / 1000 / 60 / 60;
   };
-const getWorkedHours2 = (punchIn: string, punchOut: string) => {
-  if (!punchIn || !punchOut) return '0 hr 0 min';
+  const getWorkedHours2 = (punchIn: string, punchOut: string) => {
+    if (!punchIn || !punchOut) return '0 hr 0 min';
 
-  const [inH, inM] = punchIn.split(':').map(Number);
-  const [outH, outM] = punchOut.split(':').map(Number);
+    const [inH, inM] = punchIn.split(':').map(Number);
+    const [outH, outM] = punchOut.split(':').map(Number);
 
-  if (isNaN(inH) || isNaN(inM) || isNaN(outH) || isNaN(outM)) {
-    return '0 hr 0 min';
-  }
+    if (isNaN(inH) || isNaN(inM) || isNaN(outH) || isNaN(outM)) {
+      return '0 hr 0 min';
+    }
 
-  const inDate = new Date(0, 0, 0, inH, inM);
-  const outDate = new Date(0, 0, 0, outH, outM);
+    const inDate = new Date(0, 0, 0, inH, inM);
+    const outDate = new Date(0, 0, 0, outH, outM);
 
-  let diffMs = outDate.getTime() - inDate.getTime();
-  if (diffMs <= 0) return '0 hr 0 min';
+    let diffMs = outDate.getTime() - inDate.getTime();
+    if (diffMs <= 0) return '0 hr 0 min';
 
-  const totalMinutes = Math.floor(diffMs / 60000);
+    const totalMinutes = Math.floor(diffMs / 60000);
 
-  const minutesAfterBreak = Math.max(totalMinutes - 60, 0);
+    const minutesAfterBreak = Math.max(totalMinutes - 60, 0);
 
-  const hours = Math.floor(minutesAfterBreak / 60);
-  const mins = minutesAfterBreak % 60;
+    const hours = Math.floor(minutesAfterBreak / 60);
+    const mins = minutesAfterBreak % 60;
 
-  return `${hours}:${mins.toString().padStart(2, '0')}`;
-};
+    return `${hours}:${mins.toString().padStart(2, '0')}`;
+  };
 
   const panResponder = PanResponder.create({
     onMoveShouldSetPanResponder: (_, gestureState) => {
@@ -202,7 +202,7 @@ const getWorkedHours2 = (punchIn: string, punchOut: string) => {
   }, [fromDate, toDate, fetchListData]);
 
   let data = listData.length > 0 ? [...listData] : [];
-  console.log("🚀 ~ List ~ data:", data)
+  console.log('🚀 ~ List ~ data:', data);
   if (activeFilter !== 'all') {
     switch (activeFilter) {
       case 'leave':
@@ -254,33 +254,35 @@ const getWorkedHours2 = (punchIn: string, punchOut: string) => {
     );
   }
 
-  const markedDates =listData.length > 0 && listData.reduce((acc, item) => {
-    console.log("🚀 ~ item:------------", item)
-    const dateStr = item?.date &&  normalizeDate(item?.date);
-    let color = ERP_COLOR_CODE.ERP_APP_COLOR;
+  const markedDates =
+    listData.length > 0 &&
+    listData.reduce((acc, item) => {
+      console.log('🚀 ~ item:------------', item);
+      const dateStr = item?.date && normalizeDate(item?.date);
+      let color = ERP_COLOR_CODE.ERP_APP_COLOR;
 
-    if (item?.status?.toLowerCase() === 'leave') {
-      color = '#f44336';
-    } else if (
-      item?.status?.toLowerCase() === 'leave_first_half' ||
-      item?.status?.toLowerCase() === 'leave_second_half'
-    ) {
-      color = '#ff9800';
-    } else if (item?.status?.toLowerCase() === 'working') {
-      color = '#ccc';
-    }
+      if (item?.status?.toLowerCase() === 'leave') {
+        color = '#f44336';
+      } else if (
+        item?.status?.toLowerCase() === 'leave_first_half' ||
+        item?.status?.toLowerCase() === 'leave_second_half'
+      ) {
+        color = '#ff9800';
+      } else if (item?.status?.toLowerCase() === 'working') {
+        color = '#ccc';
+      }
 
-    acc[dateStr] = {
-      selected: true,
-      selectedColor: color,
-      customStyles: {
-        container: { backgroundColor: color, borderRadius: 6 },
-        text: { color: '#fff', fontWeight: '600' },
-      },
-    };
+      acc[dateStr] = {
+        selected: true,
+        selectedColor: color,
+        customStyles: {
+          container: { backgroundColor: color, borderRadius: 6 },
+          text: { color: '#fff', fontWeight: '600' },
+        },
+      };
 
-    return acc;
-  }, {});
+      return acc;
+    }, {});
 
   return (
     <View style={{ flex: 1, backgroundColor: '#fff' }}>
@@ -317,6 +319,7 @@ const getWorkedHours2 = (punchIn: string, punchOut: string) => {
         <FlatList
           data={['calendar']}
           showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
           renderItem={() => (
             <>
               <View
@@ -458,6 +461,7 @@ const getWorkedHours2 = (punchIn: string, punchOut: string) => {
               ) : (
                 <FlatList
                   data={data}
+                  keyboardShouldPersistTaps="handled"
                   showsVerticalScrollIndicator={false}
                   keyExtractor={(item, index) => item.id?.toString() || index.toString()}
                   renderItem={({ item }) => {
@@ -526,7 +530,7 @@ const getWorkedHours2 = (punchIn: string, punchOut: string) => {
                                 >
                                   <MaterialIcons color="#666" size={14} name="query-builder" />
                                   <Text style={styles.recordPunchTime}>
-                                    { getWorkedHours2(item?.intime, item?.outtime)}
+                                    {getWorkedHours2(item?.intime, item?.outtime)}
                                   </Text>
                                 </View>
                               )}
