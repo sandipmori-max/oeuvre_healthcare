@@ -130,8 +130,12 @@ const ReportTab = () => {
             alignItems: isHorizontal ? 'flex-start' : 'center',
           }}
         >
-          <Text style={styles.title}>{item?.name}</Text>
-          <Text style={styles.subtitle}>{item?.title}</Text>
+          <Text numberOfLines={2} style={styles.title}>
+            {item?.name}
+          </Text>
+          <Text numberOfLines={2} style={styles.subtitle}>
+            {item?.title}
+          </Text>
         </View>
       </TouchableOpacity>
     );
