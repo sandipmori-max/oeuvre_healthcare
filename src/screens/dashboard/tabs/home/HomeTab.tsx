@@ -159,15 +159,21 @@ const HomeScreen = () => {
                   <Text style={{ marginLeft: 8, color: '#6C757D' }}>Loading page...</Text>
                 </View>
               )}
-              {item.data && (
+              {item.data ? (
                 <View style={styles.dataContainer}>
                   <Text style={styles.dashboardItemData} numberOfLines={2}>
                     {item?.data}
                   </Text>
                 </View>
+              ) : (
+                <View style={styles.dataContainer}>
+                  <Text style={styles.dashboardItemData} numberOfLines={2}>
+                    {'-'}
+                  </Text>
+                </View>
               )}
             </View>
-            {item?.footer && (
+            {item?.footer ? (
               <Text
                 style={{
                   color: accentColors[index % accentColors.length],
@@ -175,7 +181,18 @@ const HomeScreen = () => {
               >
                 {item?.footer}
               </Text>
+            ) : (
+              <Text
+                style={{
+                  color: accentColors[index % accentColors.length],
+                }}
+              >
+                {'-'}
+              </Text>
             )}
+            {item?.footer || item.data ? <> </> :
+                <View style={{ height: 12, width: 12, backgroundColor: '' }}></View> 
+              }
           </View>
         </View>
       </TouchableOpacity>
@@ -193,7 +210,7 @@ const HomeScreen = () => {
           padding: 12,
           textAlign: 'center',
           borderBottomRightRadius: 24,
-          borderBottomLeftRadius: 24
+          borderBottomLeftRadius: 24,
         }}
       >
         {user?.companyName || ''}

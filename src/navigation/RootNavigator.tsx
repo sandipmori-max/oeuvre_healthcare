@@ -104,19 +104,28 @@ const RootNavigator = () => {
       setLocationEnabled(enabled);
 
       if (isAuthenticated) {
+        console.log("🚀 ~ checkLocation ~ enabled:", enabled)
         if (enabled) {
           setHasSyncedDisabledLocation(false);
 
           const hasPermission = await requestLocationPermission();
+          console.log("🚀 ~ checkLocation ~ hasPermission:", hasPermission)
           if (!hasPermission) return;
 
           try {
             if (accounts.length > 0) {
               if (Platform.OS === 'android') {
                 requestLocationPermissions().then(granted => {
+                  console.log("🚀 ~ checkLocation ~ granted:", granted)
+                  console.log("🚀 ~ checkLocation ~ isAuthenticated:", isAuthenticated)
                   if (granted && isAuthenticated) {
-                    const tokens = accounts?.map(u => u.user.token);
-                    NativeModules.LocationModule.setUserTokens(tokens);
+                     const data = accounts.map(u => ({
+                        token: u?.user?.token,
+                        link: u?.user?.companyLink.replace(/^https:\/\//i, 'http://')
+                       }));
+                     console.log("🚀 ~ checkLocation companyLink ---------------------~ data:", data)
+
+                    NativeModules.LocationModule.setUserTokens(data);
                     NativeModules.LocationModule?.startService();
                   }
                 });
@@ -125,13 +134,15 @@ const RootNavigator = () => {
           } catch (err) {
             console.log('Location fetch error:', err);
           }
+        }else{
+           console.log("🚀 ~ checkLocation ~ enabled: else ------------------------")
         }
       }
     };
 
     checkLocation();
 
-    const interval = setInterval(checkLocation, 18000);
+    const interval = setInterval(checkLocation, 1800);
     return () => clearInterval(interval);
   }, [locationEnabled, accounts, dispatch, isAuthenticated, hasSyncedDisabledLocation]);
 

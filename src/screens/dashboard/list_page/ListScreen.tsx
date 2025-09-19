@@ -314,8 +314,8 @@ const ListScreen = () => {
 
   if (parsedError) {
     return (
-      <View style={{ flex: 1 }}>
-        <Text>{JSON.stringify(parsedError)}</Text>
+      <View style={{ flex: 1 , backgroundColor:'#fff'}}>
+        <ErrorMessage message={parsedError}/>
       </View>
     );
   }

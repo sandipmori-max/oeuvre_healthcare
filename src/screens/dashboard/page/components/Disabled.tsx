@@ -5,6 +5,8 @@ import { ERP_COLOR_CODE } from '../../../../utils/constants';
 import { formatDateHr } from '../../../../utils/helpers';
 
 const Disabled = ({ item, value, type }: any) => {
+  console.log("🚀 ~ Disabled ~ item:", item)
+  console.log("🚀 ~ Disabled ~ value:", value)
   return (
     <View style={{ marginBottom: 16 }}>
       <View style={{ flexDirection: 'row' }}>
@@ -14,7 +16,7 @@ const Disabled = ({ item, value, type }: any) => {
       </View>
       <View style={styles.disabledBox}>
         <Text style={{ color: '#555' }}>
-          {type === 'DATETIME' ? formatDateHr(value, true) : value || '-'}
+           {type === 'DATETIME' ? formatDateHr(value, true) : value || '-'}
         </Text>
       </View>
     </View>
