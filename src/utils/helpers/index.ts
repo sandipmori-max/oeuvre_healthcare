@@ -301,8 +301,8 @@ export function formatDateHr(input, isFullDate) {
 
   if (isNaN(date.getTime())) {
     const [mdy, time, ampm] = input?.split(" ");
-    const [m, d, y] = mdy.split("/").map(Number);
-    let [hh, mm, ss] = time.split(":").map(Number);
+    const [m, d, y] = mdy?.split("/").map(Number);
+    let [hh, mm, ss] = time?.split(":").map(Number);
 
     if (ampm === "PM" && hh < 12) hh += 12;
     if (ampm === "AM" && hh === 12) hh = 0;

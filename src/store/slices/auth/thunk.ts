@@ -338,7 +338,7 @@ export const getERPPageThunk = createAsyncThunk<
     return pageData;
   } catch (error: any) {
     console.log('🚀 ~ error:', error);
-    return rejectWithValue(error?.message || 'Failed to get ERP page data');
+    return rejectWithValue(error || 'Failed to get ERP page data');
   }
 });
 

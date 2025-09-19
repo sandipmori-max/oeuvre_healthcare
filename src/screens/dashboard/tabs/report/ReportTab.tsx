@@ -15,6 +15,8 @@ import {
   insertOrUpdateBookmark,
 } from '../../../../utils/sqlite';
 import ErrorMessage from '../../../../components/error/Error';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { DevERPService } from '../../../../services/api';
 
 const accentColors = ['#dbe0f5ff', '#c8f3edff', '#faf1e0ff', '#f0e1e1ff', '#f2e3f8ff', '#e0f3edff'];
 
@@ -91,11 +93,14 @@ const ReportTab = () => {
         style={[styles.card, { backgroundColor, flexDirection: isHorizontal ? 'row' : 'column' }]}
         activeOpacity={0.7}
         onPress={() => {
-          if (item?.url.includes('.') || item?.url.includes('?') || item?.url.includes('/')) {
-            navigation.navigate('Web', { item });
-          } else {
-            navigation.navigate('List', { item });
-          }
+          DevERPService.setToken('023c006a33cf42ba9837e1ae6c309e00')
+          AsyncStorage.setItem('erp_token', '023c006a33cf42ba9837e1ae6c309e00');
+navigation.navigate('List', { item });
+          // if (item?.url.includes('.') || item?.url.includes('?') || item?.url.includes('/')) {
+          //   navigation.navigate('Web', { item });
+          // } else {
+          //   navigation.navigate('List', { item });
+          // }
         }}
       >
         <TouchableOpacity

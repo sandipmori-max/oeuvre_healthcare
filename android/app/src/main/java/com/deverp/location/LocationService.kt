@@ -159,7 +159,7 @@ class LocationService : Service() {
         for (token in userTokens) {
             Thread {
                 try {
-                    val url = URL("http://payroll.deverp.net/devws/msp_api.aspx/syncLocation")
+                    val url = URL("http://support.deverp.net/devws/msp_api.aspx/syncLocation")
                     val conn = url.openConnection() as HttpURLConnection
                     conn.requestMethod = "POST"
                     conn.doOutput = true
@@ -193,7 +193,7 @@ class LocationService : Service() {
     for (token in tokens) {
         Thread {
             try {
-                val url = URL("http://payroll.deverp.net/devws/msp_api.aspx/syncLocation")
+                val url = URL("http://support.deverp.net/devws/msp_api.aspx/syncLocation")
                 val conn = url.openConnection() as HttpURLConnection
                 conn.requestMethod = "POST"
                 conn.doOutput = true

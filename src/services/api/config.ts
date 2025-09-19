@@ -153,6 +153,7 @@ apiClient.interceptors.response.use(
     }
   },
   (error) => {
+    console.log("🚀 ~ error:", error)
     if (error.response) {
       return Promise.reject({
         message: error.response.data?.message || "API error occurred",

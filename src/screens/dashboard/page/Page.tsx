@@ -215,7 +215,7 @@ const PageScreen = () => {
       });
     } catch (e: any) {
       console.log('🚀 ~ e:', e);
-      setError(e || 'Failed to load page');
+      setError(JSON.stringify(e?.data) || 'Failed to load page');
     } finally {
       setLoadingPageId(null);
       setTimeout(() => {
@@ -408,11 +408,13 @@ const PageScreen = () => {
   }, []);
 
   return (
-    <View style={{ flex: 1, padding: 16, backgroundColor: '#f9f9f9' }}>
+    <View style={{ flex: 1, padding: 16, backgroundColor: '#fff' }}>
       {loadingPageId ? (
         <FullViewLoader />
       ) : !!error ? (
-        <ErrorMessage message={error} />
+       <View style={{flex: 1, justifyContent:'center', alignContent:'center', backgroundColor:'#fff'}}>
+         <ErrorMessage message={error} />
+        </View>
       ) : controls?.length > 0 ? (
         <>
           <View
