@@ -19,7 +19,7 @@ import {
   onNotificationOpenedAppListener,
   checkInitialNotification,
 } from './src/firebase/firebaseService';
-
+// -------------------------------------------------------
 const App = () => {
   const isConnected = useNetworkStatus();
   const [isSplashVisible, setSplashVisible] = useState(true);
