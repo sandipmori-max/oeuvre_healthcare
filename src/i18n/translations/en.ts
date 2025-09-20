@@ -121,9 +121,9 @@ export default {
   },
   navigation: {
     home: 'Home',
-    entry: 'Entry',
+    entry: 'Hr',
     report: 'Report',
-    auth: 'Auth',
+    auth: 'Dcr',
     profile: 'Profile',
     attendance: 'Attendance',
     display: 'Display',

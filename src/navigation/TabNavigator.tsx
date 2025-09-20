@@ -64,7 +64,7 @@ const TabNavigator = () => {
         }}
       />
       <Tab.Screen
-        name="Entry"
+        name="hr"
         component={EntryTab}
         options={{
           tabBarLabel: t('navigation.entry'),
@@ -97,7 +97,7 @@ const TabNavigator = () => {
         }}
       />
       <Tab.Screen
-        name="Auth"
+        name="Dcr"
         component={AuthTab}
         options={{
           tabBarLabel: t('navigation.auth'),
