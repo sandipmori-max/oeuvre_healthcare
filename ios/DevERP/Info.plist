@@ -23,7 +23,7 @@
 	<string>We need access to your documents folder to select PDF files for upload.</string>
 	 
 	<key>CFBundleDisplayName</key>
-	<string>DevERP</string>
+	<string>Oeuvre</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
