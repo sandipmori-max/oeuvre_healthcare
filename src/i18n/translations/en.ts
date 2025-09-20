@@ -1,6 +1,6 @@
 export default {
   common: {
-    appName: 'DevERP',
+    appName: 'Oeuvre',
     loading: 'Loading...',
     error: 'An error occurred',
     success: 'Success!',
@@ -31,7 +31,7 @@ export default {
     signUp: 'Sign Up',
     signIn: 'Sign In',
     signingIn: 'Signing In...',
-    welcomeDevERP: 'Welcome DevERP',
+    welcomeDevERP: 'Welcome Oeuvre',
     addAccount: 'Add Account',
     signInToAddAccount: 'Sign in to add another account',
     signInToAccount: 'Sign in to your account',
