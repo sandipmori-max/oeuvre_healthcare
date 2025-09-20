@@ -288,14 +288,9 @@ const PageScreen = () => {
           />
         );
       }
-<<<<<<< Updated upstream
-      else if(item?.ctltype === 'Location'){
-        content = <LocationRow item={item} />
-=======
      
       else if(item?.defaultvalue === "#location"){
         content = <LocationRow item={item} setValue ={setValue }/>
->>>>>>> Stashed changes
       }
        else if (item?.ctltype === 'HTML') {
         content = <HtmlRow item={item} />;
