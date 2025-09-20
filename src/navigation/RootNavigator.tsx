@@ -31,8 +31,7 @@ const RootNavigator = () => {
  const requestLocationPermission = async (): Promise<boolean> => {
   if (Platform.OS === "android") {
     try {
-      // Check if already granted (fine location is enough to assume others)
-      const alreadyGranted = await PermissionsAndroid.check(
+       const alreadyGranted = await PermissionsAndroid.check(
         PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
       );
 
@@ -78,7 +77,6 @@ const RootNavigator = () => {
     }
   }
 
-  // iOS handled in Info.plist
   return true;
 };
 
