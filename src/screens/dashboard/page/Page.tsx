@@ -180,7 +180,7 @@ const PageScreen = () => {
   const fetchPageData = useCallback(async () => {
     try {
       setError(null);
-      setLoadingPageId(id);
+      setLoadingPageId(isFromNew ? '0' : id);
 
       const parsed = await dispatch(
         getERPPageThunk({ page: url, id: isFromNew ? 0 : id }),
