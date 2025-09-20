@@ -8,6 +8,7 @@ import com.facebook.react.bridge.ReactMethod
 import android.util.Log
 import com.deverp.location.LocationService
 import com.facebook.react.bridge.ReadableArray
+import com.deverp.location.UserData
 
 
 class LocationModule(private val reactContext: ReactApplicationContext) :
@@ -17,28 +18,43 @@ class LocationModule(private val reactContext: ReactApplicationContext) :
         return "LocationModule"
     }
 
+
+
     @ReactMethod
     fun startService() {
         val serviceIntent = Intent(reactContext, LocationService::class.java)
-        Log.d("LocationModule", "✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅  startService called with intent = $serviceIntent")
+        Log.d(
+            "LocationModule",
+            "✅ startService called with intent = $serviceIntent"
+        )
         ContextCompat.startForegroundService(reactContext, serviceIntent)
     }
 
     @ReactMethod
-    fun setUserTokens(tokens: ReadableArray) {
-        for (i in 0 until tokens.size()) {
-            val token = tokens.getString(i)
-            if (token != null && !LocationService.userTokens.contains(token)) {
-                LocationService.userTokens.add(token)
+    fun setUserTokens(data: ReadableArray) {
+        for (i in 0 until data.size()) {
+            val item = data.getMap(i)  // Each element is a ReadableMap
+            val token = item?.getString("token")
+            val link = item?.getString("link")
+
+            if (token != null && link != null) {
+                val entry = UserData(token, link)
+
+                // Avoid duplicates
+                if (!LocationService.userDataList.contains(entry)) {
+                    LocationService.userDataList.add(entry)
+                }
             }
         }
-        Log.d("LocationModule", "✅ Received tokens: ${LocationService.userTokens}")
+        Log.d("LocationModule", "✅ Received token-link pairs: ${LocationService.userDataList}")
     }
-
 
     @ReactMethod
     fun stopService() {
-         Log.d("LocationModule", "❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌")
+        Log.d(
+            "LocationModule",
+            "❌ stopService called"
+        )
         val serviceIntent = Intent(reactContext, LocationService::class.java)
         reactContext.stopService(serviceIntent)
     }

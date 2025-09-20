@@ -213,7 +213,7 @@ const HomeScreen = () => {
           borderBottomLeftRadius: 24,
         }}
       >
-        {user?.companyName || ''}
+         {user?.companyName || ''}
       </Text>
       {isDashboardLoading ? (
         <FullViewLoader />
