@@ -60,7 +60,11 @@ const CustomPicker = ({ label, selectedValue, onValueChange, item, errors, dtext
       </View>
 
       <TouchableOpacity
-        style={[styles.pickerBox, item?.disabled === '1' && styles.disabledBox]}
+        style={[styles.pickerBox, item?.disabled === '1' && styles.disabledBox,
+          errors[item?.field] && {
+            borderColor: ERP_COLOR_CODE.ERP_ERROR
+          }
+        ]}
         onPress={() => {
           if (item?.disabled !== '1') handleOpen();
         }}
