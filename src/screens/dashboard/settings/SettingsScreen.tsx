@@ -50,6 +50,9 @@ const SettingsScreen = () => {
   const navigation = useNavigation();
   const { t, changeLanguage, getAvailableLanguages, getCurrentLanguage } = useTranslations();
   const [alertVisible, setAlertVisible] = useState(false);
+
+  const [logoutVisible, setLogoutVisible] = useState(false);
+
   const [languageModalVisible, setLanguageModalVisible] = useState(false);
   const [currentLanguage, setCurrentLanguage] = useState(getCurrentLanguage());
   const [languages] = useState<LanguageOption[]>(getAvailableLanguages());
@@ -165,16 +168,21 @@ const SettingsScreen = () => {
             type: 'info',
           });
           setAlertVisible(true);
+          setTimeout(() => {
+            setAlertVisible(false);
+          }, 1200);
         }
         break;
       case 'action':
         if (item?.action === 'Logout') {
+          setLogoutVisible(true);
           setAlertConfig({
             title: t('settings.logout'),
             message: t('settings.logoutConfirm'),
             type: 'error',
           });
           setAlertVisible(true);
+         
         } else if (item?.action) {
           setAlertConfig({
             title: t('common.action'),
@@ -182,6 +190,7 @@ const SettingsScreen = () => {
             type: 'info',
           });
           setAlertVisible(true);
+          
         }
         break;
     }
@@ -198,6 +207,10 @@ const SettingsScreen = () => {
       type: 'success',
     });
     setAlertVisible(true);
+
+    setTimeout(() => {
+      setAlertVisible(false);
+    }, 1200);
   };
 
   const renderSettingItem = ({ item }: { item: SettingItem }) => (
@@ -257,7 +270,7 @@ const SettingsScreen = () => {
 
   return (
     <View style={styles.container}>
-       <ScrollView
+      <ScrollView
         style={styles.scrollContainer}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
@@ -325,13 +338,21 @@ const SettingsScreen = () => {
         visible={languageModalVisible}
         transparent
         animationType="slide"
-        onRequestClose={() => setLanguageModalVisible(false)}
+        onRequestClose={() => {
+          setLogoutVisible(false);
+          setLanguageModalVisible(false);
+        }}
       >
         <View style={languageStyles.modalOverlay}>
           <View style={languageStyles.modalContent}>
             <View style={languageStyles.modalHeader}>
               <Text style={languageStyles.modalTitle}>{t('language.selectLanguage')}</Text>
-              <TouchableOpacity onPress={() => setLanguageModalVisible(false)}>
+              <TouchableOpacity
+                onPress={() => {
+                  setLogoutVisible(false);
+                  setLanguageModalVisible(false);
+                }}
+              >
                 <Text style={languageStyles.closeButton}>✕</Text>
               </TouchableOpacity>
             </View>
@@ -351,32 +372,44 @@ const SettingsScreen = () => {
         title={alertConfig.title}
         message={alertConfig.message}
         type={alertConfig.type}
-        onClose={() => setAlertVisible(false)}
-        onCancel={() => setAlertVisible(false)}
+        onClose={() => {
+          setLogoutVisible(false);
+          setAlertVisible(false);
+        }}
+        isBottomButtonVisible={logoutVisible}
+        onCancel={() => {
+          setLogoutVisible(false);
+          setAlertVisible(false);
+        }}
         onDone={async () => {
-          const db = await getDBConnection();
-          await createAccountsTable(db);
+          if (logoutVisible) {
+            const db = await getDBConnection();
+            await createAccountsTable(db);
 
-          const activeUser = await getActiveAccount(db);
-          if (activeUser) {
-            const newActiveUser = await logoutUser(db, activeUser?.id);
+            const activeUser = await getActiveAccount(db);
+            if (activeUser) {
+              const newActiveUser = await logoutUser(db, activeUser?.id);
 
-            if (newActiveUser) {
-              DevERPService.setToken(newActiveUser?.user?.token || '');
-              await AsyncStorage.setItem('erp_token', newActiveUser?.user?.token || '');
-              await AsyncStorage.setItem('auth_token', newActiveUser?.user?.token || '');
-              await AsyncStorage.setItem('erp_token_valid_till', newActiveUser?.user?.token || '');
+              if (newActiveUser) {
+                DevERPService.setToken(newActiveUser?.user?.token || '');
+                await AsyncStorage.setItem('erp_token', newActiveUser?.user?.token || '');
+                await AsyncStorage.setItem('auth_token', newActiveUser?.user?.token || '');
+                await AsyncStorage.setItem(
+                  'erp_token_valid_till',
+                  newActiveUser?.user?.token || '',
+                );
 
-              const validation = await validateCompanyCode(() =>
-                DevERPService.validateCompanyCode(newActiveUser?.user?.company_code),
-              );
-              if (!validation?.isValid) {
-                return;
+                const validation = await validateCompanyCode(() =>
+                  DevERPService.validateCompanyCode(newActiveUser?.user?.company_code),
+                );
+                if (!validation?.isValid) {
+                  return;
+                }
+
+                dispatch(switchAccountThunk(newActiveUser?.id));
+              } else {
+                dispatch(logoutUserThunk());
               }
-
-              dispatch(switchAccountThunk(newActiveUser?.id));
-            } else {
-              dispatch(logoutUserThunk());
             }
           }
         }}

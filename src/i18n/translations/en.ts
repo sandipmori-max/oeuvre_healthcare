@@ -87,6 +87,12 @@ export default {
     accountSettings: 'Account Settings',
     switchAccount: 'Switch Account',
     addAccount: 'Add Account',
+    myProfile: "My Profile",
+    accountManagement: "Account Management",
+    manageAccounts: "Manage Accounts",
+    account: "account",
+    available: "available",
+    lastLogin: "Last Login"
   },
   language: {
     title: 'Language',
@@ -139,4 +145,15 @@ export default {
     emailRequired: 'Email is required',
     statusRequired: 'Status is required',
   },
+  home:{
+    dashboard: "Dashboard"
+  },
+  account:{
+    addAccount: "Add Account",
+    msg: "Sign in to add another account",
+    companyCode: "Company Code",
+    adding: 'Account adding...',
+    add: 'Add Account',
+    msg1: 'This account will be added to your list. You can switch between accounts anytime.'
+  }
 };

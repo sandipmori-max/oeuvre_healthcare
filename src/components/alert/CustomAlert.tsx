@@ -21,7 +21,8 @@ const CustomAlert: React.FC<CustomAlertProps> = ({
   cancelText = 'Cancel',
   isFromButtonList = false,
   actionLoader,
-  color='#000'
+  color = '#000',
+  isBottomButtonVisible,
 }) => {
   const alertStyles = getAlertStyles(type);
   const gifSource = getGifSource(type);
@@ -37,7 +38,7 @@ const CustomAlert: React.FC<CustomAlertProps> = ({
   };
 
   const handleDonePress = () => {
-    if (isFromButtonList &&  remarks && remarks?.trim() === '') {
+    if (isFromButtonList && remarks && remarks?.trim() === '') {
       setError('Remarks are required.');
       return;
     }
@@ -89,9 +90,11 @@ const CustomAlert: React.FC<CustomAlertProps> = ({
                 onChangeText={handleChangedRemarks}
                 value={remarks}
                 labelStyle={[styles.inputLabel, { fontWeight: '400', fontSize: 12 }]}
-                inputStyle={[styles.input,]}
+                inputStyle={[styles.input]}
               />
-              {error ? <Text style={{ color: ERP_COLOR_CODE.ERP_ERROR }}>{error || ''}</Text> : null}
+              {error ? (
+                <Text style={{ color: ERP_COLOR_CODE.ERP_ERROR }}>{error || ''}</Text>
+              ) : null}
             </View>
           ) : (
             <>
@@ -99,47 +102,50 @@ const CustomAlert: React.FC<CustomAlertProps> = ({
               <Text style={alertStyles.message}>{message || ''}</Text>
             </>
           )}
-
-          {(onDone || onCancel) && (
-            <View style={styles.buttonRow}>
-              {onCancel && (
-                <TouchableOpacity
-                  style={styles.buttonCancel}
-                  onPress={() => {
-                    setRemarks('');
-                    setError('');
-                    onCancel();
-                  }}
-                >
-                  <Text style={styles.buttonText}>{cancelText}</Text>
-                </TouchableOpacity>
-              )}
-              {onDone && (
-                <>
-                  {actionLoader ? (
+          {isBottomButtonVisible && (
+            <>
+              {(onDone || onCancel) && (
+                <View style={styles.buttonRow}>
+                  {onCancel && (
+                    <TouchableOpacity
+                      style={styles.buttonCancel}
+                      onPress={() => {
+                        setRemarks('');
+                        setError('');
+                        onCancel();
+                      }}
+                    >
+                      <Text style={styles.buttonText}>{cancelText}</Text>
+                    </TouchableOpacity>
+                  )}
+                  {onDone && (
                     <>
-                      <TouchableOpacity style={styles.buttonCancel}>
-                        <ActivityIndicator size={'small'} color={'#000'} />
-                      </TouchableOpacity>
-                    </>
-                  ) : (
-                    <>
-                      {' '}
-                      <TouchableOpacity
-                        style={[styles.button, {backgroundColor: color}]}
-                        onPress={() => {
-                          setRemarks('');
-                          setError('');
-                          handleDonePress();
-                        }}
-                      >
-                        <Text style={styles.buttonText}>{doneText}</Text>
-                      </TouchableOpacity>{' '}
+                      {actionLoader ? (
+                        <>
+                          <TouchableOpacity style={styles.buttonCancel}>
+                            <ActivityIndicator size={'small'} color={'#000'} />
+                          </TouchableOpacity>
+                        </>
+                      ) : (
+                        <>
+                          {' '}
+                          <TouchableOpacity
+                            style={[styles.button, { backgroundColor: color }]}
+                            onPress={() => {
+                              setRemarks('');
+                              setError('');
+                              handleDonePress();
+                            }}
+                          >
+                            <Text style={styles.buttonText}>{doneText}</Text>
+                          </TouchableOpacity>{' '}
+                        </>
+                      )}
                     </>
                   )}
-                </>
+                </View>
               )}
-            </View>
+            </>
           )}
         </View>
       </View>

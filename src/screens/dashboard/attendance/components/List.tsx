@@ -80,7 +80,6 @@ const styles = StyleSheet.create({
 });
 
 const List = ({ selectedMonth, showFilter, fromDate, toDate }: any) => {
-
   const dispatch = useAppDispatch();
 
   const [activeFilter, setActiveFilter] = useState('all');
@@ -89,7 +88,7 @@ const List = ({ selectedMonth, showFilter, fromDate, toDate }: any) => {
   const [parsedError, setParsedError] = useState<any>();
 
   const [currentView, setCurrentView] = useState<'pie' | 'calendar'>('pie');
-  
+
   const baseLink = useBaseLink();
 
   const normalizeDate = (dateStr: string) => {
@@ -247,11 +246,10 @@ const List = ({ selectedMonth, showFilter, fromDate, toDate }: any) => {
     { value: lessHours, color: '#ff9800', text: 'Less Hrs' },
   ];
 
-    
   if (parsedError) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <ErrorMessage message={JSON.stringify(parsedError)}/>
+        <ErrorMessage message={JSON.stringify(parsedError)} />
       </View>
     );
   }
@@ -259,7 +257,7 @@ const List = ({ selectedMonth, showFilter, fromDate, toDate }: any) => {
   const markedDates =
     listData?.length > 0 &&
     listData?.reduce((acc, item) => {
-       const dateStr = item?.date && normalizeDate(item?.date);
+      const dateStr = item?.date && normalizeDate(item?.date);
       let color = ERP_COLOR_CODE.ERP_APP_COLOR;
 
       if (item?.status?.toLowerCase() === 'leave') {
@@ -415,7 +413,10 @@ const List = ({ selectedMonth, showFilter, fromDate, toDate }: any) => {
                       gap: 8,
                     }}
                   >
-                    <View
+                    <TouchableOpacity
+                      onPress={() => {
+                        setCurrentView('pie');
+                      }}
                       style={{
                         width: currentView === 'pie' ? 24 : 10,
                         height: 10,
@@ -424,7 +425,10 @@ const List = ({ selectedMonth, showFilter, fromDate, toDate }: any) => {
                           currentView === 'pie' ? ERP_COLOR_CODE.ERP_APP_COLOR : '#ccc',
                       }}
                     />
-                    <View
+                    <TouchableOpacity
+                      onPress={() => {
+                        setCurrentView('calendar');
+                      }}
                       style={{
                         width: currentView === 'calendar' ? 24 : 10,
                         height: 10,
@@ -468,7 +472,9 @@ const List = ({ selectedMonth, showFilter, fromDate, toDate }: any) => {
                   renderItem={({ item }) => {
                     const isLeaveFull = item?.status?.toLowerCase() === 'leave';
                     const workedHours =
-                      !item?.intime || !item?.outtime ? 0 : getWorkedHours(item?.intime, item?.outtime);
+                      !item?.intime || !item?.outtime
+                        ? 0
+                        : getWorkedHours(item?.intime, item?.outtime);
                     const isLessThanRequired = !isLeaveFull && workedHours < 8.5;
                     const isLate = !isLeaveFull && item?.intime && isLatePunchIn(item?.intime);
 

@@ -119,8 +119,7 @@ const EntryTab = () => {
         </TouchableOpacity>
 
         <View style={[styles.iconContainer, { backgroundColor: '#fff' }]}>
-          <Text 
-          style={styles.iconText}>
+          <Text style={styles.iconText}>
             {item?.icon !== ''
               ? item?.icon
               : item?.name
@@ -141,12 +140,12 @@ const EntryTab = () => {
             alignItems: isHorizontal ? 'flex-start' : 'center',
           }}
         >
-          <Text  
-          numberOfLines={2}
-          style={styles.title}>{item?.name}</Text>
-          <Text 
-          numberOfLines={2}
-          style={styles.subtitle}>{item?.title}</Text>
+          <Text numberOfLines={2} style={styles.title}>
+            {item?.name}
+          </Text>
+          <Text numberOfLines={2} style={styles.subtitle}>
+            {item?.title}
+          </Text>
         </View>
       </TouchableOpacity>
     );
@@ -191,7 +190,12 @@ const EntryTab = () => {
     );
   }
   return (
-    <>
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: '#fff',
+      }}
+    >
       <FlatList
         key={`${isHorizontal}-${showBookmarksOnly}`}
         keyboardShouldPersistTaps="handled"
@@ -203,7 +207,7 @@ const EntryTab = () => {
         renderItem={renderItem}
         showsVerticalScrollIndicator={false}
       />
-    </>
+    </View>
   );
 };
 

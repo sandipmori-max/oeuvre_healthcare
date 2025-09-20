@@ -11,8 +11,10 @@ import ERPIcon from '../../../../components/icon/ERPIcon';
 import MaterialIcons from '@react-native-vector-icons/material-icons';
 import FastImage from 'react-native-fast-image';
 import { useBaseLink } from '../../../../hooks/useBaseLink';
+import { useTranslation } from 'react-i18next';
 
 const ProfileTab = () => {
+  const {t} = useTranslation()
   const navigation = useNavigation<any>();
   const { user, accounts } = useAppSelector(state => state?.auth);
   const [showAccountSwitcher, setShowAccountSwitcher] = useState(false);
@@ -65,7 +67,7 @@ const ProfileTab = () => {
               navigation.navigate('Page', {
                 id: user?.id,
                 item: {},
-                title: 'My Profile',
+                title: t('profile.myProfile'),
                 isFromNew: false,
                 url: 'UserProfile',
               });
@@ -98,7 +100,7 @@ const ProfileTab = () => {
                   navigation.navigate('Page', {
                     id: user?.id,
                     item: {},
-                    title: 'My Profile',
+                  title: t('profile.myProfile'),
                     isFromNew: false,
                     url: 'UserProfile',
                   });
@@ -113,16 +115,16 @@ const ProfileTab = () => {
 
         {/* Account Section */}
         <View style={styles.sectionContainer}>
-          <Text style={styles.sectionTitle}>Account Management</Text>
+          <Text style={styles.sectionTitle}>{t('profile.accountManagement')}</Text>
           <TouchableOpacity style={styles.settingCard} onPress={() => setShowAccountSwitcher(true)}>
             <View style={styles.settingHeader}>
               <View style={styles.settingIcon}>
                 <MaterialIcons name={'group'} color={'#000'} size={22} />
               </View>
               <View style={styles.settingInfo}>
-                <Text style={styles.settingTitle}>Manage Accounts</Text>
+                <Text style={styles.settingTitle}>{t('profile.manageAccounts')}</Text>
                 <Text style={styles.settingSubtitle}>
-                  {accounts?.length} account{accounts?.length !== 1 ? 's' : ''} available
+                  {accounts?.length} {t('profile.account')}{accounts?.length !== 1 ? 's' : ''} {t('profile.available')}
                 </Text>
               </View>
               <Text style={styles.arrowIcon}>›</Text>
@@ -136,7 +138,7 @@ const ProfileTab = () => {
                   <MaterialIcons name={'access-time'} color={'#000'} size={22} />
                 </View>
                 <View style={styles.settingInfo}>
-                  <Text style={styles.settingTitle}>Last Login</Text>
+                  <Text style={styles.settingTitle}>{t('profile.lastLogin')}</Text>
                   <Text style={styles.settingSubtitle}>
                     {formatDateHr(activeAccount?.lastLoginAt, false)}
                   </Text>

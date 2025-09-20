@@ -446,6 +446,7 @@ const ListScreen = () => {
         onClose={() => setAlertVisible(false)}
         onCancel={() => setAlertVisible(false)}
         actionLoader={actionLoader}
+        isBottomButtonVisible={true}
         doneText={alertConfig.title}
         color={alertConfig.color}
         onDone={async remark => {
