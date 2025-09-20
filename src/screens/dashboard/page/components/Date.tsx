@@ -18,7 +18,7 @@ const DateRow = ({ item, errors, value, showDatePicker }: any) => {
         onPress={() => showDatePicker(item?.field, value)}
       >
         <Text style={{ color: value ? '#000' : '#888' }}>
-          {value ? formatDateHr(value, true) : 'dd/mmm/yyyy hh:mm'}
+          {value ? formatDateHr(value, false) : 'dd/mmm/yyyy'}
         </Text>
         <MaterialIcons name="event" size={20} color="#555" />
       </TouchableOpacity>

@@ -27,6 +27,7 @@ import SignaturePad from './components/SignaturePad';
 import HtmlRow from './components/HtmlRow';
 import { useBaseLink } from '../../../hooks/useBaseLink';
 import DateTimeRow from './components/DateTimeRow';
+import LocationRow from './components/LocationRow';
 
 type PageRouteParams = { PageScreen: { item: any } };
 
@@ -286,8 +287,10 @@ const PageScreen = () => {
           />
         );
       }
-      //test html
-      else if (item?.ctltype === 'HTML') {
+      else if(item?.ctltype === 'Location'){
+        content = <LocationRow item={item} />
+      }
+       else if (item?.ctltype === 'HTML') {
         content = <HtmlRow item={item} />;
       } else if (item?.ctltype === 'IMAGE' && item?.field === 'signature') {
         content = (

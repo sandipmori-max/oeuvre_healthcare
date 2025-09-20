@@ -266,7 +266,7 @@ const Media = ({ item, handleAttachment, infoData, baseLink, isFromNew }: any) =
         </View>
       </Modal>
 
-       <Modal
+      <Modal
         animationType="slide"
         transparent={true}
         visible={pickerModalVisible}

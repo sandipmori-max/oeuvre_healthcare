@@ -1,5 +1,5 @@
 import React from 'react';
-import { useWindowDimensions } from 'react-native';
+import { useWindowDimensions, View } from 'react-native';
 import RenderHtml from 'react-native-render-html';
 
 const HtmlRow = ({ item }: any) => {
@@ -11,7 +11,11 @@ const HtmlRow = ({ item }: any) => {
 </p>`,
   };
 
-  return <RenderHtml contentWidth={width} source={source} />;
+  return (
+    <View style={{ marginVertical: 8 }}>
+      <RenderHtml contentWidth={width} source={source} />
+    </View>
+  );
 };
 
 export default HtmlRow;
