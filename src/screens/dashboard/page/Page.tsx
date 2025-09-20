@@ -44,6 +44,7 @@ const PageScreen = () => {
 
   const [error, setError] = useState<string | null>(null);
   const [formValues, setFormValues] = useState<any>({});
+  console.log("🚀 ~ PageScreen ~ formValues:------------", formValues)
   const [datePickerVisible, setDatePickerVisible] = useState(false);
 
   const [dateTimePickerVisible, setDateTimePickerVisible] = useState(false);
@@ -180,7 +181,7 @@ const PageScreen = () => {
   const fetchPageData = useCallback(async () => {
     try {
       setError(null);
-      setLoadingPageId(id);
+      setLoadingPageId(isFromNew ? '0' : id);
 
       const parsed = await dispatch(
         getERPPageThunk({ page: url, id: isFromNew ? 0 : id }),
@@ -287,7 +288,8 @@ const PageScreen = () => {
           />
         );
       }
-        else if(item?.defaultvalue === "#location"){
+     
+      else if(item?.defaultvalue === "#location"){
         content = <LocationRow item={item} setValue ={setValue }/>
       }
        else if (item?.ctltype === 'HTML') {

@@ -85,7 +85,13 @@ const AjaxPicker = ({ label, onValueChange, item, errors, dtext, formValues }: a
       </View>
 
       <TouchableOpacity
-        style={[styles.pickerBox, item?.disabled === '1' && styles.disabledBox]}
+        style={[
+          styles.pickerBox,
+          item?.disabled === '1' && styles.disabledBox,
+          errors[item?.field] && {
+            borderColor: ERP_COLOR_CODE.ERP_ERROR,
+          },
+        ]}
         onPress={() => {
           if (item?.disabled !== '1') {
             handleOpen();
