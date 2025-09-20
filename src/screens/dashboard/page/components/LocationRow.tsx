@@ -1,12 +1,19 @@
 import { View, Text } from 'react-native';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { styles } from '../page_style';
 import { ERP_COLOR_CODE } from '../../../../utils/constants';
 import { useCurrentAddress } from '../../../../hooks/useCurrentLocation';
 
-const LocationRow = ({ item,}: any) => {
+const LocationRow = ({ item, value, setValue }: any) => {
   const { address, coords, loading, error } = useCurrentAddress();
-  console.log("🚀 ~ LocationRow ~ coords:", coords)
+
+   useEffect(() => {
+    if (!loading && coords) {
+      setValue({
+        [item?.field]: `${coords.latitude},${coords.longitude}`,
+      });
+    }
+  }, [coords, loading]);
 
   return (
     <View style={{ marginBottom: 16 }}>
@@ -17,7 +24,11 @@ const LocationRow = ({ item,}: any) => {
       </View>
       <View style={styles.disabledBox}>
         <Text style={{ color: '#555' }}>
-          {loading ? 'Fetching...' : address || '---'}
+          {loading
+            ? 'Fetching...'
+            : address
+            ? `${address}\n(${coords?.latitude}, ${coords?.longitude})`
+            : '---'}
         </Text>
       </View>
     </View>

@@ -44,6 +44,7 @@ const PageScreen = () => {
 
   const [error, setError] = useState<string | null>(null);
   const [formValues, setFormValues] = useState<any>({});
+  console.log("🚀 ~ PageScreen ~ formValues:------------", formValues)
   const [datePickerVisible, setDatePickerVisible] = useState(false);
 
   const [dateTimePickerVisible, setDateTimePickerVisible] = useState(false);
@@ -287,8 +288,14 @@ const PageScreen = () => {
           />
         );
       }
+<<<<<<< Updated upstream
       else if(item?.ctltype === 'Location'){
         content = <LocationRow item={item} />
+=======
+     
+      else if(item?.defaultvalue === "#location"){
+        content = <LocationRow item={item} setValue ={setValue }/>
+>>>>>>> Stashed changes
       }
        else if (item?.ctltype === 'HTML') {
         content = <HtmlRow item={item} />;
