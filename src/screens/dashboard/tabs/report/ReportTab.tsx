@@ -92,15 +92,12 @@ const ReportTab = () => {
       <TouchableOpacity
         style={[styles.card, { backgroundColor, flexDirection: isHorizontal ? 'row' : 'column' }]}
         activeOpacity={0.7}
-        onPress={() => {
-          DevERPService.setToken('023c006a33cf42ba9837e1ae6c309e00')
-          AsyncStorage.setItem('erp_token', '023c006a33cf42ba9837e1ae6c309e00');
-navigation.navigate('List', { item });
-          // if (item?.url.includes('.') || item?.url.includes('?') || item?.url.includes('/')) {
-          //   navigation.navigate('Web', { item });
-          // } else {
-          //   navigation.navigate('List', { item });
-          // }
+        onPress={() => { 
+          if (item?.url.includes('.') || item?.url.includes('?') || item?.url.includes('/')) {
+            navigation.navigate('Web', { item });
+          } else {
+            navigation.navigate('List', { item });
+          }
         }}
       >
         <TouchableOpacity
@@ -185,7 +182,10 @@ navigation.navigate('List', { item });
     );
   }
   return (
-    <>
+    <View style={{
+            flex: 1, 
+            backgroundColor: '#fff',
+          }}>
       <FlatList
         key={`${isHorizontal}-${showBookmarksOnly}`}
         keyboardShouldPersistTaps="handled"
@@ -197,7 +197,7 @@ navigation.navigate('List', { item });
         renderItem={renderItem}
         showsVerticalScrollIndicator={false}
       />
-    </>
+    </View>
   );
 };
 

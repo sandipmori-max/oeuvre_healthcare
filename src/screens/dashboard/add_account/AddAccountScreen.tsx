@@ -17,8 +17,12 @@ import useFcmToken from '../../../hooks/useFcmToken';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DeviceInfo from 'react-native-device-info';
 import MaterialIcons from '@react-native-vector-icons/material-icons';
+import { useTranslation } from 'react-i18next';
 
 const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose }) => {
+
+  const {t} = useTranslation()
+
   const dispatch = useAppDispatch();
 
   const { execute: validateCompanyCode, execute: loginWithERP } = useApi();
@@ -170,7 +174,7 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
           <TouchableOpacity onPress={handleClose} style={styles.closeButton}>
             <Image source={ERP_ICON.BACK} style={styles.back} />
           </TouchableOpacity>
-          <Text style={styles.title}>Add Account</Text>
+          <Text style={styles.title}>{t('account.addAccount')}</Text>
         </View>
         <FlatList
           showsHorizontalScrollIndicator={false}
@@ -183,7 +187,7 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
                 <View style={styles.formContainer}>
                   <Image source={ERP_ICON.APP_LOGO} style={styles.logo} resizeMode="contain" />
 
-                  <Text style={styles.subtitle}>Sign in to add another account</Text>
+                  <Text style={styles.subtitle}>{t('account.msg')}</Text>
 
                   <Formik
                     initialValues={{ company_code: '', user: '', password: '' }}
@@ -193,10 +197,10 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
                     {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (
                       <>
                         <View style={styles.inputContainer}>
-                          <Text style={styles.inputLabel}>Company Code</Text>
+                          <Text style={styles.inputLabel}>{t('account.companyCode')}</Text>
                           <TextInput
                             style={styles.input}
-                            placeholder="Enter your company code"
+                            placeholder={t('auth.enterCompanyCode')}
                             placeholderTextColor="#999"
                             autoCapitalize="none"
                             onChangeText={handleChange('company_code')}
@@ -209,10 +213,10 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
                         </View>
 
                         <View style={styles.inputContainer}>
-                          <Text style={styles.inputLabel}>User name</Text>
+                          <Text style={styles.inputLabel}>{t('auth.user')}</Text>
                           <TextInput
                             style={styles.input}
-                            placeholder="Enter user name"
+                            placeholder={t('auth.enterUser')}
                             placeholderTextColor="#999"
                             autoCapitalize="none"
                             onChangeText={handleChange('user')}
@@ -230,10 +234,10 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
                             { justifyContent: 'space-between', alignContent: 'center' },
                           ]}
                         >
-                          <Text style={styles.inputLabel}>Password</Text>
+                          <Text style={styles.inputLabel}>{t('auth.password')}</Text>
                           <TextInput
                             style={styles.input}
-                            placeholder="Enter your password"
+                            placeholder={t('auth.enterPassword')}
                             secureTextEntry={showPassword}
                             placeholderTextColor="#999"
                             value={values?.password}
@@ -266,9 +270,9 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
                           disabled={loader}
                         >
                           {loader ? (
-                            <Text style={styles.addButtonText}>Account adding...</Text>
+                            <Text style={styles.addButtonText}>{t('account.adding')}</Text>
                           ) : (
-                            <Text style={styles.addButtonText}>Add Account</Text>
+                            <Text style={styles.addButtonText}>{t('account.add')}</Text>
                           )}
                         </TouchableOpacity>
                       </>
@@ -276,8 +280,7 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
                   </Formik>
 
                   <Text style={styles.note}>
-                    This account will be added to your list. You can switch between accounts
-                    anytime.
+                    {t('account.msg1')}
                   </Text>
                 </View>
               </>

@@ -80,6 +80,12 @@ export default {
     accountSettings: 'खाता सेटिंग्स',
     switchAccount: 'खाता बदलें',
     addAccount: 'खाता जोड़ें',
+    myProfile: 'My Profile',
+    accountManagement: 'खाता प्रबंधन',
+    manageAccounts: 'खातों का प्रबंधन',
+    account: 'खाता',
+    available: 'उपलब्ध',
+    lastLogin: 'आखरी लॉगइन',
   },
   language: {
     title: 'भाषा',
@@ -132,4 +138,16 @@ export default {
     emailRequired: 'ईमेल आवश्यक है',
     statusRequired: 'स्थिति आवश्यक है',
   },
+  home: {
+    dashboard: 'डैशबोर्ड',
+  },
+  account:{
+    addAccount: "खाता जोड़ें",
+    msg: "दूसरा खाता जोड़ने के लिए साइन इन करें",
+    companyCode: "कंपनी कोड",
+    adding: 'खाता जोड़ा जा रहा है...',
+    add: 'खाता जोड़ें',
+    msg1: 'यह खाता आपकी सूची में जोड़ दिया जाएगा। आप कभी भी खातों के बीच स्विच कर सकते हैं।'
+
+  }
 };

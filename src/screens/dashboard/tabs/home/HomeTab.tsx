@@ -11,7 +11,9 @@ import { PieChart } from 'react-native-gifted-charts';
 import { getERPDashboardThunk } from '../../../../store/slices/auth/thunk';
 import ErrorMessage from '../../../../components/error/Error';
 import { ERP_COLOR_CODE } from '../../../../utils/constants';
+import { useTranslation } from 'react-i18next';
 const HomeScreen = () => {
+  const {t} = useTranslation();
   const navigation = useNavigation<any>();
   const dispatch = useAppDispatch();
 
@@ -270,7 +272,7 @@ const HomeScreen = () => {
                             color: '#000',
                           }}
                         >
-                          Dashboard
+                          {t('home.dashboard')}
                         </Text>
                       )}
                     />
