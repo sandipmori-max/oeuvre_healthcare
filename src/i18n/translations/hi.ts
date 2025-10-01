@@ -25,7 +25,7 @@ export default {
     signUp: 'साइन अप',
     signIn: 'साइन इन',
     signingIn: 'साइन इन हो रहा है...',
-    welcomeDevERP: 'Oeuvre में आपका स्वागत है',
+    welcomeDevERP: 'DevERP में आपका स्वागत है',
     addAccount: 'खाता जोड़ें',
     signInToAddAccount: 'दूसरा खाता जोड़ने के लिए साइन इन करें',
     signInToAccount: 'अपने खाते में साइन इन करें',

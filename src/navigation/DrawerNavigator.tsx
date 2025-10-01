@@ -29,9 +29,9 @@ const DrawerNavigator = () => {
         options={{
           headerShown: false,
           headerStyle: {
-            backgroundColor: theme === 'dark' ? '#000' : ERP_COLOR_CODE.ERP_APP_COLOR,
+            backgroundColor: theme === 'dark' ? ERP_COLOR_CODE.ERP_BLACK : ERP_COLOR_CODE.ERP_APP_COLOR,
           },
-          headerTintColor: '#fff',
+          headerTintColor: ERP_COLOR_CODE.ERP_WHITE,
           title: t('navigation.home'),
         }}
         component={TabNavigator}
@@ -42,7 +42,7 @@ const DrawerNavigator = () => {
         options={{ title: t('navigation.attendance') }}
       />
       {/* <Drawer.Screen
-        name="Display"
+        name="Tasks"
         component={DisplayScreen}
         options={{ title: t('navigation.display') }}
       /> */}

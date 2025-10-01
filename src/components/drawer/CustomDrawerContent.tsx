@@ -10,6 +10,8 @@ import { ERP_DRAWER_LIST } from '../../constants';
 import { styles } from './drawer_style';
 import FastImage from 'react-native-fast-image';
 import { useBaseLink } from '../../hooks/useBaseLink';
+import { ERP_COLOR_CODE } from '../../utils/constants';
+import ContactRow from './ContactRow';
 
 const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
   const navigation = useNavigation();
@@ -23,7 +25,7 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
   return (
     <DrawerContentScrollView
       {...props}
-      contentContainerStyle={{ flex: 1, backgroundColor: theme === 'dark' ? 'black' : 'white' }}
+      contentContainerStyle={{ flex: 1 }}
     >
       <View style={[styles.header]}>
         <FastImage
@@ -118,7 +120,7 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
               <View style={styles.itemRow}>
                 <MaterialIcons
                   name={`${item?.icon}`}
-                  color={isActive ? '#fff' : '#000'}
+                  color={isActive ? ERP_COLOR_CODE.ERP_WHITE : ERP_COLOR_CODE.ERP_BLACK}
                   size={20}
                 />
                 <Text
@@ -126,7 +128,7 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
                     styles.itemLabel,
                     isActive && styles.activeText,
                     {
-                      color: isActive ? '#fff' : '#000',
+                      color: isActive ? ERP_COLOR_CODE.ERP_WHITE : ERP_COLOR_CODE.ERP_BLACK,
                     },
                   ]}
                 >
@@ -138,7 +140,8 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
         })}
       </View>
       <View style={styles.logoutButton}>
-        <Text style={styles.logoutText}>DevERP Mobile App</Text>
+        <Text style={styles.logoutText}>(c) DevERP Solutions Pvt. Ltd.</Text>
+         <ContactRow />
       </View>
     </DrawerContentScrollView>
   );
