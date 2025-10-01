@@ -79,7 +79,7 @@ const CustomSplashScreen: React.FC<SplashProps> = ({ onFinish }) => {
           },
         ]}
       >
-        Welcome to DevERP
+        Welcome to Oeuvre
       </Animated.Text>
 
       {/* Subtitle Animation */}

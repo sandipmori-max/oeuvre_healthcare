@@ -13,6 +13,7 @@ import { formatDateHr, formatTimeTo12Hour, isTokenValid } from '../../../../../u
 import MaterialIcons from '@react-native-vector-icons/material-icons';
 import FastImage from 'react-native-fast-image';
 import { useBaseLink } from '../../../../../hooks/useBaseLink';
+import { ERP_COLOR_CODE } from '../../../../../utils/constants';
 
 interface AccountSwitcherProps {
   visible: boolean;
@@ -72,6 +73,8 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
         onPress={async () => {
           if (isTokenValid(item?.user?.tokenValidTill)) {
             DevERPService.setToken(item?.user?.token || '');
+            DevERPService.setAppId(item?.user?.app_id || '');
+            await AsyncStorage.setItem('appid', item?.user?.app_id)
             await AsyncStorage.setItem('erp_token', item?.user?.token || '');
             await AsyncStorage.setItem('auth_token', item?.user?.token || '');
             await AsyncStorage.setItem('erp_token_valid_till', item?.user?.token || '');
@@ -133,7 +136,7 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
                   alignItems: 'center',
                 }}
               >
-                <MaterialIcons name={'date-range'} color={'#000'} size={18} />
+                <MaterialIcons name={'date-range'} color={ERP_COLOR_CODE.ERP_BLACK} size={18} />
                 <Text style={styles.lastLogin}> {lastLogin}</Text>
               </View>
 
@@ -145,7 +148,7 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
                   alignItems: 'center',
                 }}
               >
-                <MaterialIcons name={'access-alarm'} color={'#000'} size={18} />
+                <MaterialIcons name={'access-alarm'} color={ERP_COLOR_CODE.ERP_BLACK} size={18} />
                 <Text style={styles.lastLogin}>{lastLoginHr}</Text>
               </View>
             </View>
@@ -197,13 +200,14 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
         title={alertConfig.title}
         message={alertConfig.message}
         type={alertConfig.type}
+        isBottomButtonVisible={true}
         onClose={() => setAlertVisible(false)}
         onCancel={() => setAlertVisible(false)}
         onDone={() => {
           handleRemovedAccount(selectedAccount);
         }}
         doneText="Remove"
-        color="red"
+        color={ERP_COLOR_CODE.ERP_ERROR}
         actionLoader={undefined}
       />
     </Modal>

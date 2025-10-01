@@ -12,6 +12,7 @@ import useTranslations from '../../../../hooks/useTranslations';
 import ERPTextInput from '../../../../components/input/ERPTextInput';
 import ERPButton from '../../../../components/button/ERPButton';
 import useFcmToken from '../../../../hooks/useFcmToken';
+import { ERP_COLOR_CODE } from '../../../../utils/constants';
 
 const LoginForm: React.FC<LoginFormProps> = ({
   deviceId,
@@ -75,6 +76,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
 
   const handleLoginSubmit = async (values: typeof initialFormValues) => {
     try {
+      
       const companyValidation = await validateCompanyCode(() =>
         DevERPService.validateCompanyCode(values.company_code,),
       );
@@ -82,6 +84,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
       if (!companyValidation?.isValid) return;
 
       const currentFcmToken = fcmToken || (await getMessaging().getToken());
+      console.log("🚀 ~ handleLoginSubmit ~ currentFcmToken:", currentFcmToken)
 
       DevERPService.setDevice(deviceId);
 
@@ -155,7 +158,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
                         : 'enterPassword'
                     }`,
                   )}
-                  placeholderTextColor="#999"
+                  placeholderTextColor={ERP_COLOR_CODE.ERP_999}
                   autoCapitalize="none"
                   secureTextEntry={field === 'password'}
                   showToggle={field === 'password'}
@@ -180,7 +183,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
                     : t('auth.signIn')
                 }
                 onPress={handleSubmit as any}
-                color={isLoading || validationLoading || erpLoginLoading ? '#aaa' : '#007bff'}
+                color={isLoading || validationLoading || erpLoginLoading ? '#aaa' : ERP_COLOR_CODE.ERP_COLOR}
                 disabled={isLoading || validationLoading || erpLoginLoading}
                 style={styles.loginButton}
                 textStyle={styles.loginButtonText}

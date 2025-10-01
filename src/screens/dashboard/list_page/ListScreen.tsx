@@ -16,6 +16,7 @@ import ERPIcon from '../../../components/icon/ERPIcon';
 import CustomAlert from '../../../components/alert/CustomAlert';
 import { handlePageActionThunk } from '../../../store/slices/page/thunk';
 import MaterialIcons from '@react-native-vector-icons/material-icons';
+import { ERP_COLOR_CODE } from '../../../utils/constants';
 
 const ListScreen = () => {
   const navigation = useNavigation();
@@ -29,7 +30,7 @@ const ListScreen = () => {
   const [loadingListId, setLoadingListId] = useState<string | null>(null);
   const [listData, setListData] = useState<any[]>([]);
   const [configData, setConfigData] = useState<any[]>([]);
-
+ 
   const [error, setError] = useState<string | null>(null);
 
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -46,7 +47,7 @@ const ListScreen = () => {
     message: '',
     type: 'info' as 'error' | 'success' | 'info',
     actionValue: '',
-    color: '#000',
+    color: ERP_COLOR_CODE.ERP_BLACK,
     id: 0,
   });
 
@@ -75,7 +76,14 @@ const ListScreen = () => {
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      title: pageTitle || 'List Data',
+      headerTitle: () => (
+              <Text
+                numberOfLines={1}
+                style={{ maxWidth: 180, fontSize: 18, fontWeight: '700', color: ERP_COLOR_CODE.ERP_WHITE }}
+              >
+                {pageTitle || 'List Data'}
+              </Text>
+            ),
       headerRight: () => (
         <>
           <ERPIcon
@@ -221,6 +229,10 @@ const ListScreen = () => {
 
   const fetchListData = useCallback(
     async (fromDateStr: string, toDateStr: string) => {
+      console.log("🚀 ~ fromDateStr:", fromDateStr)
+      if(isFilterVisible){
+        return;
+      }
       try {
         setError(null);
         setLoadingListId(item?.id || 0);
@@ -268,7 +280,7 @@ const ListScreen = () => {
         }, 10);
       }
     },
-    [item, dispatch],
+    [item, dispatch, isFilterVisible],
   );
 
   useEffect(() => {
@@ -314,7 +326,7 @@ const ListScreen = () => {
 
   if (parsedError) {
     return (
-      <View style={{ flex: 1, backgroundColor: '#fff' }}>
+      <View style={{ flex: 1, backgroundColor: ERP_COLOR_CODE.ERP_WHITE }}>
         <ErrorMessage message={parsedError} />
       </View>
     );
@@ -323,6 +335,9 @@ const ListScreen = () => {
     <View style={styles.container}>
       {isFilterVisible && (
         <View>
+         <View style={{marginVertical: 4, alignContent:'flex-end', alignItems:'flex-end', width: '100%',}}>
+           <Text>Rows: [ {filteredData?.length} ]</Text>
+          </View>
           <View style={styles.searchContainer}>
             <View style={styles.searchInputContainer}>
               <MaterialIcons size={24} name="search" />
@@ -331,7 +346,7 @@ const ListScreen = () => {
                 placeholder={`Search ${pageTitle.toLowerCase()} in list...`}
                 value={searchQuery}
                 onChangeText={handleSearchChange}
-                placeholderTextColor="#6C757D"
+                placeholderTextColor={ERP_COLOR_CODE.ERP_6C757D}
               />
               {searchQuery.length > 0 && (
                 <TouchableOpacity onPress={clearSearch} style={styles.clearButton}>
@@ -344,43 +359,21 @@ const ListScreen = () => {
           {hasDateField && (
             <View style={styles.dateContainer}>
               <View style={styles.dateRow}>
-                <View
-                  style={{
-                    alignContent: 'center',
-                    alignItems: 'center',
-                    flexDirection: 'row',
-                    gap: 4,
-                    marginBottom: 6,
-                  }}
-                >
-                  <MaterialIcons size={20} color={'#000'} name="insert-invitation" />
-                  <Text style={styles.dateLabel}>From Date:</Text>
-                </View>
+                 
                 <TouchableOpacity
                   onPress={() => setShowDatePicker({ type: 'from', show: true })}
                   style={styles.dateButton}
                 >
-                  <Text style={styles.dateButtonText}>{fromDate || 'Select Date'}</Text>
+                  <Text style={styles.dateButtonText}>{fromDate || 'Select From Date'}</Text>
                 </TouchableOpacity>
               </View>
               <View style={styles.dateRow}>
-                <View
-                  style={{
-                    alignContent: 'center',
-                    alignItems: 'center',
-                    flexDirection: 'row',
-                    gap: 4,
-                    marginBottom: 6,
-                  }}
-                >
-                  <MaterialIcons size={20} color={'#000'} name="insert-invitation" />
-                  <Text style={styles.dateLabel}>To Date:</Text>
-                </View>
+                
                 <TouchableOpacity
                   onPress={() => setShowDatePicker({ type: 'to', show: true })}
                   style={styles.dateButton}
                 >
-                  <Text style={styles.dateButtonText}>{toDate || 'Select Date'}</Text>
+                  <Text style={styles.dateButtonText}>{toDate || 'Select To Date'}</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -456,7 +449,7 @@ const ListScreen = () => {
             handleItemPressed({}, pageParamsName, pageTitle);
           }}
         >
-          <MaterialIcons size={32} name="add" color={'#fff'} />
+          <MaterialIcons size={32} name="add" color={ERP_COLOR_CODE.ERP_WHITE} />
         </TouchableOpacity>
       )}
 

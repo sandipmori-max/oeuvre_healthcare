@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, Modal, ActivityIndicator } from 'react-native';
+import { View, Text, TouchableOpacity, Modal, ActivityIndicator, Linking } from 'react-native';
 import FastImage from 'react-native-fast-image';
 
 import { CustomAlertProps } from '../types';
@@ -8,6 +8,7 @@ import { styles } from './custom_alert_style';
 import { getAlertStyles } from './helper';
 import ERPTextInput from '../input/ERPTextInput';
 import { ERP_COLOR_CODE } from '../../utils/constants';
+import MaterialIcons from '@react-native-vector-icons/material-icons';
 
 const CustomAlert: React.FC<CustomAlertProps> = ({
   visible,
@@ -21,8 +22,9 @@ const CustomAlert: React.FC<CustomAlertProps> = ({
   cancelText = 'Cancel',
   isFromButtonList = false,
   actionLoader,
-  color = '#000',
+  color = ERP_COLOR_CODE.ERP_BLACK,
   isBottomButtonVisible,
+  isSettingVisible,
 }) => {
   const alertStyles = getAlertStyles(type);
   const gifSource = getGifSource(type);
@@ -85,7 +87,7 @@ const CustomAlert: React.FC<CustomAlertProps> = ({
               <ERPTextInput
                 label={'Remarks'}
                 placeholder={'Enter remarks'}
-                placeholderTextColor="#999"
+                placeholderTextColor={ERP_COLOR_CODE.ERP_999}
                 autoCapitalize="none"
                 onChangeText={handleChangedRemarks}
                 value={remarks}
@@ -123,7 +125,7 @@ const CustomAlert: React.FC<CustomAlertProps> = ({
                       {actionLoader ? (
                         <>
                           <TouchableOpacity style={styles.buttonCancel}>
-                            <ActivityIndicator size={'small'} color={'#000'} />
+                            <ActivityIndicator size={'small'} color={ERP_COLOR_CODE.ERP_BLACK} />
                           </TouchableOpacity>
                         </>
                       ) : (
@@ -146,6 +148,18 @@ const CustomAlert: React.FC<CustomAlertProps> = ({
                 </View>
               )}
             </>
+          )}
+          {isSettingVisible && (
+            <TouchableOpacity
+             onPress={() => Linking.openSettings()}
+            >
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                <MaterialIcons name="settings" size={20} color="#000" />
+                <Text style={{ color: ERP_COLOR_CODE.ERP_BLACK, fontWeight: '600', fontSize: 16 }}>
+                  Open Settings
+                </Text>
+              </View>
+            </TouchableOpacity>
           )}
         </View>
       </View>

@@ -91,7 +91,7 @@ const TaskListScreen = ({ tasks, onSelectTask, showPicker, showFilter }) => {
                         ]}
                         onPress={() => setStatus(s)}
                       >
-                        <Text style={[styles.chipText, status === s && { color: '#fff' }]}>
+                        <Text style={[styles.chipText, status === s && { color: ERP_COLOR_CODE.ERP_WHITE }]}>
                           {s}
                         </Text>
                       </TouchableOpacity>
@@ -111,7 +111,7 @@ const TaskListScreen = ({ tasks, onSelectTask, showPicker, showFilter }) => {
                       ]}
                       onPress={() => setPriority(p)}
                     >
-                      <Text style={[styles.chipText, priority === p && { color: '#fff' }]}>
+                      <Text style={[styles.chipText, priority === p && { color: ERP_COLOR_CODE.ERP_WHITE }]}>
                         {p}
                       </Text>
                     </TouchableOpacity>
@@ -123,12 +123,12 @@ const TaskListScreen = ({ tasks, onSelectTask, showPicker, showFilter }) => {
             {showPicker && (
               <View style={styles.dateRow}>
                 <TouchableOpacity style={styles.dateButton} onPress={() => showDatePicker('start')}>
-                  <MaterialIcons name="date-range" size={18} color="#555" />
+                  <MaterialIcons name="date-range" size={18} color={ERP_COLOR_CODE.ERP_555} />
                   <Text style={styles.dateText}>Start: {formatDate(dateFilter.start)}</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity style={styles.dateButton} onPress={() => showDatePicker('end')}>
-                  <MaterialIcons name="event" size={18} color="#555" />
+                  <MaterialIcons name="event" size={18} color={ERP_COLOR_CODE.ERP_555} />
                   <Text style={styles.dateText}>End: {formatDate(dateFilter.end)}</Text>
                 </TouchableOpacity>
               </View>
@@ -162,18 +162,18 @@ const TaskListScreen = ({ tasks, onSelectTask, showPicker, showFilter }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff' },
+  container: { flex: 1, backgroundColor: ERP_COLOR_CODE.ERP_WHITE },
   filterCard: {
-    backgroundColor: '#fff',
+    backgroundColor: ERP_COLOR_CODE.ERP_WHITE,
     margin: 10,
   },
   searchInput: {
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: ERP_COLOR_CODE.ERP_ddd,
     borderRadius: 8,
     padding: 8,
     marginBottom: 10,
-    backgroundColor: '#fafafa',
+    backgroundColor: ERP_COLOR_CODE.ERP_fafafa,
   },
   filterRow: {
     flexDirection: 'row',
@@ -182,12 +182,12 @@ const styles = StyleSheet.create({
   chip: {
     paddingVertical: 6,
     paddingHorizontal: 12,
-    backgroundColor: '#eee',
+    backgroundColor: ERP_COLOR_CODE.ERP_eee,
     borderRadius: 8,
     marginRight: 8,
     marginBottom: 6,
   },
-  chipText: { fontSize: 12, color: '#333' },
+  chipText: { fontSize: 12, color: ERP_COLOR_CODE.ERP_333 },
 
   dateRow: {
     flexDirection: 'row',
@@ -198,17 +198,17 @@ const styles = StyleSheet.create({
   dateButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#fafafa',
+    backgroundColor: ERP_COLOR_CODE.ERP_fafafa,
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: ERP_COLOR_CODE.ERP_ddd,
     borderRadius: 8,
     padding: 8,
     flex: 1,
     marginRight: 8,
   },
-  dateText: { marginLeft: 6, fontSize: 13, color: '#333' },
+  dateText: { marginLeft: 6, fontSize: 13, color: ERP_COLOR_CODE.ERP_333 },
 
-  noTask: { textAlign: 'center', marginTop: 40, fontSize: 16, color: '#888' },
+  noTask: { textAlign: 'center', marginTop: 40, fontSize: 16, color: ERP_COLOR_CODE.ERP_888 },
 });
 
 export default TaskListScreen;

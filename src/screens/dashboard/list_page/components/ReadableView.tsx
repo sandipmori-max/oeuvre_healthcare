@@ -22,11 +22,11 @@ const ReadableView = ({
   const screenWidth = Dimensions.get('window').width;
 
   const getButtonMeta = (key: string) => {
-    if (!key || !configData?.length) return { label: 'Action', color: '#007BFF' };
+    if (!key || !configData?.length) return { label: 'Action', color: ERP_COLOR_CODE.ERP_COLOR };
     const configItem = configData.find(cfg => cfg.datafield?.toLowerCase() === key.toLowerCase());
     return {
       label: configItem?.headertext || 'Action',
-      color: configItem?.colorcode || '#007BFF',
+      color: configItem?.colorcode || ERP_COLOR_CODE.ERP_COLOR,
     };
   };
 
@@ -57,14 +57,14 @@ const ReadableView = ({
     return (
       <View
         style={{
-          backgroundColor: '#fff',
+          backgroundColor: ERP_COLOR_CODE.ERP_WHITE,
           borderRadius: 8,
           paddingHorizontal: 8,
           paddingBottom: 6,
           marginVertical: 4,
           paddingTop: 6,
           borderWidth: 1,
-          borderColor: '#ddd',
+          borderColor: ERP_COLOR_CODE.ERP_ddd,
         }}
       >
         <TouchableOpacity
@@ -72,13 +72,17 @@ const ReadableView = ({
           style={{ flexDirection: 'row', alignItems: 'center' }}
           onPress={async () => {
             console.log('🚀 ~ Page:', item);
-
+            if(authUser){
+              return;
+            }
+            if(item?.id !== undefined){
             navigation.navigate('Page', {
               item,
               title: pageParamsName,
               id: item?.id,
               url: pageName,
             });
+          }
           }}
         >
           <View
@@ -95,7 +99,7 @@ const ReadableView = ({
             {item?.image && item?.image !== '' ? (
               <Image source={{ uri: baseUrl }} style={styles.profileImage} />
             ) : (
-              <Text style={{ color: '#fff', fontWeight: '400', fontSize: 16 }}>{avatarLetter}</Text>
+              <Text style={{ color: ERP_COLOR_CODE.ERP_WHITE, fontWeight: '400', fontSize: 16 }}>{avatarLetter}</Text>
             )}
           </View>
 
@@ -116,9 +120,9 @@ const ReadableView = ({
               justifyContent: 'flex-end',
             }}
           >
-            <Text style={{ fontWeight: '600', fontSize: 12, color: '#000' }}>{status}</Text>
+            <Text style={{ fontWeight: '600', fontSize: 12, color: ERP_COLOR_CODE.ERP_BLACK }}>{status}</Text>
             {!!date && (
-              <Text style={{ fontWeight: '600', fontSize: 12, color: '#ccc' }}>
+              <Text style={{ fontWeight: '800', fontSize: 12, color: ERP_COLOR_CODE.ERP_BLACK }}>
                 {formatDateToDDMMMYYYY(date)}
               </Text>
             )}
@@ -129,12 +133,15 @@ const ReadableView = ({
             if (authUser) {
               return;
             }
-            navigation.navigate('Page', {
+            if(item?.id !== undefined){
+navigation.navigate('Page', {
               item,
               title: pageParamsName,
               id: item?.id,
               url: pageName,
             });
+            }
+            
           }}
         >
           {(remarks || address || amount) && (
@@ -150,7 +157,7 @@ const ReadableView = ({
                       <Text
                         numberOfLines={isRemarksExpanded ? undefined : 2}
                         style={{
-                          color: '#777',
+                          color: ERP_COLOR_CODE.ERP_777,
                           fontStyle: 'italic',
                           marginBottom: 6,
                           fontWeight: '600',
@@ -165,7 +172,7 @@ const ReadableView = ({
                             style={{
                               fontWeight: '600',
                               fontSize: 12,
-                              color: '#007bff',
+                              color: ERP_COLOR_CODE.ERP_COLOR,
                               marginBottom: 6,
                             }}
                           >
@@ -202,7 +209,7 @@ const ReadableView = ({
                   <Text
                     numberOfLines={2}
                     style={{
-                      color: '#444',
+                      color: ERP_COLOR_CODE.ERP_444,
                       fontWeight: '600',
                       fontSize: 12,
                     }}
@@ -240,7 +247,7 @@ const ReadableView = ({
                     handleActionButtonPressed(actionValue, label, color, item?.id);
                   }}
                 >
-                  <Text style={{ color: '#fff', fontWeight: '600', fontSize: 12 }}>{label}</Text>
+                  <Text style={{ color: ERP_COLOR_CODE.ERP_WHITE, fontWeight: '600', fontSize: 12 }}>{label}</Text>
                 </TouchableOpacity>
               );
             })}
@@ -258,7 +265,7 @@ const ReadableView = ({
             flex: 1,
             justifyContent: 'center',
             alignItems: 'center',
-            backgroundColor: '#fff',
+            backgroundColor: ERP_COLOR_CODE.ERP_WHITE,
           }}
         >
           <NoData />
@@ -267,7 +274,7 @@ const ReadableView = ({
     );
   }
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, marginTop: 2 }}>
       <FlatList
         data={filteredData}
         keyboardShouldPersistTaps="handled"
@@ -285,11 +292,11 @@ const ReadableView = ({
             borderRadius: 8,
             backgroundColor: '#f1f1f1',
             borderWidth: 1,
-            borderColor: '#ddd',
+            borderColor: ERP_COLOR_CODE.ERP_ddd,
             marginBottom: 28,
           }}
         >
-          <Text style={{ fontSize: 14, fontWeight: '700', color: '#333' }}>Total Amount</Text>
+          <Text style={{ fontSize: 14, fontWeight: '700', color: ERP_COLOR_CODE.ERP_333 }}>Total Amount</Text>
           <Text
             style={{
               fontSize: 16,

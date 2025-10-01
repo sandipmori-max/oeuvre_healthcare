@@ -28,6 +28,9 @@ import HtmlRow from './components/HtmlRow';
 import { useBaseLink } from '../../../hooks/useBaseLink';
 import DateTimeRow from './components/DateTimeRow';
 import LocationRow from './components/LocationRow';
+import FilePickerRow from './components/FilePicker';
+import CustomMultiPicker from './components/CustomMultiPicker';
+import { ERP_COLOR_CODE } from '../../../utils/constants';
 
 type PageRouteParams = { PageScreen: { item: any } };
 
@@ -44,7 +47,7 @@ const PageScreen = () => {
 
   const [error, setError] = useState<string | null>(null);
   const [formValues, setFormValues] = useState<any>({});
-  console.log("🚀 ~ PageScreen ~ formValues:------------", formValues)
+  console.log("🚀 ~ PageScreen ~ formValues:------++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++------", formValues)
   const [datePickerVisible, setDatePickerVisible] = useState(false);
 
   const [dateTimePickerVisible, setDateTimePickerVisible] = useState(false);
@@ -96,7 +99,7 @@ const PageScreen = () => {
       headerTitle: () => (
         <Text
           numberOfLines={1}
-          style={{ maxWidth: isFromNew ? 280 : 180, fontSize: 18, fontWeight: '700', color: '#fff' }}
+          style={{ maxWidth: isFromNew ? 280 : 180, fontSize: 18, fontWeight: '700', color: ERP_COLOR_CODE.ERP_WHITE }}
         >
           {isFromNew ? `${pageTitle} ( New ) ` : title + ' ( Edit )' || 'Details'}
         </Text>
@@ -288,11 +291,24 @@ const PageScreen = () => {
           />
         );
       }
-     
+      else if (item?.field === "chemistname"){
+        content = <CustomMultiPicker 
+        
+         label={item?.fieldtitle}
+            selectedValue={value}
+            dtext={item?.dtext || item?.text || ''}
+            onValueChange={setValue}
+            options={item?.options || []}
+            item={item}
+            errors={errors}/>
+      }
+      else if (item?.ctltype === 'FILE') {
+        content = <FilePickerRow item={item} handleAttachment  ={handleAttachment  }/>;
+      }
       else if(item?.defaultvalue === "#location"){
         content = <LocationRow item={item} setValue ={setValue }/>
       }
-       else if (item?.ctltype === 'HTML') {
+       else if (item?.defaultvalue == '#HTML') {
         content = <HtmlRow item={item} />;
       } else if (item?.ctltype === 'IMAGE' && item?.field === 'signature') {
         content = (
@@ -413,11 +429,11 @@ const PageScreen = () => {
   }, []);
 
   return (
-    <View style={{ flex: 1, padding: 16, backgroundColor: '#fff' }}>
+    <View style={{ flex: 1, padding: 16, backgroundColor: ERP_COLOR_CODE.ERP_WHITE }}>
       {loadingPageId ? (
         <FullViewLoader />
       ) : !!error ? (
-       <View style={{flex: 1, justifyContent:'center', alignContent:'center', backgroundColor:'#fff'}}>
+       <View style={{flex: 1, justifyContent:'center', alignContent:'center', backgroundColor:ERP_COLOR_CODE.ERP_WHITE}}>
          <ErrorMessage message={error} />
         </View>
       ) : controls?.length > 0 ? (

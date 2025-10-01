@@ -9,17 +9,18 @@ import {
   Dimensions,
 } from 'react-native';
 import { ERP_COLOR_CODE } from '../../../../utils/constants';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-
+import MaterialIcons from '@react-native-vector-icons/material-icons';
+ 
 interface SlideButtonProps {
   onSlideSuccess: () => void;
   label: string;
   successColor?: string;
   loading?: boolean;
   completed?: boolean;
+  blocked?: boolean;
 }
 
-const SLIDE_WIDTH = Dimensions.get('screen').width - 70;
+const SLIDE_WIDTH = Dimensions.get('screen').width - 30;
 const SLIDER_SIZE = 44;
 
 const SlideButton: React.FC<SlideButtonProps> = ({
@@ -28,18 +29,19 @@ const SlideButton: React.FC<SlideButtonProps> = ({
   successColor = ERP_COLOR_CODE.ERP_APP_COLOR,
   loading = false,
   completed = false,
+   blocked = false,
 }) => {
   const translateX = useRef(new Animated.Value(0)).current;
 
   // 🔹 Reset knob automatically if API fails (completed = false)
   useEffect(() => {
-    if (!loading && !completed) {
+    if (!loading && !completed && blocked) {
       Animated.spring(translateX, {
         toValue: 0,
         useNativeDriver: true,
       }).start();
     }
-  }, [loading, completed]);
+  }, [loading, completed, blocked]);
 
   const panResponder = useRef(
     PanResponder.create({
@@ -86,7 +88,7 @@ const SlideButton: React.FC<SlideButtonProps> = ({
           ]}
         >
           {loading ? (
-            <ActivityIndicator color="#fff" />
+            <ActivityIndicator color={ERP_COLOR_CODE.ERP_WHITE} />
           ) : (
             <MaterialIcons
               name={completed ? 'task-alt' : 'keyboard-double-arrow-right'}
@@ -118,7 +120,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     alignSelf: 'center',
     fontWeight: '600',
-    color: '#555',
+    color: ERP_COLOR_CODE.ERP_555,
   },
   slider: {
     width: SLIDER_SIZE,

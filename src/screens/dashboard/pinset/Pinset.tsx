@@ -11,11 +11,15 @@ import {
 } from '../../../utils/sqlite';
 import { useNavigation } from '@react-navigation/native';
 import CustomAlert from '../../../components/alert/CustomAlert';
+import { useAppDispatch } from '../../../store/hooks';
+import { setIsPinLoaded } from '../../../store/slices/auth/authSlice';
 
 const { width } = Dimensions.get('screen');
 
 const PinSetupScreen = () => {
   const navigation = useNavigation();
+    const dispatch = useAppDispatch();
+  
   const [pin, setPin] = useState<string>('');
   const [storedPin, setStoredPin] = useState<string>('');
   const [mode, setMode] = useState<'verify' | 'setup'>('setup');
@@ -87,6 +91,8 @@ const PinSetupScreen = () => {
           type: 'success',
         });
         setPin('');
+        dispatch(setIsPinLoaded())
+        
         navigation.goBack();
       } catch (error) {
         console.error('Error saving PIN:', error);
@@ -172,7 +178,7 @@ const PinSetupScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: ERP_COLOR_CODE.ERP_WHITE,
     paddingTop: 32,
     alignItems: 'center',
   },

@@ -3,7 +3,7 @@ import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 import moment from 'moment';
 import { PermissionsAndroid, Platform } from 'react-native';
 
-export const getBottomTabIcon = (iconName: string, focused: boolean, theme: any) => {
+export const getBottomTabIcon = (iconName: string, focused: boolean) => {
   switch (iconName) {
     case 'home':
       return focused ? ERP_ICON.ACTIVE_HOME : ERP_ICON.HOME;
@@ -52,29 +52,72 @@ export const getGifSource = (type: 'error' | 'success' | 'info') => {
   }
 };
 
-export const requestCameraAndLocationPermission = async (): Promise<boolean> => {
-  try {
-    const cameraPerm = Platform.OS === 'ios' ? PERMISSIONS.IOS.CAMERA : PERMISSIONS.ANDROID.CAMERA;
-    const locationPerm =
-      Platform.OS === 'ios'
-        ? PERMISSIONS.IOS.LOCATION_WHEN_IN_USE
-        : PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION;
+  export const requestCameraAndLocationPermission = async (): Promise<boolean> => {
+    try {
+      const cameraPerm =
+        Platform.OS === 'ios' ? PERMISSIONS.IOS.CAMERA : PERMISSIONS.ANDROID.CAMERA;
 
-    const cameraStatus = await check(cameraPerm);
-    const locationStatus = await check(locationPerm);
+      const locationPerm =
+        Platform.OS === 'ios'
+          ? PERMISSIONS.IOS.LOCATION_WHEN_IN_USE
+          : PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION;
 
-    const cameraGranted =
-      cameraStatus === RESULTS.GRANTED ? true : (await request(cameraPerm)) === RESULTS.GRANTED;
+      // 📌 Check current statuses
+      const cameraStatus = await check(cameraPerm);
+      const locationStatus = await check(locationPerm);
 
-    const locationGranted =
-      locationStatus === RESULTS.GRANTED ? true : (await request(locationPerm)) === RESULTS.GRANTED;
+      // ✅ Handle camera permission
+      let cameraGranted = false;
+      if (cameraStatus === RESULTS.GRANTED) {
+        cameraGranted = true;
+      } else if (cameraStatus === RESULTS.DENIED) {
+        const res = await request(cameraPerm);
+        cameraGranted = res === RESULTS.GRANTED;
+        if (!cameraGranted) {
+          return false;
+          // Alert.alert('Camera Permission Denied', 'Camera access is required for this feature.');
+        }
+      } else if (cameraStatus === RESULTS.BLOCKED) {
+        return false;
+        // Alert.alert(
+        //   'Camera Permission Blocked',
+        //   'Camera access has been permanently denied. Please enable it in Settings.',
+        //   [
+        //     { text: 'Cancel', style: 'cancel' },
+        //     { text: 'Open Settings', onPress: () => Linking.openSettings() },
+        //   ],
+        // );
+      }
 
-    return cameraGranted && locationGranted;
-  } catch (error) {
-    console.warn('Permission error:', error);
-    return false;
-  }
-};
+      // ✅ Handle location permission
+      let locationGranted = false;
+      if (locationStatus === RESULTS.GRANTED) {
+        locationGranted = true;
+      } else if (locationStatus === RESULTS.DENIED) {
+        const res = await request(locationPerm);
+        locationGranted = res === RESULTS.GRANTED;
+        // if (!locationGranted) {
+        //   Alert.alert('Location Permission Denied', 'Location access is required for this feature.');
+        // }
+        return false
+      } else if (locationStatus === RESULTS.BLOCKED) {
+        // Alert.alert(
+        //   'Location Permission Blocked',
+        //   'Location access has been permanently denied. Please enable it in Settings.',
+        //   [
+        //     { text: 'Cancel', style: 'cancel' },
+        //     { text: 'Open Settings', onPress: () => Linking.openSettings() },
+        //   ],
+        // );
+        return false
+      }
+
+      return cameraGranted && locationGranted;
+    } catch (error) {
+      console.warn('⚠️ Permission error:', error);
+      return false;
+    }
+  };
 
 export function formatDateToDDMMMYYYY(dateStr: string): string {
   const formatDate = (date: Date): string => {
@@ -354,7 +397,8 @@ export const isTokenValid = (tokenValidTill: string) => {
   return new Date(tokenValidTill).getTime() > Date.now();
 };
 
-export async function requestLocationPermissions() {
+
+export async function requestLocationPermissions(): Promise<boolean> {
   if (Platform.OS === 'android') {
     try {
       const granted = await PermissionsAndroid.requestMultiple([
@@ -363,24 +407,54 @@ export async function requestLocationPermissions() {
         PermissionsAndroid.PERMISSIONS.ACCESS_BACKGROUND_LOCATION, // needed for background & terminated
       ]);
 
-      if (
-        granted['android.permission.ACCESS_FINE_LOCATION'] === PermissionsAndroid.RESULTS.GRANTED &&
-        granted['android.permission.ACCESS_COARSE_LOCATION'] ===
-          PermissionsAndroid.RESULTS.GRANTED &&
-        granted['android.permission.ACCESS_BACKGROUND_LOCATION'] ===
-          PermissionsAndroid.RESULTS.GRANTED
-      ) {
+      console.log('📌 Location permission results:', granted);
+
+      const fine = granted['android.permission.ACCESS_FINE_LOCATION'];
+      const coarse = granted['android.permission.ACCESS_COARSE_LOCATION'];
+      const background = granted['android.permission.ACCESS_BACKGROUND_LOCATION'];
+
+      const allGranted =
+        fine === PermissionsAndroid.RESULTS.GRANTED &&
+        coarse === PermissionsAndroid.RESULTS.GRANTED &&
+        background === PermissionsAndroid.RESULTS.GRANTED;
+
+      if (allGranted) {
         console.log('✅ Location permissions granted');
         return true;
-      } else {
-        console.log('❌ Location permissions denied');
+      }
+
+      // 🔎 Check for permanently denied (NEVER_ASK_AGAIN)
+      const blocked =
+        fine === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN ||
+        coarse === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN ||
+        background === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN;
+
+      if (blocked) {
+        console.log('🚫 Location permission permanently denied');
+        // Alert.alert(
+        //   'Location Permission Blocked',
+        //   'You have permanently denied location access. Please enable it from Settings.',
+        //   [
+        //     { text: 'Cancel', style: 'cancel' },
+        //     { text: 'Open Settings', onPress: () => Linking.openSettings() },
+        //   ],
+        // );
         return false;
       }
+
+      // Otherwise → denied
+      console.log('❌ Location permissions denied');
+      // Alert.alert(
+      //   'Location Permission Denied',
+      //   'Location access is required for this feature.',
+      // );
+      return false;
     } catch (err) {
-      console.warn(err);
+      console.warn('⚠️ requestLocationPermissions error:', err);
       return false;
     }
   } else {
+    // iOS handled via Info.plist
     return true;
   }
 }
@@ -441,29 +515,27 @@ export const getWorkedHours = (punchIn: string, punchOut: string): number => {
   const outDate = new Date(0, 0, 0, outH, outM);
   return (outDate.getTime() - inDate.getTime()) / 1000 / 60 / 60;
 };
-
 export const getWorkedHours2 = (punchIn: string, punchOut: string) => {
-  if (!punchIn || !punchOut) return '0 hr 0 min';
+  if (!punchIn || !punchOut) return '0:00 hr';
 
   const [inH, inM] = punchIn.split(':').map(Number);
   const [outH, outM] = punchOut.split(':').map(Number);
 
   if (isNaN(inH) || isNaN(inM) || isNaN(outH) || isNaN(outM)) {
-    return '0 hr 0 min';
+    return '0:00 hr';
   }
 
   const inDate = new Date(0, 0, 0, inH, inM);
   const outDate = new Date(0, 0, 0, outH, outM);
 
   let diffMs = outDate.getTime() - inDate.getTime();
-  if (diffMs <= 0) return '0 hr 0 min';
+  if (diffMs <= 0) return '0:00 hr';
 
   const totalMinutes = Math.floor(diffMs / 60000);
 
-  const minutesAfterBreak = Math.max(totalMinutes - 60, 0);
-
-  const hours = Math.floor(minutesAfterBreak / 60);
-  const mins = minutesAfterBreak % 60;
+  const hours = Math.floor(totalMinutes / 60);
+  const mins = totalMinutes % 60;
 
   return `${hours}:${mins.toString().padStart(2, '0')} hr`;
 };
+

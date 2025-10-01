@@ -3,7 +3,7 @@ import { ERP_COLOR_CODE } from '../../../utils/constants';
 
 export const styles = StyleSheet.create({
   container: {
-    backgroundColor: ERP_COLOR_CODE.ERP_BACKGROUND,
+    backgroundColor: ERP_COLOR_CODE.ERP_WHITE,
     justifyContent: 'center',
     paddingHorizontal: 20,
   },
@@ -15,7 +15,7 @@ export const styles = StyleSheet.create({
   },
   helperText: {
     fontSize: 12,
-    color: '#888',
+    color: ERP_COLOR_CODE.ERP_888,
     marginTop: 4,
     marginLeft: 2,
   },
@@ -31,13 +31,13 @@ export const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 6,
-    color: '#333',
+    color: ERP_COLOR_CODE.ERP_333,
   },
   subtitle: {
     fontSize: 16,
     textAlign: 'center',
     marginBottom: 30,
-    color: '#666',
+    color: ERP_COLOR_CODE.ERP_666,
   },
   inputContainer: {
     marginBottom: 8,
@@ -45,17 +45,17 @@ export const styles = StyleSheet.create({
   inputLabel: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#444',
+    color: ERP_COLOR_CODE.ERP_444,
     marginBottom: 6,
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: ERP_COLOR_CODE.ERP_ddd,
     padding: 15,
     borderRadius: 10,
     fontSize: 16,
-    backgroundColor: ERP_COLOR_CODE.ERP_INPUT_BACKGROUND,
-    color: '#333',
+    // backgroundColor: ERP_COLOR_CODE.ERP_fafafa,
+    color: ERP_COLOR_CODE.ERP_333,
   },
   errorText: {
     color: ERP_COLOR_CODE.ERP_ERROR,
@@ -63,8 +63,7 @@ export const styles = StyleSheet.create({
     marginTop: 5,
   },
   errorContainer: {
-    backgroundColor: '#ffebee',
-    borderColor: '#f44336',
+     borderColor: ERP_COLOR_CODE.ERP_ERROR,
     borderWidth: 1,
     borderRadius: 8,
     padding: 12,
@@ -75,7 +74,7 @@ export const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 10,
     marginBottom: 20,
-    shadowColor: ERP_COLOR_CODE.ERP_ACTIVE_BUTTON,
+    shadowColor: ERP_COLOR_CODE.ERP_BLACK,
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.6,
     marginTop: 12,
@@ -87,7 +86,7 @@ export const styles = StyleSheet.create({
     marginBottom: 20,
   },
   disabledButton: {
-    backgroundColor: '#ccc',
+    backgroundColor: ERP_COLOR_CODE.ERP_BORDER_LINE,
     shadowOpacity: 0,
   },
   loginButtonText: {
@@ -97,13 +96,13 @@ export const styles = StyleSheet.create({
     textAlign: 'center',
   },
   cancelButton: {
-    backgroundColor: ERP_COLOR_CODE.ERP_CANCEL_BUTTON,
+    backgroundColor: ERP_COLOR_CODE.ERP_f0f0f0,
     padding: 15,
     borderRadius: 10,
     marginBottom: 10,
   },
   cancelButtonText: {
-    color: '#666',
+    color: ERP_COLOR_CODE.ERP_666,
     fontSize: 16,
     fontWeight: 'bold',
     textAlign: 'center',
