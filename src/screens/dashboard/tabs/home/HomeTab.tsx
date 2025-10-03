@@ -119,6 +119,7 @@ const HomeScreen = () => {
             backgroundColor: accentColors[index % accentColors.length],
             borderRadius: 8,
             width: isHorizontal ? '100%' : '48%',
+            height: 120,
           },
         ]}
         activeOpacity={0.7}
@@ -299,7 +300,7 @@ const HomeScreen = () => {
           renderItem={() => (
             <>
               {/* Pie chart section */}
-              {dashboard?.length > 0 && (
+              {pieChartData?.length > 0 && (
                 <View
                   style={{
                     borderColor: ERP_COLOR_CODE.ERP_BLACK,
