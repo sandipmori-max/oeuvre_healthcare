@@ -89,7 +89,7 @@ const LoginScreen = ({ navigation, route }: any) => {
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <KeyboardAvoidingView
-        style={{ flex: 1, backgroundColor: ERP_COLOR_CODE.ERP_WHITE}}
+        style={{ flex: 1, backgroundColor: ERP_COLOR_CODE.ERP_WHITE }}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         <FlatList

@@ -6,7 +6,7 @@ export const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 8,
     paddingTop: 0,
-    backgroundColor: ERP_COLOR_CODE.ERP_F8F9FA,
+    backgroundColor: ERP_COLOR_CODE.ERP_WHITE,
   },
    profileImage: {
     width: 40,
@@ -221,6 +221,7 @@ export const styles = StyleSheet.create({
   },
 
   searchContainer: {
+    marginTop: 8,
     marginBottom: 16,
   },
   searchInputContainer: {
@@ -478,7 +479,6 @@ export const styles = StyleSheet.create({
   },
   addButton: {
     position: 'absolute',
-    bottom: 44,
     right: 18,
     backgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR, 
     borderRadius: 56,
