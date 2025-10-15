@@ -1,19 +1,21 @@
 import React from 'react';
-import { useWindowDimensions, View } from 'react-native';
-import RenderHtml from 'react-native-render-html';
+import { View, Text, useWindowDimensions } from 'react-native';
+import { styles } from '../page_style';
+import { ERP_COLOR_CODE } from '../../../../utils/constants';
+import AutoHeightWebView from './AutoHeightWebView'; // the component above
 
-const HtmlRow = ({ item }: any) => {
-  const { width } = useWindowDimensions();
-  const source = {
-    html: `
-<p style='text-align:center;'>
-  Hello World!
-</p>`,
-  };
-
+const HtmlRow = ({ item , isFromPage}: any) => {
+ 
   return (
-    <View style={{ marginVertical: 8 }}>
-      <RenderHtml contentWidth={width} source={source} />
+    <View>
+      <View style={{ marginTop: 0 }}>
+        <View style={{ flexDirection: 'row' }}>
+          <Text style={styles.label}>{item?.fieldtitle}</Text>
+          {item?.tooltip !== item?.fieldtitle && <Text> - ( {item?.tooltip} ) </Text>}
+          {item?.mandatory === '1' && <Text style={{ color: ERP_COLOR_CODE.ERP_ERROR }}>*</Text>}
+        </View>
+      </View>
+      <AutoHeightWebView html={item?.text} isFromPage={isFromPage} isHorizontal={false} isFromMenu={false} />
     </View>
   );
 };

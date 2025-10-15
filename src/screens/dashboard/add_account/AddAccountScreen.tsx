@@ -71,10 +71,12 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
       DevERPService.setDevice(deviceId);
       setLoader(true);
       const userExists = accounts?.some(acc => acc?.user?.name === values?.user);
-      if (userExists) {
+      const codeExists = accounts?.some(acc => acc?.user?.company_code === values?.company_code);
+
+      if (userExists && codeExists) {
         setAlertConfig({
           title: 'Error',
-          message: 'This user already exists in your accounts.',
+          message: 'You already have this user in your accounts.',
           type: 'error',
         });
         setAlertVisible(true);
@@ -83,7 +85,6 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
       const validation = await validateCompanyCode(() =>
         DevERPService.validateCompanyCode(values?.company_code),
       );
-      console.log('🚀 ~ handleAddAccount ~ validation:', validation);
       if (!validation?.isValid) {
         setLoader(false);
         return;
@@ -97,12 +98,14 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
           firebaseid: currentFcmToken,
         }),
       );
-      console.log('🚀 ~ handleAddAccount ~ l222222222222222oginResult:', loginResult);
       if (loginResult?.success === '0' || loginResult?.success === 0) {
         const validation = await validateCompanyCode(() =>
           DevERPService.validateCompanyCode(user?.company_code),
         );
-        console.log('🚀 ~ handleAddAccount ~ ****----*****validation:', validation);
+        if (!validation?.isValid) {
+          setLoader(false);
+          return;
+        }
         setAlertConfig({
           title: 'Login failed',
           message: loginResult?.message || 'Unable to login',
@@ -111,10 +114,6 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
         setAlertVisible(true);
         return;
       }
-      console.log(
-        '🚀 ~ handleAddAccount ~ loginResult:-----+-+-+-+-+-+-+-+-+-+-+-----------',
-        loginResult,
-      );
 
       if (loginResult?.success !== 1) {
         setAlertConfig({
@@ -129,10 +128,7 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
       DevERPService.setToken(loginResult?.token);
       await AsyncStorage.setItem('erp_token', loginResult?.token || '');
       await AsyncStorage.setItem('auth_token', loginResult?.token || '');
-      await AsyncStorage.setItem('erp_token_valid_till', loginResult?.token || '');
-      console.log('🚀 ~ handleAddAccount ~ ++++++++++++++:', validation);
-      // await DevERPService.getAuth();
-    
+      await AsyncStorage.setItem('erp_token_valid_till', loginResult?.tokenValidTill || '');
 
       dispatch(
         loginUserThunk({
@@ -178,6 +174,7 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
         <FlatList
           showsHorizontalScrollIndicator={false}
           showsVerticalScrollIndicator={false}
+          keyExtractor={(item, index) => index.toString()}
           keyboardShouldPersistTaps="handled"
           data={['']}
           renderItem={() => {
@@ -185,9 +182,7 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
               <>
                 <View style={styles.formContainer}>
                   <Image source={ERP_ICON.APP_LOGO} style={styles.logo} resizeMode="contain" />
-
                   <Text style={styles.subtitle}>{t('account.msg')}</Text>
-
                   <Formik
                     initialValues={{ company_code: '', user: '', password: '' }}
                     validationSchema={erp_add_account_validation_schema}
@@ -197,15 +192,34 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
                       <>
                         <View style={styles.inputContainer}>
                           <Text style={styles.inputLabel}>{t('account.companyCode')}</Text>
-                          <TextInput
-                            style={styles.input}
-                            placeholder={t('auth.enterCompanyCode')}
-                            placeholderTextColor={ERP_COLOR_CODE.ERP_999}
-                            autoCapitalize="none"
-                            onChangeText={handleChange('company_code')}
-                            onBlur={handleBlur('company_code')}
-                            value={values?.company_code}
-                          />
+                          <View
+                            style={[
+                              styles.inputContainer,
+                              {
+                                justifyContent: 'center',
+                                alignContent: 'center',
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                borderRadius: 8,
+                                borderWidth: 1,
+                                borderColor: ERP_COLOR_CODE.ERP_BORDER_LINE,
+                                paddingLeft: 12,
+                              },
+                            ]}
+                          >
+                            <MaterialIcons name="closed-caption-off" size={20} color={ERP_COLOR_CODE.ERP_999} />
+
+                            <TextInput
+                              style={styles.input}
+                              placeholder={t('auth.enterCompanyCode')}
+                              placeholderTextColor={ERP_COLOR_CODE.ERP_999}
+                              autoCapitalize="none"
+                              onChangeText={handleChange('company_code')}
+                              onBlur={handleBlur('company_code')}
+                              value={values?.company_code}
+                            />
+                          </View>
+
                           {touched?.company_code && errors?.company_code && (
                             <Text style={styles.errorText}>{errors?.company_code}</Text>
                           )}
@@ -213,15 +227,32 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
 
                         <View style={styles.inputContainer}>
                           <Text style={styles.inputLabel}>{t('auth.user')}</Text>
-                          <TextInput
-                            style={styles.input}
-                            placeholder={t('auth.enterUser')}
-                            placeholderTextColor={ERP_COLOR_CODE.ERP_999}
-                            autoCapitalize="none"
-                            onChangeText={handleChange('user')}
-                            onBlur={handleBlur('user')}
-                            value={values?.user}
-                          />
+                          <View
+                            style={[
+                              styles.inputContainer,
+                              {
+                                justifyContent: 'center',
+                                alignContent: 'center',
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                borderRadius: 8,
+                                borderWidth: 1,
+                                borderColor: ERP_COLOR_CODE.ERP_BORDER_LINE,
+                                paddingLeft: 12,
+                              },
+                            ]}
+                          >
+                            <MaterialIcons name="person" size={20} color={ERP_COLOR_CODE.ERP_999} />
+                            <TextInput
+                              style={styles.input}
+                              placeholder={t('auth.enterUser')}
+                              placeholderTextColor={ERP_COLOR_CODE.ERP_999}
+                              autoCapitalize="none"
+                              onChangeText={handleChange('user')}
+                              onBlur={handleBlur('user')}
+                              value={values?.user}
+                            />
+                          </View>
                           {touched?.user && errors?.user && (
                             <Text style={styles.errorText}>{errors?.user}</Text>
                           )}
@@ -229,7 +260,24 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
 
                         <View style={styles.inputContainer}>
                           <Text style={styles.inputLabel}>{t('auth.password')}</Text>
-                          <View style={styles.inputWithIcon}>
+
+                          <View
+                            style={[
+                              styles.inputContainer,
+                              {
+                                justifyContent: 'center',
+                                alignContent: 'center',
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                borderRadius: 8,
+                                borderWidth: 1,
+                                borderColor: ERP_COLOR_CODE.ERP_BORDER_LINE,
+                                paddingLeft: 12,
+                              },
+                            ]}
+                          >
+                            <MaterialIcons name="password" size={20} color={ERP_COLOR_CODE.ERP_999} />
+
                             <TextInput
                               style={styles.input1}
                               placeholder={t('auth.enterPassword')}
@@ -246,7 +294,7 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
                             >
                               <MaterialIcons
                                 name={!showPassword ? 'visibility-off' : 'visibility'}
-                                color={ERP_COLOR_CODE.ERP_BLACK}
+                                color={ERP_COLOR_CODE.ERP_999}
                                 size={20}
                               />
                             </TouchableOpacity>
@@ -263,6 +311,12 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
                           }}
                           disabled={loader}
                         >
+                          <MaterialIcons
+                            name="person-add-alt"
+                            size={24}
+                            color={ERP_COLOR_CODE.ERP_WHITE}
+                          />
+
                           {loader ? (
                             <Text style={styles.addButtonText}>{t('account.adding')}</Text>
                           ) : (
@@ -285,10 +339,15 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
           title={alertConfig.title}
           message={alertConfig.message}
           type={alertConfig.type}
-          onClose={() => {
+          onClose={async () => {
             setLoader(false);
             setAlertVisible(false);
             setAlertVisible(false);
+            DevERPService.setAppId(user?.app_id);
+            DevERPService.setToken(user?.token);
+            await AsyncStorage.setItem('erp_token', user?.token || '');
+            await AsyncStorage.setItem('auth_token', user?.token || '');
+            await AsyncStorage.setItem('erp_token_valid_till', user?.tokenValidTill || '');
           }}
           actionLoader={undefined}
         />

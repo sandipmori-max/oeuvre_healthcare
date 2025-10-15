@@ -72,6 +72,10 @@ export const styles = StyleSheet.create({
     marginTop: 4,
   },
   addButton: {
+    flexDirection:'row',
+    justifyContent:'center',
+    alignContent:'center',
+    gap: 8,
     backgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR,
     paddingVertical: 15,
     borderRadius: 10,
@@ -120,13 +124,12 @@ export const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 14,
     fontSize: 16,
-    borderWidth: 1,
-    borderColor: ERP_COLOR_CODE.ERP_BORDER_LINE,
     padding: 14,
     borderRadius: 10,
     backgroundColor: ERP_COLOR_CODE.ERP_WHITE,
   },
   input1: {
+    marginLeft: 10,
     fontSize: 16,
     borderColor: ERP_COLOR_CODE.ERP_161515,
     paddingVertical: 14,
@@ -135,6 +138,6 @@ export const styles = StyleSheet.create({
     backgroundColor: ERP_COLOR_CODE.ERP_WHITE,
   },
   toggleButton: {
-    padding: 4,
+    padding: 14,
   },
 });

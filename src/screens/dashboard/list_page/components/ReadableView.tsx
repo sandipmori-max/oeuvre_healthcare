@@ -8,6 +8,8 @@ import { formatDateToDDMMMYYYY } from '../../../../utils/helpers';
 import { styles } from '../list_page_style';
 import NoData from '../../../../components/no_data/NoData';
 import { ERP_COLOR_CODE } from '../../../../utils/constants';
+import Footer from '../../tabs/home/Footer';
+import MaterialIcons from '@react-native-vector-icons/material-icons';
 
 const ReadableView = ({
   configData,
@@ -73,19 +75,18 @@ const ReadableView = ({
           activeOpacity={0.8}
           style={{ flexDirection: 'row', alignItems: 'center' }}
           onPress={async () => {
-            console.log('🚀 ~ Page:', item);
             if (authUser) {
               return;
             }
             if (item?.id !== undefined) {
-              setIsFilterVisible(false)
-              setSearchQuery('')
+              setIsFilterVisible(false);
+              setSearchQuery('');
               navigation.navigate('Page', {
                 item,
                 title: pageParamsName,
                 id: item?.id,
                 url: pageName,
-              }); 
+              });
             }
           }}
         >
@@ -213,26 +214,48 @@ const ReadableView = ({
               </View>
               <View>
                 {!!address && (
-                  <Text
-                    numberOfLines={2}
+                  <View
                     style={{
-                      color: ERP_COLOR_CODE.ERP_444,
-                      fontWeight: '600',
-                      fontSize: 12,
+                      flexDirection: 'row',
+                      alignContent: 'center',
+                      alignItems: 'center',
+                      gap: 4,
+                      marginVertical: 4,
+                      marginBottom: 8,
                     }}
                   >
-                    📍 {address}
-                  </Text>
+                    <MaterialIcons
+                      name="info-outline"
+                      size={16}
+                      color={ERP_COLOR_CODE.ERP_APP_COLOR}
+                    />
+                    <Text>{address}</Text>
+                  </View>
                 )}
               </View>
             </View>
           )}
         </TouchableOpacity>
 
+        <View>
+          {item?.html && (
+            <Footer
+              textColor={'#000'}
+              isFromMenu={false}
+              isHorizontal={false}
+              footer={item?.html}
+              index={index}
+              accentColors={'#000'}
+              isFromListPage={true}
+            />
+          )}
+        </View>
+
         {btnKeys?.length > 0 && (
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginTop: 6, gap: 1 }}>
             {btnKeys?.map((key, idx) => {
               const actionValue = item[key];
+              console.log('🚀 ~ actionValue:', actionValue);
               const { label, color } = getButtonMeta(key);
               return (
                 <TouchableOpacity
@@ -287,13 +310,14 @@ const ReadableView = ({
   return (
     <View style={{ flex: 1, marginTop: 2 }}>
       <FlatList
+        keyExtractor={(item, index) => index.toString()}
         data={filteredData}
         keyboardShouldPersistTaps="handled"
         showsHorizontalScrollIndicator={false}
         showsVerticalScrollIndicator={false}
-        keyExtractor={(item, idx) => String(item?.id || idx)}
         renderItem={({ item, index }) => <RenderCard item={item} index={index} />}
-        contentContainerStyle={styles.listContent}
+        contentContainerStyle={styles.listContent} 
+
       />
       {filteredData?.length > 0 ? (
         <View

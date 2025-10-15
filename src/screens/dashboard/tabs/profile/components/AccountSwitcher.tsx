@@ -12,8 +12,8 @@ import { useApi } from '../../../../../hooks/useApi';
 import { formatDateHr, formatTimeTo12Hour, isTokenValid } from '../../../../../utils/helpers';
 import MaterialIcons from '@react-native-vector-icons/material-icons';
 import FastImage from 'react-native-fast-image';
-import { useBaseLink } from '../../../../../hooks/useBaseLink';
 import { ERP_COLOR_CODE } from '../../../../../utils/constants';
+import { setDashboard, setEmptyMenu } from '../../../../../store/slices/auth/authSlice';
 
 interface AccountSwitcherProps {
   visible: boolean;
@@ -25,7 +25,7 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
   const dispatch = useAppDispatch();
   const { execute: validateCompanyCode } = useApi();
 
-  const { accounts, activeAccountId } = useAppSelector(state => state?.auth);
+  const { accounts, activeAccountId, user } = useAppSelector(state => state?.auth);
   const [alertVisible, setAlertVisible] = useState(false);
   const [selectedAccount, setSelectedAccount] = useState<any>(null);
   const [alertConfig, setAlertConfig] = useState({
@@ -59,7 +59,7 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
   };
 
   const renderAccount = ({ item }: { item: any }) => {
-    const isActive = item?.id.toString() === activeAccountId?.toString();
+    const isActive = user?.id.toString() === item?.id.toString();
     const lastLogin = formatDateHr(item?.lastLoginAt, false);
     const lastLoginHr = formatTimeTo12Hour(item?.lastLoginAt);
 
@@ -71,6 +71,8 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
       <TouchableOpacity
         style={[styles.accountItem, isActive && styles.activeAccount]}
         onPress={async () => {
+          dispatch(setDashboard([]));
+          dispatch(setEmptyMenu([]));
           DevERPService.setAppId(item?.user?.app_id || '');
           await AsyncStorage.setItem('appid', item?.user?.app_id);
 
@@ -184,13 +186,18 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
         <FlatList
           data={accounts}
           renderItem={renderAccount}
-          keyExtractor={item => item?.id}
+          keyExtractor={(item, index) => index.toString()}
           style={styles.accountsList}
           showsVerticalScrollIndicator={false}
         />
 
         <TouchableOpacity style={styles.addAccountButton} onPress={onAddAccount}>
-          <Text style={styles.addAccountText}>+ Add Another Account</Text>
+           <MaterialIcons
+                                      name="person-add-alt"
+                                      size={24}
+                                      color={ERP_COLOR_CODE.ERP_WHITE}
+                                    />
+          <Text style={styles.addAccountText}>Add account</Text>
         </TouchableOpacity>
       </View>
       <CustomAlert
