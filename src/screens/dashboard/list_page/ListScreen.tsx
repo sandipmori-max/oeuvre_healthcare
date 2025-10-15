@@ -41,6 +41,7 @@ const ListScreen = () => {
   const [alertVisible, setAlertVisible] = useState(false);
   const [actionLoaders, setActionLoader] = useState(false);
   const [parsedError, setParsedError] = useState<any>();
+  const [apiError, setApiError] = useState<any>(false);
 
   const [alertConfig, setAlertConfig] = useState({
     title: '',
@@ -77,6 +78,7 @@ const ListScreen = () => {
   const hasIdField = configData.some(
     item => item?.datafield && item?.datafield.toLowerCase() === 'id',
   );
+  console.log("🚀 ~ ListScreen----------------------- ~ hasIdField:", hasIdField)
   useLayoutEffect(() => {
     navigation.setOptions({
       headerTitle: () => (
@@ -237,7 +239,6 @@ const ListScreen = () => {
 
   const fetchListData = useCallback(
     async (fromDateStr: string, toDateStr: string) => {
-      console.log('🚀 ~ fromDateStr:', fromDateStr);
       // if (isFilterVisible) {
       //   return;
       // }
@@ -254,7 +255,6 @@ const ListScreen = () => {
           }),
         ).unwrap();
         const parsed = typeof raw === 'string' ? JSON.parse(raw) : raw;
-        console.log('🚀 ~ parsed--------:', parsed);
         let dataArray = [];
         let configArray = [];
 
@@ -382,7 +382,7 @@ const ListScreen = () => {
                   </View>
                 </TouchableOpacity>
               </View>
-              <View style={{height: 1, width: 8,}}> </View>
+              <View style={{ height: 1, width: 8 }}> </View>
 
               {/* End Date */}
               <View style={styles.dateRow}>
@@ -499,27 +499,49 @@ const ListScreen = () => {
         doneText={alertConfig.title}
         color={alertConfig.color}
         onDone={async remark => {
-          console.log('🚀 ~ async ~ remark:', alertConfig?.actionValue);
+          console.log('🚀 ~ remark:', remark);
+          console.log('🚀 ~ alertConfig:', alertConfig);
+
           try {
             const type = `page${alertConfig.title}`;
-            console.log(type);
-            const res = await dispatch(
+            console.log('🚀 ~ type:', type);
+             await dispatch(
               handlePageActionThunk({
                 action: type,
                 id: alertConfig.id.toString(),
                 remarks: remark,
-                page: pageName,
+                page: alertConfig?.actionValue,
               }),
             ).unwrap();
 
-            console.log('✅ Success:', res);
             setAlertVisible(false);
             onRefresh();
           } catch (err) {
+            setAlertVisible(false);
+            setAlertConfig({
+              title: 'Api error',
+              message: err?.toString() || '',
+              type: 'info',
+              actionValue: '',
+              color: '',
+              id: 0,
+            });
+            setApiError(true);
+
             console.error('❌ Failed:', err);
           }
         }}
         isFromButtonList={true}
+      />
+
+      <CustomAlert
+        visible={apiError}
+        title={alertConfig.title}
+        message={alertConfig.message}
+        type={alertConfig.type}
+        onClose={() => setApiError(false)}
+        onCancel={() => setApiError(false)}
+        actionLoader={actionLoader}
       />
     </View>
   );

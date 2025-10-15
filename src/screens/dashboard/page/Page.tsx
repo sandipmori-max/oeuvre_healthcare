@@ -47,10 +47,7 @@ const PageScreen = () => {
 
   const [error, setError] = useState<string | null>(null);
   const [formValues, setFormValues] = useState<any>({});
-  console.log(
-    '🚀 ~ PageScreen ~ formValues:------++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++------',
-    formValues,
-  );
+
   const [datePickerVisible, setDatePickerVisible] = useState(false);
 
   const [dateTimePickerVisible, setDateTimePickerVisible] = useState(false);
@@ -66,7 +63,7 @@ const PageScreen = () => {
   const [loader, setLoader] = useState(false);
   const [actionLoader, setActionLoader] = useState(false);
   const [actionSaveLoader, setActionSaveLoader] = useState(false);
-
+ 
   const [infoData, setInfoData] = useState<any>({});
 
   const [alertConfig, setAlertConfig] = useState({
@@ -126,7 +123,7 @@ const PageScreen = () => {
       ),
       headerRight: () => (
         <>
-          {
+          {!isFromNew && (
             <ERPIcon
               name="refresh"
               isLoading={actionLoader}
@@ -137,7 +134,7 @@ const PageScreen = () => {
                 setErrorsList([]);
               }}
             />
-          }
+          )}
 
           {!authUser && controls.length > 0 && (
             <ERPIcon
@@ -162,26 +159,17 @@ const PageScreen = () => {
                       message: `Record saved successfully!`,
                       type: 'success',
                     });
+
                     setAlertVisible(true);
                     setGoBack(true);
                     setTimeout(() => {
                       setAlertVisible(false);
                       navigation.goBack();
                     }, 1500);
-                  } catch (err: any) {
-                    setLoader(false);
-
-                    setAlertConfig({
-                      title: 'Record saved',
-                      message: err,
-                      type: 'error',
-                    });
-                    setAlertVisible(true);
-                    setGoBack(false);
-                  }
+                  } catch (err: any) {}
                 }
                 setActionSaveLoader(false);
-              }}
+               }}
             />
           )}
         </>
@@ -209,6 +197,7 @@ const PageScreen = () => {
       const parsed = await dispatch(
         getERPPageThunk({ page: url, id: isFromNew ? 0 : id }),
       ).unwrap();
+      console.log('🚀 ~ parsed:', parsed);
 
       if (!isFromNew) {
         setInfoData({
@@ -219,6 +208,7 @@ const PageScreen = () => {
       }
 
       const pageControls = Array.isArray(parsed?.pagectl) ? parsed?.pagectl : [];
+      console.log('🚀 ~ pageControls:', pageControls);
 
       const normalizedControls = pageControls?.map(c => ({
         ...c,
@@ -285,7 +275,7 @@ const PageScreen = () => {
 
   const renderItem = useCallback(
     ({ item, index }: { item: any; index: number }) => {
-      console.log('itemitemitemitem', item);
+      console.log('🚀 ~ item:----------------', item);
       const setValue = (val: any) => {
         if (typeof val === 'object' && val !== null) {
           setFormValues(prev => ({ ...prev, ...val }));
@@ -323,11 +313,23 @@ const PageScreen = () => {
           />
         );
       } else if (item?.ctltype === 'FILE') {
-        content = <FilePickerRow item={item} handleAttachment={handleAttachment} />;
+        content = (
+          <FilePickerRow
+            baseLink={baseLink}
+            infoData={infoData}
+            item={item}
+            handleAttachment={handleAttachment}
+          />
+        );
       } else if (item?.defaultvalue === '#location') {
         content = <LocationRow item={item} setValue={setValue} />;
-      } else if (item?.defaultvalue == '#HTML') {
-        content = <HtmlRow item={item} />;
+      } else if (item?.defaultvalue === '#html') {
+        content = (
+          <View>
+            {' '}
+            <HtmlRow item={item} isFromPage={true} />
+          </View>
+        );
       } else if (item?.ctltype === 'IMAGE' && item?.field === 'signature') {
         content = (
           <SignaturePad
@@ -336,7 +338,11 @@ const PageScreen = () => {
             handleSignatureAttachment={handleSignatureAttachment}
           />
         );
-      } else if (item?.ctltype === 'IMAGE' || item?.ctltype === 'PHOTO') {
+      } else if (
+        item?.ctltype === 'FILE' ||
+        item?.ctltype === 'IMAGE' ||
+        item?.ctltype === 'PHOTO'
+      ) {
         content = (
           <Media
             baseLink={baseLink}
@@ -473,7 +479,7 @@ const PageScreen = () => {
               showsVerticalScrollIndicator={false}
               data={controls}
               ref={flatListRef}
-              keyExtractor={(it, idx) => it?.dtlid || idx?.toString()}
+              keyExtractor={(item, index) => index.toString()}
               renderItem={renderItem}
               contentContainerStyle={{ paddingBottom: keyboardHeight }}
               keyboardShouldPersistTaps="handled"
@@ -511,7 +517,6 @@ const PageScreen = () => {
         onConfirm={handleDateTimeConfirm}
         onCancel={hideDateTimePicker}
       />
-
       <DateTimePicker
         isVisible={datePickerVisible}
         mode="date"
@@ -533,6 +538,8 @@ const PageScreen = () => {
         }}
         actionLoader={undefined}
       />
+
+    
     </View>
   );
 };

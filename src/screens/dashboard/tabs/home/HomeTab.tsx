@@ -1,6 +1,14 @@
-import React, { useCallback, useLayoutEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, ActivityIndicator, FlatList } from 'react-native';
-import { PieChart } from 'react-native-gifted-charts';
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  ActivityIndicator,
+  FlatList,
+  Dimensions,
+  Animated,
+  TextInput,
+} from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 
@@ -12,9 +20,15 @@ import ERPIcon from '../../../../components/icon/ERPIcon';
 import { getERPDashboardThunk } from '../../../../store/slices/auth/thunk';
 import ErrorMessage from '../../../../components/error/Error';
 import { ERP_COLOR_CODE } from '../../../../utils/constants';
-import TaskListScreen from '../../../task_module/task_list/TaskListScreen';
-import TaskDetailsBottomSheet from '../../../task_module/task_details/TaskDetailsScreen';
 import MaterialIcons from '@react-native-vector-icons/material-icons';
+import Footer from './Footer';
+import PieChartSection from './chartData';
+const { width } = Dimensions.get('screen');
+
+const hasHtmlContent = (str: string) => {
+  if (!str || typeof str !== 'string') return false;
+  return /<([a-z]+)([^>]*?)>/i.test(str);
+};
 
 const HomeScreen = () => {
   const { t } = useTranslation();
@@ -24,49 +38,119 @@ const HomeScreen = () => {
   const { dashboard, isDashboardLoading, isAuthenticated, error, user } = useAppSelector(
     state => state.auth,
   );
+  console.log('🚀 ~ HomeScreen ~ dashboard:', dashboard);
   const [loadingPageId, setLoadingPageId] = useState<any>(null);
   const [isRefresh, setIsRefresh] = useState<boolean>(false);
 
   const theme = useAppSelector(state => state?.theme);
   const [actionLoader, setActionLoader] = useState(false);
   const [isHorizontal, setIsHorizontal] = useState(false);
-  const [selectedTask, setSelectedTask] = useState(null);
-  const [modalVisible, setModalVisible] = useState(false);
+  const [showSearch, setShowSearch] = useState(false);
+  const [searchText, setSearchText] = useState('');
+  const [filteredDashboard, setFilteredDashboard] = useState(dashboard);
+  const searchTimeout = useRef<NodeJS.Timeout | null>(null);
+
+  const translateX = useRef(new Animated.Value(width)).current;
+
+  const htmlItems = filteredDashboard.filter(item => hasHtmlContent(item.data));
+  const emptyItems = filteredDashboard.filter(item => item?.data === '');
+
+  const textItems = filteredDashboard.filter(item => item.data && !hasHtmlContent(item.data));
+
+  useEffect(() => {
+    if (searchTimeout.current) clearTimeout(searchTimeout.current);
+
+    searchTimeout.current = setTimeout(() => {
+      const filtered = dashboard.filter(item =>
+        (item.name || '').toLowerCase().includes(searchText.toLowerCase()),
+      );
+      console.log('🚀 ~ HomeScreen ~ filtered-------:', filtered);
+      setFilteredDashboard(filtered);
+    }, 300);
+
+    return () => {
+      if (searchTimeout.current) clearTimeout(searchTimeout.current);
+    };
+  }, [searchText, dashboard]);
+
+  useEffect(() => {
+    Animated.loop(
+      Animated.timing(translateX, {
+        toValue: -350,
+        duration: 10000,
+        useNativeDriver: true,
+      }),
+    ).start();
+  }, []);
 
   useLayoutEffect(() => {
     navigation.setOptions({
+      headerTitle: () =>
+        showSearch ? (
+          <View style={{ width: width - 70, flexDirection: 'row', alignItems: 'center' }}>
+            <TextInput
+              value={searchText}
+              onChangeText={setSearchText}
+              placeholder="Search dashboard here..."
+              style={{
+                flex: 1,
+                backgroundColor: '#f0f0f0',
+                borderRadius: 8,
+                paddingHorizontal: 12,
+                height: 36,
+              }}
+            />
+            <TouchableOpacity
+              onPress={() => {
+                setShowSearch(false);
+                setSearchText('');
+              }}
+            >
+              <MaterialIcons
+                name="clear"
+                size={24}
+                color={ERP_COLOR_CODE.ERP_WHITE}
+                style={{ marginLeft: 8 }}
+              />
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <Text style={{ color: ERP_COLOR_CODE.ERP_WHITE, fontSize: 18, fontWeight: '600' }}>
+            Home
+          </Text>
+        ),
       headerRight: () => (
         <>
-          <ERPIcon
-            name="refresh"
-            onPress={() => {
-              setActionLoader(true);
-              setIsRefresh(!isRefresh);
-              dispatch(getERPDashboardThunk());
-              setTimeout(() => {
-                setActionLoader(false);
-              }, 100);
-            }}
-            isLoading={actionLoader}
-          />
-          <ERPIcon
-            name={!isHorizontal ? 'list' : 'apps'}
-            onPress={() => setIsHorizontal(prev => !prev)}
-          />
+          {!showSearch && (
+            <>
+              {dashboard.length > 5 && (
+                <ERPIcon name="search" onPress={() => setShowSearch(true)} />
+              )}
+              <ERPIcon
+                name={!isHorizontal ? 'list' : 'apps'}
+                onPress={() => setIsHorizontal(prev => !prev)}
+              />
+              <ERPIcon
+                name="refresh"
+                onPress={() => {
+                  setActionLoader(true);
+                  setIsRefresh(!isRefresh);
+                  dispatch(getERPDashboardThunk());
+                  setTimeout(() => {
+                    setActionLoader(false);
+                  }, 100);
+                }}
+                isLoading={actionLoader}
+              />
+            </>
+          )}
         </>
       ),
       headerLeft: () => (
-        <>
-          <ERPIcon
-            extSize={24}
-            isMenu={true}
-            name="menu"
-            onPress={() => navigation?.openDrawer()}
-          />
-        </>
+        <ERPIcon extSize={24} isMenu={true} name="menu" onPress={() => navigation?.openDrawer()} />
       ),
     });
-  }, [navigation, isRefresh, actionLoader, isHorizontal]);
+  }, [navigation, isHorizontal, isRefresh, showSearch, dashboard, searchText, filteredDashboard]);
 
   useFocusEffect(
     useCallback(() => {
@@ -80,13 +164,6 @@ const HomeScreen = () => {
     }, [isAuthenticated, dispatch]),
   );
 
-  // useEffect(() => {
-  //   const intervalId = setInterval(() => {
-  //     dispatch(getERPDashboardThunk());
-  //   }, 120 * 1000);
-  //   return () => clearInterval(intervalId);
-  // }, [dispatch]);
-
   const getInitials = (text?: string) => {
     if (!text) return '?';
     const trimmed = text?.trim();
@@ -96,7 +173,7 @@ const HomeScreen = () => {
 
   const accentColors = ['#4C6FFF', '#00C2A8', '#FFB020', '#FF6B6B', '#9B59B6', '#20C997'];
 
-  const pieChartData = dashboard
+  const pieChartData = filteredDashboard
     .filter(item => {
       const num = Number(item?.data);
       return item?.title !== 'Attendance Code' && item?.data !== '' && !isNaN(num) && num > 0;
@@ -107,7 +184,7 @@ const HomeScreen = () => {
       text: item?.title,
     }));
 
-  const renderDashboardItem = ({ item, index }: any) => {
+  const renderDashboardItem = ({ item, index, isFromHtml, isFromMenu }: any) => {
     return (
       <TouchableOpacity
         key={item?.id || index}
@@ -116,10 +193,12 @@ const HomeScreen = () => {
           {
             paddingLeft: 4,
             marginHorizontal: 4,
-            backgroundColor: accentColors[index % accentColors.length],
             borderRadius: 8,
-            width: isHorizontal ? '100%' : '48%',
-            height: 120,
+            width: isFromHtml ? '100%' : isHorizontal ? '100%' : '48%',
+            flex: 1,
+            borderLeftColor: accentColors[index % accentColors.length],
+            borderWidth: 1,
+            borderLeftWidth: 3,
           },
         ]}
         activeOpacity={0.7}
@@ -146,14 +225,16 @@ const HomeScreen = () => {
                     { backgroundColor: accentColors[index % accentColors.length] },
                   ]}
                 >
-                  <Text style={styles.iconText}>{getInitials(item?.name)}</Text>
+                  <MaterialIcons name={item?.image || 'widgets'} color={ERP_COLOR_CODE.ERP_WHITE} size={22} />
+                  {/* <Text style={styles.iconText}>{getInitials(item?.name)}</Text> */}
                 </View>
                 <View style={styles.headerTextWrap}>
                   <Text
                     style={[
                       styles.dashboardItemText,
                       {
-                        color: theme === 'dark' ? ERP_COLOR_CODE.ERP_WHITE : ERP_COLOR_CODE.ERP_BLACK,
+                        color:
+                          theme === 'dark' ? ERP_COLOR_CODE.ERP_WHITE : ERP_COLOR_CODE.ERP_BLACK,
                         flexShrink: 1,
                         includeFontPadding: false,
                         textAlignVertical: 'top',
@@ -162,7 +243,11 @@ const HomeScreen = () => {
                     numberOfLines={2}
                     ellipsizeMode="tail"
                   >
-                    {!isHorizontal ? item?.title.replace(' ', '\n') : item?.title}
+                    {isFromMenu
+                      ? item?.title
+                      : !isHorizontal
+                      ? item?.title.replace(' ', '\n')
+                      : item?.title}
                   </Text>
                 </View>
               </View>
@@ -172,14 +257,21 @@ const HomeScreen = () => {
               {loadingPageId === (item.id || String(index)) && (
                 <View style={{ marginBottom: 8, flexDirection: 'row', alignItems: 'center' }}>
                   <ActivityIndicator size="small" color={ERP_COLOR_CODE.ERP_007AFF} />
-                  <Text style={{ marginLeft: 8, color: ERP_COLOR_CODE.ERP_6C757D }}>Loading page...</Text>
+                  <Text style={{ marginLeft: 8, color: ERP_COLOR_CODE.ERP_6C757D }}>
+                    Loading page...
+                  </Text>
                 </View>
               )}
               {item.data ? (
                 <View style={styles.dataContainer}>
-                  <Text style={styles.dashboardItemData} numberOfLines={2}>
-                    {item?.data}
-                  </Text>
+                  <Footer
+                    textColor={accentColors[index % accentColors.length]}
+                    isFromMenu={isFromMenu}
+                    isHorizontal={isHorizontal}
+                    footer={item?.data}
+                    index={index}
+                    accentColors={accentColors}
+                     isFromListPage={undefined}                  />
                 </View>
               ) : (
                 <View style={styles.dataContainer}>
@@ -190,13 +282,16 @@ const HomeScreen = () => {
               )}
             </View>
             {item?.footer ? (
-              <Text
-                style={{
-                  color: accentColors[index % accentColors.length],
-                }}
-              >
-                {item?.footer}
-              </Text>
+              <View style={{ marginTop: 4 }}>
+                <Footer
+                  textColor={accentColors[index % accentColors.length]}
+                  isFromMenu={isFromMenu}
+                  isHorizontal={isHorizontal}
+                  footer={item?.footer}
+                  index={index}
+                  accentColors={accentColors}
+                   isFromListPage={undefined}                />
+              </View>
             ) : (
               <Text
                 style={{
@@ -216,68 +311,47 @@ const HomeScreen = () => {
       </TouchableOpacity>
     );
   };
-
-  const dummyUpcomingEvents = [];
-
-  const dummyUpcomingBirthdays = [
-    { id: 'b1', name: 'Amit Sharma', date: '28 sep 2025', type: 'Up-coming-Birthday' },
-  ];
-
-  const dummyUpcomingAnniversaries = [
-    { id: 'w1', name: 'Rohit & Neha', date: '03 sep 2025', type: 'Up-coming-work-anniversary' },
-  ];
-
-  const todayEvents = [{ id: 't2', date: 'Today', title: 'UX Review', type: 'Event' }];
-
-  const todayBirthdays = [];
-
-  const todayAnniversaries = [];
-
-  const dummyTasks = [
-    {
-      id: '1',
-      title: 'Fix login bug',
-      description: 'Check the API response and fix login issue',
-      assignedTo: 'jr1',
-      createdBy: 'senior1',
-      status: 'pending',
-      updatedAt: '2025-09-10T10:00:00Z',
-    },
-  ];
-
-  function SmallItem({ left, primary, secondary, type }) {
-    return (
-      <TouchableOpacity style={styles.itemRow} activeOpacity={0.8}>
-        <View style={styles.avatar}>{left}</View>
-        <View style={styles.itemText}>
-          <Text numberOfLines={1} style={styles.itemPrimary}>
-            {primary}
-          </Text>
-          <Text style={styles.itemType}>{type}</Text>
-        </View>
-        <View>
-          <Text style={styles.itemSecondary}>{secondary}</Text>
-        </View>
-      </TouchableOpacity>
-    );
-  }
+ 
+  const scrollY = useRef(new Animated.Value(0)).current;
+ 
 
   return (
     <View style={theme === 'dark' ? styles.containerDark : styles.container}>
-      <Text
-        numberOfLines={1}
+      <View
         style={{
-          color: 'white',
           marginTop: 1,
           backgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR,
           padding: 12,
-          textAlign: 'center',
+          // width: width,
           borderBottomRightRadius: 24,
           borderBottomLeftRadius: 24,
         }}
       >
-        {user?.companyName || ''}
-      </Text>
+        <Animated.View
+          style={{
+            justifyContent: 'center',
+            alignContent: 'center',
+            alignItems: 'center',
+            gap: 8,
+            flexDirection: 'row',
+            // transform: [{ translateX }],
+          }}
+        >
+          <MaterialIcons name="business" size={24} color={ERP_COLOR_CODE.ERP_WHITE} />
+          <Text
+            numberOfLines={1}
+            style={{
+              color: ERP_COLOR_CODE.ERP_WHITE,
+              fontWeight: '600',
+              fontSize: 16,
+              maxWidth: 280,
+            }}
+          >
+            {user?.companyName || ''}
+          </Text>
+        </Animated.View>
+      </View>
+
       {isDashboardLoading ? (
         <FullViewLoader />
       ) : error ? (
@@ -291,260 +365,60 @@ const HomeScreen = () => {
         >
           <ErrorMessage message={error} />{' '}
         </View>
-      ) : dashboard?.length === 0 ? (
+      ) : filteredDashboard?.length === 0 && !isDashboardLoading ? (
         <NoData />
       ) : (
-        <FlatList
-          showsVerticalScrollIndicator={false}
-          data={['']}
-          renderItem={() => (
-            <>
-              {/* Pie chart section */}
-              {pieChartData?.length > 0 && (
-                <View
-                  style={{
-                    borderColor: ERP_COLOR_CODE.ERP_BLACK,
-                    borderBottomWidth: 0.4,
-                    flexDirection: 'row',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                  }}
-                >
-                  <TouchableOpacity
-                    onPress={() => navigation.navigate('Web', { isFromChart: true })}
-                    style={styles.chartContainer}
-                  >
-                    <PieChart
-                      data={pieChartData}
-                      donut
-                      radius={90}
-                      textSize={14}
-                      innerRadius={80}
-                      textColor="#000"
-                      showValuesAsLabels
-                      labelPosition="outside"
-                      innerCircleColor={ERP_COLOR_CODE.ERP_WHITE}
-                      centerLabelComponent={() => (
-                        <Text
-                          style={{
-                            textAlign: 'center',
-                            fontSize: 16,
-                            fontWeight: 'bold',
-                            color: ERP_COLOR_CODE.ERP_BLACK,
-                          }}
-                        >
-                          {t('home.dashboard')}
-                        </Text>
-                      )}
-                    />
-                  </TouchableOpacity>
-
-                  {/* Legend */}
-                  <View style={{ justifyContent: 'center', marginTop: 16 }}>
-                    {pieChartData?.map((item, idx) => (
-                      <View
-                        key={idx}
-                        style={{
-                          flexDirection: 'row',
-                          alignItems: 'center',
-                          marginHorizontal: 8,
-                          marginBottom: 8,
-                        }}
-                      >
-                        <View
-                          style={{
-                            width: 16,
-                            height: 16,
-                            borderRadius: 8,
-                            backgroundColor: item.color,
-                            marginRight: 6,
-                          }}
-                        />
-                        <Text style={{ fontSize: 14, color: ERP_COLOR_CODE.ERP_444 }}>
-                          {item?.text}: {item?.value}
-                        </Text>
-                      </View>
-                    ))}
-                  </View>
-                </View>
-              )}
-
-              {/* Dashboard items */}
-              <View style={styles.dashboardSection}>
-                <FlatList
-                  key={`${isHorizontal}`}
-                  keyboardShouldPersistTaps="handled"
-                  data={dashboard}
-                  keyExtractor={item => item?.id}
-                  numColumns={isHorizontal ? 1 : 2}
-                  columnWrapperStyle={!isHorizontal ? styles.columnWrapper : undefined}
-                  renderItem={renderDashboardItem}
-                  showsVerticalScrollIndicator={false}
-                />
-              </View>
-
-              <View style={styles.grid}>
-                <View style={styles.card}>
-                  <View style={{ flexDirection: 'row', marginVertical: 8, gap: 6 }}>
-                    <MaterialIcons size={18} color={ERP_COLOR_CODE.ERP_APP_COLOR} name="emoji-events" />
-                    <Text style={styles.cardTitle}>Events</Text>
-                  </View>
-                  <FlatList
-                    data={todayEvents}
-                    keyExtractor={i => i.id}
-                    scrollEnabled={false}
-                    renderItem={({ item }) => (
-                      <SmallItem
-                        left={<Text style={styles.avatarText}>T</Text>}
-                        primary={item.title}
-                        secondary={item.date}
-                        type={item?.type}
-                      />
-                    )}
-                  />
-
+        <>
+          <Animated.FlatList
+            showsVerticalScrollIndicator={false}
+            data={['']}
+            keyExtractor={(_, i) => i.toString()}
+            onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], {
+              useNativeDriver: true,
+            })}
+            scrollEventThrottle={16}
+            renderItem={() => (
+              <>
+                {/* Pie chart section */}
+                {pieChartData.length > 0 && (
+                  <PieChartSection pieChartData={pieChartData} navigation={navigation} t={t} />
+                )}
+                {pieChartData.length === 0 && <View style={{ marginTop: 12 }} />}
+                {/* Dashboard items */}
+                <View style={styles.dashboardSection}>
                   <FlatList
                     key={`${isHorizontal}`}
-                    data={dummyUpcomingEvents}
-                    keyExtractor={i => i.id}
-                    scrollEnabled={false}
-                    renderItem={({ item }) => (
-                      <SmallItem
-                        left={<Text style={styles.avatarText}>E</Text>}
-                        primary={item.title}
-                        secondary={item.date}
-                        type={item?.type}
-                      />
-                    )}
+                    keyboardShouldPersistTaps="handled"
+                    data={[...textItems, ...emptyItems]}
+                    keyExtractor={(item, index) => index.toString()}
+                    numColumns={isHorizontal ? 1 : 2}
+                    columnWrapperStyle={!isHorizontal ? styles.columnWrapper : undefined}
+                    renderItem={
+                      ({ item, index }) =>
+                        renderDashboardItem({ item, index, isFromHtml: false, isFromMenu: false }) // 👈 custom prop passed here
+                    }
+                    showsVerticalScrollIndicator={false}
                   />
                 </View>
 
-                <View style={styles.card}>
-                  <View style={{ flexDirection: 'row', marginVertical: 8, gap: 6 }}>
-                    <MaterialIcons size={18} color={ERP_COLOR_CODE.ERP_APP_COLOR} name="celebration" />
-                    <Text style={styles.cardTitle}>Birthday & Work-anniversary</Text>
-                  </View>
+                <View style={styles.dashboardSection}>
                   <FlatList
-                    data={todayBirthdays}
-                    keyExtractor={i => i.id}
-                    scrollEnabled={false}
-                    renderItem={({ item }) => (
-                      <SmallItem
-                        left={
-                          <Text style={styles.avatarText}>
-                            {item.name
-                              .split(' ')
-                              .map(n => n[0])
-                              .slice(0, 2)
-                              .join('')}
-                          </Text>
-                        }
-                        primary={item.name}
-                        secondary={item.date}
-                        type={item?.type}
-                      />
-                    )}
-                  />
-
-                  <FlatList
-                    data={dummyUpcomingBirthdays}
-                    keyExtractor={i => i.id}
-                    scrollEnabled={false}
-                    renderItem={({ item }) => (
-                      <SmallItem
-                        left={
-                          <Text style={styles.avatarText}>
-                            {item.name
-                              .split(' ')
-                              .map(n => n[0])
-                              .slice(0, 2)
-                              .join('')}
-                          </Text>
-                        }
-                        primary={item.name}
-                        secondary={item.date}
-                        type={item?.type}
-                      />
-                    )}
-                  />
-                  <FlatList
-                    data={todayAnniversaries}
-                    keyExtractor={i => i.id}
-                    scrollEnabled={false}
-                    renderItem={({ item }) => (
-                      <SmallItem
-                        left={<Text style={styles.avatarText}>A</Text>}
-                        primary={item.name}
-                        secondary={item.date}
-                        type={item?.type}
-                      />
-                    )}
-                  />
-
-                  <FlatList
-                    data={dummyUpcomingAnniversaries}
-                    keyExtractor={i => i.id}
-                    scrollEnabled={false}
-                    renderItem={({ item }) => (
-                      <SmallItem
-                        left={<Text style={styles.avatarText}>W</Text>}
-                        primary={item.name}
-                        secondary={item.date}
-                        type={item?.type}
-                      />
-                    )}
+                    key={`${isHorizontal}`}
+                    keyboardShouldPersistTaps="handled"
+                    data={htmlItems}
+                    keyExtractor={(item, index) => index.toString()}
+                    renderItem={
+                      ({ item, index }) =>
+                        renderDashboardItem({ item, index, isFromHtml: true, isFromMenu: true }) // 👈 custom prop passed here
+                    }
+                    showsVerticalScrollIndicator={false}
                   />
                 </View>
-              </View>
-              <View>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    marginHorizontal: 12,
-                    marginVertical: 8,
-                  }}
-                >
-                  <View style={{ flexDirection: 'row', gap: 6 }}>
-                    <MaterialIcons size={18} color={ERP_COLOR_CODE.ERP_APP_COLOR} name="pending-actions" />
-                    <Text style={{ fontSize: 16, fontWeight: '700' }}>My Pending Tasks</Text>
-                  </View>
-
-                  <TouchableOpacity
-                    onPress={() => {
-                      navigation.navigate('Tasks', {isFromViewAll : true})
-                    }}
-                  >
-                    <Text style={{ color: ERP_COLOR_CODE.ERP_BORDER_LINE, fontSize: 12 }}>View all</Text>
-                  </TouchableOpacity>
-                </View>
-                <TaskListScreen
-                  tasks={dummyTasks}
-                  onSelectTask={task => {
-                    setSelectedTask(task);
-                    setModalVisible(true);
-                  }}
-                  showPicker={undefined}
-                  showFilter={undefined}
-                />
-              </View>
-
-              {selectedTask && (
-                <TaskDetailsBottomSheet
-                  visible={modalVisible}
-                  task={selectedTask}
-                  role="junior"
-                  onClose={() => setModalVisible(false)}
-                  onUpdate={updatedTask => {
-                    console.log('Updated Task:', updatedTask);
-                    setModalVisible(false);
-                  }}
-                />
-              )}
-              <View style={{ height: 10, width: 100 }} />
-            </>
-          )}
-        />
+               
+              </>
+            )}
+          />
+        </>
       )}
     </View>
   );

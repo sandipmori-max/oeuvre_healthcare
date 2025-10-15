@@ -398,17 +398,16 @@ function buildFormatted(date, isFullDate) {
 export const isTokenValid = (tokenValidTill: string) => {
   return new Date(tokenValidTill).getTime() > Date.now();
 };
-
-export async function requestLocationPermissions(): Promise<boolean> {
+export async function requestLocationPermissions(): Promise<
+  'granted' | 'foreground-only' | 'denied' | 'blocked'
+> {
   if (Platform.OS === 'android') {
     try {
       const granted = await PermissionsAndroid.requestMultiple([
         PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
         PermissionsAndroid.PERMISSIONS.ACCESS_COARSE_LOCATION,
-        PermissionsAndroid.PERMISSIONS.ACCESS_BACKGROUND_LOCATION, // needed for background & terminated
+        PermissionsAndroid.PERMISSIONS.ACCESS_BACKGROUND_LOCATION,
       ]);
-
-      console.log('📌 Location permission results:', granted);
 
       const fine = granted['android.permission.ACCESS_FINE_LOCATION'];
       const coarse = granted['android.permission.ACCESS_COARSE_LOCATION'];
@@ -419,12 +418,20 @@ export async function requestLocationPermissions(): Promise<boolean> {
         coarse === PermissionsAndroid.RESULTS.GRANTED &&
         background === PermissionsAndroid.RESULTS.GRANTED;
 
-      if (allGranted) {
-        console.log('✅ Location permissions granted');
-        return true;
+      if (allGranted) return 'granted';
+
+      // ✅ Case 1: Foreground allowed, background denied
+      const foregroundGranted =
+        fine === PermissionsAndroid.RESULTS.GRANTED &&
+        coarse === PermissionsAndroid.RESULTS.GRANTED &&
+        background !== PermissionsAndroid.RESULTS.GRANTED;
+
+      if (foregroundGranted) {
+        console.log('📍 Foreground location granted, background denied.');
+        return 'foreground-only';
       }
 
-      // 🔎 Check for permanently denied (NEVER_ASK_AGAIN)
+      // 🚫 Case 2: Permanently denied (NEVER ASK AGAIN)
       const blocked =
         fine === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN ||
         coarse === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN ||
@@ -432,33 +439,20 @@ export async function requestLocationPermissions(): Promise<boolean> {
 
       if (blocked) {
         console.log('🚫 Location permission permanently denied');
-        // Alert.alert(
-        //   'Location Permission Blocked',
-        //   'You have permanently denied location access. Please enable it from Settings.',
-        //   [
-        //     { text: 'Cancel', style: 'cancel' },
-        //     { text: 'Open Settings', onPress: () => Linking.openSettings() },
-        //   ],
-        // );
-        return false;
+        return 'blocked';
       }
 
-      // Otherwise → denied
-      console.log('❌ Location permissions denied');
-      // Alert.alert(
-      //   'Location Permission Denied',
-      //   'Location access is required for this feature.',
-      // );
-      return false;
+      // ❌ Otherwise → denied
+      return 'denied';
     } catch (err) {
       console.warn('⚠️ requestLocationPermissions error:', err);
-      return false;
+      return 'denied';
     }
-  } else {
-    // iOS handled via Info.plist
-    return true;
   }
+  return 'granted'; // iOS handled via Info.plist
 }
+
+
 
 export const formatTo12Hour = (time: string) => {
   if (!time) return '--';
@@ -537,7 +531,7 @@ export const getWorkedHours2 = (punchIn: string, punchOut: string) => {
   const hours = Math.floor(totalMinutes / 60);
   const mins = totalMinutes % 60;
 
-  return `${hours}:${mins.toString().padStart(2, '0')} hr`;
+  return `${hours - 1}:${mins.toString().padStart(2, '0')} hr`;
 };
 
 export const clearAllTempFiles = async () => {
@@ -548,7 +542,6 @@ export const clearAllTempFiles = async () => {
     for (const file of files) {
       try {
         await RNFS.unlink(file.path);
-        console.log('Deleted temp file:', file.path);
       } catch (err) {
         console.log('Error deleting file:', file.path, err);
       }
@@ -556,7 +549,7 @@ export const clearAllTempFiles = async () => {
     FastImage.clearMemoryCache();
     FastImage.clearDiskCache();
     if (Platform.OS === 'android') {
-      WebView.clearCache(true); // clears disk cache
+      WebView.clearCache(true);
     }
     console.log('All temp files cleared!');
   } catch (err) {

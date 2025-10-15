@@ -78,17 +78,12 @@ export const loginUserThunk = createAsyncThunk(
     },
     { rejectWithValue },
   ) => {
-    console.log('🚀 ~ response:*-*-*-*-*-*-*-', response);
     try {
       const token = isAddingAccount ? newToken : await AsyncStorage.getItem('erp_token');
-      console.log(
-        '🚀 ~ companyData---------------------*****************------------------------------------------:',
-        companyData,
-      );
+      
       const tokenValidTill = isAddingAccount
         ? newvalidTill
         : await AsyncStorage.getItem('erp_token_valid_till');
-      console.log('🚀-🚀-🚀-🚀-🚀-🚀-response-🚀-🚀-🚀-🚀-🚀-🚀-🚀-🚀 ~ tokenValidTill:', response);
 
       if (!token) {
         return rejectWithValue('No authentication token found. Please login again.');
@@ -97,26 +92,26 @@ export const loginUserThunk = createAsyncThunk(
       await AsyncStorage.setItem('auth_token', token);
 
       const erpUser: User = {
-        id: response?.userid,
-        name: user_credentials?.name || user_credentials?.user || company_code.toUpperCase(),
-        company_code: company_code,
+        id: response?.userid || "",
+        name: user_credentials?.name || user_credentials?.user || company_code.toUpperCase() || "",
+        company_code: company_code || "",
         avatar: `https://ui-avatars.com/api/?name=${(
           user_credentials?.name ||
           user_credentials?.user ||
           company_code
-        ).toUpperCase()}&background=007AFF&color=fff`,
+        ).toUpperCase()}&background=007AFF&color=fff` || "",
         accountType: 'erp',
-        token: token,
-        tokenValidTill: tokenValidTill,
+        token: token || "",
+        tokenValidTill: tokenValidTill || "",
         emailid: response?.emailid || '',
-        fullname: response?.fullname,
-        mobileno: response?.mobileno,
-        roleid: response?.roleid,
-        rolename: response?.rolename,
-        username: response?.username,
-        companyLink: companyData?.response?.link,
-        companyName: companyData?.response?.name,
-        app_id: response?.app_id,
+        fullname: response?.fullname || "",
+        mobileno: response?.mobileno || "",
+        roleid: response?.roleid || "",
+        rolename: response?.rolename || "",
+        username: response?.username || "",
+        companyLink: companyData?.response?.link || "",
+        companyName: companyData?.response?.name || "",
+        app_id: response?.app_id || "",
       };
       console.log('🚀 ~ erpUser:------------------', erpUser);
 
@@ -167,7 +162,6 @@ export const loginUserThunk = createAsyncThunk(
 export const switchAccountThunk = createAsyncThunk(
   'auth/switchAccount',
   async (accountId: string, { rejectWithValue }) => {
-    console.log('🚀 ~ accountId:', accountId);
     try {
       const db = await getDBConnection();
       await createAccountsTable(db);
@@ -198,9 +192,7 @@ export const switchAccountThunk = createAsyncThunk(
       }
       await DevERPService.getAuth();
       const updatedAccounts = await getAccounts(db);
-      console.log("🚀 ~ updatedAccounts-----------------------------------------:", updatedAccounts)
       const updatedActiveAccount = await getActiveAccount(db);
-      console.log("🚀🚀🚀🚀🚀🚀 ~ updatedActiveAccount -----------------------------------------:", updatedActiveAccount)
 
       return {
         accounts: updatedAccounts,
@@ -293,7 +285,6 @@ export const getERPMenuThunk = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await DevERPService.getMenu();
-      console.log('🚀 ~ getERPMenuThunk ~ raw response:', response);
 
       if (response && typeof response === 'string') {
         return response;
@@ -314,6 +305,7 @@ export const getERPDashboardThunk = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const dashboard = await DevERPService.getDashboard();
+      console.log("🚀 ~ ++++++++++++++++++++dashboard:", dashboard)
       return dashboard;
     } catch (error: any) {
       console.log('🚀 ~ error:', error);
@@ -329,7 +321,6 @@ export const getERPPageThunk = createAsyncThunk<
 >('auth/getERPPage', async ({ page, id }, { rejectWithValue }) => {
   try {
     const pageData = await DevERPService.getPage(page, id);
-    console.log('🚀 ~ pageData:', pageData);
     return pageData;
   } catch (error: any) {
     console.log('🚀 ~ error:', error);
