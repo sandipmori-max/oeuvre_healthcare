@@ -60,7 +60,6 @@ const PieChartSection = ({ pieChartData, navigation, t }: any) => {
           {firstList.length > 0 && (
             <View
               style={{
-                 width: '68%',
                 justifyContent: 'center',
                 alignContent: 'center',
                 height: Dimensions.get('screen').height * 0.22,

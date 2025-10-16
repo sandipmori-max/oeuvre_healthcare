@@ -471,7 +471,7 @@ const ListScreen = () => {
           )}
         </>
       )}
-      {hasIdField && !loadingListId && configData && (
+      {!loadingListId && configData && (
         <TouchableOpacity
           style={[
             styles.addButton,
