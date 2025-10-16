@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unstable-nested-components */
 /* eslint-disable react-hooks/rules-of-hooks */
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState } from 'react';
@@ -8,8 +9,8 @@ import { formatDateToDDMMMYYYY } from '../../../../utils/helpers';
 import { styles } from '../list_page_style';
 import NoData from '../../../../components/no_data/NoData';
 import { ERP_COLOR_CODE } from '../../../../utils/constants';
-import Footer from '../../tabs/home/Footer';
 import MaterialIcons from '@react-native-vector-icons/material-icons';
+import MemoizedFooterView from './MemoizedFooterView';
 
 const ReadableView = ({
   configData,
@@ -161,7 +162,7 @@ const ReadableView = ({
                   }}
                 >
                   {!!remarks && (
-                    <>
+                    <View>
                       <Text
                         numberOfLines={isRemarksExpanded ? undefined : 2}
                         style={{
@@ -174,7 +175,7 @@ const ReadableView = ({
                       >
                         {remarks}
                       </Text>
-                      {remarks.length > 60 && (
+                      {remarks.length > 30 && (
                         <TouchableOpacity onPress={() => setRemarksExpanded(prev => !prev)}>
                           <Text
                             style={{
@@ -188,7 +189,7 @@ const ReadableView = ({
                           </Text>
                         </TouchableOpacity>
                       )}
-                    </>
+                    </View>
                   )}
                 </View>
                 <View
@@ -237,19 +238,7 @@ const ReadableView = ({
           )}
         </TouchableOpacity>
 
-        <View>
-          {item?.html && (
-            <Footer
-              textColor={'#000'}
-              isFromMenu={false}
-              isHorizontal={false}
-              footer={item?.html}
-              index={index}
-              accentColors={'#000'}
-              isFromListPage={true}
-            />
-          )}
-        </View>
+        <View>{item?.html && <MemoizedFooterView item={item} index={index} />}</View>
 
         {btnKeys?.length > 0 && (
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginTop: 6, gap: 1 }}>
@@ -316,8 +305,7 @@ const ReadableView = ({
         showsHorizontalScrollIndicator={false}
         showsVerticalScrollIndicator={false}
         renderItem={({ item, index }) => <RenderCard item={item} index={index} />}
-        contentContainerStyle={styles.listContent} 
-
+        contentContainerStyle={styles.listContent}
       />
       {filteredData?.length > 0 ? (
         <View
