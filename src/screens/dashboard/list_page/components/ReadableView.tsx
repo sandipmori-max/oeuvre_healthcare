@@ -22,6 +22,8 @@ const ReadableView = ({
   handleActionButtonPressed,
   setIsFilterVisible,
   setSearchQuery,
+  totalQty,
+  isFromBusinessCard,
 }: any) => {
   const navigation = useNavigation();
   const screenWidth = Dimensions.get('window').width;
@@ -87,6 +89,7 @@ const ReadableView = ({
                 title: pageParamsName,
                 id: item?.id,
                 url: pageName,
+                isFromBusinessCard: isFromBusinessCard,
               });
             }
           }}
@@ -149,6 +152,7 @@ const ReadableView = ({
                 title: pageParamsName,
                 id: item?.id,
                 url: pageName,
+                isFromBusinessCard: isFromBusinessCard,
               });
             }
           }}
@@ -319,28 +323,62 @@ const ReadableView = ({
             marginBottom: 12,
           }}
         >
-          {totalAmount !== 0 && (
+          {
             <View
               style={{
                 justifyContent: 'space-between',
                 flexDirection: 'row',
               }}
             >
-              <Text style={{ fontSize: 14, fontWeight: '700', color: ERP_COLOR_CODE.ERP_333 }}>
-                Total Amount
-              </Text>
-              <Text
-                style={{
-                  fontSize: 16,
-                  fontWeight: 'bold',
-                  color: '#28a745',
-                  marginTop: 2,
-                }}
-              >
-                ₹ {totalAmount?.toFixed(2)}
-              </Text>
+              {totalQty && (
+                <View
+                  style={{
+                    justifyContent: 'space-between',
+                    flexDirection: 'row',
+                    width: '50%',
+                  }}
+                >
+                  <Text style={{ fontSize: 14, fontWeight: '700', color: ERP_COLOR_CODE.ERP_333 }}>
+                    Total Qty
+                  </Text>
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      fontWeight: 'bold',
+                      color: '#28a745',
+                      marginTop: 2,
+                    }}
+                  >
+                    ₹ {totalQty?.toFixed(2)}
+                  </Text>
+                </View>
+              )}
+
+              {totalAmount && (
+                <View
+                  style={{
+                    justifyContent: 'space-between',
+                    flexDirection: 'row',
+                    width: '50%',
+                  }}
+                >
+                  <Text style={{ fontSize: 14, fontWeight: '700', color: ERP_COLOR_CODE.ERP_333 }}>
+                    Total Amount
+                  </Text>
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      fontWeight: 'bold',
+                      color: '#28a745',
+                      marginTop: 2,
+                    }}
+                  >
+                    ₹ {totalAmount?.toFixed(2)}
+                  </Text>
+                </View>
+              )}
             </View>
-          )}
+          }
 
           <View
             style={{
@@ -349,16 +387,7 @@ const ReadableView = ({
             }}
           >
             <Text style={{ fontSize: 14, fontWeight: '700', color: ERP_COLOR_CODE.ERP_333 }}>
-              Total Rows
-            </Text>
-            <Text
-              style={{
-                fontSize: 16,
-                fontWeight: 'bold',
-                marginTop: 2,
-              }}
-            >
-              {filteredData?.length}
+              {filteredData?.length} Row(s)
             </Text>
           </View>
         </View>

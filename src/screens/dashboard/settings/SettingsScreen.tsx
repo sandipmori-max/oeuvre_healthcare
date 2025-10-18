@@ -396,12 +396,9 @@ const SettingsScreen = () => {
 
               if (newActiveUser) {
                 DevERPService.setToken(newActiveUser?.user?.token || '');
-                await AsyncStorage.setItem('erp_token', newActiveUser?.user?.token || '');
-                await AsyncStorage.setItem('auth_token', newActiveUser?.user?.token || '');
-                await AsyncStorage.setItem(
-                  'erp_token_valid_till',
-                  newActiveUser?.user?.token || '',
-                );
+            await AsyncStorage.setItem('erp_token', newActiveUser?.user?.token || '');
+            await AsyncStorage.setItem('auth_token', newActiveUser?.user?.token || '');
+            await AsyncStorage.setItem('erp_token_valid_till', newActiveUser?.user?.token || '');
 
                 const validation = await validateCompanyCode(() =>
                   DevERPService.validateCompanyCode(newActiveUser?.user?.company_code),
