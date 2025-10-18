@@ -61,16 +61,23 @@ const ListScreen = () => {
 
   const route = useRoute<RouteProp<ListRouteParams, 'List'>>();
   const { item } = route?.params;
+  console.log("🚀 ~ ListScreen ~ item:", item)
 
   const pageTitle = item?.title || item?.name || 'List Data';
   const pageParamsName = item?.name || 'List Data';
   const pageName = item?.url;
+  const isFromBusinessCard = item?.isFromBusinessCard || false;
+  console.log("🚀 ~ ListScreen+++++++++++++++ ~ isFromBusinessCard:", isFromBusinessCard)
 
   const totalAmount = filteredData?.reduce((sum, item) => {
     const amount = parseFloat(item?.amount) || 0;
     return sum + amount;
   }, 0);
 
+  const totalQty = filteredData?.reduce((sum, item) => {
+    const amount = parseFloat(item?.qty) || 0;
+    return sum + amount;
+  }, 0);
   const hasDateField = configData.some(
     item => item?.datafield && item?.datafield.toLowerCase() === 'date',
   );
@@ -311,6 +318,7 @@ const ListScreen = () => {
   );
 
   const handleItemPressed = (item, page, pageTitle = '') => {
+    console.log("🚀 ~ handleItemPressed ~ isFromBusinessCard+++++++++++++++++++++++:", isFromBusinessCard)
     setIsFilterVisible(false);
     setSearchQuery('');
     navigation.navigate('Page', {
@@ -319,6 +327,7 @@ const ListScreen = () => {
       isFromNew: true,
       url: pageName,
       pageTitle: pageTitle,
+      isFromBusinessCard: isFromBusinessCard
     });
   };
 
@@ -443,11 +452,13 @@ const ListScreen = () => {
                     filteredData={filteredData}
                     loadingListId={loadingListId}
                     totalAmount={totalAmount}
+                    totalQty={totalQty}
                     pageParamsName={pageParamsName}
                     handleItemPressed={handleItemPressed}
                     pageName={pageName}
                     setIsFilterVisible={setIsFilterVisible}
                     setSearchQuery={setSearchQuery}
+                     isFromBusinessCard= {isFromBusinessCard}
                     handleActionButtonPressed={handleActionButtonPressed}
                   />
                 </>
@@ -458,6 +469,9 @@ const ListScreen = () => {
                     filteredData={filteredData}
                     loadingListId={loadingListId}
                     totalAmount={totalAmount}
+                    totalQty={totalQty}
+                     isFromBusinessCard= {isFromBusinessCard}
+
                     pageParamsName={pageParamsName}
                     handleItemPressed={handleItemPressed}
                     pageName={pageName}

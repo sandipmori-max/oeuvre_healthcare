@@ -31,6 +31,7 @@ import LocationRow from './components/LocationRow';
 import FilePickerRow from './components/FilePicker';
 import CustomMultiPicker from './components/CustomMultiPicker';
 import { ERP_COLOR_CODE } from '../../../utils/constants';
+import BusinessCardView from './components/BusinessCardImage';
 
 type PageRouteParams = { PageScreen: { item: any } };
 
@@ -48,7 +49,7 @@ const PageScreen = () => {
 
   const [error, setError] = useState<string | null>(null);
   const [formValues, setFormValues] = useState<any>({});
-  console.log("🚀 ~ PageScreen ~ formValues:", formValues)
+  console.log('🚀 ~ PageScreen ~ formValues:', formValues);
 
   const [datePickerVisible, setDatePickerVisible] = useState(false);
 
@@ -75,8 +76,10 @@ const PageScreen = () => {
   });
 
   const route = useRoute<RouteProp<PageRouteParams, 'PageScreen'>>();
-  const { item, title, id, isFromNew, url, pageTitle }: any = route?.params;
+  const { item, title, id, isFromNew, url, pageTitle,  }: any = route?.params;
   const authUser = item?.authuser;
+  const isFromBusinessCard =  route?.params?.isFromBusinessCard || false;
+  console.log("🚀 ~ PageScreen ~ isFromBusinessCard:", isFromBusinessCard)
 
   const validateForm = useCallback(() => {
     const validationErrors: Record<string, string> = {};
@@ -352,14 +355,25 @@ const PageScreen = () => {
         item?.ctltype === 'PHOTO'
       ) {
         content = (
-          <Media
-            isValidate={isValidate}
-            baseLink={baseLink}
-            infoData={infoData}
-            item={item}
-            isFromNew={isFromNew}
-            handleAttachment={handleAttachment}
-          />
+          <>
+            {isFromBusinessCard ? (
+              <BusinessCardView 
+              setValue={setValue}
+                controls={controls}
+                item={item}
+
+              />
+            ) : (
+              <Media
+                isValidate={isValidate}
+                baseLink={baseLink}
+                infoData={infoData}
+                item={item}
+                isFromNew={isFromNew}
+                handleAttachment={handleAttachment}
+              />
+            )}
+          </>
         );
       } else if (item?.disabled === '1' && item?.ajax !== 1) {
         content = <Disabled item={item} value={value} type={item?.ctltype} />;

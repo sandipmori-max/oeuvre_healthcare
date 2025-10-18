@@ -51,6 +51,8 @@ const Media = ({isValidate, item, handleAttachment, infoData, baseLink, isFromNe
       `${baseLink}fileupload/1/${infoData?.tableName}/${infoData?.id}/${
         type === 'small' ? `d_${item?.text}` : item?.text
       }`;
+      console.log("🚀 ~ getImageUri ~ base:", `${base}?cb=${cacheBuster}`)
+
     return `${base}?cb=${cacheBuster}`;
   };
 
