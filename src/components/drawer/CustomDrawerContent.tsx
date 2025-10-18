@@ -106,6 +106,18 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
                   key={item?.route}
                   style={[styles.drawerItem, isActive && styles.activeItemBackground]}
                   onPress={() => {
+                    if(item?.route === 'Alert'){
+                       props?.navigation.navigate('List', {item: {
+                        title: 'Alert',
+                        name: 'Alert',
+                        url: 'DEVNOTIFY',
+                        isFromBusinessCard: false,
+                        isFromAlertCard: true,
+                        id: '0',
+                      }} );
+                      props?.navigation.closeDrawer();
+                      return
+                    }
                     if (item?.route === 'List') {
                       props?.navigation.navigate('List', {item: {
                         title: 'Business Card',

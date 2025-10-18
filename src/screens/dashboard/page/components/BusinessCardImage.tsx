@@ -26,7 +26,7 @@ type ParsedCard = {
   company?: string;
 };
 
-const BusinessCardView = ({ setValue, controls, item }: any) => {
+const BusinessCardView = ({ setValue, controls, item, baseLink, infoData }: any) => {
   console.log('🚀 ~ BusinessCardView ~ controls:', controls);
   const [imageUri, setImageUri] = useState<string | null>(null);
   const [ocrResult, setOcrResult] = useState<TextRecognitionResult | null>(null);
@@ -34,9 +34,21 @@ const BusinessCardView = ({ setValue, controls, item }: any) => {
   const [parsed, setParsed] = useState<ParsedCard>({});
   const [loading, setLoading] = useState(false);
   const [base64, setBase64] = useState(false);
+  const [cacheBuster, setCacheBuster] = useState(Date.now());
+
+  const getImageUri = (type: 'small' | 'large') => {
+    const base =
+      imageUri ||
+      `${baseLink}fileupload/1/${infoData?.tableName}/${infoData?.id}/${
+        type === 'small' ? `d_${item?.text}` : item?.text
+      }`;
+    console.log('🚀 ~ getImageUri ~ base:', `${base}?cb=${cacheBuster}`);
+
+    return `${base}?cb=${cacheBuster}`;
+  };
 
   const pickFromCamera = async () => {
-    const res = await launchCamera({ mediaType: 'photo', quality: 1 });
+    const res = await launchCamera({ mediaType: 'photo', quality: 0.5, includeBase64: true });
     if (res.didCancel) return;
     if (res.assets && res.assets.length > 0) {
       let uri = res.assets[0].uri!;
@@ -44,13 +56,15 @@ const BusinessCardView = ({ setValue, controls, item }: any) => {
       if (Platform.OS === 'android' && !uri.startsWith('file://')) {
         uri = 'file://' + uri;
       }
+      setCacheBuster(Date.now());
+
       setBase64(`${item?.field}.jpeg; data:${asset.type};base64,${asset.base64}`);
       setImageUri(uri);
     }
   };
 
   const pickFromGallery = async () => {
-    const res = await launchImageLibrary({ mediaType: 'photo', quality: 1 });
+    const res = await launchImageLibrary({ mediaType: 'photo', quality: 0.5, includeBase64: true });
     if (res.didCancel) return;
     if (res.assets && res.assets.length > 0) {
       let uri = res.assets[0].uri!;
@@ -59,6 +73,8 @@ const BusinessCardView = ({ setValue, controls, item }: any) => {
       if (Platform.OS === 'android' && !uri.startsWith('file://')) {
         uri = 'file://' + uri;
       }
+      setCacheBuster(Date.now());
+
       setBase64(`${item?.field}.jpeg; data:${asset.type};base64,${asset.base64}`);
 
       setImageUri(uri);
@@ -107,10 +123,10 @@ const BusinessCardView = ({ setValue, controls, item }: any) => {
     const address = addressMatch ? addressMatch[1].trim().replace(/\s+/g, ' ') : '';
 
     const result = {
-      name: '', 
+      name: '',
       emailid: emails[0] || '',
       emailid2: emails[1] || '',
-      designation: '', 
+      designation: '',
       mobileno: phones[0] || '',
       mobileno2: phones[1] || '',
       company,
@@ -140,7 +156,6 @@ const BusinessCardView = ({ setValue, controls, item }: any) => {
             top: frame.top * scaleY,
             width: frame.width * scaleX,
             height: frame.height * scaleY,
-            borderColor: 'rgba(0,255,0,0.7)',
             borderWidth: 1,
           }}
         />
@@ -156,6 +171,18 @@ const BusinessCardView = ({ setValue, controls, item }: any) => {
         <View style={{ width: 16 }} />
         <Button title="Gallery" onPress={pickFromGallery} />
       </View>
+
+      {/* Show imageUri if exists else fallback to server URL */}
+      {
+        !imageUri && <Image
+        key={item.field}
+        source={{ uri: imageUri ? imageUri : getImageUri('small') }}
+        style={styles.imageThumb}
+        resizeMode="cover"
+      />
+      }
+      
+
       {imageUri && (
         <View style={{ marginTop: 16 }}>
           <View style={{ width: windowWidth, height: windowWidth * 0.6 }}>
@@ -177,6 +204,11 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#fff' },
   title: { fontSize: 14, fontWeight: 'bold', marginBottom: 4 },
   buttonRow: { flexDirection: 'row', justifyContent: 'center' },
+  imageThumb: {
+    borderWidth: 1,
+    width: 100,
+    height: 100,
+  },
   results: {
     marginTop: 24,
     width: '90%',

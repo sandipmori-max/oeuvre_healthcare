@@ -2,7 +2,16 @@
 /* eslint-disable react/no-unstable-nested-components */
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { Text, View, FlatList, StyleSheet, Dimensions, Keyboard, Platform } from 'react-native';
+import {
+  Text,
+  View,
+  FlatList,
+  StyleSheet,
+  Dimensions,
+  Keyboard,
+  Platform,
+  TouchableOpacity,
+} from 'react-native';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import Animated, { FadeInUp, Layout } from 'react-native-reanimated';
 import { useAppDispatch } from '../../../store/hooks';
@@ -76,10 +85,10 @@ const PageScreen = () => {
   });
 
   const route = useRoute<RouteProp<PageRouteParams, 'PageScreen'>>();
-  const { item, title, id, isFromNew, url, pageTitle,  }: any = route?.params;
+  const { item, title, id, isFromNew, url, pageTitle }: any = route?.params;
   const authUser = item?.authuser;
-  const isFromBusinessCard =  route?.params?.isFromBusinessCard || false;
-  console.log("🚀 ~ PageScreen ~ isFromBusinessCard:", isFromBusinessCard)
+  const isFromBusinessCard = route?.params?.isFromBusinessCard || false;
+  console.log('🚀 ~ PageScreen ~ isFromBusinessCard:', isFromBusinessCard);
 
   const validateForm = useCallback(() => {
     const validationErrors: Record<string, string> = {};
@@ -137,46 +146,6 @@ const PageScreen = () => {
                 fetchPageData();
                 setErrors({});
                 setErrorsList([]);
-              }}
-            />
-          )}
-
-          {!authUser && controls.length > 0 && (
-            <ERPIcon
-              name="save-as"
-              isLoading={actionSaveLoader}
-              onPress={async () => {
-                setActionSaveLoader(true);
-                setIsValidate(true);
-                if (validateForm()) {
-                  const submitValues: Record<string, any> = {};
-                  controls?.forEach(f => {
-                    if (f.refcol !== '1') submitValues[f?.field] = formValues[f?.field];
-                  });
-                  try {
-                    setLoader(true);
-                    await dispatch(
-                      savePageThunk({ page: url, id, data: { ...submitValues } }),
-                    ).unwrap();
-                    setLoader(false);
-                    setIsValidate(false);
-
-                    fetchPageData();
-                    setAlertConfig({
-                      title: 'Record saved',
-                      message: `Record saved successfully!`,
-                      type: 'success',
-                    });
-
-                    setAlertVisible(true);
-                    setGoBack(true);
-                    setTimeout(() => {
-                      setAlertVisible(false);
-                      navigation.goBack();
-                    }, 1500);
-                  } catch (err: any) {}
-                }
-                setActionSaveLoader(false);
               }}
             />
           )}
@@ -357,12 +326,12 @@ const PageScreen = () => {
         content = (
           <>
             {isFromBusinessCard ? (
+               
               <BusinessCardView 
-              setValue={setValue}
-                controls={controls}
-                item={item}
+               baseLink={baseLink}
+                infoData={infoData}
 
-              />
+              setValue={setValue} controls={controls} item={item} />
             ) : (
               <Media
                 isValidate={isValidate}
@@ -517,6 +486,62 @@ const PageScreen = () => {
               contentContainerStyle={{ paddingBottom: keyboardHeight }}
               keyboardShouldPersistTaps="handled"
             />
+            {!authUser && controls.length > 0 && (
+              <TouchableOpacity
+                style={{
+                  height: 46,
+                  width: '100%',
+                  backgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR,
+                  justifyContent: 'center',
+                  alignContent: 'center',
+                  alignItems: 'center',
+                  borderRadius: 6,
+                }}
+                onPress={async () => {
+                  setActionSaveLoader(true);
+                  setIsValidate(true);
+                  if (validateForm()) {
+                    const submitValues: Record<string, any> = {};
+                    controls?.forEach(f => {
+                      if (f.refcol !== '1') submitValues[f?.field] = formValues[f?.field];
+                    });
+                    try {
+                      setLoader(true);
+                      await dispatch(
+                        savePageThunk({ page: url, id, data: { ...submitValues } }),
+                      ).unwrap();
+                      setLoader(false);
+                      setIsValidate(false);
+
+                      fetchPageData();
+                      setAlertConfig({
+                        title: 'Record saved',
+                        message: `Record saved successfully!`,
+                        type: 'success',
+                      });
+
+                      setAlertVisible(true);
+                      setGoBack(true);
+                      setTimeout(() => {
+                        setAlertVisible(false);
+                        navigation.goBack();
+                      }, 1500);
+                    } catch (err: any) {}
+                  }
+                  setActionSaveLoader(false);
+                }}
+              >
+                <Text
+                  style={{
+                    color: ERP_COLOR_CODE.ERP_WHITE,
+                    fontSize: 16,
+                    fontWeight: '800',
+                  }}
+                >
+                  {actionSaveLoader ? 'Loading' : 'Save'}
+                </Text>
+              </TouchableOpacity>
+            )}
           </View>
           {loader && (
             <View

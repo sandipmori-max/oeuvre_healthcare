@@ -61,13 +61,14 @@ const ListScreen = () => {
 
   const route = useRoute<RouteProp<ListRouteParams, 'List'>>();
   const { item } = route?.params;
-  console.log("🚀 ~ ListScreen ~ item:", item)
+  console.log('🚀 ~ ListScreen ~ item:', item);
 
   const pageTitle = item?.title || item?.name || 'List Data';
   const pageParamsName = item?.name || 'List Data';
   const pageName = item?.url;
   const isFromBusinessCard = item?.isFromBusinessCard || false;
-  console.log("🚀 ~ ListScreen+++++++++++++++ ~ isFromBusinessCard:", isFromBusinessCard)
+  const isFromAlertCard = item?.isFromAlertCard || false;
+  console.log('🚀 ~ ListScreen+++++++++++++++ ~ isFromBusinessCard:', isFromBusinessCard);
 
   const totalAmount = filteredData?.reduce((sum, item) => {
     const amount = parseFloat(item?.amount) || 0;
@@ -78,6 +79,7 @@ const ListScreen = () => {
     const amount = parseFloat(item?.qty) || 0;
     return sum + amount;
   }, 0);
+
   const hasDateField = configData.some(
     item => item?.datafield && item?.datafield.toLowerCase() === 'date',
   );
@@ -85,7 +87,8 @@ const ListScreen = () => {
   const hasIdField = configData.some(
     item => item?.datafield && item?.datafield.toLowerCase() === 'id',
   );
-  console.log("🚀 ~ ListScreen----------------------- ~ hasIdField:", hasIdField)
+  console.log('🚀 ~ ListScreen----------------------- ~ hasIdField:', hasIdField);
+
   useLayoutEffect(() => {
     navigation.setOptions({
       headerTitle: () => (
@@ -318,7 +321,10 @@ const ListScreen = () => {
   );
 
   const handleItemPressed = (item, page, pageTitle = '') => {
-    console.log("🚀 ~ handleItemPressed ~ isFromBusinessCard+++++++++++++++++++++++:", isFromBusinessCard)
+    console.log(
+      '🚀 ~ handleItemPressed ~ isFromBusinessCard+++++++++++++++++++++++:',
+      isFromBusinessCard,
+    );
     setIsFilterVisible(false);
     setSearchQuery('');
     navigation.navigate('Page', {
@@ -327,7 +333,7 @@ const ListScreen = () => {
       isFromNew: true,
       url: pageName,
       pageTitle: pageTitle,
-      isFromBusinessCard: isFromBusinessCard
+      isFromBusinessCard: isFromBusinessCard,
     });
   };
 
@@ -458,7 +464,7 @@ const ListScreen = () => {
                     pageName={pageName}
                     setIsFilterVisible={setIsFilterVisible}
                     setSearchQuery={setSearchQuery}
-                     isFromBusinessCard= {isFromBusinessCard}
+                    isFromBusinessCard={isFromBusinessCard}
                     handleActionButtonPressed={handleActionButtonPressed}
                   />
                 </>
@@ -470,8 +476,7 @@ const ListScreen = () => {
                     loadingListId={loadingListId}
                     totalAmount={totalAmount}
                     totalQty={totalQty}
-                     isFromBusinessCard= {isFromBusinessCard}
-
+                    isFromBusinessCard={isFromBusinessCard}
                     pageParamsName={pageParamsName}
                     handleItemPressed={handleItemPressed}
                     pageName={pageName}
@@ -485,7 +490,7 @@ const ListScreen = () => {
           )}
         </>
       )}
-      {!loadingListId && configData && (
+      {!isFromAlertCard && !loadingListId && configData && (
         <TouchableOpacity
           style={[
             styles.addButton,
@@ -519,7 +524,7 @@ const ListScreen = () => {
           try {
             const type = `page${alertConfig.title}`;
             console.log('🚀 ~ type:', type);
-             await dispatch(
+            await dispatch(
               handlePageActionThunk({
                 action: type,
                 id: alertConfig.id.toString(),
