@@ -10,8 +10,8 @@ export const styles = StyleSheet.create({
   formContainer: {
     borderRadius: 12,
     height: Dimensions.get('screen').height,
-    justifyContent: 'center',
-    padding: 16
+    padding: 16,
+    marginTop: 50,
   },
   helperText: {
     fontSize: 12,
@@ -60,7 +60,7 @@ export const styles = StyleSheet.create({
     marginTop: 5,
   },
   errorContainer: {
-     borderColor: ERP_COLOR_CODE.ERP_ERROR,
+    borderColor: ERP_COLOR_CODE.ERP_ERROR,
     borderWidth: 1,
     borderRadius: 8,
     padding: 12,
