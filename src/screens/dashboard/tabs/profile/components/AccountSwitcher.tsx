@@ -26,6 +26,7 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
   const { execute: validateCompanyCode } = useApi();
 
   const { accounts, activeAccountId, user } = useAppSelector(state => state?.auth);
+  console.log("🚀 ~ AccountSwitcher ~ accounts:", accounts)
   const [alertVisible, setAlertVisible] = useState(false);
   const [selectedAccount, setSelectedAccount] = useState<any>(null);
   const [alertConfig, setAlertConfig] = useState({

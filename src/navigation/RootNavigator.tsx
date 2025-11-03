@@ -1,18 +1,18 @@
-import React, { useEffect,
-  //  useState, useRef, useCallback
-   } from 'react';
+import React, { useEffect, 
+  // useState, useRef, useCallback 
+} from 'react';
 // import {
-  // PermissionsAndroid,
-  // Platform,
-  // NativeModules,
-  // AppState,
-  // Linking,
-  // Modal,
-  // View,
-  // Text,
-  // TouchableOpacity,
+//   PermissionsAndroid,
+//   Platform,
+//   NativeModules,
+//   AppState,
+//   Linking,
+//   Modal,
+//   View,
+//   Text,
+//   TouchableOpacity,
 //   StyleSheet,
-// } from 'react-native'
+// } from 'react-native';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { checkAuthStateThunk } from '../store/slices/auth/thunk';
 import DevERPService from '../services/api/deverp';

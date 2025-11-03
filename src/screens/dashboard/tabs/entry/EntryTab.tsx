@@ -148,7 +148,7 @@ const EntryTab = () => {
   }, [isAuthenticated, dispatch, activeToken, isRefresh]);
 
   const renderItem = ({ item, index }: any) => {
-    const backgroundColor = accentColors[index % accentColors.length];
+     const backgroundColor = accentColors[index % accentColors.length];
 
     return (
       <TouchableOpacity
@@ -191,6 +191,7 @@ const EntryTab = () => {
                 })()
               : '?'}
           </Text>
+          {/* <MaterialIcons name={item.icon} color={"#000"} size={30}/> */}
         </View>
 
         <View
