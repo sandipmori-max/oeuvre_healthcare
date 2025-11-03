@@ -179,7 +179,7 @@ const ReadableView = ({
                       >
                         {remarks}
                       </Text>
-                      {remarks.length > 30 && (
+                      {remarks.length > 66 && (
                         <TouchableOpacity onPress={() => setRemarksExpanded(prev => !prev)}>
                           <Text
                             style={{
@@ -328,28 +328,27 @@ const ReadableView = ({
               style={{
                 justifyContent: 'space-between',
                 flexDirection: 'row',
+                width:'100%'
               }}
             >
               {totalQty && (
                 <View
                   style={{
-                    justifyContent: 'space-between',
                     flexDirection: 'row',
-                    width: '50%',
                   }}
                 >
                   <Text style={{ fontSize: 14, fontWeight: '700', color: ERP_COLOR_CODE.ERP_333 }}>
-                    Total Qty
+                    Quantity :-
                   </Text>
                   <Text
                     style={{
                       fontSize: 16,
                       fontWeight: 'bold',
                       color: '#28a745',
-                      marginTop: 2,
+                      marginLeft: 8,
                     }}
                   >
-                    ₹ {totalQty?.toFixed(2)}
+                     {totalQty?.toFixed(2)}
                   </Text>
                 </View>
               )}
@@ -357,20 +356,18 @@ const ReadableView = ({
               {totalAmount && (
                 <View
                   style={{
-                    justifyContent: 'space-between',
-                    flexDirection: 'row',
-                    width: '50%',
+                    flexDirection: 'row', 
                   }}
                 >
                   <Text style={{ fontSize: 14, fontWeight: '700', color: ERP_COLOR_CODE.ERP_333 }}>
-                    Total Amount
+                    Amount :-
                   </Text>
                   <Text
                     style={{
                       fontSize: 16,
                       fontWeight: 'bold',
                       color: '#28a745',
-                      marginTop: 2,
+                      marginLeft: 8,
                     }}
                   >
                     ₹ {totalAmount?.toFixed(2)}

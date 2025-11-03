@@ -19,7 +19,7 @@ const TableView = ({
   setIsFilterVisible,
   setSearchQuery,
   totalQty,
-  isFromBusinessCard
+  isFromBusinessCard,
 }: any) => {
   const screenWidth = Dimensions.get('window').width;
   const navigation = useNavigation();
@@ -122,7 +122,7 @@ const TableView = ({
               title: pageParamsName,
               id: item?.id,
               url: pageName,
-              isFromBusinessCard: isFromBusinessCard
+              isFromBusinessCard: isFromBusinessCard,
             });
           }
         }}
@@ -282,7 +282,7 @@ const TableView = ({
                       fontSize: 16,
                       fontWeight: 'bold',
                       color: '#28a745',
-                      marginTop: 2,
+                      marginLeft: 8,
                     }}
                   >
                     ₹ {totalQty?.toFixed(2)}
@@ -306,7 +306,7 @@ const TableView = ({
                       fontSize: 16,
                       fontWeight: 'bold',
                       color: '#28a745',
-                      marginTop: 2,
+                      marginLeft: 8,
                     }}
                   >
                     ₹ {totalAmount?.toFixed(2)}

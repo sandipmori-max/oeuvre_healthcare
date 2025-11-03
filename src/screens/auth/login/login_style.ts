@@ -21,9 +21,9 @@ export const styles = StyleSheet.create({
   },
   logo: {
     width: 100,
-    height: 60,
+    height: 100,
     alignSelf: 'center',
-    marginBottom: 5,
+    marginBottom: 25,
     borderRadius: 20,
   },
   title: {
@@ -40,7 +40,7 @@ export const styles = StyleSheet.create({
     color: ERP_COLOR_CODE.ERP_666,
   },
   inputContainer: {
-    marginBottom: 2,
+    marginBottom: 8,
   },
   inputLabel: {
     fontSize: 14,
