@@ -1,5 +1,5 @@
 import React from 'react';
-import { TouchableOpacity, Text } from 'react-native';
+import { TouchableOpacity, Text, ActivityIndicator } from 'react-native';
 import { ERPButtonProps } from './type';
 import { styles } from './style';
 import { ERP_COLOR_CODE } from '../../utils/constants';
@@ -12,14 +12,21 @@ const ERPButton: React.FC<ERPButtonProps> = ({
   style,
   textStyle,
   activeOpacity = 0.8,
+  isLoading
 }) => (
   <TouchableOpacity
-    style={[styles.button, { backgroundColor: color, opacity: disabled ? 0.6 : 1 }, style]}
+    style={[styles.button, { 
+      flexDirection:'row',
+      justifyContent:'center',
+      gap: 8,
+      backgroundColor: color, opacity: disabled ? 0.6 : 1 }, style]}
     onPress={onPress}
     disabled={disabled}
     activeOpacity={activeOpacity}
   >
-    <Text style={[styles.buttonText, textStyle]}>{text}</Text>
+    {
+      isLoading && <ActivityIndicator size={'large'} color={'#fff'} />
+    } <Text style={[styles.buttonText, textStyle]}>{text}</Text>
   </TouchableOpacity>
 );
 

@@ -407,7 +407,6 @@ const PageScreen = () => {
               }}
             />
           )}
-           
         </>
       ),
     });
@@ -754,7 +753,7 @@ const PageScreen = () => {
               contentContainerStyle={{ paddingBottom: keyboardHeight }}
               keyboardShouldPersistTaps="handled"
             />
-             {!authUser && controls.length > 0 && (
+            {!authUser && controls.length > 0 && (
               <TouchableOpacity
                 style={{
                   height: 46,

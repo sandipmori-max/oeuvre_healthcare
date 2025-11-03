@@ -2,7 +2,7 @@ import SQLite from 'react-native-sqlite-storage';
 
 SQLite.enablePromise(true);
 
-const ERP_DB_NAME = 'Oeuvre.db';
+const ERP_DB_NAME = 'DevERP.db';
 const ERP_TABLE = {
   ERP_ACCOUNTS: 'erp_accounts',
   ERP_META: 'meta',

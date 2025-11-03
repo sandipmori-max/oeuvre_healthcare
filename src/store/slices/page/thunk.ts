@@ -25,7 +25,24 @@ export const handlePageActionThunk = createAsyncThunk<
   { rejectValue: string }
 >('page/action', async ({ action, id, remarks, page }, { rejectWithValue }) => {
   try {
+    
     const response = await DevERPService.handlePageAction(action, id, remarks, page);
+    return response;
+  } catch (error: any) {
+    return rejectWithValue(error?.message || 'Failed to perform page action');
+  }
+});
+
+export const handleDeleteActionThunk = createAsyncThunk<
+  any,
+  { 
+    id: string; 
+    page: string;
+  },
+  { rejectValue: string }
+>('page/action', async ({  id, page }, { rejectWithValue }) => {
+  try {
+    const response = await DevERPService.handleDeleteAction( id, page);
     return response;
   } catch (error: any) {
     return rejectWithValue(error?.message || 'Failed to perform page action');
