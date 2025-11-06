@@ -24,7 +24,7 @@ const ErrorModal = ({
               alignItems: 'center',
             }}
           >
-            <Text style={styles.title}>Please fix the following errors:</Text>
+            <Text style={styles.title}>Please enter a value for this field.</Text>
             <TouchableOpacity
               onPress={() => {
                 onClose();

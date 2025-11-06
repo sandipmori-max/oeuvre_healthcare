@@ -32,6 +32,19 @@ const WebScreen = () => {
     })();
   }, []);
 
+  useEffect(() => {
+  return () => {
+     try {
+      console.log('🧹 Cleaning WebView cache on unmount...');
+      webviewRef.current?.clearCache(true);
+      webviewRef.current?.clearHistory();
+    } catch (e) {
+      console.warn('Cache clear failed:', e);
+    }
+  };
+}, []);
+
+
   const toggleDiv = () => {
     const jsCode = `
       (function() {
@@ -45,10 +58,27 @@ const WebScreen = () => {
     webviewRef?.current?.injectJavaScript(jsCode);
     setIsHidden(prev => !prev);
   };
+const [webKey, setWebKey] = useState(Date.now());
+
+useEffect(() => {
+  return () => {
+    console.log('🧹 WebView unmounted — forcing cache clear...');
+    setWebKey(Date.now()); // resets key = full WebView re-render
+  };
+}, []);
+ 
 
   const reloadWebView = () => {
+      setWebKey(Date.now());
+
     setIsReloading(true);
-    webviewRef?.current?.reload();
+     try {
+    webviewRef.current?.clearCache(true);
+    webviewRef.current?.clearHistory();
+  } catch (e) {
+    console.warn('Cache clear failed:', e);
+  }
+  webviewRef.current?.reload();
   };
 
   useLayoutEffect(() => {
@@ -78,20 +108,33 @@ const WebScreen = () => {
     });
   }, [navigation, item?.title, t, isHidden]);
 
-  const targetUrl = useMemo(() => {
-    const itemUrl = item?.url || '';
-    if (!itemUrl || !token) return '';
-    if (/^https?:\/\//i.test(itemUrl)) {
-      const baseUrl = itemUrl?.replace(/^https:\/\//i, 'http://');
-      const separator = baseUrl?.includes('?') ? '&' : '?';
-      return `${baseUrl}${separator}token=${token}`;
-    }
+ const targetUrl = useMemo(() => {
+  const itemUrl = item?.url || '';
+  if (!itemUrl || !token) return '';
 
-    const cleanedPath = itemUrl?.replace(/^\/+/, '');
-    const fullUrl = baseLink + cleanedPath;
-    const separator = fullUrl?.includes('?') ? '/' : '?';
-    return `${fullUrl}${separator}&token=${token}`;
-  }, [baseLink, item?.url, token]);
+  let url = itemUrl;
+
+  // Ensure http protocol
+  if (/^https?:\/\//i.test(url)) {
+    url = url.replace(/^https:\/\//i, 'http://');
+  } else {
+    const cleanedPath = url.replace(/^\/+/, '');
+    url = baseLink + cleanedPath;
+  }
+
+  if (url.includes('?')) {
+    const lastChar = url.slice(-1);
+    if (lastChar === '/' || lastChar === '&') {
+      return `${url}token=${token}`;
+    } else if (!url.includes('=')) {
+      return `${url}/&token=${token}`;
+    } else {
+      return `${url}&token=${token}`;
+    }
+  } else {
+    return `${url}?token=${token}`;
+  }
+}, [baseLink, item?.url, token]);
 
 
   if ((!isFromChart && !targetUrl) || (isFromChart && !url)) {
@@ -101,6 +144,8 @@ const WebScreen = () => {
       </SafeAreaView>
     );
   }
+
+  console.log("targetUrl===========================", targetUrl)
 
   return (
     <SafeAreaView style={styles.container}>
@@ -120,7 +165,8 @@ const WebScreen = () => {
             scrollEnabled={true}
             decelerationRate={0.998}
             cacheEnabled={true}
-            cacheMode="LOAD_DEFAULT"
+              incognito={true}       
+             cacheMode="LOAD_DEFAULT"
             renderLoading={() => (
               <View style={styles.webviewLoadingContainer}>
                 <View style={styles.webviewLoadingContent}>
@@ -136,6 +182,8 @@ const WebScreen = () => {
               setIsReloading(false);
             }}
             onLoadStart={() => {
+              webviewRef.current?.clearCache(true);
+              webviewRef.current?.clearHistory();
               setIsReloading(true);
             }}
             onLoadEnd={() => {
