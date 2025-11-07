@@ -358,6 +358,7 @@ const ListScreen = () => {
               handleDeleteActionThunk({
                 id: item.id.toString(),
                 page: "DEVNOTIFY",
+                remarks: ""
               }),
             ).unwrap();
             setAlertVisible(false);

@@ -35,11 +35,11 @@ const DrawerNavigator = () => {
         }}
         component={TabNavigator}
       />
-      <Drawer.Screen
+      {/* <Drawer.Screen
         name="Attendance"
         component={AttendanceScreen}
         options={{ title: t('navigation.attendance') }}
-      /> 
+      />  */}
       <Drawer.Screen
         name="Alert"
         component={AlertScreen}
