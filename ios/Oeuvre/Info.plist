@@ -12,7 +12,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-	<string>DevERP</string>
+	<string>Oeuvre</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -43,7 +43,7 @@
 	<key>NSDocumentsFolderUsageDescription</key>
 	<string>We need access to your documents folder to select PDF files for upload.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
+	<string/>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>We need access to save uploaded documents to your photo library.</string>
 	<key>NSPhotoLibraryUsageDescription</key>

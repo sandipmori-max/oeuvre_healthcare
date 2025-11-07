@@ -31,6 +31,7 @@ import { DevERPService } from '../../../services/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useApi } from '../../../hooks/useApi';
 import { isTokenValid } from '../../../utils/helpers';
+import DeviceInfo from 'react-native-device-info';
 
 interface SettingItem {
   id: string;
@@ -67,6 +68,7 @@ const SettingsScreen = () => {
     type: 'info' as 'error' | 'success' | 'info',
   });
   const [settings, setSettings] = useState<SettingItem[]>([]);
+const appVersion = DeviceInfo.getVersion();
 
   useEffect(() => {
     setSettings([
@@ -123,7 +125,7 @@ const SettingsScreen = () => {
       {
         id: '7',
         title: t('settings.aboutApp'),
-        subtitle: `${t('common.version')} 1.0.0`,
+        subtitle: `${t('common.version')} - ${appVersion}`,
         icon: 'info',
         type: 'navigate',
         action: 'About',

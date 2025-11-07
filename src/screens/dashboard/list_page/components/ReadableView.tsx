@@ -24,6 +24,7 @@ import NoData from '../../../../components/no_data/NoData';
 import { ERP_COLOR_CODE } from '../../../../utils/constants';
 import MaterialIcons from '@react-native-vector-icons/material-icons';
 import MemoizedFooterView from './MemoizedFooterView';
+import RemarksView from './RemarksView';
 
 // enable LayoutAnimation on Android
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -145,11 +146,11 @@ const ReadableView = ({
     const card = (
       <View
         style={{
-          backgroundColor: ERP_COLOR_CODE.ERP_WHITE,
+          backgroundColor: isFromAlertCard ? '#f8fff8ff' : ERP_COLOR_CODE.ERP_WHITE,
           borderRadius: 8,
           paddingHorizontal: 8,
           paddingBottom: 6,
-          marginVertical: 4,
+          marginVertical: 2.5,
           paddingTop: 6,
           borderWidth: 1,
           borderColor: ERP_COLOR_CODE.ERP_ddd,
@@ -158,7 +159,8 @@ const ReadableView = ({
         {/* main touchable */}
         <TouchableOpacity
           activeOpacity={0.8}
-          style={{ flexDirection: 'row', alignItems: 'center' }}
+          style={{ flexDirection: 'row', alignItems: 'center', 
+           }}
           onPress={async () => {
             if (authUser) return;
             if (item?.id !== undefined) {
@@ -174,7 +176,7 @@ const ReadableView = ({
             }
           }}
         >
-          <View
+           <View
             style={{
               width: 34,
               height: 34,
@@ -185,7 +187,10 @@ const ReadableView = ({
               marginRight: 12,
             }}
           >
-            {item?.image && item?.image !== '' ? (
+            {
+              isFromAlertCard ? <>
+              <MaterialIcons name='notifications' size={24} color={ERP_COLOR_CODE.ERP_WHITE} />
+              </> : <>{item?.image && item?.image !== '' ? (
               <Image source={{ uri: baseUrl }} style={styles.profileImage} />
             ) : (
               <Text
@@ -197,7 +202,8 @@ const ReadableView = ({
               >
                 {avatarLetter}
               </Text>
-            )}
+            )}</>
+            }
           </View>
 
           <View style={{ flex: 1 }}>
@@ -216,7 +222,14 @@ const ReadableView = ({
               justifyContent: 'flex-end',
             }}
           >
-            <Text
+             {
+              isFromAlertCard && <View style={{height: 12, width: 12, backgroundColor:'green',
+                borderRadius: 12,
+                marginBottom: 4
+              }}> </View>
+            }
+            {
+              status &&  <Text
               style={{
                 fontWeight: '600',
                 fontSize: 12,
@@ -225,6 +238,8 @@ const ReadableView = ({
             >
               {status}
             </Text>
+            }
+           
             {!!date && (
               <Text
                 style={{
@@ -232,8 +247,8 @@ const ReadableView = ({
                   fontSize: 12,
                   color: ERP_COLOR_CODE.ERP_BLACK,
                 }}
-              >
-                {formatDateToDDMMMYYYY(date)}
+              > 
+                {formatDateToDDMMMYYYY(date) || date}
               </Text>
             )}
           </View>
@@ -261,40 +276,9 @@ const ReadableView = ({
                   justifyContent: 'space-between',
                 }}
               >
-                <View style={{ width: '70%' }}>
+                <View style={{ width: amount ? '70%' : '100%' }}>
                   {!!remarks && (
-                    <View>
-                      <Text
-                        numberOfLines={isRemarksExpanded ? undefined : 2}
-                        style={{
-                          color: ERP_COLOR_CODE.ERP_777,
-                          fontStyle: 'italic',
-                          marginBottom: 6,
-                          fontWeight: '600',
-                          fontSize: 12,
-                        }}
-                      >
-                        {remarks}
-                      </Text>
-                      {remarks.length > 66 && (
-                        <TouchableOpacity
-                          onPress={() =>
-                            setRemarksExpanded((prev) => !prev)
-                          }
-                        >
-                          <Text
-                            style={{
-                              fontWeight: '600',
-                              fontSize: 12,
-                              color: ERP_COLOR_CODE.ERP_COLOR,
-                              marginBottom: 6,
-                            }}
-                          >
-                            {isRemarksExpanded ? 'See Less ▲' : 'See More ▼'}
-                          </Text>
-                        </TouchableOpacity>
-                      )}
-                    </View>
+                     <RemarksView remarks={remarks} />
                   )}
                 </View>
                 <View style={{ width: '30%', alignItems: 'flex-end' }}>
@@ -416,7 +400,7 @@ const ReadableView = ({
   }
 
   return (
-    <View style={{ flex: 1, marginTop: 2 }}>
+    <View style={{ flex: 1, marginTop: 0,}}>
       <FlatList
         keyExtractor={(_, index) => index.toString()}
         data={listData}
@@ -424,6 +408,9 @@ const ReadableView = ({
         renderItem={({ item, index }) => <RenderCard item={item} index={index} />}
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
+        ListFooterComponent={() => (
+          <View style={{ height: 80 }} /> 
+        )}
       />
 
       {listData?.length > 0 && (

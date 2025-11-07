@@ -5,7 +5,7 @@ export const ERP_DRAWER_LIST: DrawerItemConfig[] = [
   { label: 'Home', route: 'Home', icon: 'home' },
   { label: 'Attendance', route: 'Attendance', icon: 'calendar-month' },
   { label: 'Business Card', route: 'List', icon: 'assignment' },
-  { label: 'Alert', route: 'Alert', icon: 'notifications-active' },
+  { label: 'Notification', route: 'Alert', icon: 'notifications-active' },
   { label: 'Privacy Policy', route: 'Privacy Policy', icon: 'policy' },
 ];
 

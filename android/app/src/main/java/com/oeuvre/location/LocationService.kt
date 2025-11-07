@@ -1,4 +1,4 @@
-package com.deverp.location
+package com.oeuvre.location
 
 import android.app.Notification
 import android.app.NotificationChannel
@@ -18,7 +18,7 @@ import androidx.core.app.NotificationCompat
 import com.google.android.gms.location.*
 import java.net.HttpURLConnection
 import java.net.URL
-import com.deverp.location.UserData
+import com.oeuvre.location.UserData
 
 // --- Model class for token + link ---
  
