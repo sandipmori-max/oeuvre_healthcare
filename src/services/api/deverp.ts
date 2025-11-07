@@ -295,11 +295,12 @@ class DevERPService {
     });
   }
 
-  async handleDeleteAction(  id: string,   page: string) {
+  async handleDeleteAction(  id: string,   page: string, remarks: string) {
     return this.apiCall<any>(`msp_api.aspx/pageDelete`, {
       token: this.token,
       id,
       page,
+      remarks
     });
   }
 

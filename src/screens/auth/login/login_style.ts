@@ -22,6 +22,7 @@ export const styles = StyleSheet.create({
   logo: {
     width: 100,
     height: 50,
+    marginTop: 100,
     alignSelf: 'center',
     marginBottom: 2,
     borderRadius: 20,
