@@ -109,33 +109,10 @@ useEffect(() => {
   }, [navigation, item?.title, t, isHidden]);
 
  const targetUrl = useMemo(() => {
-  const itemUrl = item?.url || '';
-  if (!itemUrl || !token) return '';
-
-  let url = itemUrl;
-
-  // Ensure http protocol
-  if (/^https?:\/\//i.test(url)) {
-    url = url.replace(/^https:\/\//i, 'http://');
-  } else {
-    const cleanedPath = url.replace(/^\/+/, '');
-    url = baseLink + cleanedPath;
-  }
-
-  if (url.includes('?')) {
-    const lastChar = url.slice(-1);
-    if (lastChar === '/' || lastChar === '&') {
-      return `${url}token=${token}`;
-    } else if (!url.includes('=')) {
-      return `${url}/&token=${token}`;
-    } else {
-      return `${url}&token=${token}`;
-    }
-  } else {
-    return `${url}?token=${token}`;
-  }
-}, [baseLink, item?.url, token]);
-
+    const itemUrl = item?.url || '';
+    console.log("it+++++++++++++++++emUrl", itemUrl)
+    return `${baseLink}${itemUrl}&token=${token}`;
+  }, [baseLink, item?.url, token]);
 
   if ((!isFromChart && !targetUrl) || (isFromChart && !url)) {
     return (

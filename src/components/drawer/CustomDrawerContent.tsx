@@ -108,8 +108,8 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
                   onPress={() => {
                     if(item?.route === 'Alert'){
                        props?.navigation.navigate('List', {item: {
-                        title: 'Alert',
-                        name: 'Alert',
+                        title: 'Notification',
+                        name: 'Notification',
                         url: 'DEVNOTIFY',
                         isFromBusinessCard: false,
                         isFromAlertCard: true,

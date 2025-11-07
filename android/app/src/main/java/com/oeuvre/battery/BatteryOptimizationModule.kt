@@ -1,4 +1,4 @@
-package com.deverp.battery
+package com.oeuvre.battery
 
 import android.content.Context
 import android.content.Intent

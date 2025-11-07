@@ -1,5 +1,5 @@
-package com.deverp
-import com.deverp.location.LocationPackage 
+package com.oeuvre
+import com.oeuvre.location.LocationPackage 
 import android.app.Application
 import com.facebook.react.PackageList
 import com.facebook.react.ReactApplication
@@ -9,7 +9,7 @@ import com.facebook.react.ReactNativeHost
 import com.facebook.react.ReactPackage
 import com.facebook.react.defaults.DefaultReactHost.getDefaultReactHost
 import com.facebook.react.defaults.DefaultReactNativeHost
-import com.deverp.battery.BatteryOptimizationPackage;
+import com.oeuvre.battery.BatteryOptimizationPackage;
 
 class MainApplication : Application(), ReactApplication {
 

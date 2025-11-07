@@ -1,4 +1,4 @@
-package com.deverp.battery
+package com.oeuvre.battery
 
 import com.facebook.react.ReactPackage
 import com.facebook.react.bridge.NativeModule

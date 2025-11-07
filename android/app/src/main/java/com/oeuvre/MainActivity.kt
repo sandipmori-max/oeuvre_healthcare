@@ -1,4 +1,4 @@
-package com.deverp
+package com.oeuvre
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate
