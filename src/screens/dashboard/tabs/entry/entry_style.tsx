@@ -40,7 +40,6 @@ export const styles = StyleSheet.create({
     borderColor: 'rgba(107, 104, 104, 0.3)',
   },
   iconText: {
-    color: ERP_COLOR_CODE.ERP_BLACK,
     opacity: 0.5,
     fontSize: 24,
     fontWeight: '700',
@@ -48,7 +47,6 @@ export const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: '700',
-    color: ERP_COLOR_CODE.ERP_BLACK,
     marginBottom: 4,
     textAlign: 'center',
   },

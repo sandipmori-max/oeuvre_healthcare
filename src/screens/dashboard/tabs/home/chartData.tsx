@@ -1,6 +1,8 @@
 import React, { useMemo } from 'react';
 import { View, Text, FlatList, Dimensions, TouchableOpacity } from 'react-native';
 import { PieChart } from 'react-native-gifted-charts';
+import { useAppSelector } from '../../../../store/hooks';
+import { DARK_COLOR } from '../../../../utils/constants';
 
 const MAX_ITEMS_PER_LIST = 5;
 
@@ -11,6 +13,7 @@ const PieChartSection = ({ pieChartData, navigation, t }: any) => {
     const second = pieChartData.slice(MAX_ITEMS_PER_LIST);
     return [first, second];
   }, [pieChartData]);
+  const theme = useAppSelector(state => state?.theme.mode);
 
   return (
     pieChartData?.length > 0 && (
@@ -39,16 +42,16 @@ const PieChartSection = ({ pieChartData, navigation, t }: any) => {
               radius={78}
               innerRadius={68}
               textSize={14}
-              textColor="#000"
+              textColor={theme === 'dark' ? '#fff' : "#000"}
               showValuesAsLabels
-              innerCircleColor="#fff"
+              innerCircleColor={theme === 'dark' ? 'black' : "#fff"}
               centerLabelComponent={() => (
                 <Text
                   style={{
                     textAlign: 'center',
                     fontSize: 16,
                     fontWeight: 'bold',
-                    color: 'black',
+                    color: theme === 'dark' ? '#fff' : "#000",
                   }}
                 >
                   {t('home.dashboard')}
@@ -95,6 +98,7 @@ const PieChartSection = ({ pieChartData, navigation, t }: any) => {
                         style={{
                           fontWeight: '500',
                           maxWidth: 110,
+                          color: theme === 'dark' ? '#fff' : "#000",
                         }}
                       >
                         {item.text}
@@ -111,7 +115,7 @@ const PieChartSection = ({ pieChartData, navigation, t }: any) => {
                       </Text>
                     </View>
                   )}
-                 />
+                />
               </View>
             </View>
           )}
@@ -155,7 +159,7 @@ const PieChartSection = ({ pieChartData, navigation, t }: any) => {
                     </Text>
                   </View>
                 )}
-               />
+              />
             </View>
           </View>
         )}

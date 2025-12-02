@@ -2,6 +2,8 @@ import { FlatList, Modal, Text, TouchableOpacity, View } from 'react-native';
 import { styles } from '../page_style';
 import MaterialIcons from '@react-native-vector-icons/material-icons';
 import { ERP_COLOR_CODE } from '../../../../utils/constants';
+import { useAppSelector } from '../../../../store/hooks';
+import useTranslations from '../../../../hooks/useTranslations';
 
 const ErrorModal = ({
   visible,
@@ -12,10 +14,17 @@ const ErrorModal = ({
   errors: string[];
   onClose: () => void;
 }) => {
+    const theme = useAppSelector(state => state?.theme.mode);
+  const { t } = useTranslations();
+  
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
       <View style={styles.overlay}>
-        <View style={styles.bottomSheet}>
+        <View style={[styles.bottomSheet, theme==='dark' && {
+          backgroundColor: 'black',
+          borderWidth: 1,
+          borderColor: 'white'
+        }]}>
           <View
             style={{
               flexDirection: 'row',
@@ -24,7 +33,9 @@ const ErrorModal = ({
               alignItems: 'center',
             }}
           >
-            <Text style={styles.title}>Please enter a value for this field.</Text>
+            <Text style={[styles.title, theme === 'dark' && {
+              color: 'white'
+            }]}>{t("text.text35")}-</Text>
             <TouchableOpacity
               onPress={() => {
                 onClose();

@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, LayoutAnimation, Platform, UIManager } from 'react-native';
 import { ERP_COLOR_CODE } from '../../../../utils/constants';
+import { useAppSelector } from '../../../../store/hooks';
+import useTranslations from '../../../../hooks/useTranslations';
  
 // For smooth expand/collapse animation on Android
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -10,6 +12,8 @@ if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental
 const RemarksView = ({ remarks }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isTruncated, setIsTruncated] = useState(false);
+  const theme = useAppSelector(state => state?.theme.mode);
+  const { t } = useTranslations();
 
   const toggleExpand = () => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -17,6 +21,7 @@ const RemarksView = ({ remarks }) => {
   };
 
   if (!remarks) return null;
+
   return (
     <View
       style={{
@@ -30,7 +35,7 @@ const RemarksView = ({ remarks }) => {
         numberOfLines={isExpanded ? undefined : 2}
         onTextLayout={(e) => setIsTruncated(e.nativeEvent.lines.length > 2)}
         style={{
-          color: ERP_COLOR_CODE.ERP_777,
+          color: theme === 'dark' ? 'white' : ERP_COLOR_CODE.ERP_777,
           fontStyle: 'italic',
           fontWeight: '500',
           fontSize: 13,
@@ -60,7 +65,7 @@ const RemarksView = ({ remarks }) => {
               color: ERP_COLOR_CODE.ERP_COLOR,
             }}
           >
-            {isExpanded ? 'See Less ▲' : 'See More ▼'}
+            {isExpanded ? t("text.text32") : t("text.text33")}
           </Text>
         </TouchableOpacity>
       )}

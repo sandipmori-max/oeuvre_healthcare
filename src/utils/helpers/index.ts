@@ -570,3 +570,21 @@ export const clearAllTempFiles = async () => {
     console.log('Error reading temp directory:', err);
   }
 };
+
+export const formatDateList = (input: string) => {
+ const inputDate = input.split(" ")[0];
+
+// get today's date in MM/DD/YYYY format
+const today = new Date();
+const formattedToday =
+  (today.getMonth() + 1).toString().padStart(2, "0") + "/" +
+  today.getDate().toString().padStart(2, "0") + "/" +
+  today.getFullYear();
+
+// output
+if (inputDate === formattedToday) {
+    return "Today"
+} else {
+     return input.replace(" ", "\n");
+}
+}

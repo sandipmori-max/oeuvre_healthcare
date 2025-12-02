@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, useWindowDimensions } from 'react-native';
+import { View, Text } from 'react-native';
 import { styles } from '../page_style';
 import { ERP_COLOR_CODE } from '../../../../utils/constants';
 import AutoHeightWebView from './AutoHeightWebView'; // the component above

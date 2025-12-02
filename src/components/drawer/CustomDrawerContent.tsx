@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, Image } from 'react-native';
 import { DrawerContentComponentProps, DrawerContentScrollView } from '@react-navigation/drawer';
 import { useNavigation } from '@react-navigation/native';
 import MaterialIcons from '@react-native-vector-icons/material-icons';
@@ -10,41 +10,44 @@ import { firstLetterUpperCase } from '../../utils/helpers';
 import { ERP_DRAWER_LIST } from '../../constants';
 import { styles } from './drawer_style';
 import { useBaseLink } from '../../hooks/useBaseLink';
-import { ERP_COLOR_CODE } from '../../utils/constants';
+import { DARK_COLOR, ERP_COLOR_CODE } from '../../utils/constants';
 import ContactRow from './ContactRow';
+import { ERP_ICON } from '../../assets';
 
 const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
   const navigation = useNavigation();
   const { user } = useAppSelector(state => state?.auth);
-  const theme = useAppSelector(state => state.theme);
+  const theme = useAppSelector(state => state.theme.mode);
+  console.log("theme", theme)
   const baseLink = useBaseLink();
   const currentRoute = props.state.routeNames[props.state.index];
 
   return (
     <DrawerContentScrollView
       {...props}
-      contentContainerStyle={{ flexGrow: 1, backgroundColor: theme === 'dark' ? 'black' : 'white' }}
+      contentContainerStyle={{ flexGrow: 1, backgroundColor: theme === 'dark' ? DARK_COLOR : 'white' }}
       showsVerticalScrollIndicator={true}
     >
-      <View style={{ flex: 1, minWidth: '100%' }}>
+      <View style={{ flex: 1, minWidth: '100%', }}>
         {/* Header */}
-        <View style={styles.header}>
+        <View style={[styles.header, theme === 'dark' && {
+          backgroundColor: 'black'
+        }]}>
           <FastImage
             source={{
-              uri: `${baseLink}/FileUpload/1/UserMaster/${
-                user?.id
-              }/profileimage.jpeg?ts=${new Date().getTime()}`,
+              uri: `${baseLink}/FileUpload/1/UserMaster/${user?.id
+                }/profileimage.jpeg?ts=${new Date().getTime()}`,
               priority: FastImage.priority.normal,
               cache: FastImage.cacheControl.web,
             }}
             style={styles.profileImage}
           />
-          <View style={{ height: 25, width: 100 }} />
-          <Text style={[styles.username, { top: 8 }]}>
+          <View style={{ height: 28, width: 100 }} />
+          <Text style={[styles.username, { top: 8, color: '#FFF' }]}>
             {firstLetterUpperCase(user?.name || '')}
           </Text>
-          <View style={{ height: 2, width: 100 }} />
-          <View style={{ top: 18, width: '100%', marginVertical: 8 }}>
+          <View style={{ height: 8, width: 100 }} />
+          <View style={{ top: 4, width: '100%', marginVertical: 1 }}>
             {/* Phone */}
             {user?.mobileno && (
               <View
@@ -63,7 +66,7 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
                   alignItems: 'center',
                   borderRadius: 8,
                   padding: 6,
-                  marginVertical: 4,
+                  marginVertical: 2,
                 }}
               >
                 <MaterialIcons name={'mail-outline'} color={'white'} size={14} />
@@ -81,7 +84,7 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
                   alignItems: 'center',
                   borderRadius: 8,
                   padding: 6,
-                  marginBottom: 12,
+                  marginBottom: 2,
                 }}
               >
                 <MaterialIcons name={'person'} color={'white'} size={14} />
@@ -104,28 +107,37 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
               return (
                 <TouchableOpacity
                   key={item?.route}
-                  style={[styles.drawerItem, isActive && styles.activeItemBackground]}
+                  style={[styles.drawerItem, isActive && styles.activeItemBackground,
+
+                  isActive && theme === 'dark' && {
+                    backgroundColor: 'black'
+                  }
+                  ]}
                   onPress={() => {
-                    if(item?.route === 'Alert'){
-                       props?.navigation.navigate('List', {item: {
-                        title: 'Notification',
-                        name: 'Notification',
-                        url: 'DEVNOTIFY',
-                        isFromBusinessCard: false,
-                        isFromAlertCard: true,
-                        id: '0',
-                      }} );
+                    if (item?.route === 'Alert') {
+                      props?.navigation.navigate('List', {
+                        item: {
+                          title: 'Notification',
+                          name: 'Notification',
+                          url: 'DEVNOTIFY',
+                          isFromBusinessCard: false,
+                          isFromAlertCard: true,
+                          id: '0',
+                        }
+                      });
                       props?.navigation.closeDrawer();
                       return
                     }
                     if (item?.route === 'List') {
-                      props?.navigation.navigate('List', {item: {
-                        title: 'Business Card',
-                        name: 'Business Card',
-                        url: 'BusinessCardMst',
-                        isFromBusinessCard: true,
-                        id: '0',
-                      }} );
+                      props?.navigation.navigate('List', {
+                        item: {
+                          title: 'Business Card',
+                          name: 'Business Card',
+                          url: 'BusinessCardMst',
+                          isFromBusinessCard: true,
+                          id: '0',
+                        }
+                      });
                       props?.navigation.closeDrawer();
                       return;
                     }
@@ -142,14 +154,14 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
                   <View style={styles.itemRow}>
                     <MaterialIcons
                       name={`${item?.icon}`}
-                      color={isActive ? ERP_COLOR_CODE.ERP_WHITE : ERP_COLOR_CODE.ERP_BLACK}
+                      color={theme === 'dark' ? '#FFF' : isActive ? '#FFF' : '#000'}
                       size={20}
                     />
                     <Text
                       style={[
                         styles.itemLabel,
                         isActive && styles.activeText,
-                        { color: isActive ? ERP_COLOR_CODE.ERP_WHITE : ERP_COLOR_CODE.ERP_BLACK },
+                        { color: theme === 'dark' ? 'white' : isActive ? '#FFF' : '#000' },
                       ]}
                     >
                       {item?.label}
@@ -162,8 +174,25 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
         </ScrollView>
 
         {/* Footer - stays fixed at bottom */}
+        <View style={{
+          width: '100%',
+          justifyContent: 'center',
+          alignContent: 'center',
+          alignItems: 'center',
+          marginBottom: 10
+        }}>
+          <Image source={ERP_ICON.APP_LOGO} style={{
+            height: 40,
+            width: 40,
+
+          }} resizeMode="contain" />
+
+        </View>
         <View style={styles.logoutButton}>
-          <Text style={styles.logoutText}>(c) DevERP Solutions Pvt. Ltd.</Text>
+          <Text style={[styles.logoutText,
+          theme === 'dark' && {
+            color: 'white'
+          }]}>(c) DevERP Solutions Pvt. Ltd.</Text>
           <ContactRow />
         </View>
       </View>

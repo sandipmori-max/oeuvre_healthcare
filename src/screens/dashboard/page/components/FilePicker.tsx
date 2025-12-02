@@ -13,6 +13,7 @@ import MaterialIcons from '@react-native-vector-icons/material-icons';
 import { ERP_COLOR_CODE } from '../../../../utils/constants';
 import RNFS from 'react-native-fs';
 import { Linking } from 'react-native';
+import useTranslations from '../../../../hooks/useTranslations';
 
 interface FileType {
   name: string;
@@ -22,11 +23,9 @@ interface FileType {
 }
 
 const FilePickerRow = ({ item, handleAttachment, baseLink, infoData }) => {
-  console.log('🚀 ~ FilePickerRow ~ item:', item);
+   const { t } = useTranslations();
 
   const base = `${baseLink}fileupload/1/${infoData?.tableName}/${infoData?.id}/${item?.text}`;
-  console.log('🚀 ~ FilePickerRow ~ base:', base);
-
   const [selectedFiles, setSelectedFiles] = useState<FileType[]>([]);
 
   const openFilePicker = async () => {
@@ -52,10 +51,9 @@ const FilePickerRow = ({ item, handleAttachment, baseLink, infoData }) => {
       );
     } catch (err: any) {
       if (err.code === 'USER_CANCELED') {
-        console.log('User canceled picker');
-      } else {
+       } else {
         console.warn('Picker error', err);
-        Alert.alert('Error', 'Failed to pick file.');
+        Alert.alert(t("title.title1"), t("msg.msg12"));
       }
     }
   };
@@ -70,7 +68,7 @@ const FilePickerRow = ({ item, handleAttachment, baseLink, infoData }) => {
       setSelectedFiles(prev => prev.map((f, i) => (i === index ? file : f)));
     } catch (err: any) {
       if (err.code === 'USER_CANCELED') return;
-      Alert.alert('Error', 'Failed to update file.');
+        Alert.alert(t("title.title1"), t("msg.msg13"));
     }
   };
 
@@ -149,7 +147,7 @@ const FilePickerRow = ({ item, handleAttachment, baseLink, infoData }) => {
         {selectedFiles.length === 0 && (
           <TouchableOpacity style={styles.addBtn} onPress={openFilePicker}>
             <MaterialIcons name="add" size={20} color={ERP_COLOR_CODE.ERP_WHITE} />
-            <Text style={[styles.btnText, { marginLeft: 4 }]}>Select File</Text>
+            <Text style={[styles.btnText, { marginLeft: 4 }]}>{t("text.text36")}</Text>
           </TouchableOpacity>
         )}
       </ScrollView>

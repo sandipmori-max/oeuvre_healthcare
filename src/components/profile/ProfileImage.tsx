@@ -9,7 +9,7 @@ const ProfileImage = memo(({ userId, baseLink }: any) => {
   if (!userId) return null;
 
   return (
-    <View style={{ width: 130, height: 120, marginBottom: 18 }}>
+    <View style={{ width: 130, height: 120, marginBottom: 18, borderWidth: 1, borderColor: 'white', borderRadius: 12 }}>
       <FastImage
         source={{
           uri: `${baseLink}/FileUpload/1/UserMaster/${userId}/profileimage.jpeg?ts=${new Date().getTime()}`,

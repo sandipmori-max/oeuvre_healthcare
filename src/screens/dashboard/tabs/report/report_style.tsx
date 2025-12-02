@@ -14,13 +14,13 @@ export const styles = StyleSheet.create({
   columnWrapper: {
     justifyContent: 'space-between',
   },
-  icon:{
+  icon: {
     width: 24,
     height: 24,
     resizeMode: 'contain',
   },
   card: {
-   flex: 1,
+    flex: 1,
     borderRadius: 10,
     paddingVertical: 24,
     paddingHorizontal: 16,
@@ -38,7 +38,7 @@ export const styles = StyleSheet.create({
     borderColor: 'rgba(107, 104, 104, 0.3)',
   },
   iconText: {
-     color: ERP_COLOR_CODE.ERP_BLACK,
+    color: ERP_COLOR_CODE.ERP_BLACK,
     opacity: 0.5,
     fontSize: 24,
     fontWeight: '700',

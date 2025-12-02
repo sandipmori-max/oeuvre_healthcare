@@ -6,12 +6,14 @@ import { ERP_COLOR_CODE } from '../../../../utils/constants';
 import { getDDLThunk } from '../../../../store/slices/dropdown/thunk';
 import MaterialIcons from '@react-native-vector-icons/material-icons';
 import FullViewLoader from '../../../../components/loader/FullViewLoader';
+import useTranslations from '../../../../hooks/useTranslations';
 
 const CustomMultiPicker = ({ isValidate,label, selectedValue, onValueChange, item, errors, dtext }: any) => {
   const [open, setOpen] = useState(false);
   const [options, setOptions] = useState<any[]>([]);
   const dispatch = useAppDispatch();
   const [loader, setLoader] = useState(false);
+  const { t } = useTranslations();
 
   // Store selected options in an array
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
@@ -92,7 +94,7 @@ const CustomMultiPicker = ({ isValidate,label, selectedValue, onValueChange, ite
         activeOpacity={0.7}
       >
         <Text style={{ color: selectedOptions.length ? ERP_COLOR_CODE.ERP_BLACK : ERP_COLOR_CODE.ERP_888, flex: 1 }}>
-          {selectedOptions.length ? selectedOptions.join(', ') : `Select ${label}`}
+          {selectedOptions.length ? selectedOptions.join(', ') : `${t("text.text34")} ${label}`}
         </Text>
         <MaterialIcons name={open ? 'arrow-drop-up' : 'arrow-drop-down'} size={24} color={ERP_COLOR_CODE.ERP_555} />
       </TouchableOpacity>
@@ -131,7 +133,7 @@ const CustomMultiPicker = ({ isValidate,label, selectedValue, onValueChange, ite
               </ScrollView>
             ) : (
               <View style={{ marginVertical: 12, justifyContent: 'center', alignItems: 'center', height: 100 }}>
-                <Text>No data</Text>
+                <Text>{t("text.text20")}</Text>
               </View>
             )
           )}

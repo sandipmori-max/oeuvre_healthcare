@@ -66,6 +66,7 @@ const darkColors = {
 };
 
 let currentTheme: 'light' | 'dark' = 'light';
+export const DARK_COLOR = '#454545'
 
 export const setERPTheme = (theme: 'light' | 'dark') => {
   currentTheme = theme;

@@ -76,11 +76,13 @@ const App = () => {
   if (isSplashVisible) {
     return (
       <TranslationProvider>
-        <StatusBar backgroundColor={ERP_COLOR_CODE.ERP_APP_COLOR} barStyle="light-content" />
+      <Provider store={store}>
+      <StatusBar backgroundColor={ERP_COLOR_CODE.ERP_APP_COLOR} barStyle="light-content" />
         <SafeAreaView edges={['top']} style={{ backgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR }} />
         <SafeAreaView edges={['top', 'left', 'right', 'bottom']} style={styles.safeArea}>
           <CustomSplashScreen onFinish={() => setSplashVisible(false)} />
         </SafeAreaView>
+      </Provider>  
       </TranslationProvider>
     );
   }

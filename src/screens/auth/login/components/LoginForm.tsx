@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, Animated } from 'react-native';
 import { Formik } from 'formik';
 import { getMessaging } from '@react-native-firebase/messaging';
@@ -23,12 +23,19 @@ const LoginForm: React.FC<LoginFormProps> = ({
   const { t } = useTranslations();
   const { token: fcmToken } = useFcmToken();
 
+  const [focusedField, setFocusedField] = useState<string | null>(null);
+
   const {
     execute: validateCompanyCode,
     loading: validationLoading,
     error: validationError,
   } = useApi();
-  const { execute: loginWithERP, loading: erpLoginLoading, error: erpLoginError } = useApi();
+
+  const {
+    execute: loginWithERP,
+    loading: erpLoginLoading,
+    error: erpLoginError,
+  } = useApi();
 
   const fadeAnims = [
     useRef(new Animated.Value(0)).current,
@@ -76,15 +83,13 @@ const LoginForm: React.FC<LoginFormProps> = ({
 
   const handleLoginSubmit = async (values: typeof initialFormValues) => {
     try {
-      
       const companyValidation = await validateCompanyCode(() =>
-        DevERPService.validateCompanyCode(values.company_code,),
+        DevERPService.validateCompanyCode(values.company_code),
       );
-      console.log("----companyValidation-------", companyValidation)
+
       if (!companyValidation?.isValid) return;
 
       const currentFcmToken = fcmToken || (await getMessaging().getToken());
-
       DevERPService.setDevice(deviceId);
 
       const loginResult = await loginWithERP(() =>
@@ -94,7 +99,6 @@ const LoginForm: React.FC<LoginFormProps> = ({
           firebaseid: currentFcmToken || '',
         }),
       );
-
       if (loginResult?.success === 1) {
         await DevERPService.getAuth();
         await onLoginSuccess(
@@ -102,7 +106,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
           values?.password,
           { user: values?.user, name: values?.user },
           loginResult,
-          companyValidation
+          companyValidation,
         );
       } else {
         showAlert({
@@ -156,13 +160,18 @@ const LoginForm: React.FC<LoginFormProps> = ({
                         : 'enterPassword'
                     }`,
                   )}
+                  isInputEdit={focusedField === field}
                   field={field}
                   placeholderTextColor={ERP_COLOR_CODE.ERP_999}
                   autoCapitalize="none"
                   secureTextEntry={field === 'password'}
                   showToggle={field === 'password'}
                   onChangeText={handleChange(field)}
-                  onBlur={handleBlur(field)}
+                  onFocus={() => setFocusedField(field)} 
+                  onBlur={() => {
+                    handleBlur(field);
+                    setFocusedField(null);
+                  }}
                   value={values[field as keyof typeof values] as string}
                   error={errors[field as keyof typeof errors]}
                   touched={touched[field as keyof typeof touched]}
@@ -183,7 +192,11 @@ const LoginForm: React.FC<LoginFormProps> = ({
                 }
                 isLoading={isLoading}
                 onPress={handleSubmit as any}
-                color={isLoading || validationLoading || erpLoginLoading ? '#aaa' : ERP_COLOR_CODE.ERP_COLOR}
+                color={
+                  isLoading || validationLoading || erpLoginLoading
+                    ? '#aaa'
+                    : ERP_COLOR_CODE.ERP_COLOR
+                }
                 disabled={isLoading || validationLoading || erpLoginLoading}
                 style={styles.loginButton}
                 textStyle={styles.loginButtonText}

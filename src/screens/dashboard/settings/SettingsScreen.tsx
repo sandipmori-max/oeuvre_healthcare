@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useLayoutEffect } from 'react';
 import {
   View,
   Text,
@@ -13,14 +13,14 @@ import { useNavigation } from '@react-navigation/native';
 import { styles } from './settings_style';
 import CustomAlert from '../../../components/alert/CustomAlert';
 import useTranslations from '../../../hooks/useTranslations';
-import { useAppDispatch } from '../../../store/hooks';
+import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import MaterialIcons from '@react-native-vector-icons/material-icons';
 import {
   logoutUserThunk,
   removeAccountThunk,
   switchAccountThunk,
 } from '../../../store/slices/auth/thunk';
-import { ERP_COLOR_CODE } from '../../../utils/constants';
+import { ERP_COLOR_CODE, setERPTheme } from '../../../utils/constants';
 import {
   createAccountsTable,
   getActiveAccount,
@@ -32,6 +32,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useApi } from '../../../hooks/useApi';
 import { isTokenValid } from '../../../utils/helpers';
 import DeviceInfo from 'react-native-device-info';
+import { setLang, setTheme } from '../../../store/slices/theme/themeSlice';
 
 interface SettingItem {
   id: string;
@@ -52,6 +53,7 @@ const SettingsScreen = () => {
   const navigation = useNavigation();
   const { t, changeLanguage, getAvailableLanguages, getCurrentLanguage } = useTranslations();
   const [alertVisible, setAlertVisible] = useState(false);
+  const theme = useAppSelector(state => state.theme.mode);
 
   const [logoutVisible, setLogoutVisible] = useState(false);
 
@@ -68,7 +70,32 @@ const SettingsScreen = () => {
     type: 'info' as 'error' | 'success' | 'info',
   });
   const [settings, setSettings] = useState<SettingItem[]>([]);
-const appVersion = DeviceInfo.getVersion();
+  const appVersion = DeviceInfo.getVersion();
+
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerStyle: {
+        backgroundColor: theme === 'dark' ? 'black' : ERP_COLOR_CODE.ERP_APP_COLOR,   // <-- BLACK HEADER
+      },
+      headerTintColor: '#fff',
+      headerTitle: () => (
+        <Text
+          numberOfLines={1}
+          style={{
+            maxWidth: 180,
+            fontSize: 18,
+            fontWeight: '700',
+            color: theme === 'dark' ? "white" : ERP_COLOR_CODE.ERP_WHITE,
+          }}
+        >
+          {t('title.title20')}
+        </Text>
+      ),
+
+    });
+  }, [navigation]);
+
 
   useEffect(() => {
     setSettings([
@@ -170,7 +197,9 @@ const appVersion = DeviceInfo.getVersion();
         } else if (item?.title === t('settings.privacySettings')) {
           navigation.navigate('Privacy Policy');
         } else if (item?.title === t('settings.helpSupport')) {
-          // navigation.navigate('');
+          navigation.navigate('Privacy Policy', {
+            url: 'http://deverp.com/index.aspx?q=contact_us',
+          });
         } else if (item?.action) {
           setAlertConfig({
             title: t('common.navigate'),
@@ -206,6 +235,7 @@ const appVersion = DeviceInfo.getVersion();
 
   const handleLanguageChange = async (languageCode: string) => {
     await changeLanguage(languageCode);
+    dispatch(setLang(languageCode))
     setCurrentLanguage(languageCode);
     setLanguageModalVisible(false);
 
@@ -223,27 +253,42 @@ const appVersion = DeviceInfo.getVersion();
 
   const renderSettingItem = ({ item }: { item: SettingItem }) => (
     <TouchableOpacity
-      style={styles.settingCard}
+      style={[styles.settingCard, theme === 'dark' && {
+        backgroundColor: 'black'
+      }]}
       onPress={() => handleAction(item)}
       disabled={item.type === 'toggle'}
     >
       <View style={styles.settingHeader}>
         <View style={styles.settingIcon}>
-          <MaterialIcons name={item?.icon} color={ERP_COLOR_CODE.ERP_BLACK} size={22} />
+          <MaterialIcons name={item?.icon} color={theme === 'dark' ? 'black' : ERP_COLOR_CODE.ERP_BLACK} size={22} />
         </View>
         <View style={styles.settingInfo}>
-          <Text style={styles.settingTitle}>{item?.title}</Text>
+          <Text style={[styles.settingTitle, theme === 'dark' && {
+            color: 'white'
+          }]}>{item?.title}</Text>
           <Text style={styles.settingSubtitle}>{item?.subtitle}</Text>
         </View>
         {item.type === 'toggle' ? (
           <Switch
-            value={item.value}
+            value={item.title === t('settings.darkMode') ? theme === 'dark' : item.value}
             onValueChange={() => {
               handleToggle(item.id);
+
+              if (item.title === t('settings.darkMode')) {
+                if (theme === 'dark') {
+                  setERPTheme('light');
+                  dispatch(setTheme('light'));
+                } else {
+                  setERPTheme('dark');
+                  dispatch(setTheme('dark'));
+                }
+              }
             }}
             trackColor={{ false: ERP_COLOR_CODE.ERP_e0e0e0, true: '#4CAF50' }}
-            thumbColor={item.value ? ERP_COLOR_CODE.ERP_WHITE : '#f4f3f4'}
+            thumbColor={theme === 'dark' ? 'white' : '#f4f3f4'}
           />
+
         ) : (
           <>{item?.title !== t('settings.aboutApp') && <Text style={styles.arrowIcon}>›</Text>}</>
         )}
@@ -276,7 +321,9 @@ const appVersion = DeviceInfo.getVersion();
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, theme === 'dark' && {
+      backgroundColor: 'black'
+    }]}>
       <ScrollView
         style={styles.scrollContainer}
         keyboardShouldPersistTaps="handled"
@@ -284,7 +331,10 @@ const appVersion = DeviceInfo.getVersion();
         contentContainerStyle={styles.scrollContent}
       >
         <View style={styles.sectionContainer}>
-          <Text style={styles.sectionTitle}>{t('settings.notifications')}</Text>
+          <Text style={[styles.sectionTitle, theme === 'dark' && {
+            backgroundColor: 'black',
+            color: 'white'
+          }]}>{t('settings.notifications')}</Text>
           <FlatList
             keyboardShouldPersistTaps="handled"
             data={settings.filter(item => item.id === '1' || item.id === '2')}
@@ -295,7 +345,10 @@ const appVersion = DeviceInfo.getVersion();
         </View>
 
         <View style={styles.sectionContainer}>
-          <Text style={styles.sectionTitle}>{t('settings.appearance')}</Text>
+          <Text style={[styles.sectionTitle, theme === 'dark' && {
+            backgroundColor: 'black',
+            color: 'white'
+          }]}>{t('settings.appearance')}</Text>
           <FlatList
             keyboardShouldPersistTaps="handled"
             data={settings.filter(item => item.id === '3')}
@@ -306,7 +359,10 @@ const appVersion = DeviceInfo.getVersion();
         </View>
 
         <View style={styles.sectionContainer}>
-          <Text style={styles.sectionTitle}>{t('settings.security')}</Text>
+          <Text style={[styles.sectionTitle, theme === 'dark' && {
+            backgroundColor: 'black',
+            color: 'white'
+          }]}>{t('settings.security')}</Text>
           <FlatList
             keyboardShouldPersistTaps="handled"
             data={settings.filter(item => item.id === '4' || item.id === '5')}
@@ -317,7 +373,10 @@ const appVersion = DeviceInfo.getVersion();
         </View>
 
         <View style={styles.sectionContainer}>
-          <Text style={styles.sectionTitle}>{t('settings.general')}</Text>
+          <Text style={[styles.sectionTitle, theme === 'dark' && {
+            backgroundColor: 'black',
+            color: 'white'
+          }]}>{t('settings.general')}</Text>
           <FlatList
             keyboardShouldPersistTaps="handled"
             data={settings.filter(item => item.id === '6' || item.id === '7' || item.id === '8')}
@@ -328,7 +387,10 @@ const appVersion = DeviceInfo.getVersion();
         </View>
 
         <View style={styles.sectionContainer}>
-          <Text style={styles.sectionTitle}>{t('settings.account')}</Text>
+          <Text style={[styles.sectionTitle, theme === 'dark' && {
+            backgroundColor: 'black',
+            color: 'white'
+          }]}>{t('settings.account')}</Text>
           <FlatList
             keyboardShouldPersistTaps="handled"
             data={settings.filter(item => item.id === '9')}
@@ -351,7 +413,11 @@ const appVersion = DeviceInfo.getVersion();
         }}
       >
         <View style={languageStyles.modalOverlay}>
-          <View style={languageStyles.modalContent}>
+          <View style={[languageStyles.modalContent, theme === 'dark' && {
+            backgroundColor: 'black',
+            borderWidth: 1,
+            borderColor: 'white'
+          }]}>
             <View style={languageStyles.modalHeader}>
               <Text style={languageStyles.modalTitle}>{t('language.selectLanguage')}</Text>
               <TouchableOpacity

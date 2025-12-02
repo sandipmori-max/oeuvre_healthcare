@@ -21,7 +21,7 @@ import {
 } from 'react-native';
 import { RouteProp, useFocusEffect, useNavigation, useRoute } from '@react-navigation/native';
 import Animated, { FadeInUp, Layout } from 'react-native-reanimated';
-import { useAppDispatch } from '../../../store/hooks';
+import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { getERPPageThunk } from '../../../store/slices/auth/thunk';
 import { savePageThunk } from '../../../store/slices/page/thunk';
 import FullViewLoader from '../../../components/loader/FullViewLoader';
@@ -49,6 +49,7 @@ import CustomMultiPicker from './components/CustomMultiPicker';
 import { ERP_COLOR_CODE } from '../../../utils/constants';
 import BusinessCardView from './components/BusinessCardImage';
 import DeviceInfo from 'react-native-device-info';
+import useTranslations from '../../../hooks/useTranslations';
 
 type PageRouteParams = { PageScreen: { item: any } };
 
@@ -105,6 +106,8 @@ const PageScreen = () => {
   const dispatch = useAppDispatch();
   const flatListRef = useRef<FlatList>(null);
   const baseLink = useBaseLink();
+  const theme = useAppSelector(state => state?.theme.mode);
+  const { t } = useTranslations();
 
   const [loadingPageId, setLoadingPageId] = useState<string | null>(null);
   const [controls, setControls] = useState<any[]>([]);
@@ -114,7 +117,6 @@ const PageScreen = () => {
 
   const [error, setError] = useState<string | null>(null);
   const [formValues, setFormValues] = useState<any>({});
-  console.log('🚀 ~ PageScreen------------- ~ formValues:', formValues);
 
   const [datePickerVisible, setDatePickerVisible] = useState(false);
 
@@ -152,21 +154,20 @@ const PageScreen = () => {
   const appState = useRef(AppState.currentState);
 
   const hasLocationField = controls.some(
-    item => item?.defaultvalue && item?.defaultvalue === '#location',
+    item => item?.defaultvalue && item?.defaultvalue === '#location' && item?.visible === "0",
   );
 
-   const hasMediaField = controls.some(
-    item =>  item?.ctltype === 'IMAGE' ||
-        item?.ctltype === 'PHOTO',
+  const hasMediaField = controls.some(
+    item => item?.ctltype === 'IMAGE' ||
+      item?.ctltype === 'PHOTO',
   );
 
-  console.log('locationEnabled ---------------- ', locationEnabled);
 
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
 
     const checkLocation = async () => {
-      const enabled = hasLocationField && await DeviceInfo.isLocationEnabled();
+      const enabled = await DeviceInfo.isLocationEnabled();
       console.log('locationEnabled -----enabled----------- ', enabled);
 
       setLocationEnabled(enabled);
@@ -182,7 +183,7 @@ const PageScreen = () => {
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, []); 
+  }, []);
   // console.log(' ------------------------ ', hasLocationField);
   // useEffect(() => {
   //   const subscription = AppState.addEventListener('change', nextAppState => {
@@ -267,10 +268,10 @@ const PageScreen = () => {
 
       if (enabled !== locationEnabled) {
         setAlertConfig({
-          title: 'Location Status',
+          title: t("title.title13"),
           message: enabled
-            ? 'Location is now enabled'
-            : 'We need location access only to serve you better. Please enable it to continue.',
+            ? t('title.title14')
+            : t('title.title15'),
           type: enabled ? 'success' : 'error',
         });
         setAlertVisible(!enabled);
@@ -292,8 +293,6 @@ const PageScreen = () => {
       }
     } catch (err) {
       setLocationVisible(false);
-
-      console.log('Location fetch error:', err);
     }
   };
 
@@ -315,9 +314,9 @@ const PageScreen = () => {
           setBackgroundDeniedModal(true);
         } else {
           setAlertConfig({
-            title: 'Location Status',
+            title: t("title.title13"),
             message:
-              'We need location access only to serve you better. Please enable it to continue.',
+              t('title.title15'),
             type: 'error',
           });
           setModalClose(false);
@@ -354,8 +353,8 @@ const PageScreen = () => {
 
     controls.forEach(ctrl => {
       if (ctrl?.mandatory === '1' && !formValues[ctrl?.field]) {
-        validationErrors[ctrl.field] = `${ctrl?.fieldtitle || ctrl?.field} is required`;
-        errorMessages.push(`${ctrl?.fieldtitle || ctrl?.field} is required`);
+        validationErrors[ctrl.field] = `${ctrl?.fieldtitle || ctrl?.field} ${t("text.text43")}`;
+        errorMessages.push(`${ctrl?.fieldtitle || ctrl?.field} ${t("text.text43")}`);
       }
     });
 
@@ -368,6 +367,10 @@ const PageScreen = () => {
 
   useLayoutEffect(() => {
     navigation.setOptions({
+      headerStyle: {
+        backgroundColor: theme === 'dark' ? 'black' : ERP_COLOR_CODE.ERP_APP_COLOR,   // <-- BLACK HEADER
+      },
+      headerTintColor: '#fff',
       headerTitle: () => (
         <View style={{ flexDirection: 'row', alignItems: 'center', maxWidth: 210 }}>
           <Text
@@ -376,7 +379,7 @@ const PageScreen = () => {
               flexShrink: 1,
               fontSize: 18,
               fontWeight: '700',
-              color: ERP_COLOR_CODE.ERP_WHITE,
+              color: theme === 'dark' ? "white" : ERP_COLOR_CODE.ERP_WHITE,
             }}
           >
             {title || pageTitle || 'Details'}
@@ -389,7 +392,7 @@ const PageScreen = () => {
               marginLeft: 4,
             }}
           >
-            {isFromNew ? '( New )' : '( Edit )'}
+            {isFromNew ? `( ${"text.text44"} )` : `( ${'text.text45'} )`}
           </Text>
         </View>
       ),
@@ -407,6 +410,7 @@ const PageScreen = () => {
               }}
             />
           )}
+           
         </>
       ),
     });
@@ -616,6 +620,7 @@ const PageScreen = () => {
       } else if (item?.ddl && item?.ddl !== '' && item?.ajax === 0) {
         content = (
           <CustomPicker
+            isForceOpen={true}
             isValidate={isValidate}
             label={item?.fieldtitle}
             selectedValue={value}
@@ -629,6 +634,7 @@ const PageScreen = () => {
       } else if (item?.ddl && item?.ddl !== '' && item?.ajax === 1) {
         content = (
           <AjaxPicker
+            isForceOpen={true}
             isValidate={isValidate}
             label={item?.fieldtitle}
             selectedValue={value}
@@ -722,7 +728,7 @@ const PageScreen = () => {
   }, []);
 
   return (
-    <View style={{ flex: 1, padding: 16, backgroundColor: ERP_COLOR_CODE.ERP_WHITE }}>
+    <View style={{ flex: 1, padding: 16, backgroundColor: theme === 'dark' ? 'black' : ERP_COLOR_CODE.ERP_WHITE }}>
       {loadingPageId ? (
         <FullViewLoader />
       ) : !!error ? (
@@ -731,7 +737,7 @@ const PageScreen = () => {
             flex: 1,
             justifyContent: 'center',
             alignContent: 'center',
-            backgroundColor: ERP_COLOR_CODE.ERP_WHITE,
+            backgroundColor: theme === 'dark' ? 'black' : ERP_COLOR_CODE.ERP_WHITE,
           }}
         >
           <ErrorMessage message={error} />
@@ -742,6 +748,8 @@ const PageScreen = () => {
             style={{
               flex: 1,
               height: Dimensions.get('screen').height,
+              backgroundColor: theme === 'dark' ? 'black' : ERP_COLOR_CODE.ERP_WHITE,
+
             }}
           >
             <FlatList
@@ -861,7 +869,10 @@ const PageScreen = () => {
           )}
         </>
       ) : (
-        <View style={{ flex: 1 }}>
+        <View style={[{ flex: 1, }, theme === 'dark' && {
+          backgroundColor: 'black',
+          width: '100%'
+        }]}>
           <NoData />
         </View>
       )}
