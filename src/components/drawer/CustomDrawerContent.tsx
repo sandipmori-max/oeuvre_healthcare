@@ -10,7 +10,7 @@ import { firstLetterUpperCase } from '../../utils/helpers';
 import { ERP_DRAWER_LIST } from '../../constants';
 import { styles } from './drawer_style';
 import { useBaseLink } from '../../hooks/useBaseLink';
-import { DARK_COLOR, ERP_COLOR_CODE } from '../../utils/constants';
+import { DARK_COLOR } from '../../utils/constants';
 import ContactRow from './ContactRow';
 import { ERP_ICON } from '../../assets';
 
@@ -18,7 +18,6 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
   const navigation = useNavigation();
   const { user } = useAppSelector(state => state?.auth);
   const theme = useAppSelector(state => state.theme.mode);
-  console.log("theme", theme)
   const baseLink = useBaseLink();
   const currentRoute = props.state.routeNames[props.state.index];
 

@@ -377,6 +377,7 @@ const ListScreen = () => {
   };
 
   const handleActionButtonPressed = (actionValue, label, color, id, item) => {
+      console.log("result--------------------", item)
  
     if(item?.btn_edit && item?.btn_edit?.includes("/")){
       const left = item?.btn_edit.substring(0, item?.btn_edit.indexOf('/'));
@@ -385,7 +386,7 @@ const ListScreen = () => {
         item,
         id:  result,
         title: pageName,
-        isFromNew: true,
+        isFromNew: false,
         url: left,
         pageTitle: pageTitle,
         isFromBusinessCard: false,

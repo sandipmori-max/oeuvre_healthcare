@@ -392,7 +392,7 @@ const PageScreen = () => {
               marginLeft: 4,
             }}
           >
-            {isFromNew ? `( ${"text.text44"} )` : `( ${'text.text45'} )`}
+            {isFromNew ? `( ${t("text.text44")} )` : `( ${t('text.text45')} )`}
           </Text>
         </View>
       ),
@@ -410,7 +410,103 @@ const PageScreen = () => {
               }}
             />
           )}
-           
+          {!authUser && controls.length > 0 && (
+            <ERPIcon
+              name="save-as"
+              isLoading={actionSaveLoader}
+              onPress={async () => {
+                try {
+                  const enabled = await DeviceInfo.isLocationEnabled();
+                  const permissionStatus = hasLocationField && await requestLocationPermissions();
+                  const hasPermission = hasMediaField && await requestCameraPermission();
+
+                  // if(hasLocationField && hasMediaField){
+
+                  // }
+                  if (!hasPermission && hasMediaField) {
+                    setAlertConfig({
+                      title: t('title.title16'),
+                      message:
+                        t("msg.msg15"),
+                      type: 'error',
+                    });
+                    setAlertVisible(true);
+                    setModalClose(false);
+                    return;
+                  }
+                  console.log('permissionStatus', permissionStatus);
+                  if (hasLocationField && !enabled) {
+                    setAlertConfig({
+                      title: t("title.title13"),
+                      message:
+                        t('title.title15'),
+                      type: 'error',
+                    });
+                    setAlertVisible(true);
+                    setModalClose(false);
+                    return;
+                  }
+                  if (hasLocationField && permissionStatus === 'denied' || permissionStatus === 'blocked') {
+                    setAlertConfig({
+                      title: t("title.title13"),
+                      message:
+                        t('title.title15'),
+                      type: 'error',
+                    });
+                    setAlertVisible(true);
+                    setModalClose(false);
+                    return;
+                  }
+                  if (permissionStatus.toString() !== 'blocked') {
+                    setLocationVisible(true);
+                    setActionSaveLoader(true);
+                    setIsValidate(true);
+                    if (validateForm()) {
+                      const submitValues: Record<string, any> = {};
+                      controls?.forEach(f => {
+                        if (f.refcol !== '1') submitValues[f?.field] = formValues[f?.field];
+                      });
+                      try {
+                        setLoader(true);
+                        await dispatch(
+                          savePageThunk({ page: url, id, data: { ...submitValues } }),
+                        ).unwrap();
+                        setLoader(false);
+                        setIsValidate(false);
+
+                        fetchPageData();
+                        setAlertConfig({
+                          title: t('title.title17'),
+                          message: t("title.title18"),
+                          type: 'success',
+                        });
+                        setAlertVisible(true);
+                        setGoBack(true);
+                        setTimeout(() => {
+                          setAlertVisible(false);
+                          navigation.goBack();
+                        }, 1500);
+                      } catch (err: any) {
+                        setLoader(false);
+
+                        setAlertConfig({
+                          title: t('title.title17'),
+
+                          message: err,
+                          type: 'error',
+                        });
+                        setAlertVisible(true);
+                        setGoBack(false);
+                      }
+                    }
+                    setActionSaveLoader(false);
+                  }
+                } catch (error) {
+                  console.error('Error checking location status:', error);
+                }
+              }}
+            />
+          )}
         </>
       ),
     });
@@ -761,62 +857,7 @@ const PageScreen = () => {
               contentContainerStyle={{ paddingBottom: keyboardHeight }}
               keyboardShouldPersistTaps="handled"
             />
-            {!authUser && controls.length > 0 && (
-              <TouchableOpacity
-                style={{
-                  height: 46,
-                  width: '100%',
-                  backgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR,
-                  justifyContent: 'center',
-                  alignContent: 'center',
-                  alignItems: 'center',
-                  borderRadius: 6,
-                }}
-                onPress={async () => {
-                  setActionSaveLoader(true);
-                  setIsValidate(true);
-                  if (validateForm()) {
-                    const submitValues: Record<string, any> = {};
-                    controls?.forEach(f => {
-                      if (f.refcol !== '1') submitValues[f?.field] = formValues[f?.field];
-                    });
-                    try {
-                      setLoader(true);
-                      await dispatch(
-                        savePageThunk({ page: url, id, data: { ...submitValues } }),
-                      ).unwrap();
-                      setLoader(false);
-                      setIsValidate(false);
 
-                      fetchPageData();
-                      setAlertConfig({
-                        title: 'Record saved',
-                        message: `Record saved successfully!`,
-                        type: 'success',
-                      });
-
-                      setAlertVisible(true);
-                      setGoBack(true);
-                      setTimeout(() => {
-                        setAlertVisible(false);
-                        navigation.goBack();
-                      }, 1500);
-                    } catch (err: any) {}
-                  }
-                  setActionSaveLoader(false);
-                }}
-              >
-                <Text
-                  style={{
-                    color: ERP_COLOR_CODE.ERP_WHITE,
-                    fontSize: 16,
-                    fontWeight: '800',
-                  }}
-                >
-                  {actionSaveLoader ? 'Loading' : 'Save'}
-                </Text>
-              </TouchableOpacity>
-            )}
           </View>
           <CustomAlert
             visible={alertVisible}

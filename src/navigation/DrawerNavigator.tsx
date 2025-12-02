@@ -9,6 +9,7 @@ import CustomDrawerContent from '../components/drawer/CustomDrawerContent';
 import useTranslations from '../hooks/useTranslations';
 import { useAppSelector } from '../store/hooks';
 import { ERP_COLOR_CODE } from '../utils/constants';
+import FileFolderManager from '../screens/dashboard/file_folder_manager/FileFolderManager';
 
 const Drawer = createDrawerNavigator();
 
@@ -35,21 +36,7 @@ const DrawerNavigator = () => {
         }}
         component={TabNavigator}
       />
-      <Drawer.Screen
-        name="Attendance"
-        component={AttendanceScreen}
-        options={{ title: t('navigation.attendance') }}
-      /> 
-      <Drawer.Screen
-        name="Notification"
-        component={AlertScreen}
-        options={{ title: t('navigation.alert') }}
-      />
-      <Drawer.Screen
-        name="Privacy Policy"
-        component={PrivacyPolicyScreen}
-        options={{ title: t('navigation.privacyPolicy') }}
-      />
+      
     </Drawer.Navigator>
   </>
   );

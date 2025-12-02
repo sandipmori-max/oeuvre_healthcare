@@ -74,7 +74,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
   }, [isLoading, validationLoading, erpLoginLoading]);
 
   const initialFormValues = {
-    company_code: '',
+    company_code: 'oeuvre01',
     user: '',
     password: '',
     firebaseid: fcmToken,
@@ -149,7 +149,8 @@ const LoginForm: React.FC<LoginFormProps> = ({
                   ],
                 }}
               >
-                <ERPTextInput
+                {
+                  field !== 'company_code' &&    <ERPTextInput
                   label={t(`auth.${field === 'company_code' ? 'companyCode' : field}`)}
                   placeholder={t(
                     `auth.${
@@ -180,6 +181,8 @@ const LoginForm: React.FC<LoginFormProps> = ({
                   inputStyle={styles.input}
                   errorStyle={styles.errorText}
                 />
+                }
+             
               </Animated.View>
             ))}
 

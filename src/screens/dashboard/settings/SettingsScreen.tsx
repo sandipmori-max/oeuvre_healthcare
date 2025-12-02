@@ -195,10 +195,13 @@ const SettingsScreen = () => {
         } else if (item?.title === t('settings.biometricAuth')) {
           navigation.navigate('PinSet');
         } else if (item?.title === t('settings.privacySettings')) {
-          navigation.navigate('Privacy Policy');
+          navigation.navigate('Privacy Policy', {
+            titlePage: t('settings.privacySettings')
+          });
         } else if (item?.title === t('settings.helpSupport')) {
           navigation.navigate('Privacy Policy', {
             url: 'http://deverp.com/index.aspx?q=contact_us',
+            titlePage: t('settings.helpSupport')
           });
         } else if (item?.action) {
           setAlertConfig({
