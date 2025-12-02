@@ -36,7 +36,7 @@ class DevERPService {
 
     const storedToken = await AsyncStorage.getItem('erp_token');
     const storedTokenValidTill = await AsyncStorage.getItem('erp_token_valid_till');
-   
+
     if (storedToken && storedTokenValidTill && new Date(storedTokenValidTill) > new Date()) {
       this.token = storedToken;
       this.tokenValidTill = storedTokenValidTill;
@@ -48,7 +48,7 @@ class DevERPService {
 
   private async apiCall<T>(endpoint: string, payload: any): Promise<T> {
     try {
-      
+
       await this.checkNetwork();
       await this.ensureAuthToken();
       console.log("link", this.link)
@@ -89,8 +89,8 @@ class DevERPService {
 
       if (Platform.OS !== 'ios' && response.data.link.startsWith('https://')) {
         this.link = response.data.link.replace(/^https:\/\//i, 'http://');
-      }else{
-         this.link =response.data.link;
+      } else {
+        this.link = response.data.link;
       }
       await AsyncStorage.setItem('erp_link', this.link);
     }
@@ -98,7 +98,7 @@ class DevERPService {
   }
 
   async validateCompanyCode(code: string) {
-     
+
     try {
       console.log("code++++++++++++-------------", code)
 
@@ -106,14 +106,14 @@ class DevERPService {
       console.log("response-------------", response)
       return response.success === 1
         ? {
-            isValid: true,
-            appName: response?.name,
-            appUrl: response?.link,
-            message: 'Company code validated successfully',
-            response: response
-          }
+          isValid: true,
+          appName: response?.name,
+          appUrl: response?.link,
+          message: 'Company code validated successfully',
+          response: response
+        }
         : { isValid: false, message: 'Invalid company code' };
-    } catch (e){
+    } catch (e) {
       console.log("e*********************", e)
       return { isValid: false, message: 'Failed to validate company code' };
     }
@@ -123,8 +123,8 @@ class DevERPService {
     user: string;
     pass: string;
     firebaseid?: string;
-   }): Promise<LoginResponse> {
-    console.log("log----------------------------" , this.link)
+  }): Promise<LoginResponse> {
+    console.log("log----------------------------", this.link)
 
     await this.checkNetwork();
     const app_id = generateGUID();
@@ -143,14 +143,13 @@ class DevERPService {
     };
     try {
       const response = await apiClient.post<LoginResponse>(
-      `${this.link}msp_api.aspx/setAppID`,
-      loginData,
-    );
-    return {...response.data, app_id: app_id};
+        `${this.link}msp_api.aspx/setAppID`,
+        loginData,
+      );
+      return { ...response.data, app_id: app_id };
     } catch (error) {
-      console.log("🚀 ~ DevERPService ~ loginToERP ~ error:", error?.data?.message)
-       return { success: 0, message :  error?.data?.message.toString() };
-      
+      return { success: 0, message: error?.data?.message || "Something went wong" };
+
     }
   }
 
@@ -164,7 +163,7 @@ class DevERPService {
     );
 
     if (String(response?.data.success) !== '1')
-      throw new Error(response?.data?.message || 'Failed to get token');
+      throw new Error(response?.data?.message || 'Please check your internet connection');
 
     this.token = response?.data?.token || '';
     this.tokenValidTill = response?.data?.validTill || '';
@@ -181,13 +180,13 @@ class DevERPService {
       );
       if (tableCheckResult[0].rows.length > 0) {
         const activeAccount = await getActiveAccount(db);
-       
+
         this.token = response.data.token || '';
         if (activeAccount) {
           const updatedUser = {
             ...activeAccount.user,
             token: response.data.token,
-            tokenValidTill: response.data.validTill ,
+            tokenValidTill: response.data.validTill,
           };
           await db.executeSql(`UPDATE erp_accounts SET user_json = ? WHERE id = ?`, [
             JSON.stringify(updatedUser),
@@ -210,9 +209,9 @@ class DevERPService {
 
   getDashboard() {
     return this.apiCall<DashboardResponse>('msp_api.aspx/getDB', { token: this.token }).then(res => {
-    console.log("🚀 ~ DevERPService ~ getDashboard ~ res:", res)
-    return JSON.stringify(res);
-},
+      console.log("🚀 ~ DevERPService ~ getDashboard ~ res:", res)
+      return JSON.stringify(res);
+    },
     );
   }
 
@@ -247,7 +246,7 @@ class DevERPService {
       inremarks: rawData?.remark || '',
       inlocation: `${rawData?.latitude.toString()},${rawData?.longitude.toString()}`,
     };
-   
+
 
     return this.apiCall<AttendanceResponse>(`msp_api.aspx/pageSave`, {
       token: this.token,
@@ -295,7 +294,7 @@ class DevERPService {
     });
   }
 
-  async handleDeleteAction(  id: string,   page: string, remarks: string) {
+  async handleDeleteAction(id: string, page: string, remarks: string) {
     return this.apiCall<any>(`msp_api.aspx/pageDelete`, {
       token: this.token,
       id,

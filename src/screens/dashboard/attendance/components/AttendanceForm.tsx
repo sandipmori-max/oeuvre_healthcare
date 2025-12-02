@@ -1,4 +1,4 @@
-import { View, Text, Image, TextInput, AppState } from 'react-native';
+import { View, Text, Image, TextInput, AppState, Dimensions } from 'react-native';
 import React, { useState, useRef, useEffect } from 'react';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
@@ -25,6 +25,7 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
   const dispatch = useAppDispatch();
   const { user } = useAppSelector(state => state?.auth);
   const baseLink = useBaseLink();
+  const theme = useAppSelector(state => state?.theme.mode);
 
   const [statusImage, setStatusImage] = useState<string | null>(null);
   const [userLocation, setUserLocation] = useState<UserLocation | null>(null);
@@ -87,8 +88,7 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
         if (asset?.base64) {
           setFieldValue(
             'imageBase64',
-            `${
-              resData?.success === 1 || resData?.success === '1' ? 'punchOut.jpeg' : 'punchIn.jpeg'
+            `${resData?.success === 1 || resData?.success === '1' ? 'punchOut.jpeg' : 'punchIn.jpeg'
             }; data:${asset?.type};base64,${asset?.base64}`,
           );
         }
@@ -105,7 +105,7 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
     handleSubmit: () => void,
   ) => {
     const enabled = await DeviceInfo.isLocationEnabled();
-     if (!enabled) {
+    if (!enabled) {
       setBlocked(false);
       setLocationLoading(false);
       setAttendanceDone(false);
@@ -148,7 +148,7 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
         error => {
           setAlertConfig({
             title: t('errors.locationError'),
-            message: error?.message || 'Unable to fetch location',
+            message: error?.message || t("msg.msg5"),
             type: 'error',
           });
           setAlertVisible(true);
@@ -166,7 +166,11 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
   };
 
   return (
-    <View style={{ width: '100%', padding: 16 }}>
+    <View style={{
+      width: '100%',
+      height: Dimensions.get('screen').height,
+      padding: 16, backgroundColor: theme === 'dark' ? 'black' : 'white'
+    }}>
       <Formik
         initialValues={{
           name: user?.name,
@@ -181,7 +185,7 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
           longitude: Yup.string().optional(),
           remark: Yup.string().optional(),
           dateTime: Yup.string().optional(),
-          imageBase64: Yup.string().required('Image required'),
+          imageBase64: Yup.string().required(t("msg.msg6")),
         })}
         onSubmit={values => {
           dispatch(
@@ -196,8 +200,8 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
             .then(res => {
               setAttendanceDone(true);
               setAlertConfig({
-                title: 'Success',
-                message: 'Attendance marked successfully!',
+                title: t("title.title3"),
+                message: t('msg.msg7'),
                 type: 'success',
               });
               setAlertVisible(true);
@@ -212,8 +216,8 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
             .catch(err => {
               setAttendanceDone(false);
               setAlertConfig({
-                title: 'Error',
-                message: err || 'Something went wrong',
+                title: t("title.title1"),
+                message: err || t('msg.msg4'),
                 type: 'error',
               });
               setAlertVisible(true);
@@ -223,7 +227,9 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
         }}
       >
         {({ values, errors, touched, setFieldValue, handleSubmit }) => (
-          <View style={styles.profileCard}>
+          <View style={[styles.profileCard, {
+            backgroundColor: theme === 'dark' ? 'black' : 'white'
+          }]}>
             <View style={styles.profileRow}>
               <View style={styles.imageCol}>
                 {`${baseLink}/FileUpload/1/UserMaster/${user?.id}/profileimage.jpeg` ? (
@@ -251,9 +257,16 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
 
             <View style={{}}>
               <View style={styles.formGroup}>
-                <Text style={styles.label}>{t('attendance.employeeName')}</Text>
+                <Text style={[styles.label, theme === 'dark' && {
+                  color: 'white'
+                }]}>{t('attendance.employeeName')}</Text>
                 <TextInput
-                  style={[styles.input, styles.inputReadonly]}
+                  style={[styles.input, styles.inputReadonly, theme === 'dark' && {
+                    borderWidth: 1,
+                    borderColor: 'white',
+                    color: 'white',
+                    backgroundColor: 'black'
+                  }]}
                   value={values?.name}
                   editable={false}
                 />
@@ -263,9 +276,16 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
               </View>
 
               <View style={styles.formGroup}>
-                <Text style={styles.label}>{t('attendance.remark')}</Text>
+                <Text style={[styles.label, theme === 'dark' && {
+                  color: 'white'
+                }]}>{t('attendance.remark')}</Text>
                 <TextInput
-                  style={[styles.input, { minHeight: 100, textAlignVertical: 'top' }]}
+                  style={[styles.input, { minHeight: 100, textAlignVertical: 'top' }, theme === 'dark' && {
+                    borderWidth: 1,
+                    borderColor: 'white',
+                    color: 'white',
+                    backgroundColor: 'black'
+                  }]}
                   value={values?.remark}
                   onChangeText={text => setFieldValue('remark', text)}
                   placeholder={t('attendance.enterRemark')}
@@ -285,8 +305,8 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
                 <SlideButton
                   label={
                     resData?.success === 1 || resData?.success === '1'
-                      ? `Slide to ${t('attendance.checkOut')}`
-                      : `Slide to ${t('attendance.checkIn')}`
+                      ? `${t("text.text3")} ${t('attendance.checkOut')}`
+                      : `${t("text.text3")} ${t('attendance.checkIn')}`
                   }
                   successColor={
                     resData?.success === 1 || resData?.success === '1'
@@ -306,8 +326,8 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
 
       <CustomAlert
         visible={alertLocationVisible}
-        title={'Location Status'}
-        message={'We need location access only to serve you better. Please enable it to continue.'}
+        title={t("title.title4")}
+        message={t("msg.msg8")}
         type={'error'}
         onClose={() => {
           setBlocked(true);

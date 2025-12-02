@@ -9,10 +9,6 @@ const ERP_TABLE = {
   ERP_BOOKMARKS: 'erp_bookmarks',
 };
 
-// =====================
-// 🚀 MIGRATIONS SUPPORT
-// =====================
-
 const ERP_QUERY_SCHEMA_TABLE_CREATE = `
   CREATE TABLE IF NOT EXISTS schema_version (
     version INTEGER PRIMARY KEY
@@ -174,6 +170,31 @@ export const createAccountsTable = async db => {
 const META_KEYS = {
   PIN_ENABLED: 'pin_enabled',
   PIN_CODE: 'pin_code',
+  PIN_WRONG_ATTEMPTS: 'pin_wrong_attempts',
+  PIN_BLOCK_UNTIL: 'pin_block_until',
+};
+
+export const setWrongAttempts = async (db, count) => {
+  await setMeta(db, META_KEYS.PIN_WRONG_ATTEMPTS, String(count));
+};
+
+export const getWrongAttempts = async (db) => {
+  const v = await getMeta(db, META_KEYS.PIN_WRONG_ATTEMPTS);
+  return v ? Number(v) : 0;
+};
+
+export const setBlockUntil = async (db, timestamp) => {
+  await setMeta(db, META_KEYS.PIN_BLOCK_UNTIL, String(timestamp));
+};
+
+export const getBlockUntil = async (db) => {
+  const v = await getMeta(db, META_KEYS.PIN_BLOCK_UNTIL);
+  return v ? Number(v) : 0;
+};
+
+export const resetAttempts = async (db) => {
+  await setWrongAttempts(db, 0);
+  await setBlockUntil(db, 0);
 };
 
 export const setPinEnabled = async (db, enabled) => {
@@ -203,6 +224,27 @@ export const isPinEnabled = async (db) => {
     return false;
   }
 };
+
+export const resetPin = async (db) => {
+  try {
+    // Remove pin_code entry
+    await db.executeSql(
+      `DELETE FROM ${ERP_TABLE.ERP_META} WHERE key = ?`,
+      [META_KEYS.PIN_CODE]
+    );
+
+    // Disable pin_enabled flag
+    await db.executeSql(
+      `INSERT OR REPLACE INTO ${ERP_TABLE.ERP_META} (key, value) VALUES (?, ?)`,
+      [META_KEYS.PIN_ENABLED, '0']
+    );
+
+    console.log('🔓 resetPin: PIN removed & PIN disabled');
+  } catch (error) {
+    console.error("Error resetPin:", error);
+  }
+};
+
 
 export const setPinCode = async (db, pin) => {
   try {
@@ -411,5 +453,17 @@ export const logoutUser = async (db, accountId) => {
   } catch (error) {
     console.error("Error logoutUser:", error);
     return null;
+  }
+};
+
+export const removePinCode = async (db) => {
+  try {
+    await db.executeSql(
+      `DELETE FROM ${ERP_TABLE.ERP_META} WHERE key = ?`,
+      [META_KEYS.PIN_CODE]
+    );
+    console.log('🔓 removePinCode: PIN deleted');
+  } catch (error) {
+    console.error('Error removePinCode:', error);
   }
 };

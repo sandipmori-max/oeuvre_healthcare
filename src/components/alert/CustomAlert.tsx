@@ -9,6 +9,7 @@ import { getAlertStyles } from './helper';
 import ERPTextInput from '../input/ERPTextInput';
 import { ERP_COLOR_CODE } from '../../utils/constants';
 import MaterialIcons from '@react-native-vector-icons/material-icons';
+import { useAppSelector } from '../../store/hooks';
 
 const CustomAlert: React.FC<CustomAlertProps> = ({
   visible,
@@ -31,6 +32,7 @@ const CustomAlert: React.FC<CustomAlertProps> = ({
 
   const [remarks, setRemarks] = useState<any>('');
   const [error, setError] = useState<any>('');
+  const theme = useAppSelector(state => state?.theme.mode);
 
   const handleChangedRemarks = (val: string) => {
     setRemarks(val);
@@ -40,18 +42,18 @@ const CustomAlert: React.FC<CustomAlertProps> = ({
   };
 
   useEffect(() => {
-  const onBackPress = () => {
-    if (visible) {
-      onClose?.();
-      return true; // stop propagation
-    }
-    return false;
-  };
+    const onBackPress = () => {
+      if (visible) {
+        onClose?.();
+        return true; // stop propagation
+      }
+      return false;
+    };
 
-  const backHandler = BackHandler.addEventListener('hardwareBackPress', onBackPress);
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', onBackPress);
 
-  return () => backHandler.remove();
-}, [visible, onClose]);
+    return () => backHandler.remove();
+  }, [visible, onClose]);
 
 
   const handleDonePress = () => {
@@ -74,7 +76,11 @@ const CustomAlert: React.FC<CustomAlertProps> = ({
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
       <View style={styles.overlay}>
-        <View style={[styles.bottomSheet, alertStyles.container]}>
+        <View style={[styles.bottomSheet, alertStyles.container, theme === 'dark' && {
+          backgroundColor: 'black',
+          borderWidth: 1,
+          borderColor: 'white'
+        }]}>
           <View style={styles.header}>
             <Text style={alertStyles.title}>{title || ''}</Text>
             <TouchableOpacity onPress={onClose} style={styles.closeIcon}>

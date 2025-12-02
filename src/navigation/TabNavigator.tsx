@@ -1,7 +1,7 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
-import { ERP_COLOR_CODE } from '../utils/constants';
+import { DARK_COLOR, ERP_COLOR_CODE } from '../utils/constants';
 import EntryTab from '../screens/dashboard/tabs/entry/EntryTab';
 import ReportTab from '../screens/dashboard/tabs/report/ReportTab';
 import HomeScreen from '../screens/dashboard/tabs/home/HomeTab';
@@ -14,7 +14,7 @@ import TabIcon from '../components/tab_icon/TabIcon';
 const Tab = createBottomTabNavigator();
 
 const TabNavigator = () => {
-  const theme = useAppSelector(state => state.theme);
+  const theme = useAppSelector(state => state.theme.mode);
 
   const { t } = useTranslations();
   return (
@@ -22,10 +22,10 @@ const TabNavigator = () => {
       screenOptions={{
         headerTitleAlign: 'left',
         headerShown: true,
-        tabBarActiveTintColor: ERP_COLOR_CODE.ERP_APP_COLOR,
-        tabBarInactiveTintColor: '#8E8E93',
+        tabBarActiveTintColor: theme === 'dark' ? 'white' : ERP_COLOR_CODE.ERP_APP_COLOR,
+        tabBarInactiveTintColor: theme === 'dark' ? 'black' : ERP_COLOR_CODE.ERP_APP_COLOR,
         tabBarStyle: {
-          backgroundColor: theme === 'dark' ? ERP_COLOR_CODE.ERP_BLACK : ERP_COLOR_CODE.ERP_WHITE,
+          backgroundColor: theme === 'dark' ? DARK_COLOR : ERP_COLOR_CODE.ERP_WHITE,
           borderTopWidth: 1,
           borderTopColor: '#E5E5EA',
           height: 80,
@@ -37,7 +37,7 @@ const TabNavigator = () => {
           fontWeight: '500',
         },
         headerStyle: {
-          backgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR,
+          backgroundColor: theme === 'dark' ? DARK_COLOR : ERP_COLOR_CODE.ERP_APP_COLOR,
         },
         headerTintColor: 'white',
         headerTitleStyle: {

@@ -1,8 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import Geolocation from '@react-native-community/geolocation';
-import Geocoder from 'react-native-geocoding';
 
-Geocoder.init("YOUR_GOOGLE_MAPS_API_KEY");
 
 export const useCurrentAddress = () => {
   const [address, setAddress] = useState<string | null>(null);
@@ -17,18 +15,17 @@ export const useCurrentAddress = () => {
     Geolocation.getCurrentPosition(
       async (pos) => {
         const { latitude, longitude } = pos.coords;
+        console.log("longitude ***********************-******---------------- ", latitude, longitude)
+
         setCoords({ latitude, longitude });
-        try {
-          const geo = await Geocoder.from(latitude, longitude);
-          const area = geo.results[0].formatted_address;
-          setAddress(area);
-        } catch (err: any) {
-          setError(err.message || 'Geocoding failed');
-        } finally {
-          setLoading(false);
-        }
+        setAddress(`${latitude.toString()},${longitude.toString()}`);
+        setError(null)
+        setLoading(false);
+
       },
       (err) => {
+        console.log("longitude errrrrrrr***********************-******---------------- ", err)
+
         setError(err.message || 'Location error');
         setLoading(false);
       },

@@ -23,6 +23,12 @@ const initialState: AuthState = {
   isDashboardLoading: false,
   activeToken: null,
   isPinLoaded: false,
+  dashboardFromDate: '',
+  dashboardToDate: '',
+  dashboardBranch: '',
+  dashboardType: '',
+  dashboardBranchId: '',
+  dashboardTypeId: ''
 };
 
 const authSlice = createSlice({
@@ -64,6 +70,27 @@ const authSlice = createSlice({
     },
     setActiveToken: (state, action: PayloadAction<string | null>) => {
       state.activeToken = action?.payload;
+    },
+    setActiveDashboardBranchId: (state, action: PayloadAction<string | null>) => {
+      state.dashboardBranchId = action?.payload;
+    },
+    setActiveDashboardTypeId: (state, action: PayloadAction<string | null>) => {
+      state.dashboardTypeId = action?.payload;
+    },
+    setActiveDashboardFromDate: (state, action: PayloadAction<string | null>) => {
+      console.log("date---------", action.payload)
+      state.dashboardFromDate = action?.payload;
+    },
+    setActiveDashboardToDate: (state, action: PayloadAction<string | null>) => {
+      console.log("date---------", action.payload)
+
+      state.dashboardToDate = action?.payload;
+    },
+    setActiveDashboardBranch: (state, action: PayloadAction<string | null>) => {
+      state.dashboardBranch = action?.payload;
+    },
+    setActiveDashboardType: (state, action: PayloadAction<string | null>) => {
+      state.dashboardType = action?.payload;
     },
   },
   extraReducers: builder => {
@@ -313,5 +340,11 @@ export const {
   setDashboardLoading,
   setActiveToken,
   setIsPinLoaded,
+  setActiveDashboardBranchId,
+  setActiveDashboardBranch,
+  setActiveDashboardFromDate,
+  setActiveDashboardToDate,
+  setActiveDashboardType,
+  setActiveDashboardTypeId
 } = authSlice.actions;
 export default authSlice.reducer;

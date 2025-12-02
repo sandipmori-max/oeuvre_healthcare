@@ -11,7 +11,7 @@ export const styles = StyleSheet.create({
     borderRadius: 12,
     height: Dimensions.get('screen').height,
     padding: 16,
-    marginTop: 50,
+    marginTop: 90,
   },
   helperText: {
     fontSize: 12,
@@ -21,10 +21,9 @@ export const styles = StyleSheet.create({
   },
   logo: {
     width: 100,
-    height: 50,
-    marginTop: 100,
+    height: 100,
     alignSelf: 'center',
-    marginBottom: 2,
+    marginBottom: 25,
     borderRadius: 20,
   },
   title: {
@@ -76,6 +75,8 @@ export const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.6,
     marginTop: 12,
+    borderWidth: 1,
+    borderColor: '#FFF'
   },
   errorButton: {
     backgroundColor: ERP_COLOR_CODE.ERP_DE_ACTIVE_BUTTON,
@@ -88,10 +89,11 @@ export const styles = StyleSheet.create({
     shadowOpacity: 0,
   },
   loginButtonText: {
-    color: ERP_COLOR_CODE.ERP_WHITE,
+    color: '#FFF',
     fontSize: 18,
     fontWeight: 'bold',
     textAlign: 'center',
+
   },
   cancelButton: {
     backgroundColor: ERP_COLOR_CODE.ERP_f0f0f0,

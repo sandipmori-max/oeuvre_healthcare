@@ -13,14 +13,15 @@ import { useBaseLink } from '../../../../hooks/useBaseLink';
 import { useTranslation } from 'react-i18next';
 import { ERP_COLOR_CODE } from '../../../../utils/constants';
 import ProfileSection from './ProfileSection';
- 
+
 const ProfileTab = () => {
-  const {t} = useTranslation()
+  const { t } = useTranslation()
   const navigation = useNavigation<any>();
   const { user, accounts } = useAppSelector(state => state?.auth);
   const [showAccountSwitcher, setShowAccountSwitcher] = useState(false);
   const [showAddAccount, setShowAddAccount] = useState(false);
   const baseLink = useBaseLink();
+  const theme = useAppSelector(state => state?.theme.mode);
 
   const handleAddAccount = () => {
     setShowAccountSwitcher(false);
@@ -31,6 +32,10 @@ const ProfileTab = () => {
 
   useLayoutEffect(() => {
     navigation.setOptions({
+      headerStyle: {
+        backgroundColor: theme === 'dark' ? 'black' : ERP_COLOR_CODE.ERP_APP_COLOR,   // <-- BLACK HEADER
+      },
+      headerTintColor: '#fff',
       headerRight: () => (
         <>
           <ERPIcon
@@ -55,14 +60,20 @@ const ProfileTab = () => {
     });
   }, [navigation]);
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, theme === 'dark' && {
+      backgroundColor: 'black'
+    }]}>
       <ScrollView
-        style={styles.scrollContainer}
+        style={[styles.scrollContainer, theme === 'dark' && {
+          backgroundColor: 'black'
+        }]}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[styles.scrollContent, theme === 'dark' && {
+          backgroundColor: 'black'
+        }]}
       >
         {/* Profile Card */}
-         <ProfileSection 
+        <ProfileSection
           user={user}
           baseLink={baseLink}
           onEditPress={() =>
@@ -76,15 +87,27 @@ const ProfileTab = () => {
         />
 
         {/* Account Section */}
-        <View style={styles.sectionContainer}>
-          <Text style={styles.sectionTitle}>{t('profile.accountManagement')}</Text>
+        <View style={[styles.sectionContainer, theme === 'dark' && {
+          borderWidth: 1,
+          borderColor: 'white',
+          borderRadius: 8,
+          backgroundColor: 'black'
+        }]}>
+          <Text style={[styles.sectionTitle, theme === 'dark' && {
+            backgroundColor: 'black',
+            color: 'white',
+            borderBottomWidth: 1,
+            borderBottomColor: 'white'
+          }]}>{t('profile.accountManagement')}</Text>
           <TouchableOpacity style={styles.settingCard} onPress={() => setShowAccountSwitcher(true)}>
             <View style={styles.settingHeader}>
               <View style={styles.settingIcon}>
-                <MaterialIcons name={'group'} color={ERP_COLOR_CODE.ERP_BLACK} size={22} />
+                <MaterialIcons name={'group'} color={theme === 'dark' ? 'black' : ERP_COLOR_CODE.ERP_BLACK} size={22} />
               </View>
               <View style={styles.settingInfo}>
-                <Text style={styles.settingTitle}>{t('profile.manageAccounts')}</Text>
+                <Text style={[styles.settingTitle, theme === 'dark' && {
+                  color: 'white'
+                }]}>{t('profile.manageAccounts')}</Text>
                 <Text style={styles.settingSubtitle}>
                   {accounts?.length} {t('profile.account')}{accounts?.length !== 1 ? 's' : ''} {t('profile.available')}
                 </Text>
@@ -95,12 +118,14 @@ const ProfileTab = () => {
 
           {activeAccount && (
             <View style={styles.settingCard}>
-              <View style={styles.settingHeader}>
+              <View style={[styles.settingHeader,]}>
                 <View style={styles.settingIcon}>
-                  <MaterialIcons name={'access-time'} color={ERP_COLOR_CODE.ERP_BLACK} size={22} />
+                  <MaterialIcons name={'access-time'} color={theme === 'dark' ? 'black' : ERP_COLOR_CODE.ERP_BLACK} size={22} />
                 </View>
                 <View style={styles.settingInfo}>
-                  <Text style={styles.settingTitle}>{t('profile.lastLogin')}</Text>
+                  <Text style={[styles.settingTitle, theme === 'dark' && {
+                    color: 'white'
+                  }]}>{t('profile.lastLogin')}</Text>
                   <Text style={styles.settingSubtitle}>
                     {formatDateHr(activeAccount?.lastLoginAt, false)}
                   </Text>

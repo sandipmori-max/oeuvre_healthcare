@@ -16,7 +16,6 @@ export const styles = StyleSheet.create({
     color: ERP_COLOR_CODE.ERP_333,
   },
     input: {
-    borderWidth: 1,
     borderColor: ERP_COLOR_CODE.ERP_BORDER_LINE,
     borderRadius: 6,
     paddingHorizontal: 12,

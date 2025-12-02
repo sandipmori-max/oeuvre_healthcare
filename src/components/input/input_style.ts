@@ -26,7 +26,7 @@ export const styles = StyleSheet.create({
   toggleButton: {
     position: 'absolute',
     right: 14,
-    top: -8,
+    top: -4,
     height: '100%',
     justifyContent: 'center',
     alignItems: 'center',

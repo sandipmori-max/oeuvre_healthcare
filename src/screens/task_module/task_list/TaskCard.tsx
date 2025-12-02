@@ -11,7 +11,7 @@ const statusColors: Record<string, string> = {
 };
 
 const TaskCard = ({ task, onPress }) => {
- 
+
   return (
     <TouchableOpacity style={styles.card} onPress={onPress}>
       <View style={[styles.statusBar, { backgroundColor: statusColors[task.status] }]} />
@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent:'space-between',
+    justifyContent: 'space-between',
   },
   priorityChip: {
     borderRadius: 8,

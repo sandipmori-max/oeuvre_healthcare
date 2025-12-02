@@ -9,6 +9,7 @@ import { styles } from './web_style';
 import { useBaseLink } from '../../../hooks/useBaseLink';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ERPIcon from '../../../components/icon/ERPIcon';
+import { useAppSelector } from '../../../store/hooks';
 
 const WebScreen = () => {
   const { t } = useTranslations();
@@ -20,10 +21,10 @@ const WebScreen = () => {
   const [isReloading, setIsReloading] = useState(false);
   const webviewRef = useRef<WebView>(null);
   const baseLink = useBaseLink();
+  const theme = useAppSelector(state => state?.theme.mode);
 
   const url = isFromChart ? `${baseLink}app/index.html?dashboard/0/&token=${token}` : '';
 
-  console.log("url----------------", url);
 
   useEffect(() => {
     (async () => {
@@ -33,16 +34,16 @@ const WebScreen = () => {
   }, []);
 
   useEffect(() => {
-  return () => {
-     try {
-      console.log('🧹 Cleaning WebView cache on unmount...');
-      webviewRef.current?.clearCache(true);
-      webviewRef.current?.clearHistory();
-    } catch (e) {
-      console.warn('Cache clear failed:', e);
-    }
-  };
-}, []);
+    return () => {
+      try {
+        console.log('🧹 Cleaning WebView cache on unmount...');
+        webviewRef.current?.clearCache(true);
+        webviewRef.current?.clearHistory();
+      } catch (e) {
+        console.warn('Cache clear failed:', e);
+      }
+    };
+  }, []);
 
 
   const toggleDiv = () => {
@@ -58,27 +59,27 @@ const WebScreen = () => {
     webviewRef?.current?.injectJavaScript(jsCode);
     setIsHidden(prev => !prev);
   };
-const [webKey, setWebKey] = useState(Date.now());
+  const [webKey, setWebKey] = useState(Date.now());
 
-useEffect(() => {
-  return () => {
-    console.log('🧹 WebView unmounted — forcing cache clear...');
-    setWebKey(Date.now()); // resets key = full WebView re-render
-  };
-}, []);
- 
+  useEffect(() => {
+    return () => {
+      console.log('🧹 WebView unmounted — forcing cache clear...');
+      setWebKey(Date.now());
+    };
+  }, []);
+
 
   const reloadWebView = () => {
-      setWebKey(Date.now());
+    setWebKey(Date.now());
 
     setIsReloading(true);
-     try {
-    webviewRef.current?.clearCache(true);
-    webviewRef.current?.clearHistory();
-  } catch (e) {
-    console.warn('Cache clear failed:', e);
-  }
-  webviewRef.current?.reload();
+    try {
+      webviewRef.current?.clearCache(true);
+      webviewRef.current?.clearHistory();
+    } catch (e) {
+      console.warn('Cache clear failed:', e);
+    }
+    webviewRef.current?.reload();
   };
 
   useLayoutEffect(() => {
@@ -86,9 +87,9 @@ useEffect(() => {
       headerTitle: () => (
         <Text
           numberOfLines={1}
-          style={{ maxWidth: 180, fontSize: 18, fontWeight: '700', color: ERP_COLOR_CODE.ERP_WHITE }}
+          style={{ maxWidth: 180, fontSize: 18, fontWeight: '700', color: 'white' }}
         >
-          {isFromChart ? 'Dashboard' : item?.title || t('webScreen.details')}
+          {isFromChart ? t("text.text52") : item?.title || t('webScreen.details')}
         </Text>
       ),
       headerRight: () => (
@@ -108,11 +109,11 @@ useEffect(() => {
     });
   }, [navigation, item?.title, t, isHidden]);
 
- const targetUrl = useMemo(() => {
+  const targetUrl = useMemo(() => {
     const itemUrl = item?.url || '';
-    console.log("it+++++++++++++++++emUrl", itemUrl)
     return `${baseLink}${itemUrl}&token=${token}`;
   }, [baseLink, item?.url, token]);
+
 
   if ((!isFromChart && !targetUrl) || (isFromChart && !url)) {
     return (
@@ -122,7 +123,6 @@ useEffect(() => {
     );
   }
 
-  console.log("targetUrl===========================", targetUrl)
 
   return (
     <SafeAreaView style={styles.container}>
@@ -142,11 +142,15 @@ useEffect(() => {
             scrollEnabled={true}
             decelerationRate={0.998}
             cacheEnabled={true}
-              incognito={true}       
-             cacheMode="LOAD_DEFAULT"
+            incognito={true}
+            cacheMode="LOAD_DEFAULT"
             renderLoading={() => (
-              <View style={styles.webviewLoadingContainer}>
-                <View style={styles.webviewLoadingContent}>
+              <View style={[styles.webviewLoadingContainer, theme === 'dark' && {
+                backgroundColor: "black"
+              }]}>
+                <View style={[styles.webviewLoadingContent, theme === 'dark' && {
+                  backgroundColor: 'black'
+                }]}>
                   <FullViewLoader />
                 </View>
               </View>

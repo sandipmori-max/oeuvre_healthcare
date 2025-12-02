@@ -14,7 +14,7 @@ const Drawer = createDrawerNavigator();
 
 const DrawerNavigator = () => {
   const { t } = useTranslations();
-  const theme = useAppSelector(state => state.theme);
+  const theme = useAppSelector(state => state.theme.mode);
 
   return (
   <>
@@ -35,13 +35,13 @@ const DrawerNavigator = () => {
         }}
         component={TabNavigator}
       />
-      {/* <Drawer.Screen
+      <Drawer.Screen
         name="Attendance"
         component={AttendanceScreen}
         options={{ title: t('navigation.attendance') }}
-      />  */}
+      /> 
       <Drawer.Screen
-        name="Alert"
+        name="Notification"
         component={AlertScreen}
         options={{ title: t('navigation.alert') }}
       />

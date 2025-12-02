@@ -6,7 +6,6 @@ export const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: ERP_COLOR_CODE.ERP_WHITE,
   },
-
   iconWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -72,9 +71,9 @@ export const styles = StyleSheet.create({
     marginTop: 4,
   },
   addButton: {
-    flexDirection:'row',
-    justifyContent:'center',
-    alignContent:'center',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignContent: 'center',
     gap: 8,
     backgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR,
     paddingVertical: 15,

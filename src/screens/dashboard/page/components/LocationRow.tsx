@@ -4,11 +4,12 @@ import { styles } from '../page_style';
 import { ERP_COLOR_CODE } from '../../../../utils/constants';
 import { useCurrentAddress } from '../../../../hooks/useCurrentLocation';
 import MaterialIcons from '@react-native-vector-icons/material-icons';
+import useTranslations from '../../../../hooks/useTranslations';
 
 const LocationRow = ({ locationEnabled, locationVisible, isValidate, item, value, setValue }: any) => {
-  console.log("locationEnabled ***********************-******---------------- ", locationEnabled)
   const { coords, address: hookAddress, loading, error, refetch } = useCurrentAddress();
   const [address, setAddress] = useState<string>('');
+    const { t } = useTranslations();
 
   useEffect(() => {
     if(!locationEnabled){
@@ -23,9 +24,9 @@ const LocationRow = ({ locationEnabled, locationVisible, isValidate, item, value
       return;
     }
 
-    if (!loading && coords) {
+    if (!loading && hookAddress) {
       setValue({
-        [item?.field]: `${coords?.latitude.toString()},${coords?.longitude.toString()}`,
+        [item?.field]: hookAddress,
       });
       setAddress(hookAddress || `${coords?.latitude},${coords?.longitude}`);
     }
@@ -34,7 +35,7 @@ const LocationRow = ({ locationEnabled, locationVisible, isValidate, item, value
   return (
     <View style={{ marginBottom: 16 }}>
       <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
-        <Text style={styles.label}>{item?.fieldtitle}</Text>
+        <Text style={[styles.label, ]}>{item?.fieldtitle}</Text>
         {item?.fieldtitle !== item?.tooltip && <Text> - ( {item?.tooltip} )</Text>}
         {item?.mandatory === '1' && <Text style={{ color: ERP_COLOR_CODE.ERP_ERROR }}>*</Text>}
       </View>
@@ -45,7 +46,7 @@ const LocationRow = ({ locationEnabled, locationVisible, isValidate, item, value
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <ActivityIndicator size="small" color={ERP_COLOR_CODE.ERP_555} />
             <Text style={{ marginLeft: 8, color: ERP_COLOR_CODE.ERP_555 }}>
-              Fetching current location...
+              {t('text.text37')}
             </Text>
           </View>
         ) : address ? (
@@ -60,7 +61,7 @@ const LocationRow = ({ locationEnabled, locationVisible, isValidate, item, value
             }}
           >
             <Text style={{  color: '#999', width: '80%' }}>
-              {error ? `Error: ${error}` : 'Address not found'}
+              {error ? `${t("title.title1")}: ${error}` : t("text.text38")}
             </Text>
             <TouchableOpacity
               style={{

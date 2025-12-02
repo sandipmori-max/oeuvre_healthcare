@@ -222,7 +222,7 @@ export const styles = StyleSheet.create({
 
   searchContainer: {
     marginTop: 8,
-    marginBottom: 16,
+    marginBottom: 8,
   },
   searchInputContainer: {
     flexDirection: 'row',

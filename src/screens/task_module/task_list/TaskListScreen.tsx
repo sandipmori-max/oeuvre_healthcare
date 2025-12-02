@@ -77,7 +77,7 @@ const TaskListScreen = ({ tasks, onSelectTask, showPicker, showFilter }) => {
                   style={styles.searchInput}
                   placeholder="Search developer..."
                   value={search}
-                  // onChangeText={setSearch}
+                // onChangeText={setSearch}
                 />
 
                 <Text style={{ marginBottom: 4, fontSize: 12 }}>Status</Text>

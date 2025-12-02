@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
- 
+
 const HTMLTable = ({ html }) => {
   console.log("🚀 ~ HTMLTable ~ html:", html)
   // Parse <tr> rows
@@ -28,8 +28,8 @@ const HTMLTable = ({ html }) => {
 
 const styles = StyleSheet.create({
   table: {
-     borderWidth: 1,
-     height: 250,
+    borderWidth: 1,
+    height: 250,
     borderColor: "#ccc",
     width: "100%",
     marginVertical: 5,

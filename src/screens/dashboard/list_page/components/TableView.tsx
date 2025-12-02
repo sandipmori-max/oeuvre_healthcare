@@ -4,7 +4,7 @@ import { styles } from '../list_page_style';
 import { formatHeaderTitle } from '../../../../utils/helpers';
 import NoData from '../../../../components/no_data/NoData';
 import { useNavigation } from '@react-navigation/native';
-import { ERP_COLOR_CODE } from '../../../../utils/constants';
+import { DARK_COLOR, ERP_COLOR_CODE } from '../../../../utils/constants';
 import Footer from '../../tabs/home/Footer';
 import MemoizedFooterView from './MemoizedFooterView';
 
@@ -178,7 +178,7 @@ const TableView = ({
                   <TouchableOpacity
                     key={`${key}-${idx}`}
                     style={{
-                      backgroundColor: authUser ? 'gray' : color,
+                      backgroundColor: authUser ? DARK_COLOR : color,
                       paddingHorizontal: 12,
                       paddingVertical: 8,
                       borderRadius: 6,
