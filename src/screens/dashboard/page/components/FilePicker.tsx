@@ -22,7 +22,7 @@ interface FileType {
   type?: string;
 }
 
-const FilePickerRow = ({ item, handleAttachment, baseLink, infoData }) => {
+const FilePickerRow = ({ item, handleAttachment, baseLink, infoData, isFromFileManager = false , onFilePicked}) => {
    const { t } = useTranslations();
 
   const base = `${baseLink}fileupload/1/${infoData?.tableName}/${infoData?.id}/${item?.text}`;
@@ -42,7 +42,10 @@ const FilePickerRow = ({ item, handleAttachment, baseLink, infoData }) => {
         await RNFS.copyFile(files[0].uri, destPath);
         filePath = destPath;
       }
-
+    if (isFromFileManager && onFilePicked) {
+      onFilePicked(files[0]);
+      return;
+    }
       const fileBase64 = await RNFS.readFile(filePath, 'base64');
 
       handleAttachment(
@@ -101,7 +104,7 @@ const FilePickerRow = ({ item, handleAttachment, baseLink, infoData }) => {
   return (
     <View style={styles.container}>
       <Text style={styles.label}>{item?.fieldtitle}</Text>
-      {selectedFiles.length === 0 && (
+      {!isFromFileManager && selectedFiles.length === 0 && (
         <>
           {item?.text !== '' && (
             <View style={{ marginBottom: 8 }}>
@@ -120,7 +123,7 @@ const FilePickerRow = ({ item, handleAttachment, baseLink, infoData }) => {
       )}
 
       <ScrollView showsHorizontalScrollIndicator={false}>
-        {selectedFiles.map((file, index) => (
+        {!isFromFileManager && selectedFiles.map((file, index) => (
           <View key={index} style={styles.fileRow}>
             <View style={{ flexDirection: 'row' }}>
               <MaterialIcons
@@ -144,12 +147,18 @@ const FilePickerRow = ({ item, handleAttachment, baseLink, infoData }) => {
             </View>
           </View>
         ))}
-        {selectedFiles.length === 0 && (
+        {!isFromFileManager && selectedFiles.length === 0 && (
           <TouchableOpacity style={styles.addBtn} onPress={openFilePicker}>
             <MaterialIcons name="add" size={20} color={ERP_COLOR_CODE.ERP_WHITE} />
             <Text style={[styles.btnText, { marginLeft: 4 }]}>{t("text.text36")}</Text>
           </TouchableOpacity>
         )}
+        {
+          isFromFileManager && <TouchableOpacity style={styles.addBtn} onPress={openFilePicker}>
+            <MaterialIcons name="add" size={20} color={ERP_COLOR_CODE.ERP_WHITE} />
+            <Text style={[styles.btnText, { marginLeft: 4 }]}>{t("text.text36")}</Text>
+          </TouchableOpacity>
+        }
       </ScrollView>
     </View>
   );

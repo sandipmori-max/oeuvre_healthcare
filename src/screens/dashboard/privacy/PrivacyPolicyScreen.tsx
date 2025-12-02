@@ -22,6 +22,7 @@ const PrivacyPolicyScreen = () => {
 
   // Get URL from navigation params
   const passedUrl = route?.params?.url;
+  const title = route?.params?.titlePage || ""
 
   // Default URL (same as existing)
   const defaultUrl =
@@ -47,7 +48,7 @@ const PrivacyPolicyScreen = () => {
             color: theme === 'dark' ? 'white' : ERP_COLOR_CODE.ERP_WHITE,
           }}
         >
-          {t('title.title19')}
+          {title || t('title.title19')}
         </Text>
       ),
     });

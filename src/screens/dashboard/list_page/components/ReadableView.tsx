@@ -16,7 +16,8 @@ import {
   Platform,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
- 
+
+import { formatDateList, formatDateToDDMMMYYYY } from '../../../../utils/helpers';
 import { styles } from '../list_page_style';
 import NoData from '../../../../components/no_data/NoData';
 import { ERP_COLOR_CODE } from '../../../../utils/constants';
@@ -25,7 +26,6 @@ import MemoizedFooterView from './MemoizedFooterView';
 import RemarksView from './RemarksView';
 import { useAppSelector } from '../../../../store/hooks';
 import useTranslations from '../../../../hooks/useTranslations';
-import { formatDateList } from '../../../../utils/helpers';
 
 // enable LayoutAnimation on Android
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -139,6 +139,7 @@ const ReadableView = ({
 
     const status = item?.status;
     const date = item?.date;
+    console.log("date----------", date)
     const remarks = item?.remarks;
     const address = item?.address;
     const amount = item?.amount;
@@ -284,7 +285,7 @@ const ReadableView = ({
               >
                     {
                       formatDateList(date)
-                    }  
+                    }    
               </Text>
             )}
           </View>
@@ -427,48 +428,44 @@ const ReadableView = ({
           {item?.html && <MemoizedFooterView item={item} index={index} />}
         </View>
 
-        {btnKeys?.length > 0 && (
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginTop: 0, gap: 1 }}>
-            {btnKeys?.map((key, idx) => {
-              const actionValue = item[key];
-              const { label, color } = getButtonMeta(key);
-               return (
-                <TouchableOpacity
-                  key={`${key}-${idx}`}
-                  style={{
-                    backgroundColor: authUser ? '#C6C6C6' : color,
-                    paddingHorizontal: 6,
-                    paddingVertical: 4,
-                    borderRadius: 4,
-                    flexGrow: 1,
-                    maxWidth: (screenWidth ) / 6,
-                    alignItems: 'center',
-                  }}
-                  onPress={() => {
-                    if (authUser) return;
-                    handleActionButtonPressed(
-                      actionValue,
-                      label,
-                      color,
-                      item?.id,
-                      item
-                    );
-                  }}
-                >
-                  <Text
-                    style={{
-                      color: ERP_COLOR_CODE.ERP_WHITE,
-                      fontWeight: '600',
-                      fontSize: 12,
-                    }}
-                  >
-                    {label}
-                  </Text>
-                </TouchableOpacity>
-              );
-            })}
-          </View>
-        )}
+        {('btn_edit' in item ? item?.btn_edit !== '' : true) && btnKeys?.length > 0 && (
+  <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginTop: 0, gap: 1 }}>
+    {btnKeys?.map((key, idx) => {
+      const actionValue = item[key];
+      const { label, color } = getButtonMeta(key);
+
+      return (
+        <TouchableOpacity
+          key={`${key}-${idx}`}
+          style={{
+            backgroundColor: authUser ? '#C6C6C6' : color,
+            paddingHorizontal: 6,
+            paddingVertical: 4,
+            borderRadius: 4,
+            flexGrow: 1,
+            maxWidth: screenWidth / 4,
+            alignItems: 'center',
+          }}
+          onPress={() => {
+            if (authUser) return;
+            handleActionButtonPressed(actionValue, label, color, item?.id, item);
+          }}
+        >
+          <Text
+            style={{
+              color: ERP_COLOR_CODE.ERP_WHITE,
+              fontWeight: '600',
+              fontSize: 12,
+            }}
+          >
+            {label}
+          </Text>
+        </TouchableOpacity>
+      );
+    })}
+  </View>
+)}
+
       </View>
     );
 

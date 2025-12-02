@@ -3,37 +3,30 @@ import { View, Text, TouchableOpacity, LayoutAnimation, Platform, UIManager } fr
 import { ERP_COLOR_CODE } from '../../../../utils/constants';
 import { useAppSelector } from '../../../../store/hooks';
 import useTranslations from '../../../../hooks/useTranslations';
- 
-// For smooth expand/collapse animation on Android
+
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
 const RemarksView = ({ remarks }) => {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [isTruncated, setIsTruncated] = useState(false);
   const theme = useAppSelector(state => state?.theme.mode);
   const { t } = useTranslations();
 
-  const toggleExpand = () => {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    setIsExpanded((prev) => !prev);
-  };
-
   if (!remarks) return null;
 
+  // Show button only when text > 60 chars
+  const isLongText = remarks.length > 60;
+
+  const toggleExpand = () => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setIsExpanded(prev => !prev);
+  };
+
   return (
-    <View
-      style={{
-         paddingHorizontal: 4,
-        paddingVertical: 2,
-         borderColor: '#E5E7EB',
-        width: '100%'
-      }}
-    >
+    <View style={{ paddingHorizontal: 4, paddingVertical: 2, borderColor: '#E5E7EB', width: '100%' }}>
       <Text
         numberOfLines={isExpanded ? undefined : 2}
-        onTextLayout={(e) => setIsTruncated(e.nativeEvent.lines.length > 2)}
         style={{
           color: theme === 'dark' ? 'white' : ERP_COLOR_CODE.ERP_777,
           fontStyle: 'italic',
@@ -45,7 +38,7 @@ const RemarksView = ({ remarks }) => {
         {remarks}
       </Text>
 
-      {isTruncated && (
+      {isLongText && (
         <TouchableOpacity
           onPress={toggleExpand}
           activeOpacity={0.7}
