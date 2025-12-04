@@ -180,10 +180,10 @@ const HomeScreen = () => {
                 name={!isHorizontal ? 'list' : 'apps'}
                 onPress={() => setIsHorizontal(prev => !prev)}
               />
-              <ERPIcon
+              {/* <ERPIcon
                 name={isFilterVisible ? 'close' : 'filter-alt'}
                 onPress={() => setIsFilterVisible(prev => !prev)}
-              />
+              /> */}
             </>
           )}
         </>
@@ -540,6 +540,169 @@ const HomeScreen = () => {
       </TouchableOpacity>
     );
   }
+  if(!actionLoader && filteredDashboard?.length === 0 ){
+    return <View
+          style={{
+            height: Dimensions.get('screen').height * 0.75,
+            justifyContent: 'center',
+            alignItems: 'center',
+            width: '100%',
+            backgroundColor: theme === 'dark' ? 'black' : 'white',
+          }}
+        >
+
+          <View
+        style={{
+          marginTop: 1,
+          backgroundColor: theme === 'dark' ? 'black' : ERP_COLOR_CODE.ERP_APP_COLOR,
+          padding: 12,
+          // width: width,
+          borderBottomRightRadius: 24,
+          borderBottomLeftRadius: 24,
+          borderWidth: 1,
+          borderColor: 'white',
+            width: '100%',
+
+        }}
+      >
+        <Animated.View
+          style={{
+            justifyContent: 'center',
+            alignContent: 'center',
+            alignItems: 'center',
+            gap: 8,
+            flexDirection: 'row',
+            // transform: [{ translateX }],
+          }}
+        >
+          <MaterialIcons name="business" size={24} color={"#FFF"} />
+          <Text
+            numberOfLines={1}
+            style={{
+              color: "#FFF",
+              fontWeight: '600',
+              fontSize: 16,
+              maxWidth: 280,
+            }}
+          >
+            {user?.companyName || ''}
+          </Text>
+
+        </Animated.View>
+
+
+        {/* Branch + Type Buttons */}
+        {
+          isFilterVisible && <>
+            <View style={[styles.dateContainer, {
+              marginTop: 8
+            }]}>
+              {/* Dynamic Render Date Fields */}
+              {isFilterVisible && controls
+                .filter((x) => x.ctltype === "DATE")
+                .map((item, index) => (
+                  <View key={index} style={[styles.dateRow, {
+                    width: '48%'
+                  }]}>
+                    <TouchableOpacity
+                      onPress={() =>
+                        setShowDatePicker({ type: item.field === "fromdate" ? "from" : "to", show: true })
+                      }
+                      style={[styles.dateButton, {
+                        width: '98%'
+                      }]}
+                    >
+                      <View style={{ flexDirection: "row", alignItems: "center" }}>
+                        <MaterialIcons
+                          name="calendar-today"
+                          size={18}
+                          color="#fff"
+                          style={{ marginRight: 8 }}
+                        />
+                        <Text style={[styles.dateButtonText, { color: "#FFF" }]}>
+                          {item.field === "fromdate"
+                            ? fromDate || "Select From Date"
+                            : toDate || "Select To Date"}
+                        </Text>
+                      </View>
+                    </TouchableOpacity>
+                    {index === 0 && <View style={{ height: 1, width: 8 }} />}
+                  </View>
+                ))}
+            </View>
+
+            {
+              isFilterVisible &&
+
+
+              <View style={{
+
+                flexDirection: "row", justifyContent: "space-between", marginTop: 4
+              }}>
+
+                {
+                  controls
+                    .filter((x) => x.ctltype !== "DATE" && x.field !== 'userid')
+                    .map((item, index) => (<>
+                      <View style={{ width: '49.5%' }}>
+                        <CustomPicker
+                          isForceOpen={false}
+                          isValidate={false}
+                          label={item.title}
+                          selectedValue={() => { }}
+                          dtext={item?.title === 'Branch' ? auth?.dashboardBranch || item.dtext : auth.dashboardType || item?.dtext}
+                          onValueChange={(i) => {
+                            if (item?.title === 'Branch') {
+                              dispatch(setActiveDashboardBranchId(i?.value?.toString()))
+                              dispatch(setActiveDashboardBranch(i?.name))
+                            } else {
+                              dispatch(setActiveDashboardType(i?.name))
+                              dispatch(setActiveDashboardTypeId(i?.value?.toString()))
+                            }
+                          }}
+                          options={[]}
+                          item={item}
+                          errors={null}
+                          formValues={null}
+                        />
+                      </View>
+                    </>))
+
+                }
+              </View>
+            }
+          </>
+        }
+
+        {/* Date Picker */}
+        {showDatePicker?.show && (
+          <DateTimePicker
+            value={
+              showDatePicker.type === "from" && fromDate
+                ? parseCustomDate(fromDate)
+                : showDatePicker.type === "to" && toDate
+                  ? parseCustomDate(toDate)
+                  : new Date()
+            }
+            mode="date"
+            onChange={handleDateChange}
+            minimumDate={
+              showDatePicker.type === "to" && fromDate
+                ? parseCustomDate(fromDate)
+                : new Date(new Date().getFullYear(), 0, 1)
+            }
+            maximumDate={
+              showDatePicker.type === "from" && toDate ? parseCustomDate(toDate) : new Date()
+            }
+          />
+        )}
+      </View>
+      
+          <NoData />
+
+        </View>
+  };
+
   return (
     <View
       style={{

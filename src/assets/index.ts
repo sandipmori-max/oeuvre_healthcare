@@ -2,6 +2,8 @@ const ERP_BASE_URL_ICONS = './icons';
 const ERP_BASE_URL_GIF = './gif';
 
 const APP_LOGO = require(`${ERP_BASE_URL_ICONS}/logo.png`);
+const DEV_LOGO = require(`${ERP_BASE_URL_ICONS}/dev_logo.png`);
+
 
 const HOME = require(`${ERP_BASE_URL_ICONS}/home.png`);
 const ACTIVE_HOME = require(`${ERP_BASE_URL_ICONS}/active_home.png`);
@@ -34,6 +36,7 @@ const RemoteMonitoring = require(`${ERP_BASE_URL_GIF}/RemoteMonitoring.gif`);
 
 export const ERP_ICON = {
   APP_LOGO,
+  DEV_LOGO,
   HOME,
   ACTIVE_HOME,
   ENTRY,

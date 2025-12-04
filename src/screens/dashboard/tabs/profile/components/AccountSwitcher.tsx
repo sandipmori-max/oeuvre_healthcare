@@ -53,7 +53,7 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
   const handleRemoveAccount = (account: Account) => {
     setAlertConfig({
       title: 'Remove Account',
-      message: `Are you sure you want to remove ${account?.user?.company_code}?`,
+      message: `Are you sure you want to remove ${account?.user?.name}?`,
       type: 'error',
     });
     setSelectedAccount(account?.id);
@@ -89,7 +89,7 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
             await AsyncStorage.setItem('auth_token', item?.user?.token || '');
             await AsyncStorage.setItem('erp_token_valid_till', item?.user?.token || '');
             const validation = await validateCompanyCode(() =>
-              DevERPService.validateCompanyCode(item?.user?.company_code),
+              DevERPService.validateCompanyCode('oeuvre01'),
             );
             if (!validation?.isValid) {
               return;
@@ -97,7 +97,7 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
             handleSwitchAccount(item?.id);
           } else {
             const validation = await validateCompanyCode(() =>
-              DevERPService.validateCompanyCode(item?.user?.company_code),
+              DevERPService.validateCompanyCode('oeuvre01'),
             );
             if (!validation?.isValid) {
               return;

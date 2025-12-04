@@ -180,7 +180,7 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
           alignItems: 'center',
           marginBottom: 10
         }}>
-          <Image source={ERP_ICON.APP_LOGO} style={{
+          <Image source={ERP_ICON.DEV_LOGO} style={{
             height: 40,
             width: 40,
 
