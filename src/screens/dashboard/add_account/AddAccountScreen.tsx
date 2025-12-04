@@ -75,7 +75,7 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
       DevERPService.setDevice(deviceId);
       setLoader(true);
       const userExists = accounts?.some(acc => acc?.user?.name === values?.user);
-      const codeExists = accounts?.some(acc => acc?.user?.company_code === values?.company_code);
+      const codeExists = accounts?.some(acc => acc?.user?.company_code === 'oeuvre01');
 
       if (userExists && codeExists) {
         setAlertConfig({
@@ -87,7 +87,7 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
         return;
       }
       const validation = await validateCompanyCode(() =>
-        DevERPService.validateCompanyCode(values?.company_code),
+        DevERPService.validateCompanyCode('oeuvre01'),
       );
       if (!validation?.isValid) {
         setLoader(false);
@@ -104,7 +104,7 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
       );
       if (loginResult?.success === '0' || loginResult?.success === 0) {
         const validation = await validateCompanyCode(() =>
-          DevERPService.validateCompanyCode(user?.company_code),
+          DevERPService.validateCompanyCode('oeuvre01'),
         );
         if (!validation?.isValid) {
           setLoader(false);
@@ -138,7 +138,7 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
         loginUserThunk({
           newToken: loginResult?.token,
           newvalidTill: loginResult?.validtill,
-          company_code: values?.company_code,
+          company_code: 'oeuvre01',
           password: values?.password,
           isAddingAccount: true,
           user_credentials: { user: values?.user, name: values?.user },
@@ -195,13 +195,13 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
                     color: 'white'
                   }]}>{t('account.msg')}</Text>
                   <Formik
-                    initialValues={{ company_code: '', user: '', password: '' }}
+                    initialValues={{ company_code: 'oeuvre01', user: '', password: '' }}
                     validationSchema={erp_add_account_validation_schema}
                     onSubmit={handleAddAccount}
                   >
                     {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (
                       <>
-                        <View style={styles.inputContainer}>
+                        {/* <View style={styles.inputContainer}>
                           <Text style={[styles.inputLabel, theme === 'dark' && {
                             color: 'white'
                           }]}>{t('account.companyCode')}</Text>
@@ -265,7 +265,7 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
                           {touched?.company_code && errors?.company_code && (
                             <Text style={styles.errorText}>{errors?.company_code}</Text>
                           )}
-                        </View>
+                        </View> */}
 
                         <View style={styles.inputContainer}>
                           <Text style={[styles.inputLabel, theme === 'dark' && {
@@ -376,7 +376,6 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
                                 if (!values?.company_code) {
                                   handleBlur('password')
                                   setIsInputEditPass(false);
-
                                 }
                               }}
 

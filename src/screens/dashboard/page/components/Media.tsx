@@ -66,14 +66,15 @@ const Media = ({ isValidate, item, handleAttachment, infoData, baseLink, isFromN
         // Gallery / Photos
         if (Platform.OS === 'ios') {
           permission = PERMISSIONS.IOS.PHOTO_LIBRARY;
-        } else {
-          // Android 13+
-          if (Platform.Version >= 33) {
-            permission = PERMISSIONS.ANDROID.READ_MEDIA_IMAGES;
-          } else {
-            permission = PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE;
-          }
-        }
+        } 
+        // else {
+        //   // Android 13+
+        //   if (Platform.Version >= 33) {
+        //     permission = PERMISSIONS.ANDROID.READ_MEDIA_IMAGES;
+        //   } else {
+        //     permission = PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE;
+        //   }
+        // }
       }
 
       let result = await check(permission);
