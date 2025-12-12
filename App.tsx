@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Alert, AppState, StatusBar, StyleSheet } from 'react-native';
+import { ActivityIndicator, Alert, AppState, StatusBar, StyleSheet, View } from 'react-native';
 import { Provider } from 'react-redux';
 import { NavigationContainer } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -20,10 +20,33 @@ import {
   checkInitialNotification,
 } from './src/firebase/firebaseService';
 import { clearAllTempFiles } from './src/utils/helpers';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import TermsAndConsent from './src/screens/TermsConditions.tsx/TermsCondition';
+import FullViewLoader from './src/components/loader/FullViewLoader';
 
 const App = () => {
   const isConnected = useNetworkStatus();
   const [isSplashVisible, setSplashVisible] = useState(true);
+
+    const [isLoading, setIsLoading] = useState(true);
+  const [accepted, setAccepted] = useState(false);
+
+  useEffect(() => {
+    const checkAcceptance = async () => {
+      const value = await AsyncStorage.getItem("TERMS_ACCEPTED");
+      if (value === "true") {
+        setAccepted(true);
+      }
+      setIsLoading(false);
+    };
+
+    checkAcceptance();
+  }, []);
+
+  const handleAccept = () => {
+    setAccepted(true); // Move to main app
+  };
+
 
   useEffect(() => {
     clearAllTempFiles();
@@ -61,6 +84,23 @@ const App = () => {
     };
   }, []);
 
+   if (isLoading) {
+    return (
+      <TranslationProvider>
+        <Provider store={store}>
+        <View style={{flex: 1}}>
+          <FullViewLoader />
+        </View>
+        </Provider>  
+      </TranslationProvider>
+    );
+  }
+
+  // If not accepted → show Terms page
+  if (!accepted) {
+    return <TermsAndConsent onAccept={handleAccept} />;
+  }
+
   if (!isConnected) {
     return (
       <TranslationProvider>
@@ -78,11 +118,12 @@ const App = () => {
       <TranslationProvider>
       <Provider store={store}>
       <StatusBar backgroundColor={ERP_COLOR_CODE.ERP_APP_COLOR} barStyle="light-content" />
-        <SafeAreaView edges={['top']} style={{ backgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR }} />
-        <SafeAreaView edges={['top', 'left', 'right', 'bottom']} style={styles.safeArea}>
-          <CustomSplashScreen onFinish={() => setSplashVisible(false)} />
-        </SafeAreaView>
-      </Provider>  
+              <SafeAreaView edges={['top']} style={{ backgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR }} />
+              <SafeAreaView edges={['top', 'left', 'right', 'bottom']} style={styles.safeArea}>
+                <CustomSplashScreen onFinish={() => setSplashVisible(false)} />
+              </SafeAreaView>
+      </Provider>
+        
       </TranslationProvider>
     );
   }

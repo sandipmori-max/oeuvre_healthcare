@@ -113,7 +113,7 @@ export const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: ERP_COLOR_CODE.ERP_f0f0f0,
+    backgroundColor:  ERP_COLOR_CODE.ERP_f0f0f0,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,

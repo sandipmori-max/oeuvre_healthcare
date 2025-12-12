@@ -263,8 +263,14 @@ const SettingsScreen = () => {
       disabled={item.type === 'toggle'}
     >
       <View style={styles.settingHeader}>
-        <View style={styles.settingIcon}>
-          <MaterialIcons name={item?.icon} color={theme === 'dark' ? 'black' : ERP_COLOR_CODE.ERP_BLACK} size={22} />
+        <View style={[styles.settingIcon, 
+          {
+            backgroundColor: theme === 'dark' ? 'black' : "white",
+            borderWidth: 1,
+            borderColor: 'white'
+          }
+        ]}>
+          <MaterialIcons name={item?.icon} color={theme === 'dark' ? 'white' : ERP_COLOR_CODE.ERP_BLACK} size={22} />
         </View>
         <View style={styles.settingInfo}>
           <Text style={[styles.settingTitle, theme === 'dark' && {
@@ -324,8 +330,10 @@ const SettingsScreen = () => {
   };
 
   return (
-    <View style={[styles.container, theme === 'dark' && {
+    <View style={[styles.container, theme === 'dark' ? {
       backgroundColor: 'black'
+    }: {
+       backgroundColor: 'white'
     }]}>
       <ScrollView
         style={styles.scrollContainer}

@@ -540,6 +540,7 @@ const HomeScreen = () => {
       </TouchableOpacity>
     );
   }
+
   if(!actionLoader && filteredDashboard?.length === 0 ){
     return <View
           style={{
@@ -702,7 +703,6 @@ const HomeScreen = () => {
 
         </View>
   };
-
   return (
     <View
       style={{
