@@ -62,7 +62,7 @@ const PinSetupScreen = () => {
         if (enabled) {
           const oldPin = await getPinCode(db);
           setStoredPin(oldPin || '');
-          setScreen('verify'); // keep original app behavior: ask user to verify to enter setup by default
+          setScreen('verify');
         } else {
           setScreen('setup');
         }
@@ -70,7 +70,6 @@ const PinSetupScreen = () => {
         console.error('Error checking PIN:', error);
       }
 
-      // load attempts and blockUntil
       try {
         const attemptsStr = await AsyncStorage.getItem(AS_KEYS.WRONG_ATTEMPTS);
         const blockStr = await AsyncStorage.getItem(AS_KEYS.BLOCK_UNTIL);

@@ -233,7 +233,7 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
             <View style={styles.profileRow}>
               <View style={styles.imageCol}>
                 {`${baseLink}/FileUpload/1/UserMaster/${user?.id}/profileimage.jpeg` ? (
-                  <ProfileImage userId={user?.id} baseLink={baseLink} />
+                  <ProfileImage userId={user?.id} baseLink={baseLink} userName={user?.name} />
                 ) : (
                   <View
                     style={[
