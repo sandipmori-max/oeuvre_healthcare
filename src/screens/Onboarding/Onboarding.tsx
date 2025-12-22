@@ -49,15 +49,6 @@ const slides = [
   },
   {
     id: '4',
-    title: 'Real-Time Tracking & Insights',
-    desc: 'Track plant & machinery performance, vehicle routes, and order status live — with instant analytics to help you make data-driven decisions.',
-    image: ERP_GIF.DataManagement,
-    bgColor: ['#f7ce9c', '#FDEBD0'],
-    statusBar: '#f7ce9c',
-    layout: { titleY: -10, descY: 20, align: 'center' },
-  },
-  {
-    id: '5',
     title: 'Grow with Confidence',
     desc: 'Use built-in reports and dashboards to reduce waste, optimize costs, and scale business operations efficiently with DevERP.',
     image: ERP_GIF.RemoteMonitoring,
