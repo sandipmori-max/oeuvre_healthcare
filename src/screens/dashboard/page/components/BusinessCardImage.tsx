@@ -39,13 +39,16 @@ const BusinessCardView = ({ setValue, controls, item, baseLink, infoData }: any)
 
 
   const checkPermission = async (type: 'camera' | 'gallery') => {
+     if (type === 'gallery') {
+        return true
+      } 
     let permission;
 
 
     if (Platform.OS === 'ios') {
       permission = type === 'camera' ? PERMISSIONS.IOS.CAMERA : PERMISSIONS.IOS.PHOTO_LIBRARY;
     } else {
-      const androidVersion = parseInt(Platform.Version as string, 10);
+      // const androidVersion = parseInt(Platform.Version as string, 10);
       if (type === 'camera') {
         permission = PERMISSIONS.ANDROID.CAMERA;
       } 
@@ -137,7 +140,9 @@ const BusinessCardView = ({ setValue, controls, item, baseLink, infoData }: any)
 
 
     setShowPicker(false);
-    const res = await launchImageLibrary({ mediaType: 'photo', quality: 0.5, includeBase64: true });
+    const res = await launchImageLibrary({ 
+      selectionLimit: 1,
+      mediaType: 'photo', quality: 0.5, includeBase64: true });
     if (res.didCancel) return;
 
 
