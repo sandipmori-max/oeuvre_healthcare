@@ -17,6 +17,7 @@ import FullViewLoader from '../../components/loader/FullViewLoader';
 import MaterialIcons from '@react-native-vector-icons/material-icons';
 import FastImage from 'react-native-fast-image';
 import { ERP_GIF } from '../../assets';
+import { useNavigation } from '@react-navigation/native';
 
 const { width, height } = Dimensions.get('window');
 const slides = [
@@ -58,7 +59,8 @@ const slides = [
   },
 ];
 
-const Onboarding = ({ navigation }) => {
+const Onboarding = ( ) => {
+  const navigation = useNavigation();
   const [currentIndex, setCurrentIndex] = useState(0);
   const scrollX = useRef(new Animated.Value(0)).current;
   const flatListRef = useRef(null);

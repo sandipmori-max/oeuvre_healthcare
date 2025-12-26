@@ -227,7 +227,7 @@ const CustomPicker = ({
           {loader ? (
             <FullViewLoader />
           ) : (
-            <ScrollView>
+            <ScrollView keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
               {options.length > 0 ? (
                 options.map((opt: any, i: number) => (
                   <TouchableOpacity

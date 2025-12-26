@@ -128,6 +128,9 @@ export default {
     display: 'Display',
     alert: 'Alert',
     privacyPolicy: 'Privacy Policy',
+    search_entry: "Search Entry",
+    search_report: "Search Report",
+    search_auth: "Search Auth"
   },
   attendance: {
     loading: 'Loading attendance data...',

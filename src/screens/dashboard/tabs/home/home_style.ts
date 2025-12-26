@@ -17,6 +17,13 @@ export const styles = StyleSheet.create({
    dateRow: {
     flex: 1,
   },
+  logo: {
+    width: 100,
+    height: 100,
+    alignSelf: 'center',
+    marginBottom: 25,
+    borderRadius: 20,
+  },
    dateButton: {
     // backgroundColor: ERP_COLOR_CODE.ERP_WHITE,
     paddingHorizontal: 12,

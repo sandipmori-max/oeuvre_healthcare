@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, AppState, StatusBar, StyleSheet, View } from 'react-native';
+import { Alert, AppState, StatusBar, StyleSheet, View } from 'react-native';
 import { Provider } from 'react-redux';
 import { NavigationContainer } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -26,9 +26,9 @@ import FullViewLoader from './src/components/loader/FullViewLoader';
 
 const App = () => {
   const isConnected = useNetworkStatus();
-  const [isSplashVisible, setSplashVisible] = useState(true);
 
-    const [isLoading, setIsLoading] = useState(true);
+  const [isSplashVisible, setSplashVisible] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
   const [accepted, setAccepted] = useState(false);
 
   useEffect(() => {
@@ -44,22 +44,23 @@ const App = () => {
   }, []);
 
   const handleAccept = () => {
-    setAccepted(true); // Move to main app
+    setAccepted(true);
   };
-
 
   useEffect(() => {
     clearAllTempFiles();
   }, []);
+
   useEffect(() => {
     const subscription = AppState.addEventListener('change', nextState => {
       if (nextState === 'background') {
-        clearAllTempFiles(); 
+        clearAllTempFiles();
       }
     });
 
     return () => subscription.remove();
   }, []);
+
   useEffect(() => {
     requestUserPermission();
     setBackgroundMessageHandler();
@@ -84,14 +85,14 @@ const App = () => {
     };
   }, []);
 
-   if (isLoading) {
+  if (isLoading) {
     return (
       <TranslationProvider>
         <Provider store={store}>
-        <View style={{flex: 1}}>
-          <FullViewLoader />
-        </View>
-        </Provider>  
+          <View style={{ flex: 1 }}>
+            <FullViewLoader />
+          </View>
+        </Provider>
       </TranslationProvider>
     );
   }
@@ -107,7 +108,7 @@ const App = () => {
         <StatusBar backgroundColor={ERP_COLOR_CODE.ERP_APP_COLOR} barStyle="light-content" />
         <SafeAreaView edges={['top']} style={{ backgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR }} />
         <SafeAreaView edges={['top', 'left', 'right', 'bottom']} style={styles.safeArea}>
-          <NoInternetScreen onRetry={() => {}} />
+          <NoInternetScreen onRetry={() => { }} />
         </SafeAreaView>
       </TranslationProvider>
     );
@@ -116,14 +117,13 @@ const App = () => {
   if (isSplashVisible) {
     return (
       <TranslationProvider>
-      <Provider store={store}>
-      <StatusBar backgroundColor={ERP_COLOR_CODE.ERP_APP_COLOR} barStyle="light-content" />
-              <SafeAreaView edges={['top']} style={{ backgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR }} />
-              <SafeAreaView edges={['top', 'left', 'right', 'bottom']} style={styles.safeArea}>
-                <CustomSplashScreen onFinish={() => setSplashVisible(false)} />
-              </SafeAreaView>
-      </Provider>
-        
+        <Provider store={store}>
+          <StatusBar backgroundColor={ERP_COLOR_CODE.ERP_APP_COLOR} barStyle="light-content" />
+          <SafeAreaView edges={['top']} style={{ backgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR }} />
+          <SafeAreaView edges={['top', 'left', 'right', 'bottom']} style={styles.safeArea}>
+            <CustomSplashScreen onFinish={() => setSplashVisible(false)} />
+          </SafeAreaView>
+        </Provider>
       </TranslationProvider>
     );
   }
