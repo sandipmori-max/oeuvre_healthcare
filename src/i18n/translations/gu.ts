@@ -128,6 +128,9 @@ export default {
     display: 'ડિસ્પ્લે',
     alert: 'ચેતવણી',
     privacyPolicy: 'ગોપનીયતા નીતિ',
+    search_entry: "Search Entry",
+    search_report: "Search Report",
+    search_auth: "Search Auth"
   },
   attendance: {
     loading: 'હાજરી ડેટા લોડ થઈ રહ્યો છે...',

@@ -1,133 +1,110 @@
-import React from 'react';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-
-import { DARK_COLOR, ERP_COLOR_CODE } from '../utils/constants';
-import EntryTab from '../screens/dashboard/tabs/entry/EntryTab';
-import ReportTab from '../screens/dashboard/tabs/report/ReportTab';
-import HomeScreen from '../screens/dashboard/tabs/home/HomeTab';
-import AuthTab from '../screens/dashboard/tabs/auth/AuthTab';
-import useTranslations from '../hooks/useTranslations';
-import { useAppSelector } from '../store/hooks';
-import ProfileTab from '../screens/dashboard/tabs/profile/ProfileTab';
-import TabIcon from '../components/tab_icon/TabIcon';
+import React from "react";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { DARK_COLOR, ERP_COLOR_CODE } from "../utils/constants";
+import MenuTab from "../screens/dashboard/tabs/MenuTab/MenuTab";
+import HomeScreen from "../screens/dashboard/tabs/home/HomeTab";
+import ProfileTab from "../screens/dashboard/tabs/profile/ProfileTab";
+import useTranslations from "../hooks/useTranslations";
+import { useAppSelector } from "../store/hooks";
+import TabIcon from "../components/tab_icon/TabIcon";
 
 const Tab = createBottomTabNavigator();
 
 const TabNavigator = () => {
-  const theme = useAppSelector(state => state.theme.mode);
-
+  const theme = useAppSelector((state) => state.theme.mode);
   const { t } = useTranslations();
+
+  const tabConfig = [
+    {
+      name: "Home",
+      component: HomeScreen,
+      icon: "home",
+      label: t("navigation.home"),
+    },
+    {
+      name: "Hr",
+      type: "E",
+      icon: "entry",
+      label: t("navigation.entry"),
+      search: t("navigation.search_entry"),
+    },
+    {
+      name: "Report",
+      type: "R",
+      icon: "report",
+      label: t("navigation.report"),
+      search: t("navigation.search_report"),
+    },
+    {
+      name: "Dcr",
+      type: "A",
+      icon: "auth",
+      label: t("navigation.auth"),
+      search: t("navigation.search_auth"),
+    },
+    {
+      name: "Profile",
+      component: ProfileTab,
+      icon: "profile",
+      label: t("navigation.profile"),
+    },
+  ];
+
   return (
     <Tab.Navigator
       screenOptions={{
-        headerTitleAlign: 'left',
         headerShown: true,
-        tabBarActiveTintColor: theme === 'dark' ? 'white' : ERP_COLOR_CODE.ERP_APP_COLOR,
-        tabBarInactiveTintColor: theme === 'dark' ? 'black' : ERP_COLOR_CODE.ERP_APP_COLOR,
+        headerTitleAlign: "left",
+        tabBarActiveTintColor:
+          theme === "dark" ? "white" : ERP_COLOR_CODE.ERP_APP_COLOR,
+        tabBarInactiveTintColor:
+          theme === "dark" ? "black" : ERP_COLOR_CODE.ERP_APP_COLOR,
         tabBarStyle: {
-          backgroundColor: theme === 'dark' ? DARK_COLOR : ERP_COLOR_CODE.ERP_WHITE,
-          borderTopWidth: 1,
-          borderTopColor: '#E5E5EA',
+          backgroundColor: theme === "dark" ? DARK_COLOR : ERP_COLOR_CODE.ERP_WHITE,
           height: 80,
           paddingBottom: 5,
           paddingTop: 5,
         },
-        tabBarLabelStyle: {
-          fontSize: 12,
-          fontWeight: '500',
-        },
         headerStyle: {
-          backgroundColor: theme === 'dark' ? DARK_COLOR : ERP_COLOR_CODE.ERP_APP_COLOR,
+          backgroundColor: theme === "dark" ? DARK_COLOR : ERP_COLOR_CODE.ERP_APP_COLOR,
         },
-        headerTintColor: 'white',
-        headerTitleStyle: {
-          fontWeight: 'bold',
-        },
+        headerTintColor: "white",
       }}
     >
-      <Tab.Screen
-        name="Home"
-        component={HomeScreen}
-        options={{
-          tabBarLabel: t('navigation.home'),
-          title: t('navigation.home'),
-          headerStyle: {
-            backgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR,
-          },
-          tabBarLabelStyle: {
-            fontSize: 12,
-            fontWeight: '500',
-            marginTop: 8,
-          },
-          tabBarIcon: ({ color, size, focused }) => (
-            <TabIcon name="home" color={color} size={size} focused={focused} />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="Entry"
-        component={EntryTab}
-        options={{
-          tabBarLabel: t('navigation.entry'),
-          title: t('navigation.entry'),
-          tabBarLabelStyle: {
-            fontSize: 12,
-            fontWeight: '500',
-            marginTop: 8,
-          },
-          tabBarIcon: ({ color, size, focused }) => (
-            <TabIcon name="entry" color={color} size={size} focused={focused} />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="Report"
-        component={ReportTab}
-        options={{
-          tabBarLabel: t('navigation.report'),
-          title: t('navigation.report'),
-          tabBarLabelStyle: {
-            fontSize: 12,
-            fontWeight: '500',
-            marginTop: 8,
-          },
-          tabBarIcon: ({ color, size, focused }) => (
-            <TabIcon focused={focused} name="report" color={color} size={size} />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="Auth"
-        component={AuthTab}
-        options={{
-          tabBarLabel: t('navigation.auth'),
-          title: t('navigation.auth'),
-          tabBarLabelStyle: {
-            fontSize: 12,
-            fontWeight: '500',
-            marginTop: 8,
-          },
-          tabBarIcon: ({ color, size, focused }) => (
-            <TabIcon focused={focused} name="auth" color={color} size={size} />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="Profile"
-        component={ProfileTab}
-        options={{
-          tabBarLabel: t('navigation.profile'),
-          title: t('navigation.profile'),
-          tabBarLabelStyle: {
-            fontSize: 12,
-            fontWeight: '500',
-            marginTop: 8,
-          },
-          tabBarIcon: ({ color, size, focused }) => (
-            <TabIcon focused={focused} name="profile" color={color} size={size} />
-          ),
-        }}
-      />
+      {tabConfig.map((tab, index) => (
+        <Tab.Screen
+          key={index}
+          name={tab.name}
+          children={
+            tab.component
+              ? () => <tab.component />
+              : () => (
+                  <MenuTab
+                    type={tab.type}
+                    headerText={tab.label}
+                    searchPlaceholder={tab.search}
+                  />
+                )
+          }
+          options={{
+            tabBarLabel: tab.label,
+            title: tab.label,
+            tabBarLabelStyle: {
+              fontSize: 12,
+              fontWeight: "500",
+              marginTop: 8,
+            },
+            tabBarIcon: ({ color, size, focused }) => (
+              <TabIcon
+                name={tab.icon}
+                color={color}
+                size={size}
+                focused={focused}
+              />
+            ),
+          }}
+        />
+      ))}
     </Tab.Navigator>
   );
 };

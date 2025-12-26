@@ -26,9 +26,7 @@ import { ERP_COLOR_CODE } from '../../../../utils/constants';
 import MaterialIcons from '@react-native-vector-icons/material-icons';
 import Footer from './Footer';
 import PieChartSection from './chartData';
-import TaskListScreen from '../../../task_module/task_list/TaskListScreen';
 
-import TaskDetailsBottomSheet from '../../../task_module/task_details/TaskDetailsScreen';
 import { formatDateForAPI, parseCustomDate } from '../../../../utils/helpers';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import CustomPicker from '../../page/components/CustomPicker';
@@ -48,7 +46,6 @@ const HomeScreen = () => {
   const [controls, setControls] = useState<any[]>([]);
   const [controlsLoader, setControlsLoader] = useState<any>(false);
 
-
   const { dashboard, isDashboardLoading, isAuthenticated, error, user } = useAppSelector(
     state => state.auth,
   );
@@ -58,7 +55,6 @@ const HomeScreen = () => {
   const [toDate, setToDate] = useState<string>('');
 
   const auth = useAppSelector(state => state?.auth);
-  console.log("auth---------------", auth)
   const [showDatePicker, setShowDatePicker] = useState<null | {
     type: 'from' | 'to';
     show: boolean;
@@ -92,8 +88,7 @@ const HomeScreen = () => {
       const filtered = dashboard.filter(item =>
         (item.name || '').toLowerCase().includes(searchText.toLowerCase()),
       );
-      console.log('🚀 ~ HomeScreen ~ filtered-------:', filtered);
-      setFilteredDashboard(filtered);
+       setFilteredDashboard(filtered);
     }, 300);
 
     return () => {
@@ -161,14 +156,12 @@ const HomeScreen = () => {
                 name="refresh"
                 onPress={() => {
                   setControlsLoader(true);
-
                   setActionLoader(true);
                   setIsRefresh(!isRefresh);
-                  dispatch(getERPDashboardThunk());
+                  dispatch(getERPDashboardThunk({branch: auth.dashboardBranch, type: auth.dashboardType, fd: auth.dashboardFromDate, td: auth.dashboardToDate}));
                   setTimeout(() => {
                     setActionLoader(false);
                     setControlsLoader(false);
-
                   }, 100);
                 }}
                 isLoading={actionLoader}
@@ -180,10 +173,10 @@ const HomeScreen = () => {
                 name={!isHorizontal ? 'list' : 'apps'}
                 onPress={() => setIsHorizontal(prev => !prev)}
               />
-              {/* <ERPIcon
+              <ERPIcon
                 name={isFilterVisible ? 'close' : 'filter-alt'}
                 onPress={() => setIsFilterVisible(prev => !prev)}
-              /> */}
+              />
             </>
           )}
         </>
@@ -199,12 +192,13 @@ const HomeScreen = () => {
       setLoadingPageId(true);
 
       if (isAuthenticated) {
-        dispatch(getERPDashboardThunk());
+      dispatch(getERPDashboardThunk({branch: auth.dashboardBranch, type: auth.dashboardType, fd: auth.dashboardFromDate, td: auth.dashboardToDate}));
         dispatch(getERPMenuThunk())
       }
       return () => { };
     }, [isAuthenticated, dispatch]),
   );
+
   const dummyUpcomingEvents = [];
 
   const dummyUpcomingBirthdays = [
@@ -457,10 +451,8 @@ const HomeScreen = () => {
         }
       }
       setToDate(formattedDate);
-      console.log("formattedDate", formattedDate)
       dispatch(setActiveDashboardToDate(formattedDate))
     } else {
-      console.log("formattedDate-----", formattedDate)
 
       setFromDate(formattedDate);
       dispatch(setActiveDashboardFromDate(formattedDate))
@@ -474,7 +466,6 @@ const HomeScreen = () => {
     setShowDatePicker(null);
   };
 
-
   const fetchPageData = useCallback(async () => {
     try {
       setControlsLoader(true);
@@ -482,11 +473,7 @@ const HomeScreen = () => {
       const parsed = await dispatch(
         getERPPageThunk({ page: 'Dashboard', id: "" }),
       ).unwrap();
-      console.log('🚀 ~ parsed:', parsed);
-
       const pageControls = Array.isArray(parsed?.pagectl) ? parsed?.pagectl : [];
-      console.log('🚀 ~ pageControls:', pageControls);
-
       const normalizedControls = pageControls?.map(c => ({
         ...c,
         disabled: String(c?.disabled ?? '0'),
@@ -499,7 +486,6 @@ const HomeScreen = () => {
 
 
     } catch (e: any) {
-      console.log('🚀 ~ e:', e);
     } finally {
       setLoadingPageId(null);
       setTimeout(() => {
@@ -512,6 +498,9 @@ const HomeScreen = () => {
     fetchPageData();
   }, [fetchPageData]);
 
+  useEffect(()=>{
+      dispatch(getERPDashboardThunk({branch: auth.dashboardBranch, type: auth.dashboardType, fd: auth.dashboardFromDate, td: auth.dashboardToDate}));
+  },[auth.dashboardBranch, auth.dashboardType, auth.dashboardFromDate, auth.dashboardToDate])
 
   function SmallItem({ left, primary, secondary, type }) {
     return (
@@ -541,6 +530,7 @@ const HomeScreen = () => {
     );
   }
 
+  if (isDashboardLoading || filteredDashboard?.length === 0) return <FullViewLoader />
   if(!actionLoader && filteredDashboard?.length === 0 ){
     return <View
           style={{
@@ -637,7 +627,6 @@ const HomeScreen = () => {
 
 
               <View style={{
-
                 flexDirection: "row", justifyContent: "space-between", marginTop: 4
               }}>
 
@@ -703,6 +692,7 @@ const HomeScreen = () => {
 
         </View>
   };
+  
   return (
     <View
       style={{
@@ -713,13 +703,11 @@ const HomeScreen = () => {
     >
       <View
         style={{
-          marginTop: 1,
           backgroundColor: theme === 'dark' ? 'black' : ERP_COLOR_CODE.ERP_APP_COLOR,
           padding: 12,
-          // width: width,
           borderBottomRightRadius: 24,
           borderBottomLeftRadius: 24,
-          borderWidth: 1,
+          borderWidth: 0.5,
           borderColor: 'white'
         }}
       >
@@ -748,14 +736,11 @@ const HomeScreen = () => {
 
         </Animated.View>
 
-
-        {/* Branch + Type Buttons */}
         {
           isFilterVisible && <>
             <View style={[styles.dateContainer, {
               marginTop: 8
             }]}>
-              {/* Dynamic Render Date Fields */}
               {isFilterVisible && controls
                 .filter((x) => x.ctltype === "DATE")
                 .map((item, index) => (
@@ -832,7 +817,6 @@ const HomeScreen = () => {
           </>
         }
 
-        {/* Date Picker */}
         {showDatePicker?.show && (
           <DateTimePicker
             value={
@@ -855,8 +839,6 @@ const HomeScreen = () => {
           />
         )}
       </View>
-
-
 
       {controlsLoader ? (
         <View
@@ -890,7 +872,6 @@ const HomeScreen = () => {
           }}
         >
           <NoData />
-
         </View>
       ) : (
         <View style={{

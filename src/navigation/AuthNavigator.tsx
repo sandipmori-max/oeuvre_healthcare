@@ -9,6 +9,7 @@ import Onboarding from '../screens/Onboarding/Onboarding';
 const Stack = createStackNavigator<AuthStackParamList>();
 
 const AuthNavigator = () => {
+  console.log("checking auth state====================")
   return (
     <Stack.Navigator
       screenOptions={{

@@ -1,15 +1,11 @@
 import React from 'react';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 
-import AttendanceScreen from '../screens/dashboard/attendance/AttendanceScreen';
-import AlertScreen from '../screens/dashboard/alert/AlertScreen';
-import PrivacyPolicyScreen from '../screens/dashboard/privacy/PrivacyPolicyScreen';
 import TabNavigator from './TabNavigator';
 import CustomDrawerContent from '../components/drawer/CustomDrawerContent';
 import useTranslations from '../hooks/useTranslations';
 import { useAppSelector } from '../store/hooks';
 import { ERP_COLOR_CODE } from '../utils/constants';
-import FileFolderManager from '../screens/dashboard/file_folder_manager/FileFolderManager';
 
 const Drawer = createDrawerNavigator();
 

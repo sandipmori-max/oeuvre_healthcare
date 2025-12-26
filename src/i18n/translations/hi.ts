@@ -122,6 +122,9 @@ export default {
     display: 'प्रदर्शन',
     alert: 'अलर्ट',
     privacyPolicy: 'गोपनीयता नीति',
+    search_entry: "Search Entry",
+    search_report: "Search Report",
+    search_auth: "Search Auth"
   },
   attendance: {
     loading: 'उपस्थिति डेटा लोड हो रहा है...',
