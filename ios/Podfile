@@ -7,12 +7,36 @@ prepare_react_native_project!
 use_frameworks! :linkage => :static
 use_modular_headers!
 
+# 📌 Import the react-native-permissions setup script
+def node_require(script)
+  require Pod::Executable.execute_command('node', ['-p',
+    "require.resolve('#{script}', {paths: [process.argv[1]]})",
+    __dir__
+  ]).strip
+end
+
+# 🧩 Import the setup scripts
+node_require('react-native/scripts/react_native_pods.rb')
+node_require('react-native-permissions/scripts/setup.rb')
+
+# ✨ IMPORTANT: list only the permissions your app needs
+setup_permissions([
+   'Camera',
+   'Microphone',
+   'Notifications',
+   'LocationAlways',
+   'LocationWhenInUse',
+   'PhotoLibrary',
+   'PhotoLibraryAddOnly',
+   'MediaLibrary'
+])
+
 target 'Oeuvre' do
   config = use_native_modules!
 
   use_react_native!(
     :path => config[:reactNativePath],
-    :hermes_enabled => true, # or false, depending on your setup
+    :hermes_enabled => true,
   )
 
   # 👇 Add this line for MLKit integration
