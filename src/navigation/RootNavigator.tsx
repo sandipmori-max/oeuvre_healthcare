@@ -1,18 +1,16 @@
-import React, { useEffect, 
-  // useState, useRef, useCallback 
-} from 'react';
-// import {
-//   PermissionsAndroid,
-//   Platform,
-//   NativeModules,
-//   AppState,
-//   Linking,
-//   Modal,
-//   View,
-//   Text,
-//   TouchableOpacity,
-//   StyleSheet,
-// } from 'react-native';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
+import {
+  PermissionsAndroid,
+  Platform,
+  NativeModules,
+  AppState,
+  Linking,
+  Modal,
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+} from 'react-native';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { checkAuthStateThunk } from '../store/slices/auth/thunk';
 import DevERPService from '../services/api/deverp';
@@ -20,290 +18,191 @@ import AuthNavigator from './AuthNavigator';
 import StackNavigator from './StackNavigator';
 import FullViewLoader from '../components/loader/FullViewLoader';
 import DeviceInfo from 'react-native-device-info';
-// import CustomAlert from '../components/alert/CustomAlert';
+import CustomAlert from '../components/alert/CustomAlert';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-// import { useFocusEffect } from '@react-navigation/native';
-import { setERPTheme, 
-  // ERP_COLOR_CODE
- } from '../utils/constants';
-import { setTheme } from '../store/slices/theme/themeSlice';
-import { useColorScheme } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
+import { ERP_COLOR_CODE } from '../utils/constants';
 import { changeLanguage } from '../i18n';
- 
+import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
+
 // ------------------------- Location Permission Helper -------------------------
-// export async function requestLocationPermissions(): Promise<
-//   'granted' | 'foreground-only' | 'denied' | 'blocked'
-// > {
-//   if (Platform.OS === 'android') {
-//     try {
-//       const granted = await PermissionsAndroid.requestMultiple([
-//         PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-//         PermissionsAndroid.PERMISSIONS.ACCESS_COARSE_LOCATION,
-//         PermissionsAndroid.PERMISSIONS.ACCESS_BACKGROUND_LOCATION,
-//       ]);
+export async function requestLocationPermissions(): Promise<
+  'granted' | 'foreground-only' | 'denied' | 'blocked'
+> {
+  if (Platform.OS === 'android') {
+    const granted = await PermissionsAndroid.requestMultiple([
+      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+      PermissionsAndroid.PERMISSIONS.ACCESS_COARSE_LOCATION,
+      PermissionsAndroid.PERMISSIONS.ACCESS_BACKGROUND_LOCATION,
+    ]);
 
-//       const fine = granted['android.permission.ACCESS_FINE_LOCATION'];
-//       const coarse = granted['android.permission.ACCESS_COARSE_LOCATION'];
-//       const background = granted['android.permission.ACCESS_BACKGROUND_LOCATION'];
+    if (
+      granted['android.permission.ACCESS_FINE_LOCATION'] ===
+      PermissionsAndroid.RESULTS.GRANTED &&
+      granted['android.permission.ACCESS_COARSE_LOCATION'] ===
+      PermissionsAndroid.RESULTS.GRANTED &&
+      granted['android.permission.ACCESS_BACKGROUND_LOCATION'] ===
+      PermissionsAndroid.RESULTS.GRANTED
+    ) return 'granted';
 
-//       if (
-//         fine === PermissionsAndroid.RESULTS.GRANTED &&
-//         coarse === PermissionsAndroid.RESULTS.GRANTED &&
-//         background === PermissionsAndroid.RESULTS.GRANTED
-//       ) {
-//         return 'granted';
-//       }
+    if (
+      granted['android.permission.ACCESS_FINE_LOCATION'] ===
+      PermissionsAndroid.RESULTS.GRANTED &&
+      granted['android.permission.ACCESS_COARSE_LOCATION'] ===
+      PermissionsAndroid.RESULTS.GRANTED
+    ) return 'foreground-only';
 
-//       if (
-//         fine === PermissionsAndroid.RESULTS.GRANTED &&
-//         coarse === PermissionsAndroid.RESULTS.GRANTED &&
-//         background !== PermissionsAndroid.RESULTS.GRANTED
-//       ) {
-//         return 'foreground-only';
-//       }
+    if (
+      granted['android.permission.ACCESS_FINE_LOCATION'] ===
+      PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN ||
+      granted['android.permission.ACCESS_COARSE_LOCATION'] ===
+      PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN
+    ) return 'blocked';
 
-//       if (
-//         fine === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN ||
-//         coarse === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN ||
-//         background === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN
-//       ) {
-//         return 'blocked';
-//       }
+    return 'denied';
+  } else {
+    // iOS logic
+    let status = await check(PERMISSIONS.IOS.LOCATION_ALWAYS);
+    console.log("status----------------------1---------------------", status)
+    if (status === RESULTS.GRANTED) return 'granted';
+    console.log("status----------------------2---------------------", status)
+    if (status === RESULTS.BLOCKED) return 'blocked';
+    console.log("status-----------------------3--------------------", status)
 
-//       return 'denied';
-//     } catch (err) {
-//       console.warn('requestLocationPermissions error:', err);
-//       return 'denied';
-//     }
-//   }
-//   return 'granted';
-// }
+    // Request foreground permission first
+    let foregroundStatus = await check(PERMISSIONS.IOS.LOCATION_WHEN_IN_USE);
+    console.log("foregroundStatus---------------------4----------------------", foregroundStatus)
 
-// ------------------------- RootNavigator Component -------------------------
+    if (foregroundStatus === RESULTS.DENIED) {
+
+      foregroundStatus = await request(PERMISSIONS.IOS.LOCATION_WHEN_IN_USE);
+      console.log("foregroundStatus---------------------5----------------------", foregroundStatus)
+
+    }
+
+    if (foregroundStatus === RESULTS.GRANTED || foregroundStatus === RESULTS.LIMITED) {
+      console.log("foregroundStatus---------------------6----------------------", foregroundStatus)
+
+      // Now ask for "Always" if needed
+      status = await request(PERMISSIONS.IOS.LOCATION_ALWAYS);
+      console.log("status---------------------7----------------------", status)
+
+      if (status === RESULTS.GRANTED) return 'granted';
+      console.log("status----------------------8---------------------", status)
+
+      return 'foreground-only';
+    }
+    console.log("status-----------------------9--------------------", status)
+
+    if (foregroundStatus === RESULTS.BLOCKED) return 'blocked';
+    console.log("status------------------------10-------------------", status)
+
+    return 'denied';
+  }
+}
+
+// ------------------------- RootNavigator -------------------------
 const RootNavigator = () => {
   const dispatch = useAppDispatch();
-  const theme = useAppSelector(state => state?.theme.mode);
-  const colorScheme = useColorScheme();
-   const { isLoading, isAuthenticated, accounts, user } = useAppSelector(state => state.auth);
-  // const theme = useAppSelector(state => state.theme.mode);
-  const langCode = useAppSelector(state => state?.theme.langcode);
+  const { isLoading, isAuthenticated, accounts, user } =
+    useAppSelector(state => state.auth);
+  const langCode = useAppSelector(state => state.theme.langcode);
 
-  // const [locationEnabled, setLocationEnabled] = useState<boolean | null>(null);
-  // const [alertVisible, setAlertVisible] = useState(false);
-  // const [modalClose, setModalClose] = useState(false);
-  // const [isSettingVisible, setIsSettingVisible] = useState(false);
-  // const [backgroundDeniedModal, setBackgroundDeniedModal] = useState(false);
-  // const [alertConfig, setAlertConfig] = useState({
-  //   title: '',
-  //   message: '',
-  //   type: 'info' as 'error' | 'success' | 'info',
-  // });
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [backgroundDeniedModal, setBackgroundDeniedModal] = useState(false);
+  const [alertConfig, setAlertConfig] = useState({
+    title: '',
+    message: '',
+    type: 'error' as 'error' | 'success' | 'info',
+  });
 
-  // const isCheckingPermission = useRef(false);
-  // const locationSyncInterval = useRef<NodeJS.Timeout | null>(null);
-  // const lastLocationEnabled = useRef<boolean | null>(null);
-  const app_id = user?.app_id;
-  // const appState = useRef(AppState.currentState);
+  const locationModalShownRef = useRef(false);
+  const appState = useRef(AppState.currentState);
 
-  // ------------------------- Theme -------------------------
-  // useEffect(() => {
-  //   if(colorScheme === 'dark' || theme === 'dark'){
-  //     setERPTheme('dark');
-  //     // dispatch(setTheme('dark'));
-  //   }else{
-  //     setERPTheme('light');
-  //     // dispatch(setTheme('light'));
-  //   }
-     
-  //  }, [colorScheme, theme]);
-
-  //  useEffect(() => {
-  //   const subscription = AppState.addEventListener('change', nextAppState => {
-  //     if (appState.current.match(/inactive|background/) && nextAppState === 'active') {
-  //       console.log('App**************************************************************** has come to the foreground!');
-  //       // Put your code here to check permissions, refresh data, etc.
-  //       checkLocation()
-  //     }
-  //     appState.current = nextAppState;
-  //   });
-
-  //   return () => subscription.remove();
-  // }, []);
-
-  // ------------------------- Detect Location Enabled & Permission -------------------------
-  // useEffect(() => {
-  //   const interval = setInterval(async () => {
-  //     const enabled = await DeviceInfo.isLocationEnabled();
-  //     const permissionStatus = await requestLocationPermissions();
-
-  //     // Show alert only if status changed
-  //     if (enabled !== lastLocationEnabled.current) {
-  //       if (!enabled) {
-  //         setAlertConfig({
-  //           title: 'Location Status',
-  //           message:
-  //             'We need location access only to serve you better. Please enable it to continue.',
-  //           type: 'error',
-  //         });
-  //         setAlertVisible(true);
-  //         setModalClose(false);
-  //       } else {
-  //         setAlertVisible(false);
-  //         setModalClose(true);
-  //       }
-  //       lastLocationEnabled.current = enabled;
-  //     }
-
-  //     // Show background permission modal only once when required
-  //     if (permissionStatus === 'foreground-only' && !backgroundDeniedModal) {
-  //       setBackgroundDeniedModal(true);
-  //     } else if (permissionStatus !== 'foreground-only' && backgroundDeniedModal) {
-  //       setBackgroundDeniedModal(false);
-  //     }
-
-  //     setLocationEnabled(enabled);
-  //   }, 1000);
-
-  //   return () => clearInterval(interval);
-  // }, [backgroundDeniedModal]);
-
+  // ------------------------- AppState Listener -------------------------
   useEffect(() => {
-    changeLanguage(langCode)
-  }, [langCode])
-  // ------------------------- Device & Auth Setup -------------------------
-  useEffect(() => {
-    const fetchDeviceName = async () => {
-      const name = await DeviceInfo.getDeviceName();
-      let appid = await AsyncStorage.getItem('appid');
-      if (!appid) {
-        appid = app_id;
-        await AsyncStorage.setItem('appid', appid || '');
+    const handleAppStateChange = async nextAppState => {
+      if (
+        appState.current.match(/inactive|background/) &&
+        nextAppState === 'active'
+      ) {
+        await checkLocation();
       }
+      appState.current = nextAppState;
+    };
+
+    const sub = AppState.addEventListener('change', handleAppStateChange);
+    return () => sub.remove();
+  }, [isAuthenticated]);
+
+  // ------------------------- Language -------------------------
+  useEffect(() => {
+    changeLanguage(langCode);
+  }, [langCode]);
+
+  // ------------------------- Device Setup -------------------------
+  useEffect(() => {
+    const init = async () => {
+      const name = await DeviceInfo.getDeviceName();
       await AsyncStorage.setItem('device', name);
-
       DevERPService.initialize();
-      DevERPService.setAppId(appid || '');
-      DevERPService.setDevice(name);
-
       dispatch(checkAuthStateThunk());
     };
-    fetchDeviceName();
-  }, [dispatch, theme]);
-
-  // ------------------------- Request Foreground Permissions -------------------------
-  // const requestLocationPermission = async (): Promise<boolean> => {
-  //   if (Platform.OS === 'android') {
-  //     return await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION);
-  //   }
-  //   return true;
-  // };
-
-  // ------------------------- Start Location Sync -------------------------
-  // const startLocationSync = async () => {
-  //   const enabled = await DeviceInfo.isLocationEnabled();
-  //   if (!enabled) return;
-
-  //   const hasPermission = await requestLocationPermission();
-  //   const fullPermission = await requestLocationPermissions();
-
-  //   if (fullPermission === 'foreground-only') {
-  //     setBackgroundDeniedModal(true);
-  //     return;
-  //   }
-
-  //   if (!hasPermission || fullPermission === 'denied' || fullPermission === 'blocked') return;
-
-  //   if (locationSyncInterval.current) clearInterval(locationSyncInterval.current);
-
-  //   locationSyncInterval.current = setInterval(() => {
-  //     checkLocation();
-  //   }, 1800);
-  // };
+    init();
+  }, [dispatch]);
 
   // ------------------------- Check Location -------------------------
-  // const checkLocation = async () => {
-  //   try {
-  //     const enabled = await DeviceInfo.isLocationEnabled();
+  const checkLocation = async () => {
+    if (!isAuthenticated) return;
 
-  //     if (enabled !== locationEnabled) {
-  //       setAlertConfig({
-  //         title: 'Location Status',
-  //         message: enabled
-  //           ? 'Location is now enabled'
-  //           : 'We need location access only to serve you better. Please enable it to continue.',
-  //         type: enabled ? 'success' : 'error',
-  //       });
-  //       setAlertVisible(!enabled);
-  //       setModalClose(false);
-  //       setLocationEnabled(enabled);
-  //     }
+    const enabled = await DeviceInfo.isLocationEnabled();
+    const permission = await requestLocationPermissions();
 
-  //     if (isAuthenticated && enabled) {
-  //       if (accounts.length > 0 && Platform.OS === 'android') {
-  //         const granted = await requestLocationPermissions();
-  //         if (granted === 'granted') {
-  //           const data = accounts.map(u => ({
-  //             token: u?.user?.token,
-  //             link: u?.user?.companyLink.replace(/^https:\/\//i, 'http://'),
-  //           }));
-  //           NativeModules.LocationModule.setUserTokens(data);
-  //           NativeModules.LocationModule?.startService();
-  //         } else if (granted === 'foreground-only') {
-  //           setBackgroundDeniedModal(true);
-  //         }
-  //       }
-  //     }
-  //   } catch (err) {
-  //     console.log('Location fetch error:', err);
-  //   }
-  // };
+    if (enabled && permission === 'granted') {
+      // ✅ Permission granted, hide modals
+      locationModalShownRef.current = false;
+      setAlertVisible(false);
+      setBackgroundDeniedModal(false);
 
-  // ------------------------- Focus / AppState -------------------------
-  // useFocusEffect(
-  //   useCallback(() => {
-  //     const checkPermissionsOnFocus = async () => {
-  //       if (isCheckingPermission.current) return;
-  //       isCheckingPermission.current = true;
+      if (accounts.length && Platform.OS === 'android') {
+        const data = accounts.map(u => ({
+          token: u.user.token,
+          link: u.user.companyLink.replace(/^https:\/\//i, 'http://'),
+        }));
+        NativeModules.LocationModule.setUserTokens(data);
+        NativeModules.LocationModule.startService();
+      }
+      return;
+    }
 
-  //       const hasPermission = await requestLocationPermission();
-  //       const fullPermission = await requestLocationPermissions();
+    if (permission === 'foreground-only') {
+      setBackgroundDeniedModal(true);
+      setAlertVisible(false);
+      return;
+    }
 
-  //       if (hasPermission && fullPermission === 'granted') {
-  //         setAlertVisible(false);
-  //         setIsSettingVisible(false);
-  //         setModalClose(true);
-  //         startLocationSync();
-  //       } else if (hasPermission && fullPermission === 'foreground-only') {
-  //         setBackgroundDeniedModal(true);
-  //       } else {
-  //         setAlertConfig({
-  //           title: 'Location Status',
-  //           message:
-  //             'We need location access only to serve you better. Please enable it to continue.',
-  //           type: 'error',
-  //         });
-  //                   setModalClose(false);
+    // Denied or blocked
+    if ((!enabled || permission === 'denied' || permission === 'blocked') && !locationModalShownRef.current) {
+      setAlertConfig({
+        title: 'Location Required',
+        message:
+          'Please enable location permission to continue using the app.',
+        type: 'error',
+      });
+      setAlertVisible(true);
+      setBackgroundDeniedModal(false);
+      locationModalShownRef.current = true;
+    }
+  };
 
-  //         setAlertVisible(true);
-  //         setIsSettingVisible(true);
-  //       }
-
-  //       isCheckingPermission.current = false;
-  //     };
-
-  //     const subscription = AppState.addEventListener('change', nextAppState => {
-  //       if (nextAppState === 'active') {
-  //         checkPermissionsOnFocus();
-  //       }
-  //     });
-
-  //     if (isAuthenticated) {
-  //       checkPermissionsOnFocus();
-  //     }
-
-  //     return () => subscription.remove();
-  //   }, [isAuthenticated]),
-  // );
+  // ------------------------- Focus -------------------------
+  useFocusEffect(
+    useCallback(() => {
+      if (isAuthenticated) {
+        checkLocation();
+      }
+    }, [isAuthenticated]),
+  );
 
   // ------------------------- Render -------------------------
   if (isLoading) return <FullViewLoader />;
@@ -312,44 +211,41 @@ const RootNavigator = () => {
     <>
       {isAuthenticated ? <StackNavigator /> : <AuthNavigator />}
 
-      {/* General Alert */}
-      {/* <CustomAlert
-        visible={alertVisible}
-        title={alertConfig.title}
-        message={alertConfig.message}
-        type={alertConfig.type}
-        onClose={() => {
-          if (modalClose) setAlertVisible(false);
-        }}
-        actionLoader={undefined}
-        isSettingVisible={isSettingVisible}
-      /> */}
+      {
+        isAuthenticated && (
+          <CustomAlert
+            visible={alertVisible}
+            title={alertConfig.title}
+            message={alertConfig.message}
+            type={alertConfig.type}
+            onClose={() => { }}
+            isSettingVisible
+            actionLoader={undefined}
+          />
+        )
+      }
 
-      {/* Foreground-only Background Permission Modal */}
-      {/* <Modal visible={backgroundDeniedModal} transparent animationType="fade">
-        <View style={styles.overlay}>
-          <View style={styles.modalContainer}>
-            <Text style={styles.title}>Allow Background Location</Text>
-            <Text style={styles.message}>
-              For continuous location tracking, set location access to{' '}
-              <Text style={{ fontWeight: '600' }}>"Allow all the time"</Text> in your phone
-              settings.
-            </Text>
 
-            <View style={styles.btnRow}>
-              <TouchableOpacity
-                style={[styles.btn, styles.btnPrimary]}
-                onPress={() => {
-                  Linking.openSettings();
-                  setBackgroundDeniedModal(false);
-                }}
-              >
-                <Text style={styles.btnText}>Open Settings</Text>
-              </TouchableOpacity>
+      {
+        isAuthenticated && (
+          <Modal visible={backgroundDeniedModal} transparent>
+            <View style={styles.overlay}>
+              <View style={styles.modalContainer}>
+                <Text style={styles.title}>Allow Background Location</Text>
+                <Text style={styles.message}>
+                  Set location access to "Always Allow" in settings for continuous tracking.
+                </Text>
+                <TouchableOpacity
+                  style={styles.btnPrimary}
+                  onPress={() => Linking.openSettings()}>
+                  <Text style={styles.btnText}>Open Settings</Text>
+                </TouchableOpacity>
+              </View>
             </View>
-          </View>
-        </View>
-      </Modal> */}
+          </Modal>
+        )
+      }
+
     </>
   );
 };
@@ -357,50 +253,37 @@ const RootNavigator = () => {
 export default RootNavigator;
 
 // ------------------------- Styles -------------------------
-// const styles = StyleSheet.create({
-//   overlay: {
-//     flex: 1,
-//     backgroundColor: 'rgba(0,0,0,0.5)',
-//     justifyContent: 'center',
-//     alignItems: 'center',
-//   },
-//   modalContainer: {
-//     backgroundColor: '#fff',
-//     borderRadius: 12,
-//     width: '85%',
-//     padding: 20,
-//     elevation: 6,
-//   },
-//   title: {
-//     fontSize: 18,
-//     fontWeight: '700',
-//     marginBottom: 8,
-//     textAlign: 'center',
-//   },
-//   message: {
-//     fontSize: 14,
-//     color: '#333',
-//     textAlign: 'center',
-//     marginBottom: 16,
-//   },
-//   btnRow: {
-//     flexDirection: 'row',
-//     justifyContent: 'space-around',
-//   },
-//   btn: {
-//     borderRadius: 10,
-//     paddingVertical: 10,
-//     paddingHorizontal: 18,
-//   },
-//   btnPrimary: {
-//     backgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR,
-//   },
-//   btnSecondary: {
-//     borderWidth: 1,
-//     borderColor: ERP_COLOR_CODE.ERP_APP_COLOR,
-//   },
-//   btnText: {
-//     fontWeight: '600',
-//     color: '#fff',
-//   },
-// });
+const styles = StyleSheet.create({
+  overlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContainer: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    width: '85%',
+    padding: 20,
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: '700',
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  message: {
+    textAlign: 'center',
+    marginBottom: 16,
+  },
+  btnPrimary: {
+    backgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR,
+    padding: 12,
+    borderRadius: 10,
+  },
+  btnText: {
+    color: '#fff',
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+});

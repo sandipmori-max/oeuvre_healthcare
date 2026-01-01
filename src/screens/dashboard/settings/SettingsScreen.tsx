@@ -8,6 +8,7 @@ import {
   Switch,
   ScrollView,
   Modal,
+  Platform,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { styles } from './settings_style';
@@ -198,9 +199,10 @@ const SettingsScreen = () => {
           navigation.navigate('Privacy Policy', {
             titlePage: t('settings.privacySettings')
           });
+                
         } else if (item?.title === t('settings.helpSupport')) {
           navigation.navigate('Privacy Policy', {
-            url: 'http://deverp.com/index.aspx?q=contact_us',
+            url: Platform.OS === 'ios' ? 'https://deverp.com/index.aspx?q=contact_us' : 'http://deverp.com/index.aspx?q=contact_us',
             titlePage: t('settings.helpSupport')
           });
         } else if (item?.action) {
@@ -283,19 +285,27 @@ const SettingsScreen = () => {
             value={item.title === t('settings.darkMode') ? theme === 'dark' : item.value}
             onValueChange={() => {
               handleToggle(item.id);
-
               if (item.title === t('settings.darkMode')) {
-                if (theme === 'dark') {
-                  setERPTheme('light');
-                  dispatch(setTheme('light'));
-                } else {
-                  setERPTheme('dark');
-                  dispatch(setTheme('dark'));
-                }
+                const newTheme = theme === 'dark' ? 'light' : 'dark';
+                setERPTheme(newTheme);
+                dispatch(setTheme(newTheme));
               }
             }}
-            trackColor={{ false: ERP_COLOR_CODE.ERP_e0e0e0, true: '#4CAF50' }}
-            thumbColor={theme === 'dark' ? 'white' : '#f4f3f4'}
+            trackColor={{
+              false: Platform.OS === 'ios' ? '#e5e7eb' : ERP_COLOR_CODE.ERP_e0e0e0,
+              true: '#4CAF50',
+            }}
+            thumbColor={
+              Platform.OS === 'android'
+                ? theme === 'dark'
+                  ? '#ffffff'
+                  : '#f4f3f4'
+                : undefined // iOS ignores thumbColor mostly
+            }
+            ios_backgroundColor="#e5e7eb"
+            style={{
+              transform: Platform.OS === 'ios' ? [{ scaleX: 0.9 }, { scaleY: 0.9 }] : [],
+            }}
           />
 
         ) : (

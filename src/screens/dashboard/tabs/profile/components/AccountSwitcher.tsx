@@ -14,6 +14,11 @@ import MaterialIcons from '@react-native-vector-icons/material-icons';
 import FastImage from 'react-native-fast-image';
 import { ERP_COLOR_CODE } from '../../../../../utils/constants';
 import { setDashboard, setEmptyMenu } from '../../../../../store/slices/auth/authSlice';
+import { clearAuthState, setDashboard, setEmptyMenu } from '../../../../../store/slices/auth/authSlice';
+import { resetAjaxState } from '../../../../../store/slices/ajax/ajaxSlice';
+import { resetAttendanceState } from '../../../../../store/slices/attendance/attendanceSlice';
+import { resetDropdownState } from '../../../../../store/slices/dropdown/dropdownSlice';
+import { resetSyncLocationState } from '../../../../../store/slices/location/syncLocationSlice';
 
 interface AccountSwitcherProps {
   visible: boolean;
@@ -80,6 +85,11 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
         onPress={async () => {
           dispatch(setDashboard([]));
           dispatch(setEmptyMenu([]));
+          dispatch(resetAjaxState());
+          dispatch(resetAttendanceState())
+          dispatch(clearAuthState())
+          dispatch(resetDropdownState())
+          dispatch(resetSyncLocationState())
           DevERPService.setAppId(item?.user?.app_id || '');
           await AsyncStorage.setItem('appid', item?.user?.app_id);
 

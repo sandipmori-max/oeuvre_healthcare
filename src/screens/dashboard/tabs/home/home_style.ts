@@ -14,6 +14,47 @@ export const styles = StyleSheet.create({
   columnWrapper: {
     justifyContent: 'space-between',
   },
+  overlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.35)',
+    justifyContent: 'flex-end',
+  },
+
+  sheet: {
+    backgroundColor: '#fff',
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+    paddingBottom: 20,
+  },
+
+  header: {
+    height: 50,
+    paddingHorizontal: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+
+  headerTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#111827',
+  },
+
+  doneText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#2563eb', // iOS blue
+  },
+
+  divider: {
+    height: 1,
+    backgroundColor: '#e5e7eb',
+  },
+
+  picker: {
+    height: 220,
+  },
    dateRow: {
     flex: 1,
   },
