@@ -65,6 +65,16 @@
   <key>NSDocumentsFolderUsageDescription</key>
   <string>We need access to your documents folder to select PDF files for upload.</string>
 
+  <key>NSLocationWhenInUseUsageDescription</key>
+  <string>We need your location to track your activities.</string>
+
+  <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+  <string>We need your location even in the background for continuous tracking.</string>
+
+  <key>UIBackgroundModes</key>
+  <array>
+    <string>location</string>
+  </array>
   <!-- React Native -->
   <key>RCTNewArchEnabled</key>
   <true/>

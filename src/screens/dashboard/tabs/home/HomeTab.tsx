@@ -663,9 +663,34 @@ const HomeScreen = () => {
             }
           </>
         }
+ {showDatePicker?.show && Platform.OS === 'ios' && (
+  <Modal transparent animationType="slide" statusBarTranslucent>
+  <View style={styles.overlay}>
+    <View style={styles.sheet}>
+      {/* Divider */}
+      <View style={styles.divider} />
 
+      {/* Date Picker */}
+      <DateTimePicker
+            value={
+              showDatePicker.type === "from" && fromDate
+                ? parseCustomDate(fromDate)
+                : showDatePicker.type === "to" && toDate
+                  ? parseCustomDate(toDate)
+                  : new Date()
+            }
+            mode="date"
+            display='spinner'
+            onChange={handleDateChange}
+           
+          />
+    </View>
+  </View>
+</Modal>
+
+)}
         {/* Date Picker */}
-        {showDatePicker?.show && (
+        {showDatePicker?.show && Platform.OS !== 'ios' &&   (
           <DateTimePicker
             value={
               showDatePicker.type === "from" && fromDate
@@ -676,14 +701,7 @@ const HomeScreen = () => {
             }
             mode="date"
             onChange={handleDateChange}
-            minimumDate={
-              showDatePicker.type === "to" && fromDate
-                ? parseCustomDate(fromDate)
-                : new Date(new Date().getFullYear(), 0, 1)
-            }
-            maximumDate={
-              showDatePicker.type === "from" && toDate ? parseCustomDate(toDate) : new Date()
-            }
+           
           />
         )}
       </View>
@@ -828,14 +846,7 @@ const HomeScreen = () => {
             }
             mode="date"
             onChange={handleDateChange}
-            minimumDate={
-              showDatePicker.type === "to" && fromDate
-                ? parseCustomDate(fromDate)
-                : new Date(new Date().getFullYear(), 0, 1)
-            }
-            maximumDate={
-              showDatePicker.type === "from" && toDate ? parseCustomDate(toDate) : new Date()
-            }
+            
           />
         )}
       </View>

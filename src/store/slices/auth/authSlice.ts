@@ -44,6 +44,15 @@ const authSlice = createSlice({
     setLoading: (state, action: PayloadAction<boolean>) => {
       state.isLoading = action.payload;
     },
+    clearAuthState: state => {
+      
+      state.dashboardBranch = '';
+      state.dashboardBranchId = '',
+      state.dashboardFromDate = '',
+      state.dashboardToDate = '',
+      state.dashboardType = '',
+      state.dashboardTypeId = ''
+    },
     logout: state => {
       state.user = null;
       state.accounts = [];
