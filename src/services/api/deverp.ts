@@ -51,12 +51,8 @@ class DevERPService {
 
       await this.checkNetwork();
       await this.ensureAuthToken();
-      console.log("link", this.link)
-      console.log("endpoint", endpoint)
-      console.log("payload", payload)
 
       const response = await apiClient.post<T>(`${this.link}${endpoint}`, payload);
-      console.log("🚀 ~ DevERPService ~ apiCall ~ response:", response)
 
       if (
         (response as any).data?.success === 0 &&
@@ -72,7 +68,6 @@ class DevERPService {
 
       return response.data;
     } catch (error) {
-      console.log('🚀 ~ DevERPService ~ apiCall ~ error:', error);
       throw error;
     }
   }
@@ -83,8 +78,7 @@ class DevERPService {
     const response = await apiClient.post<DevERPResponse>(`${this.baseUrl}/appcode.aspx/getLink`, {
       code,
     });
-    console.log("🚀 ~ DevERPService ~ getAppLink ~ response:", response)
-
+    console.log("response--------------------", response)
     if (response.data.success === 1 && response.data.link) {
 
       if (Platform.OS !== 'ios' && response.data.link.startsWith('https://')) {
@@ -100,10 +94,7 @@ class DevERPService {
   async validateCompanyCode(code: string) {
 
     try {
-      console.log("code++++++++++++-------------", code)
-
       const response = await this.getAppLink(code);
-      console.log("response-------------", response)
       return response.success === 1
         ? {
           isValid: true,
@@ -114,7 +105,6 @@ class DevERPService {
         }
         : { isValid: false, message: 'Invalid company code' };
     } catch (e) {
-      console.log("e*********************", e)
       return { isValid: false, message: 'Failed to validate company code' };
     }
   }
@@ -124,16 +114,13 @@ class DevERPService {
     pass: string;
     firebaseid?: string;
   }): Promise<LoginResponse> {
-    console.log("log----------------------------", this.link)
 
     await this.checkNetwork();
     const app_id = generateGUID();
     await AsyncStorage.setItem('appid', app_id)
     this.appid = app_id;
     this.link = (await AsyncStorage.getItem('erp_link')) || this.link;
-    // if (!this.link) throw new Error('No ERP link available. Please validate company code first.');
 
-    console.log(this.link)
     const loginData: LoginRequest = {
       user: credentials.user,
       pass: credentials.pass,
@@ -195,7 +182,6 @@ class DevERPService {
         }
       }
     } catch (err) {
-      console.log('⚠️ SQLite update skipped:', err);
     }
 
     return this.token;
@@ -207,7 +193,13 @@ class DevERPService {
     );
   }
 
- getDashboard(
+  getAppMenu() {
+    return this.apiCall<MenuResponse>('msp_api.aspx/getAppConfig', { token: this.token }).then(res =>
+      JSON.stringify(res),
+    );
+  }
+
+  getDashboard(
     branch: string,
     type: string,
     fd: string,
@@ -282,6 +274,7 @@ class DevERPService {
   }
 
   getLastPunchIn() {
+    console.log("TOKEN___________________", this.token)
     return this.apiCall<any>('msp_api.aspx/getLastPunchIn', { token: this.token });
   }
 
@@ -314,7 +307,6 @@ class DevERPService {
   }
 
   async syncLocation(token: string, location: string) {
-    console.log('🚀 ~ DevERPService ~ syncLocation ---------++++++-----++++++~ token:', token);
     return this.apiCall<any>(`msp_api.aspx/syncLocation`, {
       token: token,
       location: location,

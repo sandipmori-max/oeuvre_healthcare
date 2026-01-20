@@ -1,10 +1,9 @@
 import { ERP_GIF, ERP_ICON } from '../../assets';
 import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 import moment from 'moment';
-import { PermissionsAndroid, Platform } from 'react-native';
+import { Dimensions, Linking, PermissionsAndroid, Platform } from 'react-native';
 import RNFS from 'react-native-fs';
 import FastImage from 'react-native-fast-image';
-import WebView from 'react-native-webview';
 
 export const getBottomTabIcon = (iconName: string, focused: boolean) => {
   switch (iconName) {
@@ -67,13 +66,12 @@ export const requestCameraPermission = async (): Promise<boolean> => {
       cameraGranted = res === RESULTS.GRANTED;
       if (!cameraGranted) {
         return false;
-       }
+      }
     } else if (cameraStatus === RESULTS.BLOCKED) {
-      return false; 
+      return false;
     }
     return cameraGranted;
   } catch (error) {
-    console.warn('⚠️ Permission error:', error);
     return false;
   }
 };
@@ -87,11 +85,9 @@ export const requestCameraAndLocationPermission = async (): Promise<boolean> => 
         ? PERMISSIONS.IOS.LOCATION_WHEN_IN_USE
         : PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION;
 
-    // 📌 Check current statuses
     const cameraStatus = await check(cameraPerm);
     const locationStatus = await check(locationPerm);
 
-    // ✅ Handle camera permission
     let cameraGranted = false;
     if (cameraStatus === RESULTS.GRANTED) {
       cameraGranted = true;
@@ -100,12 +96,11 @@ export const requestCameraAndLocationPermission = async (): Promise<boolean> => 
       cameraGranted = res === RESULTS.GRANTED;
       if (!cameraGranted) {
         return false;
-       }
+      }
     } else if (cameraStatus === RESULTS.BLOCKED) {
-      return false; 
+      return false;
     }
 
-    // ✅ Handle location permission
     let locationGranted = false;
     if (locationStatus === RESULTS.GRANTED) {
       locationGranted = true;
@@ -130,10 +125,24 @@ export const requestCameraAndLocationPermission = async (): Promise<boolean> => 
 
     return cameraGranted && locationGranted;
   } catch (error) {
-    console.warn('⚠️ Permission error:', error);
     return false;
   }
 };
+
+export const formatDateList = (input: string) => {
+  const inputDate = input.split(" ")[0];
+
+  const today = new Date();
+  const formattedToday =
+    (today.getMonth() + 1).toString().padStart(2, "0") + "/" +
+    today.getDate().toString().padStart(2, "0") + "/" +
+    today.getFullYear();
+  if (inputDate === formattedToday) {
+    return "Today"
+  } else {
+    return input.replace(" ", input.length > 11 ? "\n" : " ");
+  }
+}
 
 export function formatDateToDDMMMYYYY(dateStr: string): string {
   const formatDate = (date: Date): string => {
@@ -434,36 +443,30 @@ export async function requestLocationPermissions(): Promise<
 
       if (allGranted) return 'granted';
 
-      // ✅ Case 1: Foreground allowed, background denied
       const foregroundGranted =
         fine === PermissionsAndroid.RESULTS.GRANTED &&
         coarse === PermissionsAndroid.RESULTS.GRANTED &&
         background !== PermissionsAndroid.RESULTS.GRANTED;
 
       if (foregroundGranted) {
-        console.log('📍 Foreground location granted, background denied.');
         return 'foreground-only';
       }
 
-      // 🚫 Case 2: Permanently denied (NEVER ASK AGAIN)
       const blocked =
         fine === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN ||
         coarse === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN ||
         background === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN;
 
       if (blocked) {
-        console.log('🚫 Location permission permanently denied');
         return 'blocked';
       }
 
-      // ❌ Otherwise → denied
       return 'denied';
     } catch (err) {
-      console.warn('⚠️ requestLocationPermissions error:', err);
       return 'denied';
     }
   }
-  return 'granted'; // iOS handled via Info.plist
+  return 'granted'; 
 }
 
 
@@ -557,7 +560,6 @@ export const clearAllTempFiles = async () => {
       try {
         await RNFS.unlink(file.path);
       } catch (err) {
-        console.log('Error deleting file:', file.path, err);
       }
     }
     FastImage.clearMemoryCache();
@@ -565,26 +567,263 @@ export const clearAllTempFiles = async () => {
     if (Platform.OS === 'android') {
       // WebView.clearCache(true);
     }
-    console.log('All temp files cleared!');
   } catch (err) {
-    console.log('Error reading temp directory:', err);
   }
 };
 
-export const formatDateList = (input: string) => {
- const inputDate = input.split(" ")[0];
+export const getShadowProps = (
+  offset: number = 2,
+  radius: number = 8,
+  opacity: number = 0.2,
+) => ({
+  shadowColor: '#000',
+  shadowOffset: {
+    width: 0,
+    height: offset,
+  },
+  shadowOpacity: opacity,
+  shadowRadius: radius,
+  elevation: radius,
+});
 
-// get today's date in MM/DD/YYYY format
-const today = new Date();
-const formattedToday =
-  (today.getMonth() + 1).toString().padStart(2, "0") + "/" +
-  today.getDate().toString().padStart(2, "0") + "/" +
-  today.getFullYear();
+export const isIos = Platform.OS === 'ios';
+export const isAndroid = Platform.OS === 'android';
 
-// output
-if (inputDate === formattedToday) {
-    return "Today"
-} else {
-     return input.replace(" ", "\n");
-}
-}
+export const getWindowWidth = () => Dimensions.get('window').width;
+export const getWindowHeight = () => Dimensions.get('window').height;
+
+export const goToSettings = () => {
+  if (isIos) {
+    Linking.openURL('app-settings:');
+  } else {
+    Linking.openSettings();
+  }
+};
+
+export const handlePhonePress = (phoneNumber: string) => {
+      Linking.openURL(`tel:${phoneNumber}`);
+};
+  
+export  const handleEmailPress = (emailAddress: any) => {
+      Linking.openURL(`mailto:${emailAddress}`);
+};
+export const handleLocationPress = (location: string) => {
+  if (!location) return;
+
+  // Split the string into latitude and longitude
+  const [lat, lng] = location.split(',').map(coord => coord.trim());
+
+  // Construct URL for maps
+  const url = Platform.select({
+    ios: `http://maps.apple.com/?ll=${lat},${lng}`,  // Apple Maps on iOS
+    android: `geo:${lat},${lng}?q=${lat},${lng}`,    // Google Maps on Android
+  });
+
+  Linking.canOpenURL(url!)
+    .then(supported => {
+      if (supported) {
+        Linking.openURL(url!);
+      } else {
+        Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${lat},${lng}`);
+      }
+    })
+    .catch(err => console.error('Error opening map:', err));
+};
+
+// =======================
+// Operators (camelCase full names)
+// =======================
+const operators = {
+  // Equality
+  equals: (a, b) => a === b,
+  notEquals: (a, b) => a !== b,
+
+  // Numeric
+  greaterThan: (a, b) => Number(a) > Number(b),
+  greaterThanOrEqual: (a, b) => Number(a) >= Number(b),
+  lessThan: (a, b) => Number(a) < Number(b),
+  lessThanOrEqual: (a, b) => Number(a) <= Number(b),
+
+  // String
+  containsString: (a, b) => typeof a === "string" && typeof b === "string" && a.includes(b),
+  startsWithString: (a, b) => typeof a === "string" && typeof b === "string" && a.startsWith(b),
+  endsWithString: (a, b) => typeof a === "string" && typeof b === "string" && a.endsWith(b),
+
+  // Array
+  inArray: (a, b) => Array.isArray(b) && b.includes(a),
+  notInArray: (a, b) => Array.isArray(b) && !b.includes(a),
+
+  // Empty / Non-empty
+  isEmpty: (a) => a === null || a === undefined || a === "",
+  isNotEmpty: (a) => a !== null && a !== undefined && a !== "",
+
+  // Boolean
+  isTruthy: (a) => Boolean(a),
+  isFalsy: (a) => !Boolean(a),
+
+  // Regex
+  matchesRegex: (a, b) => typeof a === "string" && new RegExp(b).test(a),
+
+  // Dates
+  isBeforeDate: (a, b) => new Date(a) < new Date(b),
+  isAfterDate: (a, b) => new Date(a) > new Date(b),
+};
+
+// =======================
+// Evaluate Condition
+// =======================
+const evaluateCondition = (rule, values) => {
+  if (!rule || !rule.operator) return false;
+  const leftValue = values[rule.left];
+  const rightValue =
+    typeof rule.right === "string" && values.hasOwnProperty(rule.right)
+      ? values[rule.right] // field-to-field comparison
+      : rule.right;        // field-to-value comparison
+
+  const operatorFn = operators[rule.operator];
+  if (!operatorFn) {
+    console.warn(`Unsupported operator: ${rule.operator}`);
+    return false;
+  }
+
+  return operatorFn(leftValue, rightValue);
+};
+
+
+
+export const evaluateRules = (condition, values) => {
+  if (!condition) return false;
+
+  if (Array.isArray(condition.rules)) {
+    const results = condition.rules.map((rule) => evaluateRules(rule, values));
+    return condition.logic === "OR" ? results.some(Boolean) : results.every(Boolean);
+  }
+
+  return evaluateCondition(condition, values);
+};
+
+export const computeControlVisibility = (
+  rules: any[] | null,
+  formValues: Record<string, any>,
+  logic: "AND" | "OR" = "AND"
+): boolean => {
+  if (!rules || !Array.isArray(rules) || rules.length === 0) {
+    return true;
+  }
+
+  const results = rules.map(rule => evaluateRules(rule, formValues));
+
+  return logic === "OR"
+    ? results.some(Boolean)
+    : results.every(Boolean);
+};
+
+
+const evaluateCondition2 = (rule, values) => {
+  if (!rule || !rule.operator) return false;
+
+  const leftValue = values[rule.left];
+  const rightValue =
+    typeof rule.right === "string" && values.hasOwnProperty(rule.right)
+      ? values[rule.right]
+      : rule.right;
+
+  const operatorFn = operators[rule.operator];
+  if (!operatorFn) {
+    console.warn(`Unsupported operator: ${rule.operator}`);
+    return false;
+  }
+
+  return operatorFn(leftValue, rightValue);
+};
+
+export const evaluateRules2 = (condition, values) => {
+  if (!condition) return false;
+
+  // Nested rules
+  if (condition.logic && Array.isArray(condition.rules)) {
+    const results = condition.rules.map(rule =>
+      evaluateRules2(rule, values)
+    );
+
+    return condition.logic === "OR"
+      ? results.some(Boolean)
+      : results.every(Boolean);
+  }
+
+  // Leaf rule
+  return evaluateCondition2(condition, values);
+};
+
+export const collectActionsFromRule2 = (rule, values) => {
+  const result = evaluateRules2(rule, values);
+
+  if (result && rule.validActions) {
+    return rule.validActions;
+  }
+
+  if (!result && rule.invalidActions) {
+    return rule.invalidActions;
+  }
+
+  return [];
+};
+
+export const evaluateRulesWithActions = (
+  rules,
+  formValues,
+  logic = "AND"
+) => {
+  if (!rules) return { isValid: true, actions: [] };
+
+  const ruleArray = Array.isArray(rules) ? rules : [rules];
+
+  const results = [];
+  let actions = [];
+
+  ruleArray.forEach(rule => {
+    const isValid = evaluateRules(rule, formValues);
+    results.push(isValid);
+
+    actions = actions.concat(collectActionsFromRule2(rule, formValues));
+  });
+
+  const finalResult =
+    logic === "OR"
+      ? results.some(Boolean)
+      : results.every(Boolean);
+
+  return { isValid: finalResult, actions };
+};
+export const applyActionsToControls = (controls, actions) => {
+  if (!actions || actions.length === 0) return controls;
+
+  return controls.map(ctrl => {
+    const fieldActions = actions.filter(a => a.field === ctrl.field);
+    if (fieldActions.length === 0) return ctrl;
+
+    return fieldActions.reduce((updatedCtrl, action) => {
+      switch (action.action) {
+        case "hide":
+          return { ...updatedCtrl, visible: "1" };
+        case "background":
+          return { ...updatedCtrl, background: action.background };
+        case "borderColor":
+          return { ...updatedCtrl, borderColor: action.borderColor };
+        case "unhide":
+          return { ...updatedCtrl, visible: "0" };
+        case "disable":
+          return { ...updatedCtrl, disabled: "1" };
+        case "enable":
+          return { ...updatedCtrl, disabled: "0" };
+        case "setValue":
+          return { ...updatedCtrl, text: action.value , };
+        case "setBoolValue":
+          return { ...updatedCtrl, text: action.value, field: action.value };
+        default:
+          return updatedCtrl;
+      }
+    }, ctrl);
+  });
+};
+

@@ -9,6 +9,10 @@ const ERP_TABLE = {
   ERP_BOOKMARKS: 'erp_bookmarks',
 };
 
+// =====================
+// 🚀 MIGRATIONS SUPPORT
+// =====================
+
 const ERP_QUERY_SCHEMA_TABLE_CREATE = `
   CREATE TABLE IF NOT EXISTS schema_version (
     version INTEGER PRIMARY KEY
@@ -43,9 +47,7 @@ const migrations = [
         await db.executeSql(
           `ALTER TABLE ${ERP_TABLE.ERP_ACCOUNTS} ADD COLUMN profilePicture TEXT;`,
         );
-        console.log("🆕 Migration v1 applied: profilePicture column added");
       } catch (err) {
-        console.log("⚠️ Migration v1 skipped (maybe already applied):", err.message);
       }
     },
   },
@@ -61,18 +63,15 @@ const migrations = [
           createdAt TEXT
         );
       `);
-      console.log("🆕 Migration v2 applied: notifications table created");
     },
   },
 ];
 
 const migrateDatabase = async (db) => {
   const currentVersion = await getSchemaVersion(db);
-  console.log("📦 Current DB schema version:", currentVersion);
 
   for (const migration of migrations) {
     if (migration.version > currentVersion) {
-      console.log(`🚀 Running migration v${migration.version}`);
       await migration.run(db);
       await setSchemaVersion(db, migration.version);
     }
@@ -84,13 +83,11 @@ const migrateDatabase = async (db) => {
 // =====================
 
 export const getDBConnection = async () => {
-  console.log('🔍 getDBConnection called');
   const db = await SQLite.openDatabase({
     name: ERP_DB_NAME,
     location: 'default',
   });
   await migrateDatabase(db); // run migrations automatically
-  console.log('🔍 getDBConnection completed, db object:', db);
   return db;
 };
 
@@ -136,9 +133,7 @@ const ERP_QUERY_BOOKMARKS_TABLE_CREATE = `
 export const createCompanyTable = async (db) => {
   try {
     await db.executeSql(ERP_QUERY_COMPANY_TABLE_CREATE);
-    console.log("🏢 createCompanyTable created successfully");
   } catch (error) {
-    console.error("Error createCompanyTable:", error);
   }
 };
 
@@ -150,20 +145,15 @@ export const insertOrUpdateCompany = async (db, company) => {
        VALUES (?, ?, ?, COALESCE((SELECT createdAt FROM company_details WHERE id = ?), ?), ?);`,
       [company.id, company.name, company.link, company.id, now, now]
     );
-    console.log("🏢 insertOrUpdateCompany:", company.id);
   } catch (error) {
-    console.error("Error insertOrUpdateCompany:", error);
   }
 };
 
 export const createAccountsTable = async db => {
   try {
-    console.log('🔍 createAccountsTable called');
     await db.executeSql(ERP_QUERY_ACCOUNTS_TABLE_CREATE);
     await db.executeSql(ERP_QUERY_META_TABLE_CREATE);
-    console.log('🔍 createAccountsTable completed successfully');
   } catch (error) {
-    console.error('Error createAccountsTable:', error);
   }
 };
 
@@ -203,9 +193,7 @@ export const setPinEnabled = async (db, enabled) => {
       `INSERT OR REPLACE INTO ${ERP_TABLE.ERP_META} (key, value) VALUES (?, ?)`,
       [META_KEYS.PIN_ENABLED, enabled ? '1' : '0']
     );
-    console.log('🔐 setPinEnabled:', enabled);
   } catch (error) {
-    console.error('Error setPinEnabled:', error);
   }
 };
 
@@ -220,28 +208,21 @@ export const isPinEnabled = async (db) => {
     }
     return false;
   } catch (error) {
-    console.error('Error isPinEnabled:', error);
     return false;
   }
 };
 
 export const resetPin = async (db) => {
   try {
-    // Remove pin_code entry
     await db.executeSql(
       `DELETE FROM ${ERP_TABLE.ERP_META} WHERE key = ?`,
       [META_KEYS.PIN_CODE]
     );
-
-    // Disable pin_enabled flag
     await db.executeSql(
       `INSERT OR REPLACE INTO ${ERP_TABLE.ERP_META} (key, value) VALUES (?, ?)`,
       [META_KEYS.PIN_ENABLED, '0']
     );
-
-    console.log('🔓 resetPin: PIN removed & PIN disabled');
   } catch (error) {
-    console.error("Error resetPin:", error);
   }
 };
 
@@ -253,9 +234,7 @@ export const setPinCode = async (db, pin) => {
 
       [META_KEYS.PIN_CODE, pin]
     );
-    console.log('🔐 setPinCode: saved');
   } catch (error) {
-    console.error('Error setPinCode:', error);
   }
 };
 
@@ -270,7 +249,6 @@ export const getPinCode = async (db) => {
     }
     return null;
   } catch (error) {
-    console.error('Error getPinCode:', error);
     return null;
   }
 };
@@ -288,7 +266,6 @@ export const insertAccount = async (db, account) => {
       insertValues,
     );
   } catch (error) {
-    console.error('Error insertAccount:', error);
   }
 };
 
@@ -302,7 +279,6 @@ export const updateAccountActive = async (db, accountId) => {
       [accountId, accountId, currentTime],
     );
   } catch (error) {
-    console.error('Error updateAccountActive:', error);
   }
 };
 
@@ -321,7 +297,6 @@ export const getAccounts = async db => {
     }
     return accounts;
   } catch (error) {
-    console.error('Error getAccounts:', error);
   }
 };
 
@@ -341,7 +316,6 @@ export const getActiveAccount = async db => {
     }
     return null;
   } catch (error) {
-    console.error('Error getActiveAccount:', error);
   }
 };
 
@@ -349,7 +323,6 @@ export const removeAccount = async (db, accountId) => {
   try {
     await db.executeSql(`DELETE FROM ${ERP_TABLE.ERP_ACCOUNTS} WHERE id = ?`, [accountId]);
   } catch (error) {
-    console.error('Error removeAccount:', error);
   }
 };
 
@@ -360,7 +333,6 @@ export const setMeta = async (db, key, value) => {
       value,
     ]);
   } catch (error) {
-    console.error('Error setMeta:', error);
   }
 };
 
@@ -374,7 +346,6 @@ export const getMeta = async (db, key) => {
     }
     return null;
   } catch (error) {
-    console.error('Error getMeta:', error);
   }
 };
 
@@ -382,7 +353,6 @@ export const clearAccounts = async db => {
   try {
     await db.executeSql(`DELETE FROM ${ERP_TABLE.ERP_ACCOUNTS}`);
   } catch (error) {
-    console.error('Error clearAccounts:', error);
   }
 };
 
@@ -390,7 +360,6 @@ export const createBookmarksTable = async (db) => {
   try {
     await db.executeSql(ERP_QUERY_BOOKMARKS_TABLE_CREATE);
   } catch (error) {
-    console.error("Error createBookmarksTable:", error);
   }
 };
 
@@ -402,7 +371,6 @@ export const insertOrUpdateBookmark = async (db, id, userId, isBookmarked) => {
       [id, userId, isBookmarked ? 1 : 0]
     );
   } catch (error) {
-    console.error("Error insertOrUpdateBookmark:", error);
   }
 };
 
@@ -423,7 +391,6 @@ export const getBookmarks = async (db, userId) => {
 
     return bookmarks;
   } catch (error) {
-    console.error("Error getBookmarks:", error);
     return {};
   }
 };
@@ -432,7 +399,6 @@ export const removeBookmark = async (db, id) => {
   try {
     await db.executeSql(`DELETE FROM ${ERP_TABLE.ERP_BOOKMARKS} WHERE id = ?`, [id]);
   } catch (error) {
-    console.error("Error removeBookmark:", error);
   }
 };
 
@@ -441,17 +407,12 @@ export const logoutUser = async (db, accountId) => {
     await removeAccount(db, accountId);
     const remainingAccounts = await getAccounts(db);
     if (remainingAccounts.length === 0) {
-      console.log("✅ All accounts removed. No active user.");
       return null;
     }
-
     const newActive = remainingAccounts[0];
     await updateAccountActive(db, newActive.id);
-
-    console.log("✅ Logout done. New active user:", newActive.id);
     return newActive;
   } catch (error) {
-    console.error("Error logoutUser:", error);
     return null;
   }
 };
@@ -462,8 +423,6 @@ export const removePinCode = async (db) => {
       `DELETE FROM ${ERP_TABLE.ERP_META} WHERE key = ?`,
       [META_KEYS.PIN_CODE]
     );
-    console.log('🔓 removePinCode: PIN deleted');
   } catch (error) {
-    console.error('Error removePinCode:', error);
   }
 };

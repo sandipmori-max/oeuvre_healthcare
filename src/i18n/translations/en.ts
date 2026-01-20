@@ -31,7 +31,7 @@ export default {
     signUp: 'Sign Up',
     signIn: 'Sign In',
     signingIn: 'Signing In...',
-    welcomeDevERP: 'Welcome Oeuvre',
+    welcomeDevERP: 'Welcome',
     addAccount: 'Add Account',
     signInToAddAccount: 'Sign in to add another account',
     signInToAccount: 'Sign in to your account',

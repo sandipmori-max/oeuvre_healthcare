@@ -11,7 +11,6 @@ const useFcmToken = () => {
       try {
         const permission = await requestUserPermission();
         setPermissionGranted(permission);
-
         if (permission) {
           const fcmToken = await messaging().getToken();
           if (fcmToken) {
@@ -19,16 +18,12 @@ const useFcmToken = () => {
           }
         }
       } catch (err) {
-        console.error('FCM Initialization error:', err);
       }
     };
-
     initializeFCM();
-
     const unsubscribe = messaging().onTokenRefresh(newToken => {
       setToken(newToken);
     });
-
     return unsubscribe;
   }, []);
 
@@ -71,11 +66,9 @@ const useFcmToken = () => {
             return false;
 
           default:
-            console.log('ℹ️ Push notification permission status:', authStatus);
             return false;
         }
       } catch (error) {
-        console.error('Error requesting notification permission:', error);
         return false;
       }
     }

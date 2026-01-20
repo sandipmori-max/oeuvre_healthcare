@@ -3,10 +3,6 @@ import messaging, {
 } from '@react-native-firebase/messaging';
 import { Alert } from 'react-native';
 
-/**
- * Request permission for push notifications (iOS requires explicit).
- */
-
 export async function requestUserPermission(): Promise<void> {
   try {
     const authStatus = await messaging().requestPermission({
@@ -43,16 +39,11 @@ export async function requestUserPermission(): Promise<void> {
         break;
 
       default:
-        console.log('ℹ️ Push notification permission status:', authStatus);
     }
   } catch (error) {
-    console.error('Error requesting notification permission:', error);
   }
 }
 
-/**
- * Get FCM token for the device.
- */
 export async function getFcmToken(): Promise<string | null> {
   try {
     const token = await messaging().getToken();
@@ -61,14 +52,10 @@ export async function getFcmToken(): Promise<string | null> {
     }
     return null;
   } catch (error) {
-    console.error('Error getting FCM token:', error);
     return null;
   }
 }
 
-/**
- * Foreground notification listener.
- */
 export function onMessageListener(
   callback: (message: FirebaseMessagingTypes.RemoteMessage) => void
 ) {
@@ -77,14 +64,9 @@ export function onMessageListener(
   });
 }
 
-/**
- * Background notification handler.
- */
 export function setBackgroundMessageHandler() {
   messaging().setBackgroundMessageHandler(
     async (remoteMessage: FirebaseMessagingTypes.RemoteMessage) => {
-      console.log('📩 Background message:', remoteMessage);
-      // You can trigger a local notification here if needed
     }
   );
 }
@@ -97,7 +79,6 @@ export function onNotificationOpenedAppListener(
 ) {
   return messaging().onNotificationOpenedApp(remoteMessage => {
     if (remoteMessage) {
-      console.log('📩 Opened from background:', remoteMessage);
       callback(remoteMessage);
     }
   });
@@ -111,7 +92,6 @@ export async function checkInitialNotification(
 ) {
   const remoteMessage = await messaging().getInitialNotification();
   if (remoteMessage) {
-    console.log('📩 Opened from quit state:', remoteMessage);
     callback(remoteMessage);
   }
 }

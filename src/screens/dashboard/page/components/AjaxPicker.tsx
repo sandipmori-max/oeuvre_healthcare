@@ -113,9 +113,12 @@ const AjaxPicker = ({ isValidate, label, onValueChange, item, errors, dtext, for
             borderWidth: 1,
           },
           theme === 'dark' && {
-            backgroundColor: DARK_COLOR,
+            backgroundColor: 'black',
             borderWidth: 1,
-          }
+          },
+           item?.background && {
+              backgroundColor: item?.background
+            }
         ]}
         onPress={() => {
           if (item?.disabled !== '1') {

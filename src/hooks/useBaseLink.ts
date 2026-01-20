@@ -7,7 +7,6 @@ export const useBaseLink = () => {
 
   useEffect(() => {
     let isMounted = true;
-
     const loadBaseLink = async () => {
       try {
         const storedLink = await AsyncStorage.getItem('erp_link');
@@ -19,12 +18,9 @@ export const useBaseLink = () => {
 
         setBaseLink(normalizedBase || '');
       } catch (e) {
-        console.error('Error loading stored data:', e);
       }
     };
-
     loadBaseLink();
-
     return () => {
       isMounted = false;
     };

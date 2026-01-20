@@ -191,7 +191,6 @@ const [actionTarget, setActionTarget] = useState(null);
   // ----------------------------------------------------
   let currentList = items.filter((i) => i.parentId === currentFolder);
 
-  console.log("currentList", currentList)
   if (sortType === "name") {
     currentList.sort((a, b) => a.name.localeCompare(b.name));
   } else if (sortType === "date") {

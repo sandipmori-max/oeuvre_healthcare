@@ -24,9 +24,9 @@ const ERPTextInput: React.FC<ERPTextInputProps> = ({
   ...rest
 }) => {
   const [showPassword, setShowPassword] = useState(!secureTextEntry);
- 
+
   return (
-    <View style={[styles.inputContainer, containerStyle,                        ,]}>
+    <View style={[styles.inputContainer, containerStyle, ,]}>
       {label ? <Text style={[styles.inputLabel, labelStyle]}>{label}</Text> : null}
 
       <View style={styles.inputWrapper}>
@@ -52,12 +52,11 @@ const ERPTextInput: React.FC<ERPTextInputProps> = ({
             },
             value && {
               borderColor: 'green',
-
             }
           ]}
         >
           <MaterialIcons name={
-            field === 'company_code' ? 'closed-caption-off' : field === 'user' ? 'person' : 'password' 
+            field === 'company_code' ? 'closed-caption-off' : field === 'user' ? 'person' : 'password'
           } size={20} color={ERP_COLOR_CODE.ERP_999} />
 
           <TextInput
@@ -67,7 +66,7 @@ const ERPTextInput: React.FC<ERPTextInputProps> = ({
               { paddingRight: showToggle && secureTextEntry ? 36 : 12 },
             ]}
             secureTextEntry={secureTextEntry && !showPassword}
-            {...rest} 
+            {...rest}
           />
         </View>
 

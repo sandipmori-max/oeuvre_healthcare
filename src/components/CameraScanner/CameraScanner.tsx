@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Alert,
   Modal,
@@ -9,21 +9,21 @@ import {
   StyleSheet,
 } from 'react-native';
 
-import {styles} from './CameraScanner.styles';
-import {RNHoleView} from 'react-native-hole-view';
+import { styles } from './CameraScanner.styles';
+import { RNHoleView } from 'react-native-hole-view';
 import {
   Camera,
   CameraRuntimeError,
   useCameraDevice,
   useCodeScanner,
 } from 'react-native-vision-camera';
-import {useIsFocused} from '@react-navigation/native';
-import {useAppStateListener} from '../../hooks/useAppStateListener';
-import {ICameraScannerProps} from '../../utils/helpers/types';
-import {getWindowHeight, getWindowWidth, isIos} from '../../utils/helpers';
+import { useIsFocused } from '@react-navigation/native';
+import { useAppStateListener } from '../../hooks/useAppStateListener';
+import { ICameraScannerProps } from '../../utils/helpers/types';
+import { getWindowHeight, getWindowWidth, isIos } from '../../utils/helpers';
 import MaterialIcons from '@react-native-vector-icons/material-icons';
 
- 
+
 export const CameraScanner = ({
   setIsCameraShown,
   onReadCode,
@@ -34,7 +34,7 @@ export const CameraScanner = ({
   const [isCameraInitialized, setIsCameraInitialized] = useState(isIos);
   const [isActive, setIsActive] = useState(isIos);
   const [flash, setFlash] = useState<'on' | 'off'>(isIos ? 'off' : 'on');
-  const {appState} = useAppStateListener();
+  const { appState } = useAppStateListener();
   const [codeScanned, setCodeScanned] = useState('');
 
   useEffect(() => {

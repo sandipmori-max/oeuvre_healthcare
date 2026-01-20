@@ -30,6 +30,9 @@ const DateRow = ({ isValidate, item, errors, value, showDatePicker }: any) => {
             borderColor: 'green',
             borderWidth: 0.8,
           },
+          item?.borderColor && {
+            borderColor: item?.borderColor
+          }
         ]}
         onPress={() => showDatePicker(item?.field, value)}
       >

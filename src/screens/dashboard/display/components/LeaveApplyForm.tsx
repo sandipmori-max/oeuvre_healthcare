@@ -148,8 +148,6 @@ const LeaveApplyForm = () => {
           'Un-Paid': extraDays,
         },
       };
-
-      console.log('Payload (with sandwich):', finalPayload);
       return;
     }
 

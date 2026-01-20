@@ -11,13 +11,11 @@ import {
   Platform,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-//  import { ERP_GIF } from '../../assets';
 import { ERP_COLOR_CODE } from '../../utils/constants';
 import FullViewLoader from '../../components/loader/FullViewLoader';
 import MaterialIcons from '@react-native-vector-icons/material-icons';
 import FastImage from 'react-native-fast-image';
 import { ERP_GIF } from '../../assets';
-import { useNavigation } from '@react-navigation/native';
 
 const { width, height } = Dimensions.get('window');
 const slides = [
@@ -47,7 +45,7 @@ const slides = [
     bgColor: ['#8de0d2', '#D1F2EB'],
     statusBar: '#8de0d2',
     layout: { titleY: -30, descY: 10, align: 'right' },
-  },
+  }, 
   {
     id: '4',
     title: 'Grow with Confidence',
@@ -59,8 +57,7 @@ const slides = [
   },
 ];
 
-const Onboarding = ( ) => {
-  const navigation = useNavigation();
+const Onboarding = ({ navigation }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const scrollX = useRef(new Animated.Value(0)).current;
   const flatListRef = useRef(null);

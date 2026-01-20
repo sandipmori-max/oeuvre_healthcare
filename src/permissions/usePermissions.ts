@@ -42,7 +42,6 @@ export const usePermissions = (typeOfPermission: EPermissionTypes) => {
         //if error present, return error
         try {
           await request(getPermission()).then(result => {
-            console.log('result', result);
             switch (result) {
               case RESULTS.UNAVAILABLE:
                 return reject({

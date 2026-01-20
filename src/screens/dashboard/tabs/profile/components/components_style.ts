@@ -54,7 +54,7 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
   },
   avatar: {
-    backgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR,
+    backgroundColor: ERP_COLOR_CODE.ERP_999,
     width: 50,
     height: 50,
     borderRadius: 25,

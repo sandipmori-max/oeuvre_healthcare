@@ -24,91 +24,68 @@ import { useFocusEffect } from '@react-navigation/native';
 import { ERP_COLOR_CODE } from '../utils/constants';
 import { changeLanguage } from '../i18n';
 import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
+import { getLastPunchInThunk } from '../store/slices/attendance/thunk';
+import { setReloadApp } from '../store/slices/reloadApp/reloadAppSlice';
 
 // ------------------------- Location Permission Helper -------------------------
 export async function requestLocationPermissions(): Promise<
   'granted' | 'foreground-only' | 'denied' | 'blocked'
 > {
   if (Platform.OS === 'android') {
-    const granted = await PermissionsAndroid.requestMultiple([
-      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-      PermissionsAndroid.PERMISSIONS.ACCESS_COARSE_LOCATION,
-      PermissionsAndroid.PERMISSIONS.ACCESS_BACKGROUND_LOCATION,
-    ]);
 
-    if (
-      granted['android.permission.ACCESS_FINE_LOCATION'] ===
-      PermissionsAndroid.RESULTS.GRANTED &&
-      granted['android.permission.ACCESS_COARSE_LOCATION'] ===
-      PermissionsAndroid.RESULTS.GRANTED &&
-      granted['android.permission.ACCESS_BACKGROUND_LOCATION'] ===
-      PermissionsAndroid.RESULTS.GRANTED
-    ) return 'granted';
+    const fine = await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
+    );
 
-    if (
-      granted['android.permission.ACCESS_FINE_LOCATION'] ===
-      PermissionsAndroid.RESULTS.GRANTED &&
-      granted['android.permission.ACCESS_COARSE_LOCATION'] ===
-      PermissionsAndroid.RESULTS.GRANTED
-    ) return 'foreground-only';
+    if (fine === PermissionsAndroid.RESULTS.GRANTED) {
+      // Ask background AFTER foreground
+      const background = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.ACCESS_BACKGROUND_LOCATION
+      );
 
-    if (
-      granted['android.permission.ACCESS_FINE_LOCATION'] ===
-      PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN ||
-      granted['android.permission.ACCESS_COARSE_LOCATION'] ===
-      PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN
-    ) return 'blocked';
-
-    return 'denied';
-  } else {
-    // iOS logic
-    let status = await check(PERMISSIONS.IOS.LOCATION_ALWAYS);
-    console.log("status----------------------1---------------------", status)
-    if (status === RESULTS.GRANTED) return 'granted';
-    console.log("status----------------------2---------------------", status)
-    if (status === RESULTS.BLOCKED) return 'blocked';
-    console.log("status-----------------------3--------------------", status)
-
-    // Request foreground permission first
-    let foregroundStatus = await check(PERMISSIONS.IOS.LOCATION_WHEN_IN_USE);
-    console.log("foregroundStatus---------------------4----------------------", foregroundStatus)
-
-    if (foregroundStatus === RESULTS.DENIED) {
-
-      foregroundStatus = await request(PERMISSIONS.IOS.LOCATION_WHEN_IN_USE);
-      console.log("foregroundStatus---------------------5----------------------", foregroundStatus)
-
+      return background === PermissionsAndroid.RESULTS.GRANTED
+        ? 'granted'
+        : 'foreground-only';
     }
 
-    if (foregroundStatus === RESULTS.GRANTED || foregroundStatus === RESULTS.LIMITED) {
-      console.log("foregroundStatus---------------------6----------------------", foregroundStatus)
-
-      // Now ask for "Always" if needed
-      status = await request(PERMISSIONS.IOS.LOCATION_ALWAYS);
-      console.log("status---------------------7----------------------", status)
-
-      if (status === RESULTS.GRANTED) return 'granted';
-      console.log("status----------------------8---------------------", status)
-
-      return 'foreground-only';
+    if (fine === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN) {
+      return 'blocked';
     }
-    console.log("status-----------------------9--------------------", status)
-
-    if (foregroundStatus === RESULTS.BLOCKED) return 'blocked';
-    console.log("status------------------------10-------------------", status)
 
     return 'denied';
   }
+
+  // -------------------- iOS --------------------
+  const whenInUse = await request(PERMISSIONS.IOS.LOCATION_WHEN_IN_USE);
+
+  if (whenInUse === RESULTS.GRANTED || whenInUse === RESULTS.LIMITED) {
+    const always = await request(PERMISSIONS.IOS.LOCATION_ALWAYS);
+    return always === RESULTS.GRANTED ? 'granted' : 'foreground-only';
+  }
+
+  if (whenInUse === RESULTS.BLOCKED) {
+    return 'blocked';
+  }
+
+  return 'denied';
 }
 
 // ------------------------- RootNavigator -------------------------
 const RootNavigator = () => {
   const dispatch = useAppDispatch();
-  const { isLoading, isAuthenticated, accounts, user } =
-    useAppSelector(state => state.auth);
+  const LOCATION_MESSAGES = {
+    PERMISSION_DENIED: 'Location permission has been denied. Please allow it to continue using the app.',
+    SERVICE_DISABLED: 'Location services are disabled. Please enable location services to continue.',
+  };
+
+  const { isLoading, isAuthenticated, accounts, user, appColorCode } = useAppSelector(state => state.auth);
+  const { reLoading } = useAppSelector(state => state.reloadApp);
+  console.log("res reLoading =======================================", reLoading);
+
   const langCode = useAppSelector(state => state.theme.langcode);
 
   const [alertVisible, setAlertVisible] = useState(false);
+  const [openSettings, setOpenSettings] = useState(false);
   const [backgroundDeniedModal, setBackgroundDeniedModal] = useState(false);
   const [alertConfig, setAlertConfig] = useState({
     title: '',
@@ -118,6 +95,59 @@ const RootNavigator = () => {
 
   const locationModalShownRef = useRef(false);
   const appState = useRef(AppState.currentState);
+
+  const locationServiceIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const gpsModalShownRef = useRef(false);
+
+
+  const checkLocationServiceOnly = async () => {
+  if (!isAuthenticated) return;
+
+  const enabled = await DeviceInfo.isLocationEnabled();
+
+  // GPS OFF → show modal once & stop features
+  if (!enabled && !gpsModalShownRef.current) {
+    setAlertConfig({
+      title: 'Location service disabled (GPS OFF)',
+      message: LOCATION_MESSAGES.SERVICE_DISABLED,
+      type: 'error',
+    });
+
+    setAlertVisible(true);
+    setOpenSettings(false);
+    setBackgroundDeniedModal(false);
+
+    gpsModalShownRef.current = true;
+    locationModalShownRef.current = true; // reuse existing stop-flow logic
+    return;
+  }
+
+  // GPS ON again → reset flags & resume
+  if (enabled && gpsModalShownRef.current) {
+    gpsModalShownRef.current = false;
+    locationModalShownRef.current = false;
+    setAlertVisible(false);
+  }
+};
+
+
+useEffect(() => {
+  if (!isAuthenticated) return;
+
+  // Start checking every 1 second
+  locationServiceIntervalRef.current = setInterval(() => {
+    checkLocationServiceOnly();
+  }, 1000);
+
+  return () => {
+    // Cleanup on logout / unmount
+    if (locationServiceIntervalRef.current) {
+      clearInterval(locationServiceIntervalRef.current);
+      locationServiceIntervalRef.current = null;
+    }
+  };
+}, [isAuthenticated]);
+
 
   // ------------------------- AppState Listener -------------------------
   useEffect(() => {
@@ -141,15 +171,16 @@ const RootNavigator = () => {
   }, [langCode]);
 
   // ------------------------- Device Setup -------------------------
-  useEffect(() => {
-    const init = async () => {
-      const name = await DeviceInfo.getDeviceName();
-      await AsyncStorage.setItem('device', name);
-      DevERPService.initialize();
-      dispatch(checkAuthStateThunk());
-    };
-    init();
-  }, [dispatch]);
+
+  const init = async () => {
+    const name = await DeviceInfo.getDeviceName();
+    await AsyncStorage.setItem('device', name);
+    await DevERPService.initialize();
+    setTimeout(async () =>{
+      await dispatch(checkAuthStateThunk());
+    }, 1200)
+  };
+
 
   // ------------------------- Check Location -------------------------
   const checkLocation = async () => {
@@ -159,7 +190,6 @@ const RootNavigator = () => {
     const permission = await requestLocationPermissions();
 
     if (enabled && permission === 'granted') {
-      // ✅ Permission granted, hide modals
       locationModalShownRef.current = false;
       setAlertVisible(false);
       setBackgroundDeniedModal(false);
@@ -181,27 +211,73 @@ const RootNavigator = () => {
       return;
     }
 
-    // Denied or blocked
-    if ((!enabled || permission === 'denied' || permission === 'blocked') && !locationModalShownRef.current) {
-      setAlertConfig({
-        title: 'Location Required',
-        message:
-          'Please enable location permission to continue using the app.',
-        type: 'error',
-      });
-      setAlertVisible(true);
-      setBackgroundDeniedModal(false);
-      locationModalShownRef.current = true;
+    // ------------------------- Denied / Disabled Handling -------------------------
+    if (!locationModalShownRef.current) {
+
+      // CASE 1: Location service disabled (GPS OFF)
+      if (!enabled) {
+        setAlertConfig({
+          title: 'Location service disabled (GPS OFF)',
+          message: LOCATION_MESSAGES.SERVICE_DISABLED,
+          type: 'error',
+        });
+
+        setAlertVisible(true);
+        setOpenSettings(false)
+        setBackgroundDeniedModal(false); // ❌ no Open Settings modal
+        locationModalShownRef.current = true;
+        return;
+      }
+
+      // CASE 2: Permission denied or blocked
+      if (permission === 'denied' || permission === 'blocked') {
+        setAlertConfig({
+          title: 'Permission Denied',
+          message: LOCATION_MESSAGES.PERMISSION_DENIED,
+          type: 'error',
+        });
+
+        setAlertVisible(true);
+        setOpenSettings(true);
+        setBackgroundDeniedModal(false); // ❌ background modal not needed here
+        locationModalShownRef.current = true;
+        return;
+      }
     }
   };
 
+
+  useEffect(()=>{
+    return(()=>{
+      console.log("F----A----L----S-----E--------0=======================================",);
+      dispatch(setReloadApp())
+    })
+  },[])
   // ------------------------- Focus -------------------------
   useFocusEffect(
     useCallback(() => {
-      if (isAuthenticated) {
-        checkLocation();
-      }
-    }, [isAuthenticated]),
+      init();
+      setTimeout(() => {
+        if (isAuthenticated) {
+          // dispatch(getERPAppConfigMenuThunk())
+          dispatch(getLastPunchInThunk())
+            .unwrap()
+            .then(res => {
+              if (res?.success === 1 || res?.success === '1') {
+                checkLocation();
+              }else{
+                NativeModules.LocationModule.setUserTokens([]);
+                NativeModules.LocationModule.stopService();
+              }
+            })
+            .catch(err => {
+              console.log("err=======================================", err);
+              NativeModules.LocationModule.setUserTokens([]);
+              NativeModules.LocationModule.stopService();
+            });
+        }
+      }, 1200)
+    }, [isAuthenticated,reLoading]),
   );
 
   // ------------------------- Render -------------------------
@@ -210,7 +286,6 @@ const RootNavigator = () => {
   return (
     <>
       {isAuthenticated ? <StackNavigator /> : <AuthNavigator />}
-
       {
         isAuthenticated && (
           <CustomAlert
@@ -219,13 +294,11 @@ const RootNavigator = () => {
             message={alertConfig.message}
             type={alertConfig.type}
             onClose={() => { }}
-            isSettingVisible
+            isSettingVisible={openSettings}
             actionLoader={undefined}
           />
         )
       }
-
-
       {
         isAuthenticated && (
           <Modal visible={backgroundDeniedModal} transparent>
@@ -245,7 +318,6 @@ const RootNavigator = () => {
           </Modal>
         )
       }
-
     </>
   );
 };

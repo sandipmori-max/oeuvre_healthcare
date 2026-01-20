@@ -1,6 +1,15 @@
 import MaterialIcons from '@react-native-vector-icons/material-icons';
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
+import React, { useState, useRef } from 'react';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Dimensions,
+  Animated,
+  Platform,
+  NativeModules,
+} from 'react-native';
 import { ERP_COLOR_CODE } from '../../../utils/constants';
 import { getDBConnection, getPinCode } from '../../../utils/sqlite';
 import { useNavigation } from '@react-navigation/native';
@@ -23,20 +32,61 @@ const PinVerifyScreen = () => {
 
   const navigation = useNavigation<any>();
 
+  // Each key has its own scale value
+  const keyScales = useRef<{ [key: string]: Animated.Value }>({}).current;
+
+  const getScale = (key: string) => {
+    if (!keyScales[key]) keyScales[key] = new Animated.Value(1);
+    return keyScales[key];
+  };
+
+  const animateKey = (key: string) => {
+    const scale = getScale(key);
+    Animated.sequence([
+      Animated.timing(scale, {
+        toValue: 1.2,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+      Animated.timing(scale, {
+        toValue: 1,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  };
+
+  // Optional: sound function (requires native setup)
+  const playTapSound = () => {
+    if (Platform.OS === 'ios') {
+      const { AudioServices } = NativeModules;
+      AudioServices?.playSystemSound?.(1104);
+    } else if (Platform.OS === 'android') {
+      const { SoundModule } = NativeModules;
+      SoundModule?.playTap?.();
+    }
+  };
+
   const handleKeyPress = (digit: string) => {
     if (!isBlocked && pin.length < 4) {
       setPin(pin + digit);
+      animateKey(digit);
+      playTapSound();
     }
   };
 
   const handleDelete = () => {
-    if (!isBlocked) setPin(pin.slice(0, -1));
+    if (!isBlocked) {
+      setPin(pin.slice(0, -1));
+      animateKey('del');
+      playTapSound();
+    }
   };
 
   const blockUser = () => {
     setIsBlocked(true);
     setCountdown(60);
-    setAttempts(0); // reset attempts after block
+    setAttempts(0);
 
     const timer = setInterval(() => {
       setCountdown(prev => {
@@ -51,7 +101,7 @@ const PinVerifyScreen = () => {
   };
 
   const handleVerifyPin = async () => {
-    if (isBlocked) return; // Don't allow input if blocked
+    if (isBlocked) return;
 
     if (pin.length < 4) {
       setAlertVisible(true);
@@ -81,6 +131,8 @@ const PinVerifyScreen = () => {
         });
         setPin('');
 
+        animateKey('ok'); // optional animation on wrong OK press
+
         if (newAttempts >= 3) {
           blockUser();
         }
@@ -95,6 +147,13 @@ const PinVerifyScreen = () => {
     }
   };
 
+  const keypadRows = [
+    ['1', '2', '3'],
+    ['4', '5', '6'],
+    ['7', '8', '9'],
+    ['del', '0', 'ok'],
+  ];
+
   return (
     <View style={styles.container}>
       {/* Header */}
@@ -103,7 +162,15 @@ const PinVerifyScreen = () => {
 
       {/* Countdown if blocked */}
       {isBlocked && (
-      <Text style={{ color: 'red', fontSize: 16, marginBottom: 20, paddingHorizontal: 30, textAlign:'center' }}>
+        <Text
+          style={{
+            color: 'red',
+            fontSize: 16,
+            marginBottom: 20,
+            paddingHorizontal: 30,
+            textAlign: 'center',
+          }}
+        >
           Too many wrong attempts.{'\n'}Try again in {countdown} seconds
         </Text>
       )}
@@ -123,35 +190,32 @@ const PinVerifyScreen = () => {
 
       {/* Keypad */}
       <View style={styles.keypad}>
-        {[
-          ['1', '2', '3'],
-          ['4', '5', '6'],
-          ['7', '8', '9'],
-          ['del', '0', 'ok'],
-        ].map((row, rowIndex) => (
+        {keypadRows.map((row, rowIndex) => (
           <View key={rowIndex} style={styles.keypadRow}>
             {row.map(key => (
               <TouchableOpacity
                 key={key}
                 style={styles.key}
                 onPress={() => {
-                  if (isBlocked) return; // Disable all keys if blocked
+                  if (isBlocked) return;
                   if (key === 'del') handleDelete();
                   else if (key === 'ok') handleVerifyPin();
                   else handleKeyPress(key);
                 }}
               >
-                {key === 'del' ? (
-                  <MaterialIcons name="backspace" size={28} color="#374151" />
-                ) : key === 'ok' ? (
-                  <MaterialIcons
-                    name="check-circle"
-                    size={36}
-                    color={pin.length === 4 ? '#16a34a' : '#9ca3af'}
-                  />
-                ) : (
-                  <Text style={styles.keyText}>{key}</Text>
-                )}
+                <Animated.View style={{ transform: [{ scale: getScale(key) }] }}>
+                  {key === 'del' ? (
+                    <MaterialIcons name="backspace" size={28} color="#374151" />
+                  ) : key === 'ok' ? (
+                    <MaterialIcons
+                      name="check-circle"
+                      size={36}
+                      color={pin.length === 4 ? '#16a34a' : '#9ca3af'}
+                    />
+                  ) : (
+                    <Text style={styles.keyText}>{key}</Text>
+                  )}
+                </Animated.View>
               </TouchableOpacity>
             ))}
           </View>

@@ -1,7 +1,7 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import NetInfo from '@react-native-community/netinfo';
-import { Platform, ViewComponent } from 'react-native';
+import { Platform } from 'react-native';
 
 const ENV = {
   development: {
@@ -103,24 +103,17 @@ apiClient.interceptors.request.use(
 apiClient.interceptors.response.use(
   (response: AxiosResponse<ApiResponse>) => {
     try {
-      console.log("🚀 ~ response:", response)
       if (response.data && response.data.d) {
         let raw = response?.data?.d;
-        console.log('🚀 ~----------------- raw:',);
         let parsedData: any;
 
         try {
           if (typeof raw === 'string') {
             let sanitized = raw.replace(/[\u0000-\u001F]+/g, '');
             sanitized = sanitized.replace(/^\uFEFF/, '');
-
-            // Fix escaped quotes: \" -> "
             sanitized = sanitized.replace(/\\"/g, '"');
-
-            // Optional: remove double-escaped backslashes \\n -> \n
             sanitized = sanitized.replace(/\\\\n/g, '');
             sanitized = sanitized.replace(/\\\\/g, '');
-
             parsedData = JSON.parse(sanitized);
           } else if (typeof raw === 'object') {
             parsedData = raw;
@@ -128,7 +121,6 @@ apiClient.interceptors.response.use(
             throw new Error('Unsupported response format');
           }
         } catch (error) {
-          console.log('🚀 ~ JSON parse error:', error, '\nraw:', raw);
           if (typeof raw === 'string' && raw.includes(',')) {
             const [successPart, ...msgParts] = raw.split(',');
             parsedData = {
@@ -157,7 +149,6 @@ apiClient.interceptors.response.use(
       }
       return response;
     } catch (err) {
-      console.error('❌ Failed to parse API response:', err);
       return Promise.reject({
         message: 'Invalid response format',
         statusCode: response.status,
@@ -166,7 +157,6 @@ apiClient.interceptors.response.use(
     }
   },
   error => {
-    console.log('🚀 ~ error:', error);
     if (error.response) {
       return Promise.reject({
         message: error.response.data?.message || 'API error occurred',

@@ -99,6 +99,8 @@ const MenuTab = ({ type, headerText, searchPlaceholder }: any) => {
     navigation.setOptions({
       headerStyle: {
         backgroundColor: theme === 'dark' ? 'black' : ERP_COLOR_CODE.ERP_APP_COLOR,
+         borderBottomWidth: 1,
+        borderBottomColor: '#fff',
       },
       headerTintColor: 'white',
       headerTitle: () =>
@@ -108,6 +110,7 @@ const MenuTab = ({ type, headerText, searchPlaceholder }: any) => {
               value={searchText}
               onChangeText={setSearchText}
               placeholder={searchPlaceholder}
+              autoFocus={true}
               style={{
                 flex: 1,
                 backgroundColor: '#f0f0f0',
@@ -166,7 +169,9 @@ const MenuTab = ({ type, headerText, searchPlaceholder }: any) => {
         }
       >
         <TouchableOpacity onPress={() => toggleBookmark(item.id)} style={{ position: 'absolute', top: 0, right: 0 }}>
-          <MaterialIcons name={bookmarks[item.id] ? 'bookmark' : 'bookmark-outline'} size={24} />
+          <MaterialIcons 
+          color={theme === 'dark' ? 'white' : 'black'}
+          name={bookmarks[item.id] ? 'bookmark' : 'bookmark-outline'} size={24} />
         </TouchableOpacity>
 
         <View
@@ -187,7 +192,11 @@ const MenuTab = ({ type, headerText, searchPlaceholder }: any) => {
           <Text numberOfLines={2} style={[styles.title, theme === 'dark' && { color: 'white' }]}>
             {item.name}
           </Text>
-          <Text numberOfLines={2} style={[styles.subtitle, theme === 'dark' && { color: 'white' }]}>
+          <Text numberOfLines={2} style={[styles.subtitle, theme === 'dark' && { color: 'white' },
+          !isHorizontal && {
+            textAlign:'center'
+          }
+          ]}>
             {item.title}
           </Text>
         </View>
@@ -269,6 +278,5 @@ export const styles = StyleSheet.create({
   subtitle: {
     fontSize: 14,
     color: 'rgba(75, 73, 73, 0.85)',
-    textAlign: 'center',
   },
 });

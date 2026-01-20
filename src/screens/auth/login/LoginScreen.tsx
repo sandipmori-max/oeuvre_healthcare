@@ -12,7 +12,7 @@ import {
 import DeviceInfo from 'react-native-device-info';
 
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
-import { loginUserThunk } from '../../../store/slices/auth/thunk';
+import { getERPAppConfigMenuThunk, loginUserThunk } from '../../../store/slices/auth/thunk';
 import CustomAlert from '../../../components/alert/CustomAlert';
 import useTranslations from '../../../hooks/useTranslations';
 import { styles } from './login_style';
@@ -20,6 +20,7 @@ import LoginHeader from './components/LoginHeader';
 import LoginForm from './components/LoginForm';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ERP_COLOR_CODE } from '../../../utils/constants';
+import { setReloadApp } from '../../../store/slices/reloadApp/reloadAppSlice';
 
 const LoginScreen = ({ navigation, route }: any) => {
   const { t } = useTranslations();
@@ -75,6 +76,8 @@ const LoginScreen = ({ navigation, route }: any) => {
         companyData,
       }),
     );
+    dispatch(setReloadApp())
+    // dispatch(getERPAppConfigMenuThunk())
   };
 
   const showAlert = (config: {

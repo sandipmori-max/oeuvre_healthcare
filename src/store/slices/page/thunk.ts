@@ -44,7 +44,6 @@ export const handleDeleteActionThunk = createAsyncThunk<
 >('page/action', async ({  id, page , remarks}, { rejectWithValue }) => {
   try {
     const response = await DevERPService.handleDeleteAction( id, page, remarks);
-    console.log("response++++++++++++++++++++", response)
     return response;
   } catch (error: any) {
     return rejectWithValue(error?.message || 'Failed to perform page action');

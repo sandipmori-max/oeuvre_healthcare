@@ -31,7 +31,7 @@ export default {
     signUp: 'સાઇન અપ',
     signIn: 'સાઇન ઇન',
     signingIn: 'સાઇન ઇન થઈ રહ્યું છે...',
-    welcomeDevERP: 'સ્વાગત છે Oeuvre',
+    welcomeDevERP: 'સ્વાગત છે',
     addAccount: 'એકાઉન્ટ ઉમેરો',
     signInToAddAccount: 'બીજું એકાઉન્ટ ઉમેરવા માટે સાઇન ઇન કરો',
     signInToAccount: 'તમારા એકાઉન્ટમાં સાઇન ઇન કરો',

@@ -13,6 +13,15 @@ const Tab = createBottomTabNavigator();
 const TabNavigator = () => {
   const theme = useAppSelector((state) => state.theme.mode);
   const { t } = useTranslations();
+  const { appBottomMenuList } = useAppSelector(state => state?.auth);
+
+  const navigationItems = (appBottomMenuList || []).map(item => ({
+      name:  item?.name,
+      type: item?.type,
+      icon: item?.icon,
+      label: item?.name,
+      search: item?.name,
+  }));
 
   const tabConfig = [
     {
@@ -22,7 +31,7 @@ const TabNavigator = () => {
       label: t("navigation.home"),
     },
     {
-      name: "Hr",
+      name: "Entry",
       type: "E",
       icon: "entry",
       label: t("navigation.entry"),
@@ -36,7 +45,7 @@ const TabNavigator = () => {
       search: t("navigation.search_report"),
     },
     {
-      name: "Dcr",
+      name: "Auth",
       type: "A",
       icon: "auth",
       label: t("navigation.auth"),

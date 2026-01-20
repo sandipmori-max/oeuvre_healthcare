@@ -45,7 +45,7 @@ const CustomAlert: React.FC<CustomAlertProps> = ({
     const onBackPress = () => {
       if (visible) {
         onClose?.();
-        return true; // stop propagation
+        return true;
       }
       return false;
     };

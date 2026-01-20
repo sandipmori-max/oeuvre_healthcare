@@ -102,7 +102,6 @@ const ReadableView = ({
 }: any) => {
   const { t } = useTranslations();
 
-  console.log("filteredData", filteredData.length);
   const navigation = useNavigation();
   const screenWidth = Dimensions.get('window').width;
   const [listData, setListData] = useState(filteredData || []);
@@ -112,14 +111,12 @@ const ReadableView = ({
     setListData(filteredData)
   },[filteredData])
   const handleDelete = (item) => {
-    console.log("id", item);
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     handleDeleteNotification(item)
     // setListData((prev) => prev.filter((_, idx) => idx !== id));
   };
 
   const getButtonMeta = (key: string) => {
-    console.log("keykeykeykeykeykey", key, configData)
     if (!key || !configData?.length)
       return { label: 'Action', color: ERP_COLOR_CODE.ERP_COLOR };
     const configItem = configData.find(
@@ -132,6 +129,8 @@ const ReadableView = ({
   };
 
   const RenderCard = ({ item, index }: any) => {
+
+    console.log("---------------------------", item);
     if (!item) return null;
     const name = item?.name?.toString() || `-`;
     const subName = item?.number || `-`;
@@ -139,7 +138,6 @@ const ReadableView = ({
 
     const status = item?.status;
     const date = item?.date;
-    console.log("date----------", date)
     const remarks = item?.remarks;
     const address = item?.address;
     const amount = item?.amount;
@@ -361,9 +359,10 @@ const ReadableView = ({
           )}
         </TouchableOpacity>
         {
-          qty && amount && <View style={{
-            justifyContent: 'space-between',
-            width: '100%', flexDirection: 'row'
+            <View style={{
+            justifyContent:  qty && amount ?'space-between' : 'flex-start',
+            width: '100%', flexDirection: 'row',
+            
           }}>
             {!!qty && (
               <View style={{ flexDirection: 'row', width: '50%' }}>
@@ -391,12 +390,11 @@ const ReadableView = ({
                 </Text>
               </View>
             )}
-            {!!amount && (
+            {!!amount && !!qty && (
               <View style={{
-                flexDirection: 'row',
-                justifyContent: 'flex-end',
-                width: '50%',
+                flexDirection: 'row', 
               }}>
+                
                 <Text
                   numberOfLines={1}
                   style={{
@@ -417,7 +415,9 @@ const ReadableView = ({
                     fontWeight: '700',
                     color: 'green',
                   }}
-                >  {amount}
+                >  {
+                  amount
+                }
                 </Text>
               </View>
             )}
@@ -527,7 +527,7 @@ const ReadableView = ({
             marginTop: 6,
             padding: 8,
             borderRadius: 8,
-            backgroundColor: '#f1f1f1',
+            backgroundColor: theme === 'dark' ? '#000' : '#f1f1f1',
             borderWidth: 1,
             borderColor: ERP_COLOR_CODE.ERP_ddd,
             marginBottom: 12,
@@ -547,7 +547,7 @@ const ReadableView = ({
                     fontSize: 14,
                     fontWeight: '700',
 
-                    color: theme === 'dark' ? 'black' : ERP_COLOR_CODE.ERP_333,
+                    color: theme === 'dark' ? 'white' : ERP_COLOR_CODE.ERP_333,
                   }}
                 >
                   {t("text.text28")} :-
@@ -556,7 +556,7 @@ const ReadableView = ({
                   style={{
                     fontSize: 16,
                     fontWeight: 'bold',
-                    color: '#28a745',
+                    color: theme === 'dark' ? 'white'  : '#28a745',
                     marginLeft: 8,
                   }}
                 >
@@ -575,7 +575,7 @@ const ReadableView = ({
                     fontSize: 14,
                     fontWeight: '700',
                     flexShrink: 1,
-                    color: theme === 'dark' ? 'black' : ERP_COLOR_CODE.ERP_333,
+                    color: theme === 'dark' ? 'white' : ERP_COLOR_CODE.ERP_333,
                   }}
                 >
                   {t("text.text29")} :-
@@ -584,7 +584,7 @@ const ReadableView = ({
                   style={{
                     fontSize: 16,
                     fontWeight: 'bold',
-                    color: '#28a745',
+                    color: theme === 'dark' ? 'white'  : '#28a745',
                     marginLeft: 8,
 
                   }}
@@ -600,7 +600,7 @@ const ReadableView = ({
               style={{
                 fontSize: 14,
                 fontWeight: '700',
-                color: theme === 'dark' ? 'black' : ERP_COLOR_CODE.ERP_333,
+                color: theme === 'dark' ? 'white' : ERP_COLOR_CODE.ERP_333,
               }}
             >
               {listData?.length} {t("text.text31")}

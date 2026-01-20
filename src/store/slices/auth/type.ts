@@ -52,5 +52,8 @@ export interface AuthState {
   dashboardBranch: string,
   dashboardType: string,
   dashboardBranchId: string,
-  dashboardTypeId: string
+  dashboardTypeId: string,
+  appDrawerMenuList: [],
+  appBottomMenuList: [],
+  appColorCode: string
 }

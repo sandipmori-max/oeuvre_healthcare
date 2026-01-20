@@ -18,6 +18,7 @@ import SlideButton from './SlideButton';
 import { useBaseLink } from '../../../../hooks/useBaseLink';
 import ProfileImage from '../../../../components/profile/ProfileImage';
 import DeviceInfo from 'react-native-device-info';
+import { setReloadApp } from '../../../../store/slices/reloadApp/reloadAppSlice';
 
 const AttendanceForm = ({ setBlockAction, resData }: any) => {
   const { t } = useTranslations();
@@ -165,6 +166,14 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
     getLocationWithRetry();
   };
 
+  const formatName = (name = '') =>
+  name
+    .toLowerCase()
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+
+
   return (
     <View style={{
       width: '100%',
@@ -211,6 +220,7 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
               setTimeout(() => {
                 navigation?.goBack();
                 setAlertVisible(false);
+                dispatch(setReloadApp())
               }, 1000);
             })
             .catch(err => {
@@ -267,7 +277,7 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
                     color: 'white',
                     backgroundColor: 'black'
                   }]}
-                  value={values?.name}
+                  value={formatName(values?.name)}
                   editable={false}
                 />
                 {touched?.name && errors?.name ? (

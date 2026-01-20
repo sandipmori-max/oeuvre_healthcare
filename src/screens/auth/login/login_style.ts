@@ -20,15 +20,14 @@ export const styles = StyleSheet.create({
     marginLeft: 2,
   },
   logo: {
-    width: 100,
-    height: 100,
+    width: 148,
+    height: 148,
     alignSelf: 'center',
     marginBottom: 25,
     borderRadius: 20,
   },
   title: {
     fontSize: 28,
-    fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 6,
     color: ERP_COLOR_CODE.ERP_333,

@@ -13,7 +13,8 @@ import ERPTextInput from '../../../../components/input/ERPTextInput';
 import ERPButton from '../../../../components/button/ERPButton';
 import useFcmToken from '../../../../hooks/useFcmToken';
 import { ERP_COLOR_CODE } from '../../../../utils/constants';
-
+import messaging from '@react-native-firebase/messaging';
+ 
 const LoginForm: React.FC<LoginFormProps> = ({
   deviceId,
   isLoading,
@@ -84,7 +85,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
   const handleLoginSubmit = async (values: typeof initialFormValues) => {
     try {
       const companyValidation = await validateCompanyCode(() =>
-        DevERPService.validateCompanyCode(values.company_code),
+        DevERPService.validateCompanyCode('oeuvre01'),
       );
 
       if (!companyValidation?.isValid) return;
@@ -106,7 +107,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
       if (loginResult?.success === 1) {
         await DevERPService.getAuth();
         await onLoginSuccess(
-          values?.company_code,
+          'oeuvre01',
           values?.password,
           { user: values?.user, name: values?.user },
           loginResult,
@@ -119,7 +120,10 @@ const LoginForm: React.FC<LoginFormProps> = ({
           type: 'error',
         });
       }
-    } catch {}
+    } catch(e) {
+
+      console.log("error --------------------- ", e)
+    }
   };
 
   return (
@@ -138,7 +142,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
       >
         {({ handleChange, handleBlur, values, errors, touched, handleSubmit }) => (
           <>
-            {['company_code', 'user', 'password'].map((field, index) => (
+            {['user', 'password'].map((field, index) => (
               <Animated.View
                 key={field}
                 style={{
@@ -153,8 +157,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
                   ],
                 }}
               >
-                {
-                  field !== 'company_code' &&    <ERPTextInput
+                <ERPTextInput
                   label={t(`auth.${field === 'company_code' ? 'companyCode' : field}`)}
                   placeholder={t(
                     `auth.${
@@ -185,8 +188,6 @@ const LoginForm: React.FC<LoginFormProps> = ({
                   inputStyle={styles.input}
                   errorStyle={styles.errorText}
                 />
-                }
-             
               </Animated.View>
             ))}
 

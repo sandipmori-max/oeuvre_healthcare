@@ -36,7 +36,7 @@ import Input from './components/Input';
 import CustomAlert from '../../../components/alert/CustomAlert';
 import AjaxPicker from './components/AjaxPicker';
 import DateTimePicker from 'react-native-modal-datetime-picker';
-import { parseCustomDatePage, requestCameraPermission } from '../../../utils/helpers';
+import { applyActionsToControls, computeControlVisibility, evaluateRules, evaluateRulesWithActions, parseCustomDatePage, requestCameraPermission } from '../../../utils/helpers';
 import DateRow from './components/Date';
 import BoolInput from './components/BoolInput';
 import SignaturePad from './components/SignaturePad';
@@ -50,6 +50,10 @@ import { ERP_COLOR_CODE } from '../../../utils/constants';
 import BusinessCardView from './components/BusinessCardImage';
 import DeviceInfo from 'react-native-device-info';
 import useTranslations from '../../../hooks/useTranslations';
+import VideoRecorder from './components/VideoRecorder';
+import ScanScreen from './components/ScanScreen';
+import BarCodeScan from './components/BarCodeScan';
+import { styles } from './page_style';
 
 type PageRouteParams = { PageScreen: { item: any } };
 
@@ -91,10 +95,8 @@ export async function requestLocationPermissions(): Promise<
       ) {
         return 'blocked';
       }
-
       return 'denied';
     } catch (err) {
-      console.warn('requestLocationPermissions error:', err);
       return 'denied';
     }
   }
@@ -108,7 +110,7 @@ const PageScreen = () => {
   const baseLink = useBaseLink();
   const theme = useAppSelector(state => state?.theme.mode);
   const { t } = useTranslations();
-
+  const [buttonSave, setButtonSave] = useState(true)
   const [loadingPageId, setLoadingPageId] = useState<string | null>(null);
   const [controls, setControls] = useState<any[]>([]);
   const [errorsList, setErrorsList] = useState<string[]>([]);
@@ -134,9 +136,7 @@ const PageScreen = () => {
   const [loader, setLoader] = useState(false);
   const [actionLoader, setActionLoader] = useState(false);
   const [actionSaveLoader, setActionSaveLoader] = useState(false);
-
   const [infoData, setInfoData] = useState<any>({});
-
   const [alertConfig, setAlertConfig] = useState({
     title: '',
     message: '',
@@ -153,6 +153,7 @@ const PageScreen = () => {
   const lastLocationEnabled = useRef<boolean | null>(null);
   const appState = useRef(AppState.currentState);
 
+  console.log("controls-==-=================================", controls)
   const hasLocationField = controls.some(
     item => item?.defaultvalue && item?.defaultvalue === '#location' && item?.visible === "0",
   );
@@ -162,79 +163,22 @@ const PageScreen = () => {
       item?.ctltype === 'PHOTO',
   );
 
-
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
 
     const checkLocation = async () => {
       const enabled = await DeviceInfo.isLocationEnabled();
-      console.log('locationEnabled -----enabled----------- ', enabled);
-
       setLocationEnabled(enabled);
     };
 
-    // Run immediately once
     checkLocation();
 
-    // Then run every 1 second
     interval = setInterval(checkLocation, 1000);
 
-    // Cleanup interval on unmount
     return () => {
       if (interval) clearInterval(interval);
     };
   }, []);
-  // console.log(' ------------------------ ', hasLocationField);
-  // useEffect(() => {
-  //   const subscription = AppState.addEventListener('change', nextAppState => {
-  //     if (appState.current.match(/inactive|background/) && nextAppState === 'active') {
-  //       console.log(
-  //         'App**************************************************************** has come to the foreground!',
-  //       );
-  //       // Put your code here to check permissions, refresh data, etc.
-  //       checkLocation();
-  //     }
-  //     appState.current = nextAppState;
-  //   });
-
-  //   return () => subscription.remove();
-  // }, []);
-
-  // useEffect(() => {
-  //   const interval = setInterval(async () => {
-  //     const enabled = await DeviceInfo.isLocationEnabled();
-  //     const permissionStatus = await requestLocationPermissions();
-
-  //     // Show alert only if status changed
-  //     if (enabled !== lastLocationEnabled.current) {
-  //       if (!enabled) {
-  //         setAlertConfig({
-  //           title: 'Location Status',
-  //           message:
-  //             'We need location access only to serve you better. Please enable it to continue.',
-  //           type: 'error',
-  //         });
-  //         setAlertVisible(true);
-  //         setModalClose(false);
-  //       } else {
-  //         setAlertVisible(false);
-  //         setModalClose(true);
-  //       }
-  //       lastLocationEnabled.current = enabled;
-  //     }
-
-  //     // Show background permission modal only once when required
-  //     if (permissionStatus === 'foreground-only' && !backgroundDeniedModal) {
-  //       setBackgroundDeniedModal(true);
-  //     } else if (permissionStatus !== 'foreground-only' && backgroundDeniedModal) {
-  //       setBackgroundDeniedModal(false);
-  //     }
-
-  //     setLocationEnabled(enabled);
-  //   }, 1000);
-
-  //   return () => clearInterval(interval);
-  // }, [backgroundDeniedModal]);
 
   const requestLocationPermission = async (): Promise<boolean> => {
     if (Platform.OS === 'android') {
@@ -329,7 +273,7 @@ const PageScreen = () => {
       };
 
       const subscription = AppState.addEventListener('change', nextAppState => {
-        if (nextAppState === 'active') {
+        if (nextAppState === 'active' && hasLocationField) {
           checkPermissionsOnFocus();
         }
       });
@@ -368,7 +312,9 @@ const PageScreen = () => {
   useLayoutEffect(() => {
     navigation.setOptions({
       headerStyle: {
-        backgroundColor: theme === 'dark' ? 'black' : ERP_COLOR_CODE.ERP_APP_COLOR,   // <-- BLACK HEADER
+        backgroundColor: theme === 'dark' ? 'black' : ERP_COLOR_CODE.ERP_APP_COLOR,
+        borderBottomWidth: 1,
+        borderBottomColor: '#fff',
       },
       headerTintColor: '#fff',
       headerTitle: () => (
@@ -410,103 +356,7 @@ const PageScreen = () => {
               }}
             />
           )}
-          {/* {!authUser && controls.length > 0 && (
-            <ERPIcon
-              name="save-as"
-              isLoading={actionSaveLoader}
-              onPress={async () => {
-                try {
-                  const enabled = await DeviceInfo.isLocationEnabled();
-                  const permissionStatus = hasLocationField && await requestLocationPermissions();
-                  const hasPermission = hasMediaField && await requestCameraPermission();
-
-                  // if(hasLocationField && hasMediaField){
-
-                  // }
-                  if (!hasPermission && hasMediaField) {
-                    setAlertConfig({
-                      title: t('title.title16'),
-                      message:
-                        t("msg.msg15"),
-                      type: 'error',
-                    });
-                    setAlertVisible(true);
-                    setModalClose(false);
-                    return;
-                  }
-                  console.log('permissionStatus', permissionStatus);
-                  if (hasLocationField && !enabled) {
-                    setAlertConfig({
-                      title: t("title.title13"),
-                      message:
-                        t('title.title15'),
-                      type: 'error',
-                    });
-                    setAlertVisible(true);
-                    setModalClose(false);
-                    return;
-                  }
-                  if (hasLocationField && permissionStatus === 'denied' || permissionStatus === 'blocked') {
-                    setAlertConfig({
-                      title: t("title.title13"),
-                      message:
-                        t('title.title15'),
-                      type: 'error',
-                    });
-                    setAlertVisible(true);
-                    setModalClose(false);
-                    return;
-                  }
-                  if (permissionStatus.toString() !== 'blocked') {
-                    setLocationVisible(true);
-                    setActionSaveLoader(true);
-                    setIsValidate(true);
-                    if (validateForm()) {
-                      const submitValues: Record<string, any> = {};
-                      controls?.forEach(f => {
-                        if (f.refcol !== '1') submitValues[f?.field] = formValues[f?.field];
-                      });
-                      try {
-                        setLoader(true);
-                        await dispatch(
-                          savePageThunk({ page: url, id, data: { ...submitValues } }),
-                        ).unwrap();
-                        setLoader(false);
-                        setIsValidate(false);
-
-                        fetchPageData();
-                        setAlertConfig({
-                          title: t('title.title17'),
-                          message: t("title.title18"),
-                          type: 'success',
-                        });
-                        setAlertVisible(true);
-                        setGoBack(true);
-                        setTimeout(() => {
-                          setAlertVisible(false);
-                          navigation.goBack();
-                        }, 1500);
-                      } catch (err: any) {
-                        setLoader(false);
-
-                        setAlertConfig({
-                          title: t('title.title17'),
-
-                          message: err,
-                          type: 'error',
-                        });
-                        setAlertVisible(true);
-                        setGoBack(false);
-                      }
-                    }
-                    setActionSaveLoader(false);
-                  }
-                } catch (error) {
-                  console.error('Error checking location status:', error);
-                }
-              }}
-            />
-          )} */}
+           
         </>
       ),
     });
@@ -522,6 +372,7 @@ const PageScreen = () => {
     loader,
     actionLoader,
     actionSaveLoader,
+    buttonSave,
   ]);
 
   const fetchPageData = useCallback(async () => {
@@ -532,8 +383,8 @@ const PageScreen = () => {
       const parsed = await dispatch(
         getERPPageThunk({ page: url, id: isFromNew ? 0 : id }),
       ).unwrap();
-      console.log('🚀 ~ parsed:', parsed);
 
+      console.log("-----parsed------parsed--------parsed------", parsed)
       if (!isFromNew) {
         setInfoData({
           id: id?.toString(),
@@ -543,8 +394,6 @@ const PageScreen = () => {
       }
 
       const pageControls = Array.isArray(parsed?.pagectl) ? parsed?.pagectl : [];
-      console.log('🚀 ~ pageControls:', pageControls);
-
       const normalizedControls = pageControls?.map(c => ({
         ...c,
         disabled: String(c?.disabled ?? '0'),
@@ -564,7 +413,6 @@ const PageScreen = () => {
         return merged;
       });
     } catch (e: any) {
-      console.log('🚀 ~ e:', e);
       setError(JSON.stringify(e?.data) || 'Failed to load page');
     } finally {
       setLoadingPageId(null);
@@ -608,9 +456,64 @@ const PageScreen = () => {
     hideDateTimePicker();
   };
 
+  const checkScript = () => {
+    const scriptRules = {
+      logic: "AND",
+      rules: [
+        {
+          left: "btid",
+          operator: "lessThan",
+          right: "muid"
+        },
+        {
+          logic: "OR",
+          rules: [
+            { left: "termhead", operator: "equals", right: "POterms12" },
+            { left: "active", operator: "isTruthy" }
+          ]
+        }
+      ],
+      validActions: [
+        { field: "termhead", action: "background", background: 'red' },
+        { field: "termhead", action: "borderColor", borderColor: 'red' },
+        { field: "btid", action: "hide" },
+        { field: "active", action: "setBoolValue", value: false },
+        { field: "businessterm", action: "hide", },
+        { field: "businessterm", action: "setValue", value: 'Test123' },
+        { field: "cdt", action: "enable" },
+        { field: "cdt", action: "borderColor", borderColor: 'red' },
+        { field: "buttonSave", action: "disable" },
+      ],
+      invalidActions: [
+        { field: "termhead", action: "disable" },
+        { field: "buttonSave", action: "enable" },
+      ]
+    }
+
+    const { actions } = evaluateRulesWithActions(scriptRules, formValues);
+    console.log("actions+++++++++", actions)
+    const hasButtonSaveEnable = actions.some(
+      item => item?.field === "buttonSave"
+    );
+    if (hasButtonSaveEnable) {
+      const hasButtonSaveEnable = actions.some(
+        item => item?.field === "buttonSave" && item.action === "enable"
+      );
+      setButtonSave(hasButtonSaveEnable)
+    }
+    const updatedControls = applyActionsToControls(controls, actions);
+    console.log("updated-----------------Controls", updatedControls)
+    setControls(updatedControls)
+  }
+
+  useEffect(() => {
+    // checkScript()
+  }, [formValues]);
+
+
   const renderItem = useCallback(
     ({ item, index }: { item: any; index: number }) => {
-      console.log('🚀 ~ item:----------------', item);
+
       const setValue = (val: any) => {
         if (typeof val === 'object' && val !== null) {
           setFormValues(prev => ({ ...prev, ...val }));
@@ -625,17 +528,24 @@ const PageScreen = () => {
       if (item?.visible === '1') return null;
 
       let content = null;
+      //BoolInput
       if (item?.ctltype === 'BOOL') {
         const rawVal = formValues[item?.field] ?? item?.text;
+        console.log("rawVal", rawVal)
         const boolVal = String(rawVal).toLowerCase() === 'true';
         content = (
           <BoolInput
             label={item?.fieldtitle}
             value={boolVal}
-            onChange={val => setValue({ [item?.field]: val })}
+            onChange={val => {
+              checkScript()
+              setValue({ [item?.field]: val })
+            }}
           />
         );
-      } else if (item?.field === 'chemistname') {
+      }
+      //----PENDING----CustomMultiPicker
+      else if (item?.field === '---') {
         content = (
           <CustomMultiPicker
             isValidate={isValidate}
@@ -648,7 +558,9 @@ const PageScreen = () => {
             errors={errors}
           />
         );
-      } else if (item?.ctltype === 'FILE') {
+      }
+      //FilePickerRow
+      else if (item?.ctltype === 'FILE') {
         content = (
           <FilePickerRow
             isValidate={isValidate}
@@ -658,7 +570,21 @@ const PageScreen = () => {
             handleAttachment={handleAttachment}
           />
         );
-      } else if (item?.defaultvalue === '#location') {
+      }
+      //VideoRecorder
+      else if (item?.ctltype === 'VIDEO') {
+        content = <VideoRecorder item={item} />
+      }
+      //ScanScreen
+      else if (item?.ctltype === 'QRSCANNER' && item?.title === "QR Scan") {
+        content = <ScanScreen item={item} />
+      }
+      //BarCodeScan
+      else if (item?.ctltype === 'QRSCANNER' && item?.title === "Barcode Scan") {
+        content = <BarCodeScan item={item} />
+      }
+      //LocationRow
+      else if (item?.defaultvalue === '#location') {
         content = (
           <LocationRow
             locationVisible={locationVisible}
@@ -668,14 +594,17 @@ const PageScreen = () => {
             setValue={setValue}
           />
         );
-      } else if (item?.defaultvalue === '#html') {
+      }
+      //HtmlRow
+      else if (item?.defaultvalue === '#html') {
         content = (
           <View>
-            {' '}
             <HtmlRow item={item} isFromPage={true} />
           </View>
         );
-      } else if (item?.ctltype === 'IMAGE' && item?.field === 'signature') {
+      }
+      //SignaturePad
+      else if (item?.ctltype === 'IMAGE' && item?.field === 'signature') {
         content = (
           <SignaturePad
             isValidate={isValidate}
@@ -684,7 +613,9 @@ const PageScreen = () => {
             handleSignatureAttachment={handleSignatureAttachment}
           />
         );
-      } else if (
+      }
+      //Media - BusinessCardView
+      else if (
         item?.ctltype === 'FILE' ||
         item?.ctltype === 'IMAGE' ||
         item?.ctltype === 'PHOTO'
@@ -711,9 +642,13 @@ const PageScreen = () => {
             )}
           </>
         );
-      } else if (item?.disabled === '1' && item?.ajax !== 1) {
+      }
+      //Disabled
+      else if (item?.disabled === '1' && item?.ajax !== 1) {
         content = <Disabled item={item} value={value} type={item?.ctltype} />;
-      } else if (item?.ddl && item?.ddl !== '' && item?.ajax === 0) {
+      }
+      //CustomPicker
+      else if (item?.ddl && item?.ddl !== '' && item?.ajax === 0) {
         content = (
           <CustomPicker
             isForceOpen={true}
@@ -727,7 +662,9 @@ const PageScreen = () => {
             errors={errors}
           />
         );
-      } else if (item?.ddl && item?.ddl !== '' && item?.ajax === 1) {
+      }
+      //AjaxPicker
+      else if (item?.ddl && item?.ddl !== '' && item?.ajax === 1) {
         content = (
           <AjaxPicker
             isForceOpen={true}
@@ -742,7 +679,9 @@ const PageScreen = () => {
             formValues={formValues}
           />
         );
-      } else if (item?.ctltype === 'DATE') {
+      }
+      //DATE
+      else if (item?.ctltype === 'DATE') {
         content = (
           <DateRow
             isValidate={isValidate}
@@ -752,7 +691,9 @@ const PageScreen = () => {
             showDatePicker={showDatePicker}
           />
         );
-      } else if (item?.ctltype === 'DATETIME') {
+      }
+      //DATETIME
+      else if (item?.ctltype === 'DATETIME') {
         content = (
           <DateTimeRow
             isValidate={isValidate}
@@ -762,9 +703,12 @@ const PageScreen = () => {
             showDateTimePicker={showDateTimePicker}
           />
         );
-      } else {
+      }
+      //Input
+      else {
         content = (
           <Input
+            id={item?.fieldtitle}
             isValidate={isValidate}
             onFocus={() => flatListRef.current?.scrollToIndex({ index, animated: true })}
             item={item}
@@ -774,7 +718,7 @@ const PageScreen = () => {
           />
         );
       }
-
+      //content
       return (
         <Animated.View
           entering={FadeInUp.delay(index * 70).springify()}
@@ -857,113 +801,120 @@ const PageScreen = () => {
               contentContainerStyle={{ paddingBottom: keyboardHeight }}
               keyboardShouldPersistTaps="handled"
             />
-            {!authUser && controls.length > 0 && (
-              <TouchableOpacity
-                style={{
-                  height: 46,
-                  width: '100%',
-                  backgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR,
-                  justifyContent: 'center',
-                  alignContent: 'center',
-                  alignItems: 'center',
-                  borderRadius: 6,
-                }}
-                onPress={async () => {
-                  try {
-                    const locationEnabled = hasLocationField ? await DeviceInfo.isLocationEnabled() : true;
-                    const permissionStatus = hasLocationField
-                      ? await requestLocationPermissions()
-                      : 'granted';
-                    const hasCameraPermission = hasMediaField ? await requestCameraPermission() : true;
-                    if (!hasCameraPermission && hasMediaField) {
-                      setAlertConfig({
-                        title: t('title.title16'),
-                        message: t("msg.msg15"),
-                        type: 'error',
-                      });
-                      setAlertVisible(true);
-                      setModalClose(false);
-                      return;
-                    }
-                    if (hasLocationField && !locationEnabled) {
-                      setAlertConfig({
-                        title: t("title.title13"),
-                        message: t('title.title15'),
-                        type: 'error',
-                      });
-                      setAlertVisible(true);
-                      setModalClose(false);
-                      return;
-                    }
-                    if (hasLocationField && (permissionStatus === 'denied' || permissionStatus === 'blocked')) {
-                      setAlertConfig({
-                        title: t("title.title13"),
-                        message: t('title.title15'),
-                        type: 'error',
-                      });
-                      setAlertVisible(true);
-                      setModalClose(false);
-                      return;
-                    }
-                    setLocationVisible(true);
-                    setActionSaveLoader(true);
-                    setIsValidate(true);
+{!authUser && controls.length > 0 && (
+             <TouchableOpacity
+               style={{
+                 height: 46,
+                 width: '100%',
+                 backgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR,
+                 justifyContent: 'center',
+                 alignContent: 'center',
+                 alignItems: 'center',
+                 borderRadius: 6,
+               }}
+               onPress={async () => {
+                 try {
+                   const locationEnabled = hasLocationField ? await DeviceInfo.isLocationEnabled() : true;
+                   const permissionStatus = hasLocationField
+                     ? await requestLocationPermissions()
+                     : 'granted';
+                   const hasCameraPermission = hasMediaField ? await requestCameraPermission() : true;
+                   if (!hasCameraPermission && hasMediaField) {
+                     setAlertConfig({
+                       title: t('title.title16'),
+                       message: t("msg.msg15"),
+                       type: 'error',
+                     });
+                     setAlertVisible(true);
+                     setModalClose(false);
+                     return;
+                   }
+                   if (hasLocationField && !locationEnabled) {
+                     setAlertConfig({
+                       title: t("title.title13"),
+                       message: t('title.title15'),
+                       type: 'error',
+                     });
+                     setAlertVisible(true);
+                     setModalClose(false);
+                     return;
+                   }
+                   if (hasLocationField && (permissionStatus === 'denied' || permissionStatus === 'blocked')) {
+                     setAlertConfig({
+                       title: t("title.title13"),
+                       message: t('title.title15'),
+                       type: 'error',
+                     });
+                     setAlertVisible(true);
+                     setModalClose(false);
+                     return;
+                   }
+                   setLocationVisible(true);
+                   setActionSaveLoader(true);
+                   setIsValidate(true);
 
-                    if (validateForm()) {
-                      const submitValues: Record<string, any> = {};
-                      controls?.forEach(f => {
-                        if (f.refcol !== '1') submitValues[f?.field] = formValues[f?.field];
-                      });
 
-                      try {
-                        setLoader(true);
-                        await dispatch(savePageThunk({ page: url, id, data: { ...submitValues } })).unwrap();
-                        setLoader(false);
-                        setIsValidate(false);
+                   if (validateForm()) {
+                     const submitValues: Record<string, any> = {};
+                     controls?.forEach(f => {
+                       if (f.refcol !== '1') submitValues[f?.field] = formValues[f?.field];
+                     });
 
-                        fetchPageData();
-                        setAlertConfig({
-                          title: t('title.title17'),
-                          message: t("title.title18"),
-                          type: 'success',
-                        });
-                        setAlertVisible(true);
-                        setGoBack(true);
 
-                        setTimeout(() => {
-                          setAlertVisible(false);
-                          navigation.goBack();
-                        }, 1500);
-                      } catch (err: any) {
-                        setLoader(false);
-                        setAlertConfig({
-                          title: t('title.title17'),
-                          message: err,
-                          type: 'error',
-                        });
-                        setAlertVisible(true);
-                        setGoBack(false);
-                      }
-                    }
+                     try {
+                       setLoader(true);
+                       await dispatch(savePageThunk({ page: url, id, data: { ...submitValues } })).unwrap();
+                       setLoader(false);
+                       setIsValidate(false);
 
-                    setActionSaveLoader(false);
-                  } catch (error) {
-                    console.error("Save error:", error);
-                    setActionSaveLoader(false);
-                  }
-                }}
-              >
-                <Text
-                  style={{
-                    color: ERP_COLOR_CODE.ERP_WHITE,
-                    fontSize: 16,
-                    fontWeight: '800',
-                  }}
-                >
-                  {actionSaveLoader ? 'Loading' : 'Save'}
-                </Text>
-              </TouchableOpacity>
-            )}
+
+                       fetchPageData();
+                       setAlertConfig({
+                         title: t('title.title17'),
+                         message: t("title.title18"),
+                         type: 'success',
+                       });
+                       setAlertVisible(true);
+                       setGoBack(true);
+
+
+                       setTimeout(() => {
+                         setAlertVisible(false);
+                         navigation.goBack();
+                       }, 1500);
+                     } catch (err: any) {
+                       setLoader(false);
+                       setAlertConfig({
+                         title: t('title.title17'),
+                         message: err,
+                         type: 'error',
+                       });
+                       setAlertVisible(true);
+                       setGoBack(false);
+                     }
+                   }
+
+
+                   setActionSaveLoader(false);
+                 } catch (error) {
+                   console.error("Save error:", error);
+                   setActionSaveLoader(false);
+                 }
+               }}
+             >
+               <Text
+                 style={{
+                   color: ERP_COLOR_CODE.ERP_WHITE,
+                   fontSize: 16,
+                   fontWeight: '800',
+                 }}
+               >
+                 {actionSaveLoader ? 'Loading' : 'Save'}
+               </Text>
+             </TouchableOpacity>
+           )}
+
+
           </View>
           <CustomAlert
             visible={alertVisible}
@@ -976,31 +927,6 @@ const PageScreen = () => {
             actionLoader={undefined}
             isSettingVisible={isSettingVisible}
           />
-
-          {/* <Modal visible={backgroundDeniedModal} transparent animationType="fade">
-        <View style={styles.overlay}>
-          <View style={styles.modalContainer}>
-            <Text style={styles.title}>Allow Background Location</Text>
-            <Text style={styles.message}>
-              For continuous location tracking, set location access to{' '}
-              <Text style={{ fontWeight: '600' }}>"Allow all the time"</Text> in your phone
-              settings.
-            </Text>
-
-            <View style={styles.btnRow}>
-              <TouchableOpacity
-                style={[styles.btn, styles.btnPrimary]}
-                onPress={() => {
-                  Linking.openSettings();
-                  setBackgroundDeniedModal(false);
-                }}
-              >
-                <Text style={styles.btnText}>Open Settings</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </Modal> */}
           {loader && (
             <View
               style={{
@@ -1029,73 +955,77 @@ const PageScreen = () => {
         errors={errorsList}
         onClose={() => setShowErrorModal(false)}
       />
-            
-             {dateTimePickerVisible && Platform.OS === 'ios' && (
-  <Modal transparent animationType="slide" statusBarTranslucent>
-  <View style={styles.overlay}>
-    <View style={styles.sheet}>
-      {/* Divider */}
-      <View style={styles.divider} />
 
-      {/* Date Picker */}
-      <DateTimePicker
-        isVisible={dateTimePickerVisible}
-        mode="datetime"
-        display='spinner'
-        date={activeDateTime ? parseCustomDatePage(activeDateTime) : new Date()}
-        onConfirm={handleDateTimeConfirm}
-        onCancel={hideDateTimePicker}
-      />
-    </View>
-  </View>
-</Modal>
+      {dateTimePickerVisible && Platform.OS === 'ios' && (
+        <Modal transparent animationType="slide" statusBarTranslucent>
+          <View style={styles.overlay}>
+            <View style={styles.sheet}>
+              {/* Divider */}
+              <View style={styles.divider} />
 
-)}
+              {/* Date Picker */}
+              <DateTimePicker
+                isVisible={dateTimePickerVisible}
+                mode="datetime"
+                display='spinner'
+                   is24Hour={false}
+                date={activeDateTime ? parseCustomDatePage(activeDateTime) : new Date()}
+                onConfirm={handleDateTimeConfirm}
+                onCancel={hideDateTimePicker}
+              />
+            </View>
+          </View>
+        </Modal>
 
-
- {datePickerVisible && Platform.OS === 'ios' && (
-  <Modal transparent animationType="slide" statusBarTranslucent>
-  <View style={styles.overlay}>
-    <View style={styles.sheet}>
-      {/* Divider */}
-      <View style={styles.divider} />
-
-      {/* Date Picker */}
-       Platform.OS !== 'ios' &&  <DateTimePicker
-        isVisible={datePickerVisible}
-        mode="date"
-        display='spinner'
-        date={activeDate ? parseCustomDatePage(activeDate) : new Date()}
-        onConfirm={handleConfirm}
-        onCancel={hideDatePicker}
-      />
-    </View>
-  </View>
-</Modal>
-
-)}
+      )}
 
 
-{
-  Platform.OS !== 'ios' &&  <DateTimePicker
-        isVisible={dateTimePickerVisible}
-        mode="datetime"
-        date={activeDateTime ? parseCustomDatePage(activeDateTime) : new Date()}
-        onConfirm={handleDateTimeConfirm}
-        onCancel={hideDateTimePicker}
-      />
-}
+      {datePickerVisible && Platform.OS === 'ios' && (
+        <Modal transparent animationType="slide" statusBarTranslucent>
+          <View style={styles.overlay}>
+            <View style={styles.sheet}>
+              {/* Divider */}
+              <View style={styles.divider} />
 
-{
-  Platform.OS !== 'ios' &&  <DateTimePicker
-        isVisible={datePickerVisible}
-        mode="date"
-        date={activeDate ? parseCustomDatePage(activeDate) : new Date()}
-        onConfirm={handleConfirm}
-        onCancel={hideDatePicker}
-      />
-}
-   
+              {/* Date Picker */}
+              <DateTimePicker
+                isVisible={datePickerVisible}
+                mode="date"
+                 date={activeDate ? parseCustomDatePage(activeDate) : new Date()}
+                onConfirm={handleConfirm}
+                onCancel={hideDatePicker}
+                display="spinner"
+                is24Hour={false}
+              />
+            </View>
+          </View>
+        </Modal>
+      )}
+
+      {
+        Platform.OS !== 'ios' && <DateTimePicker
+          isVisible={dateTimePickerVisible}
+          mode="datetime"
+          display="spinner"
+          is24Hour={false}
+          date={activeDateTime ? parseCustomDatePage(activeDateTime) : new Date()}
+          onConfirm={handleDateTimeConfirm}
+          onCancel={hideDateTimePicker}
+        />
+      }
+
+      {
+        Platform.OS !== 'ios' && <DateTimePicker
+          isVisible={datePickerVisible}
+          mode="date"
+          display="spinner"
+          is24Hour={false}
+          date={activeDate ? parseCustomDatePage(activeDate) : new Date()}
+          onConfirm={handleConfirm}
+          onCancel={hideDatePicker}
+        />
+      }
+
       <CustomAlert
         visible={alertVisible}
         title={alertConfig.title}
