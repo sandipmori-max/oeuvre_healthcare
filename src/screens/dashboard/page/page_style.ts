@@ -62,6 +62,7 @@ overlay: {
     borderRadius: 10,
     padding: 10,
     backgroundColor: ERP_COLOR_CODE.ERP_WHITE,
+    color:'black'
   },
   pickerBox: {
     borderWidth: 1,

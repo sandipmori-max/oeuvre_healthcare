@@ -55,8 +55,7 @@ const FilePickerRow = ({ item, handleAttachment, baseLink, infoData, isFromFileM
     } catch (err: any) {
       if (err.code === 'USER_CANCELED') {
        } else {
-        console.warn('Picker error', err);
-        Alert.alert(t("title.title1"), t("msg.msg12"));
+         Alert.alert(t("title.title1"), t("msg.msg12"));
       }
     }
   };

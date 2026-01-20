@@ -3,8 +3,10 @@ import React, { useState } from 'react';
 import { styles } from '../page_style';
 import { DARK_COLOR, ERP_COLOR_CODE } from '../../../../utils/constants';
 import { useAppSelector } from '../../../../store/hooks';
+import MaterialIcons from '@react-native-vector-icons/material-icons';
+import ShortAction from './ShortAction';
 
-const Input = ({ isValidate, item, errors, value, setValue, onFocus }: any) => {
+const Input = ({ id, isValidate, item, errors, value, setValue, onFocus }: any) => {
 
   const theme = useAppSelector(state => state?.theme.mode);
 
@@ -23,8 +25,10 @@ const Input = ({ isValidate, item, errors, value, setValue, onFocus }: any) => {
           color: 'white'
         }]}> - ( {item?.tooltip} )</Text>}
         {item?.mandatory === '1' && <Text style={{ color: ERP_COLOR_CODE.ERP_ERROR }}>*</Text>}
+        <ShortAction item={item} value={value}/>
       </View>
       <TextInput
+        id={id}
         multiline={value?.length > 40 ? true : item?.title === 'Card Text' ? true : false}
         editable
         scrollEnabled

@@ -14,6 +14,9 @@ export const styles = StyleSheet.create({
   columnWrapper: {
     justifyContent: 'space-between',
   },
+   dateRow: {
+    flex: 1,
+  },
   overlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.35)',
@@ -55,14 +58,11 @@ export const styles = StyleSheet.create({
   picker: {
     height: 220,
   },
-   dateRow: {
-    flex: 1,
-  },
   logo: {
     width: 100,
     height: 100,
     alignSelf: 'center',
-    marginBottom: 25,
+    marginBottom: 5,
     borderRadius: 20,
   },
    dateButton: {

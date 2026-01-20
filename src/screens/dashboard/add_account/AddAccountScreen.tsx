@@ -19,6 +19,12 @@ import DeviceInfo from 'react-native-device-info';
 import MaterialIcons from '@react-native-vector-icons/material-icons';
 import { useTranslation } from 'react-i18next';
 import { ERP_COLOR_CODE } from '../../../utils/constants';
+import { clearAuthState, setDashboard, setEmptyMenu } from '../../../store/slices/auth/authSlice';
+import { resetAjaxState } from '../../../store/slices/ajax/ajaxSlice';
+import { resetAttendanceState } from '../../../store/slices/attendance/attendanceSlice';
+import { resetDropdownState } from '../../../store/slices/dropdown/dropdownSlice';
+import { resetSyncLocationState } from '../../../store/slices/location/syncLocationSlice';
+import { setReloadApp } from '../../../store/slices/reloadApp/reloadAppSlice';
 
 const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose }) => {
   const { t } = useTranslation();
@@ -50,6 +56,13 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
   }, [visible]);
 
   useEffect(() => {
+    return () => {
+      setIsInputEditCC(false);
+      setIsInputEditUser(false);
+      setIsInputEditPass(false)
+    }
+  }, [])
+  useEffect(() => {
     const fetchDeviceName = async () => {
       const name = await DeviceInfo.getDeviceName();
       setDeviceId(name);
@@ -75,7 +88,7 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
       DevERPService.setDevice(deviceId);
       setLoader(true);
       const userExists = accounts?.some(acc => acc?.user?.name === values?.user);
-      const codeExists = accounts?.some(acc => acc?.user?.company_code === 'oeuvre01');
+      const codeExists = accounts?.some(acc => acc?.user?.company_code === values?.company_code);
 
       if (userExists && codeExists) {
         setAlertConfig({
@@ -87,7 +100,7 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
         return;
       }
       const validation = await validateCompanyCode(() =>
-        DevERPService.validateCompanyCode('oeuvre01'),
+        DevERPService.validateCompanyCode(values?.company_code),
       );
       if (!validation?.isValid) {
         setLoader(false);
@@ -104,7 +117,7 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
       );
       if (loginResult?.success === '0' || loginResult?.success === 0) {
         const validation = await validateCompanyCode(() =>
-          DevERPService.validateCompanyCode('oeuvre01'),
+          DevERPService.validateCompanyCode(user?.company_code),
         );
         if (!validation?.isValid) {
           setLoader(false);
@@ -128,7 +141,13 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
         setAlertVisible(true);
         return;
       }
-
+      dispatch(setDashboard([]));
+      dispatch(setEmptyMenu([]));
+      dispatch(resetAjaxState());
+      dispatch(resetAttendanceState())
+      dispatch(clearAuthState())
+      dispatch(resetDropdownState())
+      dispatch(resetSyncLocationState())
       DevERPService.setToken(loginResult?.token);
       await AsyncStorage.setItem('erp_token', loginResult?.token || '');
       await AsyncStorage.setItem('auth_token', loginResult?.token || '');
@@ -138,7 +157,7 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
         loginUserThunk({
           newToken: loginResult?.token,
           newvalidTill: loginResult?.validtill,
-          company_code: 'oeuvre01',
+          company_code: values?.company_code,
           password: values?.password,
           isAddingAccount: true,
           user_credentials: { user: values?.user, name: values?.user },
@@ -148,10 +167,11 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
       );
       setAlertConfig({ title: t("title.title3"), message: t("msg.msg3"), type: 'success' });
       setAlertVisible(true);
+      
+      dispatch(setReloadApp())
       onClose();
       setLoader(false);
     } catch (e: any) {
-      console.log("e -------------------- ", e)
       setAlertConfig({
         title: t("title.title1"),
         message: e?.message || t("msg.msg4"),
@@ -201,71 +221,7 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
                   >
                     {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (
                       <>
-                        {/* <View style={styles.inputContainer}>
-                          <Text style={[styles.inputLabel, theme === 'dark' && {
-                            color: 'white'
-                          }]}>{t('account.companyCode')}</Text>
-                          <View
-                            style={[
-                              styles.inputContainer,
-                              {
-                                justifyContent: 'center',
-                                alignContent: 'center',
-                                flexDirection: 'row',
-                                alignItems: 'center',
-                                borderRadius: 8,
-                                borderWidth: 1,
-                                borderColor: ERP_COLOR_CODE.ERP_BORDER_LINE,
-                                paddingLeft: 12,
-                              },
-                              touched?.company_code && errors?.company_code &&
-                              {
-                                borderColor: ERP_COLOR_CODE.ERP_ERROR,
-                                borderWidth: 0.8,
-                              },
-                              isInputEditCC && {
-                                borderColor: '#81b5e4',
-                                borderWidth: 0.8,
-                              },
-                              values?.company_code && {
-                                borderColor: 'green',
-                                borderWidth: 0.8,
-                              },
-                              theme === 'dark' && {
-                                backgroundColor: 'black'
-                              }
-                            ]}
-                          >
-                            <MaterialIcons name="closed-caption-off" size={20} color={ERP_COLOR_CODE.ERP_999} />
-
-                            <TextInput
-                              style={[styles.input,
-                              theme === 'dark' && {
-                                backgroundColor: 'black'
-                              }
-                              ]}
-                              placeholder={t('auth.enterCompanyCode')}
-                              placeholderTextColor={ERP_COLOR_CODE.ERP_999}
-                              autoCapitalize="none"
-                              onChangeText={handleChange('company_code')}
-                              value={values?.company_code}
-                              onFocus={e => {
-                                setIsInputEditCC(true);
-                              }}
-                              onBlur={() => {
-                                if (!values?.company_code) {
-                                  handleBlur('company_code')
-                                  setIsInputEditCC(false);
-
-                                }
-                              }}
-                            />
-                          </View>
-
-                          {touched?.company_code && errors?.company_code && (
-                            <Text style={styles.errorText}>{errors?.company_code}</Text>
-                          )}
-                        </View> */}
+                         
 
                         <View style={styles.inputContainer}>
                           <Text style={[styles.inputLabel, theme === 'dark' && {
@@ -303,7 +259,11 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
                             <TextInput
                               style={[styles.input, theme === 'dark' && {
                                 backgroundColor: 'black'
-                              }]}
+                              },
+                              theme === 'dark' && {
+                                color: 'white'
+                              }
+                              ]}
                               placeholder={t('auth.enterUser')}
                               placeholderTextColor={ERP_COLOR_CODE.ERP_999}
                               autoCapitalize="none"
@@ -363,7 +323,12 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
                             <TextInput
                               style={[styles.input1, theme === 'dark' && {
                                 backgroundColor: 'black'
-                              }]}
+                              },
+
+                              theme === 'dark' && {
+                                color: 'white'
+                              }
+                              ]}
                               placeholder={t('auth.enterPassword')}
                               secureTextEntry={!showPassword}
                               placeholderTextColor={ERP_COLOR_CODE.ERP_999}
@@ -376,6 +341,7 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
                                 if (!values?.company_code) {
                                   handleBlur('password')
                                   setIsInputEditPass(false);
+
                                 }
                               }}
 
@@ -399,7 +365,7 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
 
                         <TouchableOpacity
                           style={[styles.addButton, loader && styles.disabledButton, theme === 'dark' && {
-                            backgroundColor: 'black',
+                            backgroundColor: 'white',
                             borderColor: 'white',
                             borderWidth: 1
                           }]}
@@ -411,13 +377,17 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose })
                           <MaterialIcons
                             name="person-add-alt"
                             size={24}
-                            color={theme === 'dark' ? 'white' : ERP_COLOR_CODE.ERP_WHITE}
+                            color={theme === 'dark' ? 'black' : ERP_COLOR_CODE.ERP_WHITE}
                           />
 
                           {loader ? (
-                            <Text style={styles.addButtonText}>{t('account.adding')}</Text>
+                            <Text style={[styles.addButtonText, theme === 'dark' && {
+                              color: 'black'
+                            }]}>{t('account.adding')}</Text>
                           ) : (
-                            <Text style={styles.addButtonText}>{t('account.add')}</Text>
+                            <Text style={[styles.addButtonText, theme === 'dark' && {
+                              color: 'black'
+                            }]}>{t('account.add')}</Text>
                           )}
                         </TouchableOpacity>
                       </>

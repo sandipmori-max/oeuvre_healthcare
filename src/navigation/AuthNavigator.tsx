@@ -9,7 +9,6 @@ import Onboarding from '../screens/Onboarding/Onboarding';
 const Stack = createStackNavigator<AuthStackParamList>();
 
 const AuthNavigator = () => {
-  console.log("checking auth state====================")
   return (
     <Stack.Navigator
       screenOptions={{
@@ -23,11 +22,11 @@ const AuthNavigator = () => {
         headerShown: false,
       }}
     >
-            <Stack.Screen 
-            screenOptions={{
-              headerShown: false,
-            }}
-            name="Onboarding" component={Onboarding} />
+      <Stack.Screen
+        screenOptions={{
+          headerShown: false,
+        }}
+        name="Onboarding" component={Onboarding} />
 
       <Stack.Screen name="Login" component={LoginScreen} />
     </Stack.Navigator>

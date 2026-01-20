@@ -48,7 +48,6 @@ export const checkAuthStateThunk = createAsyncThunk(
         user: updatedActiveAccount?.user || null,
       };
     } catch (error) {
-      console.error('Error checking auth state:', error);
       return rejectWithValue('Failed to check authentication state');
     }
   },
@@ -113,8 +112,6 @@ export const loginUserThunk = createAsyncThunk(
         companyName: companyData?.response?.name || "",
         app_id: response?.app_id || "",
       };
-      console.log('🚀 ~ erpUser:------------------', erpUser);
-
       const db = await getDBConnection();
       await createAccountsTable(db);
       const currentAccounts = await getAccounts(db);
@@ -145,7 +142,7 @@ export const loginUserThunk = createAsyncThunk(
       await insertAccount(db, newAccount);
       await updateAccountActive(db, newAccount?.id);
       const updatedAccounts = await getAccounts(db);
-
+      
       return {
         user: erpUser,
         accountId: erpUser?.id,
@@ -153,7 +150,6 @@ export const loginUserThunk = createAsyncThunk(
         accounts: updatedAccounts,
       };
     } catch (error: any) {
-      console.log('Login error:', error);
       return rejectWithValue(error?.message || 'Login failed. Please try again.');
     }
   },
@@ -200,7 +196,6 @@ export const switchAccountThunk = createAsyncThunk(
         user: updatedActiveAccount?.user || null,
       };
     } catch (error) {
-      console.error('Error switching account:', error);
       return rejectWithValue('Failed to switch account');
     }
   },
@@ -231,7 +226,6 @@ export const removeAccountThunk = createAsyncThunk(
         activeAccountId: newActiveAccountId,
       };
     } catch (error) {
-      console.error('Error removing account:', error);
       return rejectWithValue('Failed to remove account');
     }
   },
@@ -253,7 +247,6 @@ export const logoutUserThunk = createAsyncThunk(
       ]);
       return { success: true };
     } catch (error) {
-      console.error('Logout error:', error);
       await AsyncStorage.multiRemove([
         'auth_token',
         'refresh_token',
@@ -294,19 +287,48 @@ export const getERPMenuThunk = createAsyncThunk(
 
       return rejectWithValue('Invalid menu response format');
     } catch (error: any) {
-      console.error('🚀 ~ getERPMenuThunk ~ error:', error);
       return rejectWithValue(error?.message || 'Failed to get ERP menu');
     }
   },
 );
 
+export const getERPAppConfigMenuThunk = createAsyncThunk(
+  'auth/getERPAppConfigMenu',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await DevERPService.getAppMenu();
+
+      if (response && typeof response === 'string') {
+        return response;
+      } else if (response && typeof response === 'object') {
+        return response;
+      }
+
+      return rejectWithValue('Invalid menu response format');
+    } catch (error: any) {
+      return rejectWithValue(error?.message || 'Failed to get ERP menu');
+    }
+  },
+);
+
+type ERPDashboardParams = {
+  branch: string;
+  type: string;
+  fd: string;
+  td: string;
+};
 
 export const getERPDashboardThunk = createAsyncThunk(
   'auth/getERPDashboard',
   async (
-    { branch, type, fd, td }: any,
+    { branch, type, fd, td }: ERPDashboardParams,
     { rejectWithValue }
   ) => {
+    console.log("branch--------", branch)
+    console.log("type--------", type)
+    console.log("fd--------", fd)
+    console.log("td--------", td)
+
     try {
       const dashboard = await DevERPService.getDashboard(
         branch,
@@ -314,8 +336,10 @@ export const getERPDashboardThunk = createAsyncThunk(
         fd,
         td
       );
+      console.log("dashboard", dashboard)
       return dashboard;
     } catch (error: any) {
+      console.log("error", error)
       return rejectWithValue(
         error?.message || 'Failed to get ERP dashboard'
       );
@@ -323,16 +347,16 @@ export const getERPDashboardThunk = createAsyncThunk(
   }
 );
 
+
 export const getERPPageThunk = createAsyncThunk<
   any,
   { page: string; id: string },
   { rejectValue: string }
 >('auth/getERPPage', async ({ page, id }, { rejectWithValue }) => {
   try {
-    const pageData = await DevERPService.getPage(page, id);
+    const pageData = await DevERPService.getPage(page, id );
     return pageData;
   } catch (error: any) {
-    console.log('🚀 ~ error:', error);
     return rejectWithValue(error || 'Failed to get ERP page data');
   }
 });

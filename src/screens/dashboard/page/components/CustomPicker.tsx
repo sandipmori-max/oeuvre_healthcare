@@ -30,6 +30,7 @@ const CustomPicker = ({
   isForceOpen,
 }: any) => {
   const { t } = useTranslations();
+  console.log("----------------item------*******-------+++++++++++++-----------", item)
 
   const [open, setOpen] = useState(false);
   const [options, setOptions] = useState<any[]>([]);
@@ -134,6 +135,10 @@ const CustomPicker = ({
         style={[
           styles.pickerBox,
           item?.disabled === '1' && styles.disabledBox,
+          item?.disabled === '1' && theme === 'dark' && {
+                      backgroundColor: DARK_COLOR,
+                      borderWidth: 1,
+                    },
           isForceOpen &&
             errors[item?.field] && {
               borderColor: ERP_COLOR_CODE.ERP_ERROR,
@@ -148,6 +153,12 @@ const CustomPicker = ({
           isForceOpen &&
             theme === 'dark' && {
               backgroundColor: DARK_COLOR,
+            },
+            item?.background && {
+              backgroundColor: item?.background
+            },
+            theme === 'dark' && {
+              backgroundColor: 'black',
             },
         ]}
         onPress={() => {

@@ -36,11 +36,9 @@ const WebScreen = () => {
   useEffect(() => {
     return () => {
       try {
-        console.log('🧹 Cleaning WebView cache on unmount...');
         webviewRef.current?.clearCache(true);
         webviewRef.current?.clearHistory();
       } catch (e) {
-        console.warn('Cache clear failed:', e);
       }
     };
   }, []);
@@ -63,7 +61,6 @@ const WebScreen = () => {
 
   useEffect(() => {
     return () => {
-      console.log('🧹 WebView unmounted — forcing cache clear...');
       setWebKey(Date.now());
     };
   }, []);
@@ -77,7 +74,6 @@ const WebScreen = () => {
       webviewRef.current?.clearCache(true);
       webviewRef.current?.clearHistory();
     } catch (e) {
-      console.warn('Cache clear failed:', e);
     }
     webviewRef.current?.reload();
   };
@@ -114,7 +110,6 @@ const WebScreen = () => {
     return `${baseLink}${itemUrl}&token=${token}`;
   }, [baseLink, item?.url, token]);
 
-
   if ((!isFromChart && !targetUrl) || (isFromChart && !url)) {
     return (
       <SafeAreaView style={styles.container}>
@@ -122,7 +117,6 @@ const WebScreen = () => {
       </SafeAreaView>
     );
   }
-
 
   return (
     <SafeAreaView style={styles.container}>
@@ -190,11 +184,9 @@ const WebScreen = () => {
               true;
             `}
             onMessage={event => {
-              console.log('✅ WebView sent a message!');
               const data = JSON.parse(event.nativeEvent.data);
-              console.log('All IDs:', data.ids);
-              console.log('All Classes:', data.classes);
-            }}
+              console.log('All IDs in WebView:-----------------------', data.ids);
+             }}
           />
         </>
       ) : (

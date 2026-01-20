@@ -67,8 +67,7 @@ const PinSetupScreen = () => {
           setScreen('setup');
         }
       } catch (error) {
-        console.error('Error checking PIN:', error);
-      }
+       }
 
       try {
         const attemptsStr = await AsyncStorage.getItem(AS_KEYS.WRONG_ATTEMPTS);
@@ -83,8 +82,7 @@ const PinSetupScreen = () => {
           setScreen('blocked');
         }
       } catch (e) {
-        console.warn('Error loading pin attempt data', e);
-      }
+       }
     };
     bootstrap();
   }, []);
@@ -249,7 +247,6 @@ const PinSetupScreen = () => {
         navigation.goBack();
       }, 400);
     } catch (err) {
-      console.error('performRemovePin err', err);
       showAlert('Error', 'Failed to remove PIN', 'error');
     }
   };
@@ -279,7 +276,6 @@ const PinSetupScreen = () => {
         setScreen('menu');
       }
     } catch (error) {
-      console.error('Error saving PIN:', error);
       showAlert('Error', 'Error saving PIN', 'error');
     }
   };

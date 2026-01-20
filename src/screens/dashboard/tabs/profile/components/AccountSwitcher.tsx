@@ -13,12 +13,13 @@ import { formatDateHr, formatTimeTo12Hour, isTokenValid } from '../../../../../u
 import MaterialIcons from '@react-native-vector-icons/material-icons';
 import FastImage from 'react-native-fast-image';
 import { ERP_COLOR_CODE } from '../../../../../utils/constants';
-import { setDashboard, setEmptyMenu } from '../../../../../store/slices/auth/authSlice';
 import { clearAuthState, setDashboard, setEmptyMenu } from '../../../../../store/slices/auth/authSlice';
 import { resetAjaxState } from '../../../../../store/slices/ajax/ajaxSlice';
 import { resetAttendanceState } from '../../../../../store/slices/attendance/attendanceSlice';
 import { resetDropdownState } from '../../../../../store/slices/dropdown/dropdownSlice';
 import { resetSyncLocationState } from '../../../../../store/slices/location/syncLocationSlice';
+import { getLastPunchInThunk } from '../../../../../store/slices/attendance/thunk';
+import { setReloadApp } from '../../../../../store/slices/reloadApp/reloadAppSlice';
 
 interface AccountSwitcherProps {
   visible: boolean;
@@ -32,7 +33,6 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
   const theme = useAppSelector(state => state?.theme.mode);
 
   const { accounts, activeAccountId, user } = useAppSelector(state => state?.auth);
-  console.log("user------", user);
   const [alertVisible, setAlertVisible] = useState(false);
   const [selectedAccount, setSelectedAccount] = useState<any>(null);
   const [alertConfig, setAlertConfig] = useState({
@@ -44,6 +44,8 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
   const handleSwitchAccount = (accountId: string) => {
     if (accountId !== activeAccountId) {
       dispatch(switchAccountThunk(accountId));
+      dispatch(getLastPunchInThunk())
+      dispatch(setReloadApp())
     }
     onClose();
   };
@@ -66,7 +68,6 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
   };
 
   const renderAccount = ({ item }: { item: any }) => {
-    console.log("item------", item);
     const isActive = user?.id.toString() === item?.user?.id.toString() || user?.id.toString() == item?.user?.id.toString();
     const lastLogin = formatDateHr(item?.lastLoginAt, false);
     const lastLoginHr = formatTimeTo12Hour(item?.lastLoginAt);
@@ -114,6 +115,7 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
             }
             handleSwitchAccount(item?.id);
           }
+ 
         }}
       >
         <View style={styles.accountContent}>

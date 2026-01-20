@@ -27,7 +27,11 @@ const LoginHeader = ({ isAddingAccount, t }: { isAddingAccount: boolean; t: any 
       style={{ opacity: fadeAnim, transform: [{ translateY: slideAnim }] }}
     >
       <Image source={ERP_ICON.APP_LOGO} style={styles.logo} resizeMode="contain" />
-      <Text style={styles.title}>
+      <Text style={[styles.title, 
+         {
+            fontFamily: "Handlee-Regular",
+          }
+      ]}>
         {isAddingAccount ? t('auth.addAccount') : t('auth.welcomeDevERP')}
       </Text>
       <Text style={styles.subtitle}>

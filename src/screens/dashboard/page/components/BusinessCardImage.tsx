@@ -39,7 +39,7 @@ const BusinessCardView = ({ setValue, controls, item, baseLink, infoData }: any)
 
 
   const checkPermission = async (type: 'camera' | 'gallery') => {
-     if (type === 'gallery') {
+    if (type === 'gallery') {
         return true
       } 
     let permission;
@@ -62,8 +62,6 @@ const BusinessCardView = ({ setValue, controls, item, baseLink, infoData }: any)
 
 
     const result = await check(permission);
-    console.log('🚀 Permission Check:', result);
-
 
     switch (result) {
       case RESULTS.GRANTED:
@@ -140,9 +138,7 @@ const BusinessCardView = ({ setValue, controls, item, baseLink, infoData }: any)
 
 
     setShowPicker(false);
-    const res = await launchImageLibrary({ 
-      selectionLimit: 1,
-      mediaType: 'photo', quality: 0.5, includeBase64: true });
+    const res = await launchImageLibrary({ mediaType: 'photo', quality: 0.5, includeBase64: true });
     if (res.didCancel) return;
 
 
@@ -166,17 +162,14 @@ const BusinessCardView = ({ setValue, controls, item, baseLink, infoData }: any)
         const parsed = parseCard(joined);
         setValue(parsed);
       } catch (err) {
-        console.error('❌ OCR error:', err);
       } finally {
         setLoading(false);
       }
     })();
   }, [imageUri]);
 
-  // 🧠 Ultra Pro-Max OCR Algorithm
-  const parseCard = (text: string): any => {
+   const parseCard = (text: string): any => {
 
-    console.log("text -----------------------  ", text)
     // Normalize text
     let cleanText = text
       .replace(/[\u2018\u2019]/g, "'")

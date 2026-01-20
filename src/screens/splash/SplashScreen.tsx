@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { View, Image, StatusBar, Animated, Easing, Dimensions } from 'react-native';
+import { View, Image, StatusBar, Animated, Easing } from 'react-native';
 
 import { ERP_ICON } from '../../assets';
 import { styles } from './splash_style';
@@ -17,7 +17,6 @@ const CustomSplashScreen: React.FC<SplashProps> = ({ onFinish }) => {
   const { t } = useTranslations();
 
   useEffect(() => {
-    // Animate logo (fade + scale)
     Animated.parallel([
       Animated.timing(fadeAnim, {
         toValue: 1,
@@ -32,7 +31,6 @@ const CustomSplashScreen: React.FC<SplashProps> = ({ onFinish }) => {
         useNativeDriver: true,
       }),
     ]).start(() => {
-      // After logo animation, animate text with staggered effect
       Animated.sequence([
         Animated.parallel([
           Animated.timing(textTranslateY, {
@@ -63,8 +61,6 @@ const CustomSplashScreen: React.FC<SplashProps> = ({ onFinish }) => {
       backgroundColor: DARK_COLOR
     }]}>
       <StatusBar hidden />
-
-      {/* Logo Animation */}
       <Animated.View
         style={[
           styles.logoWrapper,
@@ -79,8 +75,6 @@ const CustomSplashScreen: React.FC<SplashProps> = ({ onFinish }) => {
       >
         <Image source={ERP_ICON.APP_LOGO} style={styles.logo} resizeMode="contain" />
       </Animated.View>
-
-      {/* Title Animation */}
       <Animated.Text
         style={[
           styles.title,
@@ -89,13 +83,14 @@ const CustomSplashScreen: React.FC<SplashProps> = ({ onFinish }) => {
           },
           theme === 'dark' && {
             color: 'white'
+          },
+          {
+            fontFamily: "Handlee-Regular",
           }
         ]}
       >
         {t("text.text53")}
       </Animated.Text>
-
-      {/* Subtitle Animation */}
       <Animated.Text
         style={[
           styles.subtitle,

@@ -1,4 +1,23 @@
 import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
+
+import { styles } from './home_style';
+import { useAppDispatch, useAppSelector } from '../../../../store/hooks';
+import FullViewLoader from '../../../../components/loader/FullViewLoader';
+import NoData from '../../../../components/no_data/NoData';
+import ERPIcon from '../../../../components/icon/ERPIcon';
+import { getERPAppConfigMenuThunk, getERPDashboardThunk, getERPMenuThunk, getERPPageThunk } from '../../../../store/slices/auth/thunk';
+import ErrorMessage from '../../../../components/error/Error';
+import { ERP_COLOR_CODE } from '../../../../utils/constants';
+import MaterialIcons from '@react-native-vector-icons/material-icons';
+import Footer from './Footer';
+import PieChartSection from './chartData';
+
+import { formatDateForAPI, parseCustomDate } from '../../../../utils/helpers';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import CustomPicker from '../../page/components/CustomPicker';
+import { setActiveDashboardBranch, setActiveDashboardBranchId, setActiveDashboardFromDate, setActiveDashboardToDate, setActiveDashboardType, setActiveDashboardTypeId, setDashboardLoading } from '../../../../store/slices/auth/authSlice';
 import {
   View,
   Text,
@@ -11,26 +30,10 @@ import {
   Alert,
   Modal,
   Pressable,
+  Platform,
+  Image,
 } from 'react-native';
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
-import { useTranslation } from 'react-i18next';
-
-import { styles } from './home_style';
-import { useAppDispatch, useAppSelector } from '../../../../store/hooks';
-import FullViewLoader from '../../../../components/loader/FullViewLoader';
-import NoData from '../../../../components/no_data/NoData';
-import ERPIcon from '../../../../components/icon/ERPIcon';
-import { getERPDashboardThunk, getERPMenuThunk, getERPPageThunk } from '../../../../store/slices/auth/thunk';
-import ErrorMessage from '../../../../components/error/Error';
-import { ERP_COLOR_CODE } from '../../../../utils/constants';
-import MaterialIcons from '@react-native-vector-icons/material-icons';
-import Footer from './Footer';
-import PieChartSection from './chartData';
-
-import { formatDateForAPI, parseCustomDate } from '../../../../utils/helpers';
-import DateTimePicker from '@react-native-community/datetimepicker';
-import CustomPicker from '../../page/components/CustomPicker';
-import { setActiveDashboardBranch, setActiveDashboardBranchId, setActiveDashboardFromDate, setActiveDashboardToDate, setActiveDashboardType, setActiveDashboardTypeId } from '../../../../store/slices/auth/authSlice';
+import { ERP_ICON } from '../../../../assets';
 
 const { width } = Dimensions.get('screen');
 
@@ -49,12 +52,16 @@ const HomeScreen = () => {
   const { dashboard, isDashboardLoading, isAuthenticated, error, user } = useAppSelector(
     state => state.auth,
   );
+
+
   const [loadingPageId, setLoadingPageId] = useState<any>(null);
   const [isRefresh, setIsRefresh] = useState<boolean>(false);
   const [fromDate, setFromDate] = useState<string>('');
   const [toDate, setToDate] = useState<string>('');
 
   const auth = useAppSelector(state => state?.auth);
+  console.log("dashboard------------------------------------", auth)
+
   const [showDatePicker, setShowDatePicker] = useState<null | {
     type: 'from' | 'to';
     show: boolean;
@@ -88,7 +95,7 @@ const HomeScreen = () => {
       const filtered = dashboard.filter(item =>
         (item.name || '').toLowerCase().includes(searchText.toLowerCase()),
       );
-       setFilteredDashboard(filtered);
+      setFilteredDashboard(filtered);
     }, 300);
 
     return () => {
@@ -109,7 +116,9 @@ const HomeScreen = () => {
   useLayoutEffect(() => {
     navigation.setOptions({
       headerStyle: {
-        backgroundColor: theme === 'dark' ? 'black' : ERP_COLOR_CODE.ERP_APP_COLOR,   // <-- BLACK HEADER
+        backgroundColor: theme === 'dark' ? 'black' : ERP_COLOR_CODE.ERP_APP_COLOR,
+        borderBottomWidth: 1,
+        borderBottomColor: '#fff',
       },
       headerTintColor: '#fff',
       headerTitle: () =>
@@ -118,6 +127,7 @@ const HomeScreen = () => {
             <TextInput
               value={searchText}
               onChangeText={setSearchText}
+              autoFocus={true}
               placeholder="Search dashboard here..."
               style={{
                 flex: 1,
@@ -158,11 +168,15 @@ const HomeScreen = () => {
                   setControlsLoader(true);
                   setActionLoader(true);
                   setIsRefresh(!isRefresh);
-                  dispatch(getERPDashboardThunk({branch: auth.dashboardBranch, type: auth.dashboardType, fd: auth.dashboardFromDate, td: auth.dashboardToDate}));
-                  setTimeout(() => {
+                  dispatch(getERPDashboardThunk({ branch: auth.dashboardBranch, type: auth.dashboardType, fd: auth.dashboardFromDate, td: auth.dashboardToDate }));
+
+                  const timer = setTimeout(() => {
                     setActionLoader(false);
                     setControlsLoader(false);
-                  }, 100);
+                    dispatch(setDashboardLoading(false));
+                  }, 3000);
+                  return () => clearTimeout(timer);
+
                 }}
                 isLoading={actionLoader}
               />
@@ -185,19 +199,33 @@ const HomeScreen = () => {
         <ERPIcon extSize={24} isMenu={true} name="menu" onPress={() => navigation?.openDrawer()} />
       ),
     });
-  }, [navigation, isHorizontal, isRefresh, showSearch, dashboard, searchText, filteredDashboard, isFilterVisible]);
+  }, [actionLoader, navigation, isHorizontal, isRefresh, showSearch, dashboard, searchText, filteredDashboard, isFilterVisible]);
 
   useFocusEffect(
     useCallback(() => {
-      setLoadingPageId(true);
+      let timer;
 
       if (isAuthenticated) {
-      dispatch(getERPDashboardThunk({branch: auth.dashboardBranch, type: auth.dashboardType, fd: auth.dashboardFromDate, td: auth.dashboardToDate}));
-        dispatch(getERPMenuThunk())
+        setLoadingPageId(true);
+
+        // dispatch(getERPAppConfigMenuThunk());
+        dispatch(getERPDashboardThunk({ branch: '', type: '', fd: '', td: '' }));
+        dispatch(getERPMenuThunk());
+
+        timer = setTimeout(() => {
+          dispatch(setDashboardLoading(false));
+        }, 3000);
       }
-      return () => { };
-    }, [isAuthenticated, dispatch]),
+
+      // ✅ single cleanup function
+      return () => {
+        if (timer) {
+          clearTimeout(timer);
+        }
+      };
+    }, [isAuthenticated, dispatch])
   );
+
 
   const dummyUpcomingEvents = [];
 
@@ -404,6 +432,7 @@ const HomeScreen = () => {
   };
 
   const scrollY = useRef(new Animated.Value(0)).current;
+
   const getCurrentMonthRange = useCallback(() => {
     const now = new Date();
     const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -469,7 +498,6 @@ const HomeScreen = () => {
   const fetchPageData = useCallback(async () => {
     try {
       setControlsLoader(true);
-
       const parsed = await dispatch(
         getERPPageThunk({ page: 'Dashboard', id: "" }),
       ).unwrap();
@@ -480,11 +508,8 @@ const HomeScreen = () => {
         visible: String(c?.visible ?? '1'),
         mandatory: String(c?.mandatory ?? '0'),
       }));
-
       setControls(normalizedControls);
       setControlsLoader(false);
-
-
     } catch (e: any) {
     } finally {
       setLoadingPageId(null);
@@ -496,11 +521,16 @@ const HomeScreen = () => {
 
   useEffect(() => {
     fetchPageData();
-  }, [fetchPageData]);
+  }, []);
 
-  useEffect(()=>{
-      dispatch(getERPDashboardThunk({branch: auth.dashboardBranch, type: auth.dashboardType, fd: auth.dashboardFromDate, td: auth.dashboardToDate}));
-  },[auth.dashboardBranch, auth.dashboardType, auth.dashboardFromDate, auth.dashboardToDate])
+  useEffect(() => {
+    dispatch(getERPDashboardThunk({ branch: auth.dashboardBranch, type: auth.dashboardType, fd: auth.dashboardFromDate, td: auth.dashboardToDate }));
+    const timer = setTimeout(() => {
+      dispatch(setDashboardLoading(false));
+    }, 3000);
+    return () => clearTimeout(timer);
+
+  }, [auth.dashboardBranch, auth.dashboardType, auth.dashboardFromDate, auth.dashboardToDate])
 
   function SmallItem({ left, primary, secondary, type }) {
     return (
@@ -530,19 +560,19 @@ const HomeScreen = () => {
     );
   }
 
-  if (isDashboardLoading || filteredDashboard?.length === 0) return <FullViewLoader />
-  if(!actionLoader && filteredDashboard?.length === 0 ){
+  if (isDashboardLoading) return <FullViewLoader />
+  if (!actionLoader && filteredDashboard?.length === 0) {
     return <View
-          style={{
-            height: Dimensions.get('screen').height * 0.75,
-            justifyContent: 'center',
-            alignItems: 'center',
-            width: '100%',
-            backgroundColor: theme === 'dark' ? 'black' : 'white',
-          }}
-        >
+      style={{
+        height: Dimensions.get('screen').height * 0.75,
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: '100%',
+        backgroundColor: theme === 'dark' ? 'black' : 'white',
+      }}
+    >
 
-          <View
+      <View
         style={{
           marginTop: 1,
           backgroundColor: theme === 'dark' ? 'black' : ERP_COLOR_CODE.ERP_APP_COLOR,
@@ -552,7 +582,7 @@ const HomeScreen = () => {
           borderBottomLeftRadius: 24,
           borderWidth: 1,
           borderColor: 'white',
-            width: '100%',
+          width: '100%',
 
         }}
       >
@@ -629,7 +659,6 @@ const HomeScreen = () => {
               <View style={{
                 flexDirection: "row", justifyContent: "space-between", marginTop: 4
               }}>
-
                 {
                   controls
                     .filter((x) => x.ctltype !== "DATE" && x.field !== 'userid')
@@ -649,6 +678,7 @@ const HomeScreen = () => {
                               dispatch(setActiveDashboardType(i?.name))
                               dispatch(setActiveDashboardTypeId(i?.value?.toString()))
                             }
+                            setIsFilterVisible(false)
                           }}
                           options={[]}
                           item={item}
@@ -657,40 +687,40 @@ const HomeScreen = () => {
                         />
                       </View>
                     </>))
-
                 }
               </View>
             }
           </>
         }
- {showDatePicker?.show && Platform.OS === 'ios' && (
-  <Modal transparent animationType="slide" statusBarTranslucent>
-  <View style={styles.overlay}>
-    <View style={styles.sheet}>
-      {/* Divider */}
-      <View style={styles.divider} />
+        {showDatePicker?.show && Platform.OS === 'ios' && (
+          <Modal transparent animationType="slide" statusBarTranslucent>
+            <View style={styles.overlay}>
+              <View style={styles.sheet}>
+                {/* Divider */}
+                <View style={styles.divider} />
 
-      {/* Date Picker */}
-      <DateTimePicker
-            value={
-              showDatePicker.type === "from" && fromDate
-                ? parseCustomDate(fromDate)
-                : showDatePicker.type === "to" && toDate
-                  ? parseCustomDate(toDate)
-                  : new Date()
-            }
-            mode="date"
-            display='spinner'
-            onChange={handleDateChange}
-           
-          />
-    </View>
-  </View>
-</Modal>
+                {/* Date Picker */}
+                <DateTimePicker
+                  value={
+                    showDatePicker.type === "from" && fromDate
+                      ? parseCustomDate(fromDate)
+                      : showDatePicker.type === "to" && toDate
+                        ? parseCustomDate(toDate)
+                        : new Date()
+                  }
+                  mode="date"
+                  display='spinner'
+                  onChange={handleDateChange}
 
-)}
+                />
+              </View>
+            </View>
+          </Modal>
+
+        )}
+
         {/* Date Picker */}
-        {showDatePicker?.show && Platform.OS !== 'ios' &&   (
+        {Platform.OS !== 'ios' && showDatePicker?.show && (
           <DateTimePicker
             value={
               showDatePicker.type === "from" && fromDate
@@ -701,16 +731,15 @@ const HomeScreen = () => {
             }
             mode="date"
             onChange={handleDateChange}
-           
           />
         )}
       </View>
-      
-          <NoData />
 
-        </View>
+      <NoData />
+
+    </View>
   };
-  
+
   return (
     <View
       style={{
@@ -719,6 +748,7 @@ const HomeScreen = () => {
         backgroundColor: isDashboardLoading ? 'black' : theme === 'dark' ? 'black' : 'white'
       }}
     >
+
       <View
         style={{
           backgroundColor: theme === 'dark' ? 'black' : ERP_COLOR_CODE.ERP_APP_COLOR,
@@ -794,13 +824,9 @@ const HomeScreen = () => {
 
             {
               isFilterVisible &&
-
-
               <View style={{
-
                 flexDirection: "row", justifyContent: "space-between", marginTop: 4
               }}>
-
                 {
                   controls
                     .filter((x) => x.ctltype !== "DATE" && x.field !== 'userid')
@@ -828,14 +854,40 @@ const HomeScreen = () => {
                         />
                       </View>
                     </>))
-
                 }
               </View>
             }
           </>
         }
 
-        {showDatePicker?.show && (
+        {showDatePicker?.show && Platform.OS === 'ios' && (
+          <Modal transparent animationType="slide" statusBarTranslucent>
+            <View style={styles.overlay}>
+              <View style={styles.sheet}>
+                {/* Divider */}
+                <View style={styles.divider} />
+
+                {/* Date Picker */}
+                <DateTimePicker
+                  value={
+                    showDatePicker.type === 'from' && fromDate
+                      ? parseCustomDate(fromDate)
+                      : showDatePicker.type === 'to' && toDate
+                        ? parseCustomDate(toDate)
+                        : new Date()
+                  }
+                  mode="date"
+                  display="spinner"
+                  is24Hour={false}
+                  onChange={handleDateChange}
+                  style={styles.picker}
+                />
+              </View>
+            </View>
+          </Modal>
+        )}
+
+        {Platform.OS !== 'ios' && showDatePicker?.show && (
           <DateTimePicker
             value={
               showDatePicker.type === "from" && fromDate
@@ -844,104 +896,144 @@ const HomeScreen = () => {
                   ? parseCustomDate(toDate)
                   : new Date()
             }
-            mode="date"
+            mode='date'
+            display={'spinner'}
+            is24Hour={false}
             onChange={handleDateChange}
-            
+
           />
         )}
       </View>
+      <FlatList
+        data={['']}
+        showsVerticalScrollIndicator={false}
+        renderItem={() => {
+          return (<>
+            {controlsLoader ? (
+              <View
+                style={{
+                  height: Dimensions.get('screen').height * 0.75,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  backgroundColor: theme === 'dark' ? 'black' : 'white',
+                }}
+              >
+                <FullViewLoader />
+              </View>
+            ) : error ? (
+              <View
+                style={{
+                  flex: 1,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  backgroundColor: theme === 'dark' ? 'black' : 'white',
+                }}
+              >
+                <ErrorMessage message={error} />{' '}
+              </View>
+            ) : controls?.length === 0 && !isDashboardLoading ? (
+              <View
+                style={{
+                  height: Dimensions.get('screen').height * 0.75,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  backgroundColor: theme === 'dark' ? 'black' : 'white',
+                }}
+              >
+                <View style={{
+                  height: 140, width: '100%',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
+                  <Image source={ERP_ICON.APP_LOGO} style={[styles.logo,
+                  {
+                    height: 140,
+                    width: 140, marginBottom: 12
+                  }
+                  ]} resizeMode="contain" />
+                  <Text style={{
+                    fontSize: 30,
+                    fontFamily: "Handlee-Regular",
+                  }}>Welocome</Text>
+                </View>
+              </View>
+            ) : (
+              <View style={{
+                backgroundColor: theme === 'dark' ? 'black' : 'white',
+                flex: 1
+              }}>
+                <>
+                  <Animated.FlatList
+                    showsVerticalScrollIndicator={false}
+                    data={['']}
+                    keyExtractor={(_, i) => i.toString()}
+                    onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], {
+                      useNativeDriver: true,
+                    })}
+                    scrollEventThrottle={16}
+                    renderItem={() => (
+                      <View
+                        style={{
+                          backgroundColor: theme === 'dark' ? 'black' : 'white',
+                          flex: 1
+                        }}
+                      >
+                        <View>
+                          {pieChartData.length > 0 && (
+                            <PieChartSection pieChartData={pieChartData} navigation={navigation} t={t} />
+                          )}
+                          {pieChartData.length === 0 && <View style={{ marginTop: 12 }} />}
+                        </View>
+                        <View style={styles.dashboardSection}>
+                          <FlatList
+                            key={`${isHorizontal}`}
+                            keyboardShouldPersistTaps="handled"
+                            data={[...textItems, ...emptyItems]}
+                            keyExtractor={(item, index) => index.toString()}
+                            numColumns={isHorizontal ? 1 : 2}
+                            columnWrapperStyle={!isHorizontal ? styles.columnWrapper : undefined}
+                            renderItem={
+                              ({ item, index }) =>
+                                renderDashboardItem({ item, index, isFromHtml: false, isFromMenu: false })
+                            }
+                            showsVerticalScrollIndicator={false}
+                          />
+                        </View>
 
-      {controlsLoader ? (
-        <View
-          style={{
-            height: Dimensions.get('screen').height * 0.75,
-            justifyContent: 'center',
-            alignItems: 'center',
-            backgroundColor: theme === 'dark' ? 'black' : 'white',
-          }}
-        >
-          <FullViewLoader />
-        </View>
-      ) : error ? (
-        <View
-          style={{
-            flex: 1,
-            justifyContent: 'center',
-            alignItems: 'center',
-            backgroundColor: theme === 'dark' ? 'black' : 'white',
-          }}
-        >
-          <ErrorMessage message={error} />{' '}
-        </View>
-      ) : controls?.length === 0 && !isDashboardLoading ? (
-        <View
-          style={{
-            height: Dimensions.get('screen').height,
-            justifyContent: 'center',
-            alignItems: 'center',
-            backgroundColor: theme === 'dark' ? 'black' : 'white',
-          }}
-        >
-          <NoData />
-        </View>
-      ) : (
-        <View style={{
-          backgroundColor: theme === 'dark' ? 'black' : 'white',
-          flex: 1
-        }}>
-          <>
-            <Animated.FlatList
-              showsVerticalScrollIndicator={false}
-              data={['']}
-              keyExtractor={(_, i) => i.toString()}
-              onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], {
-                useNativeDriver: true,
-              })}
-              scrollEventThrottle={16}
-              renderItem={() => (
-                <View
-                  style={{
-                    backgroundColor: theme === 'dark' ? 'black' : 'white',
-                    flex: 1
-                  }}
-                >
-                  <View>
-                    {pieChartData.length > 0 && (
-                      <PieChartSection pieChartData={pieChartData} navigation={navigation} t={t} />
-                    )}
-                    {pieChartData.length === 0 && <View style={{ marginTop: 12 }} />}
-                  </View>
-                  <View style={styles.dashboardSection}>
-                    <FlatList
-                      key={`${isHorizontal}`}
-                      keyboardShouldPersistTaps="handled"
-                      data={[...textItems, ...emptyItems]}
-                      keyExtractor={(item, index) => index.toString()}
-                      numColumns={isHorizontal ? 1 : 2}
-                      columnWrapperStyle={!isHorizontal ? styles.columnWrapper : undefined}
-                      renderItem={
-                        ({ item, index }) =>
-                          renderDashboardItem({ item, index, isFromHtml: false, isFromMenu: false }) // 👈 custom prop passed here
-                      }
-                      showsVerticalScrollIndicator={false}
-                    />
-                  </View>
+                        <View style={styles.dashboardSection}>
+                          <FlatList
+                            key={`${isHorizontal}`}
+                            keyboardShouldPersistTaps="handled"
+                            data={htmlItems}
+                            keyExtractor={(item, index) => index.toString()}
+                            renderItem={
+                              ({ item, index }) =>
+                                renderDashboardItem({ item, index, isFromHtml: true, isFromMenu: true })
+                            }
+                            showsVerticalScrollIndicator={false}
+                          />
+                          <View style={{
+                            height: 350, width: '100%',
 
-                  <View style={styles.dashboardSection}>
-                    <FlatList
-                      key={`${isHorizontal}`}
-                      keyboardShouldPersistTaps="handled"
-                      data={htmlItems}
-                      keyExtractor={(item, index) => index.toString()}
-                      renderItem={
-                        ({ item, index }) =>
-                          renderDashboardItem({ item, index, isFromHtml: true, isFromMenu: true }) // 👈 custom prop passed here
-                      }
-                      showsVerticalScrollIndicator={false}
-                    />
-                  </View>
+                            alignContent: 'center',
+                            alignItems: 'center',
+                            alignSelf: 'center',
+                            justifyContent: "center"
+                          }}>
+                            <Image source={ERP_ICON.APP_LOGO} style={[styles.logo,
+                            {
+                              height: 140,
+                              width: 140, marginBottom: 12
+                            }
+                            ]} resizeMode="contain" />
+                            <Text style={{
+                              fontSize: 30,
+                              fontFamily: "Handlee-Regular",
+                            }}>Welocome</Text>
+                          </View>
 
-                  {/* <View>
+                        </View>
+                        {/* <View>
                     <Animated.FlatList
                       showsVerticalScrollIndicator={false}
                       data={['']}
@@ -1157,13 +1249,16 @@ const HomeScreen = () => {
                       )}
                     />
                   </View> */}
-                  <View style={{height: 120, width: 20}}> </View>
-                </View>
-              )}
-            />
+                      </View>
+                    )}
+                  />
+                </>
+              </View>
+            )}
           </>
-        </View>
-      )}
+          )
+        }}
+      />
     </View>
   );
 };

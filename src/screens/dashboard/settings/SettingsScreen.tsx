@@ -34,6 +34,11 @@ import { useApi } from '../../../hooks/useApi';
 import { isTokenValid } from '../../../utils/helpers';
 import DeviceInfo from 'react-native-device-info';
 import { setLang, setTheme } from '../../../store/slices/theme/themeSlice';
+import { clearAuthState, setDashboard, setEmptyMenu } from '../../../store/slices/auth/authSlice';
+import { resetAjaxState } from '../../../store/slices/ajax/ajaxSlice';
+import { resetAttendanceState } from '../../../store/slices/attendance/attendanceSlice';
+import { resetDropdownState } from '../../../store/slices/dropdown/dropdownSlice';
+import { resetSyncLocationState } from '../../../store/slices/location/syncLocationSlice';
 
 interface SettingItem {
   id: string;
@@ -95,7 +100,7 @@ const SettingsScreen = () => {
       ),
 
     });
-  }, [navigation]);
+  }, [navigation, theme]);
 
 
   useEffect(() => {
@@ -199,7 +204,7 @@ const SettingsScreen = () => {
           navigation.navigate('Privacy Policy', {
             titlePage: t('settings.privacySettings')
           });
-                
+
         } else if (item?.title === t('settings.helpSupport')) {
           navigation.navigate('Privacy Policy', {
             url: Platform.OS === 'ios' ? 'https://deverp.com/index.aspx?q=contact_us' : 'http://deverp.com/index.aspx?q=contact_us',
@@ -265,12 +270,12 @@ const SettingsScreen = () => {
       disabled={item.type === 'toggle'}
     >
       <View style={styles.settingHeader}>
-        <View style={[styles.settingIcon, 
-          {
-            backgroundColor: theme === 'dark' ? 'black' : "white",
-            borderWidth: 1,
-            borderColor: 'white'
-          }
+        <View style={[styles.settingIcon,
+        {
+          backgroundColor: theme === 'dark' ? 'black' : "white",
+          borderWidth: 1,
+          borderColor: 'white'
+        }
         ]}>
           <MaterialIcons name={item?.icon} color={theme === 'dark' ? 'white' : ERP_COLOR_CODE.ERP_BLACK} size={22} />
         </View>
@@ -342,8 +347,8 @@ const SettingsScreen = () => {
   return (
     <View style={[styles.container, theme === 'dark' ? {
       backgroundColor: 'black'
-    }: {
-       backgroundColor: 'white'
+    } : {
+      backgroundColor: 'white'
     }]}>
       <ScrollView
         style={styles.scrollContainer}
@@ -513,6 +518,14 @@ const SettingsScreen = () => {
                   dispatch(switchAccountThunk(newActiveUser?.id));
                 }
               } else {
+                dispatch(setDashboard([]));
+                dispatch(setEmptyMenu([]));
+                dispatch(resetAjaxState());
+                dispatch(resetAttendanceState())
+                dispatch(clearAuthState())
+                dispatch(resetDropdownState())
+                dispatch(resetSyncLocationState())
+                dispatch(resetAttendanceState())
                 dispatch(logoutUserThunk());
               }
             }

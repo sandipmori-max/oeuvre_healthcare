@@ -20,6 +20,7 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
   const theme = useAppSelector(state => state.theme.mode);
   const baseLink = useBaseLink();
   const currentRoute = props.state.routeNames[props.state.index];
+  const {appDrawerMenuList, appColorCode} = useAppSelector(state => state?.auth);
 
   return (
     <DrawerContentScrollView
@@ -140,6 +141,16 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
                       props?.navigation.closeDrawer();
                       return;
                     }
+                    if(item?.route === "Attendance"){
+                      props?.navigation.closeDrawer();
+                      navigation.navigate(item?.route, { isFor: 'Attendance' });
+                      return;
+                    }
+                    if(item?.route === "MyAttendance"){
+                      props?.navigation.closeDrawer();
+                      navigation.navigate(item?.route, { isFor: 'MyAttendance' });
+                      return;
+                    }
                     if (item?.route === 'Home') {
                       props?.navigation.navigate('Home', { screen: 'Home' });
                       props?.navigation.closeDrawer();
@@ -180,7 +191,7 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
           alignItems: 'center',
           marginBottom: 10
         }}>
-          <Image source={ERP_ICON.DEV_LOGO} style={{
+          <Image source={ERP_ICON.APP_LOGO} style={{
             height: 40,
             width: 40,
 

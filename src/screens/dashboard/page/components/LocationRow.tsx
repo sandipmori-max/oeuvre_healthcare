@@ -5,11 +5,14 @@ import { ERP_COLOR_CODE } from '../../../../utils/constants';
 import { useCurrentAddress } from '../../../../hooks/useCurrentLocation';
 import MaterialIcons from '@react-native-vector-icons/material-icons';
 import useTranslations from '../../../../hooks/useTranslations';
+import ShortAction from './ShortAction';
+import { useAppSelector } from '../../../../store/hooks';
 
 const LocationRow = ({ locationEnabled, locationVisible, isValidate, item, value, setValue }: any) => {
   const { coords, address: hookAddress, loading, error, refetch } = useCurrentAddress();
   const [address, setAddress] = useState<string>('');
     const { t } = useTranslations();
+  const theme = useAppSelector(state => state?.theme.mode);
 
   useEffect(() => {
     if(!locationEnabled){
@@ -34,23 +37,30 @@ const LocationRow = ({ locationEnabled, locationVisible, isValidate, item, value
 
   return (
     <View style={{ marginBottom: 16 }}>
-      <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
-        <Text style={[styles.label, ]}>{item?.fieldtitle}</Text>
-        {item?.fieldtitle !== item?.tooltip && <Text> - ( {item?.tooltip} )</Text>}
+      <View style={{ flexDirection: 'row' }}>
+        <Text style={[styles.label, theme === 'dark' && {
+          color: 'white'
+        }]}>{item?.fieldtitle}</Text>
+        {item?.fieldtitle !== item?.tooltip && <Text style={[styles.label, theme === 'dark' && {
+          color: 'white'
+        }]}> - ( {item?.tooltip} )</Text>}
         {item?.mandatory === '1' && <Text style={{ color: ERP_COLOR_CODE.ERP_ERROR }}>*</Text>}
+        <ShortAction item={item} value={address}/>
       </View>
 
       {/* Address / Loading / Error */}
-      <View style={styles.disabledBox}>
+      <View style={[styles.disabledBox, theme === 'dark' && {
+        backgroundColor: ERP_COLOR_CODE.ERP_555 
+      }]}>
         {loading ? (
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <ActivityIndicator size="small" color={ERP_COLOR_CODE.ERP_555} />
-            <Text style={{ marginLeft: 8, color: ERP_COLOR_CODE.ERP_555 }}>
+            <ActivityIndicator size="small" color={theme === 'dark' ? 'white':ERP_COLOR_CODE.ERP_555} />
+            <Text style={{ marginLeft: 8, color: theme === 'dark' ?'white' :ERP_COLOR_CODE.ERP_555 }}>
               {t('text.text37')}
             </Text>
           </View>
         ) : address ? (
-          <Text style={{ marginTop: 4, color: ERP_COLOR_CODE.ERP_333 }}>{address}</Text>
+          <Text style={{ marginTop: 4, color: theme === 'dark' ?'white' : ERP_COLOR_CODE.ERP_333 }}>{address}</Text>
         ) : (
           <View
             style={{
@@ -60,20 +70,20 @@ const LocationRow = ({ locationEnabled, locationVisible, isValidate, item, value
               justifyContent: 'space-between',
             }}
           >
-            <Text style={{  color: '#999', width: '80%' }}>
+            <Text style={{  color: theme === 'dark' ?'white' : '#999', width: '80%' }}>
               {error ? `${t("title.title1")}: ${error}` : t("text.text38")}
             </Text>
             <TouchableOpacity
               style={{
                 paddingVertical: 4,
                 paddingHorizontal: 6,
-                backgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR,
+                backgroundColor: theme === 'dark' ?'white' : ERP_COLOR_CODE.ERP_APP_COLOR,
                 borderRadius: 6,
                 alignSelf: 'flex-start',
               }}
               onPress={refetch}
             >
-              <MaterialIcons name="refresh" color={'#fff'} size={18} />
+              <MaterialIcons name="refresh" color={theme === 'dark' ?'black' : '#fff'} size={18} />
             </TouchableOpacity>
           </View>
         )}
