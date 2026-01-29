@@ -24,7 +24,12 @@ const BoolInput = ({ value, onChange, label }: BoolInputProps) => {
         >
           {value && <View style={styles.radioInner} />}
         </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => onChange(true)}
+        >
         <Text style={[{ marginRight: 16, }, theme === 'dark' && { color: 'white' }]}>{t("title.title7")}</Text>
+
+        </TouchableOpacity>
 
         <TouchableOpacity
           style={[styles.radio, !value && styles.radioSelected]}
@@ -32,7 +37,12 @@ const BoolInput = ({ value, onChange, label }: BoolInputProps) => {
         >
           {!value && <View style={styles.radioInner} />}
         </TouchableOpacity>
+         <TouchableOpacity
+          onPress={() => onChange(false)}
+        >
         <Text style={[theme === 'dark' && { color: 'white' }]}>{t("title.title8")}</Text>
+
+        </TouchableOpacity>
       </View>
     </View>
   );

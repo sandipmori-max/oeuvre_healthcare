@@ -97,7 +97,8 @@ const WebScreen = () => {
           ) : (
             <>
               <ERPIcon name={'refresh'} onPress={reloadWebView} />
-              <ERPIcon name={'filter-alt'} onPress={toggleDiv} />
+              <ERPIcon name={isHidden ? 'close' :'filter-alt'}
+               onPress={toggleDiv} />
             </>
           )}
         </>

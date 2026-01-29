@@ -32,17 +32,17 @@ const Input = ({ id, isValidate, item, errors, value, setValue, onFocus }: any) 
       </View>
       <TextInput
         id={id}
-        multiline={value?.length > 40 ? true : item?.title === 'Card Text' ? true : false}
+        multiline={item?.size > 100 ? true : value?.length > 40 ? true : item?.title === 'Card Text' ? true : false}
         editable
         scrollEnabled
         style={[
           styles.textInput,
+          item?.size > 100 && { minHeight: 100, textAlignVertical: 'top' },
           errors[item.field] && { borderColor: ERP_COLOR_CODE.ERP_ERROR },
           value && {
             borderColor: 'green',
             borderWidth: 0.8,
           },
-
           isInputEdit && {
             borderColor: '#81b5e4',
             borderWidth: 0.8,
@@ -58,6 +58,9 @@ const Input = ({ id, isValidate, item, errors, value, setValue, onFocus }: any) 
           },
           theme === 'dark' && value && {
             color: 'white'
+          },
+          item?.borderColor && {
+            borderColor: item?.borderColor
           }
         ]}
         keyboardType={item?.ctltype === 'NUMERIC' ? 'number-pad' : 'default'}
@@ -76,7 +79,6 @@ const Input = ({ id, isValidate, item, errors, value, setValue, onFocus }: any) 
       />
       {errors[item.field] && (
                <InputError error = {errors[item?.field]}/>
-
       )}
     </View>
   );

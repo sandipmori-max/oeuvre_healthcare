@@ -21,7 +21,8 @@ const authPersistConfig = {
   'user', 
   'appDrawerMenuList',
   'appBottomMenuList',
-  'appColorCode'
+  'appColorCode',
+  'accounts'
   ],
 };
 

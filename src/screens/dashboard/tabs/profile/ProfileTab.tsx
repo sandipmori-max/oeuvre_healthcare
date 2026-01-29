@@ -25,9 +25,12 @@ const ProfileTab = () => {
   const [isSwitchAccountOpen, setIsSwitchAccountOpen] = useState(false);
 
   const handleAddAccount = () => {
-    setShowAccountSwitcher(false);
+    setTapLoader(true)
+    setTimeout(()=>{
+setShowAccountSwitcher(false);
     setIsSwitchAccountOpen(true)
     setShowAddAccount(true);
+    },600)
   };
 
   const activeAccount = accounts?.find(acc => acc?.user?.id === user?.id);
@@ -35,33 +38,43 @@ const ProfileTab = () => {
   // Animated values
   const profileAnim = useRef(new Animated.Value(0)).current;
   const accountAnim = useRef(new Animated.Value(0)).current;
+  const [tapLoader, setTapLoader] = useState(false);
 
   useFocusEffect(
-  useCallback(() => {
-    // Reset animation values
-    profileAnim.setValue(0);
-    accountAnim.setValue(0);
+      useCallback(() => {
+         setTapLoader(false)
+        return () => {
+        };
+      }, [navigation])
+  );
+   
+      
+  useFocusEffect(
+    useCallback(() => {
+      // Reset animation values
+      profileAnim.setValue(0);
+      accountAnim.setValue(0);
 
-    // Animate both sections sequentially
-    Animated.sequence([
-      Animated.timing(profileAnim, {
-        toValue: 1,
-        duration: 500,
-        useNativeDriver: true,
-        easing: Easing.out(Easing.exp),
-      }),
-      Animated.timing(accountAnim, {
-        toValue: 1,
-        duration: 400,
-        useNativeDriver: true,
-        easing: Easing.out(Easing.exp),
-      }),
-    ]).start();
+      // Animate both sections sequentially
+      Animated.sequence([
+        Animated.timing(profileAnim, {
+          toValue: 1,
+          duration: 140,
+          useNativeDriver: true,
+          easing: Easing.out(Easing.exp),
+        }),
+        Animated.timing(accountAnim, {
+          toValue: 1,
+          duration: 100,
+          useNativeDriver: true,
+          easing: Easing.out(Easing.exp),
+        }),
+      ]).start();
 
-    return () => {
-      // Optional cleanup
-    };
-  }, [showAccountSwitcher, showAddAccount])
+      return () => {
+        // Optional cleanup
+      };
+    }, [showAccountSwitcher, showAddAccount])
 );
 
   useLayoutEffect(() => {
@@ -74,7 +87,10 @@ const ProfileTab = () => {
       headerTintColor: '#fff',
       headerRight: () => (
         <>
-          <ERPIcon name="person-add-alt" onPress={()=>{
+          <ERPIcon
+          isLoading={tapLoader}
+          name="person-add-alt" onPress={()=>{
+            setTapLoader(true)
               setShowAccountSwitcher(false);
               setIsSwitchAccountOpen(false)
               setShowAddAccount(true);
@@ -86,7 +102,7 @@ const ProfileTab = () => {
         <ERPIcon extSize={24} isMenu={true} name="menu" onPress={() => navigation.openDrawer()} />
       ),
     });
-  }, [navigation, theme]);
+  }, [navigation, theme, tapLoader]);
 
   return (
     <View
@@ -148,7 +164,7 @@ const ProfileTab = () => {
               {
                 translateY: accountAnim.interpolate({
                   inputRange: [0, 1],
-                  outputRange: [30, 0],
+                  outputRange: [24, 0],
                 }),
               },
             ],
@@ -246,13 +262,17 @@ const ProfileTab = () => {
 
       <AccountSwitcher
         visible={showAccountSwitcher}
-        onClose={() => setShowAccountSwitcher(false)}
+        onClose={() =>{
+          setTapLoader(false)
+          setShowAccountSwitcher(false)}}
         onAddAccount={handleAddAccount}
+        tapLoader={tapLoader}
       />
 
       <AddAccountScreen 
         visible={showAddAccount}
         onClose={() => {
+          setTapLoader(false)
           if(isSwitchAccountOpen){
             setShowAddAccount(false)
             setShowAccountSwitcher(true)

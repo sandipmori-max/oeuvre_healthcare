@@ -227,7 +227,13 @@ const PinSetupScreen = () => {
       setScreen('blocked');
       showAlert('Blocked', 'Too many wrong attempts. Try again after 5 minutes.', 'error');
     } else {
-      showAlert('Error', `Incorrect PIN (${newAttempts}/3)`, 'error', 1500);
+      showAlert(
+        'Incorrect PIN',
+        `The PIN you entered is incorrect. Attempt ${newAttempts} of 3.`,
+        'error',
+        35000
+      );
+
     }
   };
 
@@ -239,16 +245,16 @@ const PinSetupScreen = () => {
       await removePinCode(db);  // remove code if exists
       await resetAttemptsAndBlock();
 
-      showAlert('Success', 'PIN removed', 'success', 800);
+      showAlert('Success', 'Your PIN has been successfully removed.', 'success', 1800);
 
       // update store and navigate back (same as original remove flow)
       dispatch(setIsPinLoaded());
       setTimeout(() => {
         setAlertVisible(false);
         navigation.goBack();
-      }, 400);
+      }, 1800);
     } catch (err) {
-      showAlert('Error', 'Failed to remove PIN', 'error');
+      showAlert('Error', 'Failed to remove your PIN. Please try again.', 'error');
     }
   };
 
@@ -260,7 +266,7 @@ const PinSetupScreen = () => {
       await setPinEnabled(db, true);
       await resetAttemptsAndBlock();
 
-      showAlert('Success', 'PIN setup done', 'success', 800);
+      showAlert('Success', 'Your PIN has been successfully set up.', 'success', 1800);
       dispatch(setIsPinLoaded());
 
       // update local storedPin and maybe go back
@@ -271,13 +277,13 @@ const PinSetupScreen = () => {
         setTimeout(() => {
           setAlertVisible(false);
           navigation.goBack();
-        }, 400);
+        }, 1800);
       } else {
         // keep in-screen if you want (we'll go to menu)
         setScreen('menu');
       }
     } catch (error) {
-      showAlert('Error', 'Error saving PIN', 'error');
+      showAlert('Error', 'There was an issue saving your PIN. Please try again.', 'error');
     }
   };
 
@@ -297,7 +303,7 @@ const PinSetupScreen = () => {
     if (screen === 'verify') {
       if (pin === storedPin) {
         await resetAttemptsAndBlock();
-        showAlert('Success', 'Enter new PIN', 'success', 700);
+        showAlert('Success', 'Please enter your new PIN.', 'success', 1800);
         setPin('');
         setScreen('setup');
       } else {
@@ -319,7 +325,7 @@ const PinSetupScreen = () => {
       if (pin === tempPinRef.current) {
         await performSavePin(pin, true); // navigate back as original did
       } else {
-        showAlert('Error', 'PINs do not match', 'error');
+        showAlert('PIN Mismatch', 'The PINs you entered do not match. Please re-enter them.', 'error');
         tempPinRef.current = '';
         setPin('');
         setScreen('setup');
@@ -333,7 +339,7 @@ const PinSetupScreen = () => {
         await resetAttemptsAndBlock();
         setPin('');
         setScreen('change_setup');
-        showAlert('Success', 'Enter new PIN', 'success', 700);
+        showAlert('Success', 'Please enter your new PIN.', 'success', 1800);
       } else {
         await handleWrongPin();
         setPin('');
@@ -350,7 +356,7 @@ const PinSetupScreen = () => {
       if (pin === tempPinRef.current) {
         await performSavePin(pin, true); // save and go back
       } else {
-        showAlert('Error', 'PINs do not match', 'error');
+        showAlert('PIN Mismatch', 'The PINs you entered do not match. Please re-enter them.', 'error');
         tempPinRef.current = '';
         setPin('');
         setScreen('change_setup');
@@ -364,7 +370,7 @@ const PinSetupScreen = () => {
         await resetAttemptsAndBlock();
         setPin('');
         setScreen('remove_confirm');
-        showAlert('Success', 'Verified. Tap Remove to confirm', 'success', 700);
+        showAlert('Success', 'Verified. Tap Remove to confirm', 'success', 1800);
       } else {
         await handleWrongPin();
         setPin('');
@@ -390,7 +396,7 @@ const PinSetupScreen = () => {
         // save new PIN
         await performSavePin(pin, true);
       } else {
-        showAlert('Error', 'PINs do not match', 'error');
+        showAlert('PIN Mismatch', 'The PINs you entered do not match. Please re-enter them.', 'error');
         tempPinRef.current = '';
         setPin('');
         setScreen('forgot_setup');
@@ -404,7 +410,7 @@ const PinSetupScreen = () => {
   // remove button pressed initially: we ask to verify before removal (preserve security)
   const onRemovePinPress = () => {
     if (!storedPin) {
-      showAlert('Error', 'No PIN set', 'error');
+      showAlert('PIN Error', 'Please set your PIN first', 'error');
       return;
     }
     setScreen('remove_verify');
@@ -413,7 +419,6 @@ const PinSetupScreen = () => {
 
   const onChangePinPress = () => {
     if (!storedPin) {
-      // no pin yet -> go to setup
       setScreen('setup');
       setPin('');
       return;
@@ -424,7 +429,7 @@ const PinSetupScreen = () => {
 
   const onForgotPinPress = () => {
     if (!storedPin) {
-      showAlert('Info', 'No PIN set. Use Add PIN.', 'info');
+      showAlert('Info', 'No PIN is set. Please use "Add PIN" to create one.', 'info');
       return;
     }
     // we will show a confirmation dialog to avoid accidental resets

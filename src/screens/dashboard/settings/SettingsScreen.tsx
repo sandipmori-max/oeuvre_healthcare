@@ -56,13 +56,15 @@ interface LanguageOption {
   code: string;
   name: string;
 }
+const HIDDEN_POSITION = 400;
 
 const SettingsScreen = () => {
   const navigation = useNavigation();
   const { t, changeLanguage, getAvailableLanguages, getCurrentLanguage } = useTranslations();
   const [alertVisible, setAlertVisible] = useState(false);
   const theme = useAppSelector(state => state.theme.mode);
-
+const translateY = useRef(new Animated.Value(HIDDEN_POSITION)).current;
+  const overlayOpacity = useRef(new Animated.Value(0)).current;
   const [logoutVisible, setLogoutVisible] = useState(false);
 
   const [languageModalVisible, setLanguageModalVisible] = useState(false);
@@ -75,11 +77,47 @@ const SettingsScreen = () => {
   const [alertConfig, setAlertConfig] = useState({
     title: '',
     message: '',
-    type: 'info' as 'error' | 'success' | 'info',
+    type: 'info' as 'error' | 'success' | 'info' | 'exit',
   });
   const [settings, setSettings] = useState<SettingItem[]>([]);
   const appVersion = DeviceInfo.getVersion();
 
+ useEffect(() => {
+    if (languageModalVisible) {
+      Animated.parallel([
+        Animated.timing(translateY, {
+          toValue: 0,
+          duration: 300,
+          easing: Easing.out(Easing.ease),
+          useNativeDriver: true,
+        }),
+        Animated.timing(overlayOpacity, {
+          toValue: 1,
+          duration: 250,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    }
+  }, [languageModalVisible]);
+
+  const closeWithAnimation = () => {
+    Animated.parallel([
+      Animated.timing(translateY, {
+        toValue: 200,
+        duration: 260,
+        easing: Easing.in(Easing.ease),
+        useNativeDriver: true,
+      }),
+      Animated.timing(overlayOpacity, {
+        toValue: 0,
+        duration: 260,
+        useNativeDriver: true,
+      }),
+    ]).start(() => {
+      setLogoutVisible(false);
+      setLanguageModalVisible(false);
+    });
+  };
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -221,7 +259,7 @@ const SettingsScreen = () => {
           setAlertVisible(true);
           setTimeout(() => {
             setAlertVisible(false);
-          }, 1200);
+          }, 1800);
         }
         break;
       case 'action':
@@ -230,7 +268,7 @@ const SettingsScreen = () => {
           setAlertConfig({
             title: t('settings.logout'),
             message: t('settings.logoutConfirm'),
-            type: 'error',
+            type: 'exit',
           });
           setAlertVisible(true);
         } else if (item?.action) {
@@ -260,7 +298,7 @@ const SettingsScreen = () => {
 
     setTimeout(() => {
       setAlertVisible(false);
-    }, 1200);
+    }, 1800);
   };
 
   const renderSettingItem = ({ item }: { item: SettingItem }) => (
@@ -338,7 +376,7 @@ const SettingsScreen = () => {
       >
         {item.name}
       </Text>
-      {currentLanguage === item.code && <Text style={languageStyles.checkmark}>✓</Text>}
+      {currentLanguage === item.code && <MaterialIcons name='done-all' size={22} color={ERP_COLOR_CODE.ERP_APP_COLOR}/>}
     </TouchableOpacity>
   );
 
@@ -494,42 +532,51 @@ const SettingsScreen = () => {
 
       <View style={styles.bottomSpacing} />
     </ScrollView>
-      <Modal
-        visible={languageModalVisible}
-        transparent
-        animationType="slide"
-        onRequestClose={() => {
-          setLogoutVisible(false);
-          setLanguageModalVisible(false);
-        }}
+     <Modal
+      visible={languageModalVisible}
+      transparent
+      animationType="none"
+      onRequestClose={closeWithAnimation}
+    >
+      <Animated.View
+        style={[
+          languageStyles.modalOverlay,
+          { opacity: overlayOpacity },
+        ]}
       >
-        <View style={languageStyles.modalOverlay}>
-          <View style={[languageStyles.modalContent, theme === 'dark' && {
-            backgroundColor: 'black',
-            borderWidth: 1,
-            borderColor: 'white'
-          }]}>
-            <View style={languageStyles.modalHeader}>
-              <Text style={languageStyles.modalTitle}>{t('language.selectLanguage')}</Text>
-              <TouchableOpacity
-                onPress={() => {
-                  setLogoutVisible(false);
-                  setLanguageModalVisible(false);
-                }}
-              >
-                <Text style={languageStyles.closeButton}>✕</Text>
-              </TouchableOpacity>
-            </View>
-            <FlatList
-              data={languages}
-              keyboardShouldPersistTaps="handled"
-              renderItem={renderLanguageOption}
-              keyExtractor={(item, index) => index.toString()}
-              style={languageStyles.languageList}
-            />
+        <Animated.View
+          style={[
+            languageStyles.modalContent,
+            theme === 'dark' && {
+              backgroundColor: 'black',
+              borderWidth: 1,
+              borderColor: 'white',
+            },
+            { transform: [{ translateY }] },
+          ]}
+        >
+          {/* Header */}
+          <View style={languageStyles.modalHeader}>
+            <Text style={languageStyles.modalTitle}>
+              {t('language.selectLanguage')}
+            </Text>
+
+            <TouchableOpacity onPress={closeWithAnimation}>
+              <Text style={languageStyles.closeButton}>✕</Text>
+            </TouchableOpacity>
           </View>
-        </View>
-      </Modal>
+
+          {/* List */}
+          <FlatList
+            data={languages}
+            keyboardShouldPersistTaps="handled"
+            renderItem={renderLanguageOption}
+            keyExtractor={(_, index) => index.toString()}
+            style={languageStyles.languageList}
+          />
+        </Animated.View>
+      </Animated.View>
+    </Modal>
 
       <CustomAlert
         visible={alertVisible}
@@ -645,6 +692,7 @@ const languageStyles = StyleSheet.create({
   },
   selectedLanguage: {
     backgroundColor: '#f5f5f5',
+    borderRadius: 8,
   },
   languageName: {
     fontSize: 16,
@@ -652,7 +700,7 @@ const languageStyles = StyleSheet.create({
   },
   selectedLanguageText: {
     fontWeight: 'bold',
-    color: '#2196F3',
+    color: ERP_COLOR_CODE.ERP_APP_COLOR,
   },
   checkmark: {
     fontSize: 18,

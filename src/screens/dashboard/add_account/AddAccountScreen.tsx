@@ -157,7 +157,7 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose, i
 
       if (userExists && codeExists) {
         setAlertConfig({
-          title: t("title.title1"),
+          title: 'Duplicate user',
           message: t("msg.msg1"),
           type: 'error',
         });
@@ -187,7 +187,7 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose, i
 
       if (loginResult?.success !== 1) {
         setAlertConfig({
-          title: t("title.title1"),
+          title:  'Authentication failed',
           message: loginResult?.message || t("msg.msg2"),
           type: 'error',
         });
@@ -264,52 +264,48 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose, i
   return (
     <Modal visible={visible} transparent onRequestClose={handleClose}>
 
-      <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+
+      <ImageBackground
+        source={ERP_GIF.BACK_IMG}
+        style={{
+          height: Dimensions.get('screen').height,
+          width: Dimensions.get('screen').width
+        }}
+        resizeMode='cover'
       >
-        <ScrollView
-          keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingBottom: 40 }}
+        <View style={[styles.header, theme === 'dark' && { backgroundColor: 'black' }
+        ]}>
+          <TouchableOpacity onPress={handleClose} style={styles.closeButton}>
+            <Image source={ERP_ICON.BACK} style={styles.back} />
+          </TouchableOpacity>
+          <Text style={styles.title}>{t('account.addAccount')}</Text>
+        </View>
+        <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         >
-          <Animated.View
-            style={[
-              styles.container,
-              theme === 'dark' && { backgroundColor: 'black' },
-              {
-                transform: [
-                  {
-                    translateY: slideAnim.interpolate({
-                      inputRange: [0, 1],
-                      outputRange: [800, 0],
-                    }),
-                  },
-                ],
-                opacity: slideAnim,
-              },
-            ]}
+          <ScrollView
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ paddingBottom: 40 }}
           >
-            <ImageBackground
-              source={ERP_GIF.BACK_IMG}
-              style={{
-                height: Dimensions.get('screen').height,
-                width: Dimensions.get('screen').width
-              }}
-              resizeMode='cover'
+            <Animated.View
+              style={[
+                styles.container,
+                theme === 'dark' && { backgroundColor: 'black' },
+                {
+                  transform: [
+                    {
+                      translateY: slideAnim.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [800, 0],
+                      }),
+                    },
+                  ],
+                  opacity: slideAnim,
+                },
+              ]}
             >
-              <View style={[styles.header, theme === 'dark' && { backgroundColor: 'black' }
-
-
-              ]}>
-                <TouchableOpacity onPress={handleClose} style={styles.closeButton}>
-                  <Image source={ERP_ICON.BACK} style={styles.back} />
-                </TouchableOpacity>
-                <Text style={styles.title}>{t('account.addAccount')}</Text>
-              </View>
-
-
-
               <FlatList
                 showsHorizontalScrollIndicator={false}
                 showsVerticalScrollIndicator={false}
@@ -377,9 +373,7 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose, i
                           }, [touched?.password, errors?.password]);
 
                           return (
-                            <>
-                              {/* Company Code Input */}
-                            
+                            <> 
 
                               {/* User Input */}
                               <View style={styles.inputContainer}>
@@ -549,27 +543,27 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose, i
                   </Animated.View>
                 )}
               />
-            </ImageBackground>
-            <CustomAlert
-              visible={alertVisible}
-              title={alertConfig.title}
-              message={alertConfig.message}
-              type={alertConfig.type}
-              onClose={async () => {
-                setLoader(false);
-                setAlertVisible(false);
-                DevERPService.setAppId(user?.app_id);
-                DevERPService.setToken(user?.token);
-                await AsyncStorage.setItem('erp_token', user?.token || '');
-                await AsyncStorage.setItem('auth_token', user?.token || '');
-                await AsyncStorage.setItem('erp_token_valid_till', user?.tokenValidTill || '');
-              }}
-              actionLoader={undefined}
-            />
-          </Animated.View>
-        </ScrollView>
+              <CustomAlert
+                visible={alertVisible}
+                title={alertConfig.title}
+                message={alertConfig.message}
+                type={alertConfig.type}
+                onClose={async () => {
+                  setLoader(false);
+                  setAlertVisible(false);
+                  DevERPService.setAppId(user?.app_id);
+                  DevERPService.setToken(user?.token);
+                  await AsyncStorage.setItem('erp_token', user?.token || '');
+                  await AsyncStorage.setItem('auth_token', user?.token || '');
+                  await AsyncStorage.setItem('erp_token_valid_till', user?.tokenValidTill || '');
+                }}
+                actionLoader={undefined}
+              />
+            </Animated.View>
+          </ScrollView>
+        </KeyboardAvoidingView>
+      </ImageBackground>
 
-      </KeyboardAvoidingView>
 
     </Modal>
   );

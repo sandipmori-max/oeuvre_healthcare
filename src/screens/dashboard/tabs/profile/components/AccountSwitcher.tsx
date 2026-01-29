@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, TouchableOpacity, Modal, FlatList, Image, Animated, Easing, Platform } from 'react-native';
+import { View, Text, TouchableOpacity, Modal, FlatList, Image, Animated, Easing, Platform, ActivityIndicator } from 'react-native';
 import { styles } from './components_style';
 import { useAppDispatch, useAppSelector } from '../../../../../store/hooks';
 import { removeAccountThunk, switchAccountThunk } from '../../../../../store/slices/auth/thunk';
@@ -27,7 +27,8 @@ interface AccountSwitcherProps {
   onAddAccount: () => void;
 }
 
-const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onAddAccount }) => {
+const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onAddAccount, tapLoader }: any) => {
+  console.log("tapLoader", tapLoader)
   const dispatch = useAppDispatch();
   const { execute: validateCompanyCode } = useApi();
   const theme = useAppSelector(state => state?.theme.mode);
@@ -38,7 +39,7 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
   const [alertConfig, setAlertConfig] = useState({
     title: '',
     message: '',
-    type: 'info' as 'error' | 'success' | 'info',
+    type: 'info' as 'error' | 'success' | 'info' | 'confirmation',
   });
 
   // Animated values
@@ -126,17 +127,33 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
   };
 
   const handleRemovedAccount = (accountId: string) => {
-    if (accountId !== activeAccountId) {
-      dispatch(removeAccountThunk(accountId));
+    try {
+      if (accountId !== activeAccountId) {
+        dispatch(removeAccountThunk(accountId));
+      }
+      setAlertConfig({
+        title: 'Remove account success',
+        message: `Something went wrong!!`,
+        type: 'success',
+      });
+      setTimeout(() => {
+        onClose();
+      }, 1800)
+
+    } catch (error) {
+      setAlertConfig({
+        title: 'Remove account',
+        message: `Something went wrong!!`,
+        type: 'error',
+      });
     }
-    onClose();
   };
 
   const handleRemoveAccount = (account: Account) => {
     setAlertConfig({
-      title: 'Remove Account',
+      title: 'Remove account',
       message: `Are you sure you want to remove ${account?.user?.company_code}?`,
-      type: 'error',
+      type: 'confirmation',
     });
     setSelectedAccount(account?.id);
     setAlertVisible(true);
@@ -146,12 +163,12 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
     const isActive = user?.id.toString() === item?.user?.id.toString();
     const lastLogin = formatDateHr(item?.lastLoginAt, false);
     const lastLoginHr = formatTimeTo12Hour(item?.lastLoginAt);
+    console.log("normalizedBase", item)
 
     let normalizedBase = (item?.user?.companyLink || '').replace(/\/+$/, '');
     normalizedBase = normalizedBase.replace(/\/devws\/?/, '/');
     normalizedBase = normalizedBase.replace(/^https:\/\//i, Platform.OS === 'ios' ? 'https://' : 'http://');
 
-    console.log("normalizedBase", `${normalizedBase}/FileUpload/1/UserMaster/${item?.user?.id}/profileimage.jpeg?ts=${new Date().getTime()}`)
     return (
       <Animated.View
         style={{
@@ -223,7 +240,7 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
               <Text numberOfLines={1} style={[styles.accountEmail, isActive && styles.activeText, theme === 'dark' && { color: 'white' }]}>
                 {item?.user?.companyName}
               </Text>
-               
+
               <View style={{ width: isActive ? '100%' : '80%', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                 <View style={{ gap: 2, flexDirection: 'row', alignItems: 'center' }}>
                   <MaterialIcons name={'date-range'} color={theme === 'dark' ? 'white' : ERP_COLOR_CODE.ERP_BLACK} size={18} />
@@ -333,23 +350,32 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
           }}
         >
           <TouchableOpacity
-            style={[styles.addAccountButton, theme === 'dark' && { backgroundColor: 'white' }]}
+            style={[
+              styles.addAccountButton, theme === 'dark' && { backgroundColor: 'white' },
+              tapLoader && {
+                backgroundColor: ERP_COLOR_CODE.ERP_999
+              }
+            ]}
             onPress={() => {
-              setTimeout(() => {
-                onAddAccount()
-              }, 600)
+              onAddAccount()
             }}
             onPressIn={onPressIn}
             onPressOut={onPressOut}
           >
-            <MaterialIcons
-              name="person-add-alt"
-              size={24}
-              color={theme === 'dark' ? 'black' : 'white'}
-            />
+            {
+              <MaterialIcons
+                name="person-add-alt"
+                size={24}
+                color={theme === 'dark' ? 'black' : 'white'}
+              />
+            }
+
             <Text style={[styles.addAccountText, theme === 'dark' && { color: 'black' }]}>
-              Add account
+              {
+                tapLoader ? 'Add account...' : 'Add account'
+              }
             </Text>
+
           </TouchableOpacity>
         </Animated.View>
 

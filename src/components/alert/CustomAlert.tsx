@@ -148,11 +148,28 @@ const CustomAlert: React.FC<CustomAlertProps> = ({
             },
           ]}
         >
+          
           {/* Header */}
           <Animated.View style={{ opacity: headerAnim }}>
             <View style={styles.header}>
               <Text style={alertStyles.title}>{title || ''}</Text>
-              <TouchableOpacity onPress={onClose} style={styles.closeIcon}>
+              <TouchableOpacity onPress={() => {
+                Animated.parallel([
+                  Animated.timing(containerAnim, {
+                    toValue: 0,
+                    duration: 260,
+                    easing: Easing.in(Easing.ease),
+                    useNativeDriver: true,
+                  }),
+                  Animated.timing(headerAnim, {
+                    toValue: 0,
+                    duration: 260,
+                    useNativeDriver: true,
+                  }),
+                ]).start(() => {
+                  onClose();
+                });
+              }} style={styles.closeIcon}>
                 <Text style={styles.closeIconText}>✕</Text>
               </TouchableOpacity>
             </View>
@@ -227,9 +244,24 @@ const CustomAlert: React.FC<CustomAlertProps> = ({
                   <TouchableOpacity
                     style={styles.buttonCancel}
                     onPress={() => {
-                      setRemarks('');
-                      setError('');
-                      onCancel();
+                      Animated.parallel([
+                        Animated.timing(containerAnim, {
+                          toValue: 0,
+                          duration: 260,
+                          easing: Easing.in(Easing.ease),
+                          useNativeDriver: true,
+                        }),
+                        Animated.timing(headerAnim, {
+                          toValue: 0,
+                          duration: 260,
+                          useNativeDriver: true,
+                        }),
+                      ]).start(() => {
+                        setRemarks('');
+                        setError('');
+                        onCancel();
+                      });
+
                     }}
                   >
                     <Text style={styles.cancelButtonText}>{cancelText}</Text>

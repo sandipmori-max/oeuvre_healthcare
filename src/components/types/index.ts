@@ -9,7 +9,7 @@ export interface CustomAlertProps {
   visible: boolean;
   title: string;
   message: string;
-  type?: 'error' | 'success' | 'info';
+  type?: 'error' | 'success' | 'info' | 'confirmation' | 'exit';
   onClose: () => void;
   onDone?: (remarks?: any) => void;
   onCancel?: () => void;

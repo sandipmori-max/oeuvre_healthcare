@@ -36,7 +36,7 @@ const TermsAndConsent = ({ onAccept }: any) => {
 
   return (
     <>
-    <View style={{height: 12, marginTop: 4}}/>
+    <View style={{height: 12, marginTop: 40}}/>
       <Text style={[styles.title, {
         borderBottomWidth: 0.4,
         paddingBottom: 4
@@ -228,9 +228,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  checkedBox: { backgroundColor: "#3498db", borderColor: "#3498db" },
+  checkedBox: { backgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR },
   checkmark: { color: "#fff", fontWeight: "bold" },
-  checkboxText: { marginLeft: 10, fontSize: 14, flex: 1 },
+  checkboxText: { 
+    marginLeft: 10, fontSize: 14, flex: 1 },
 
   button: {
     marginTop: 25,
@@ -245,14 +246,15 @@ const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.5)",
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'flex-end',
+    alignItems: 'flex-end',
+    alignContent:'flex-end'
   },
   modalBox: {
     backgroundColor: "#fff",
     borderRadius: 10,
     padding: 20,
-    width: "90%",
+    width: "100%",
   },
   modalTitle: { fontSize: 18, fontWeight: "bold", marginBottom: 10 },
   modalText: { fontSize: 14, marginBottom: 8, color: "#333" },

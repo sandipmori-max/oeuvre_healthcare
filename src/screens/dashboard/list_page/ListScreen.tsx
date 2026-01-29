@@ -1,4 +1,4 @@
-import { Text, View, TextInput, TouchableOpacity, Alert, Modal, Platform, Animated } from 'react-native';
+import { Text, View, TextInput, TouchableOpacity, Alert, Modal, Platform, Animated, ActivityIndicator } from 'react-native';
 import React, { useEffect, useLayoutEffect, useState, useCallback, useMemo, useRef } from 'react';
 import { RouteProp, useFocusEffect, useNavigation, useRoute } from '@react-navigation/native';
 
@@ -18,6 +18,7 @@ import { handleDeleteActionThunk, handlePageActionThunk } from '../../../store/s
 import MaterialIcons from '@react-native-vector-icons/material-icons';
 import { ERP_COLOR_CODE } from '../../../utils/constants';
 import useTranslations from '../../../hooks/useTranslations';
+import { tags } from 'react-native-svg/lib/typescript/xmlTags';
 
 const ListScreen = () => {
   const navigation = useNavigation();
@@ -44,6 +45,13 @@ const ListScreen = () => {
   const [actionLoaders, setActionLoader] = useState(false);
   const [parsedError, setParsedError] = useState<any>();
   const [apiError, setApiError] = useState<any>(false);
+  const [tapLoader, setTapLoader] = useState(false)
+
+  useEffect(() => {
+    return (() => {
+      setTapLoader(false)
+    })
+  }, [])
 
   const [alertConfig, setAlertConfig] = useState({
     title: '',
@@ -140,11 +148,21 @@ const ListScreen = () => {
     item => item?.datafield && item?.datafield.toLowerCase() === 'id',
   );
 
+    useFocusEffect(
+    useCallback(() => {
+       setTapLoader(false)
+      return () => {
+      };
+    }, [navigation])
+  );
+ 
+
   useLayoutEffect(() => {
+     
     navigation.setOptions({
       headerStyle: {
         backgroundColor: theme === 'dark' ? 'black' : ERP_COLOR_CODE.ERP_APP_COLOR,
-        borderBottomWidth: 1,
+        // borderBottomWidth: 1,
         borderBottomColor: '#fff',
       },
       headerTintColor: '#fff',
@@ -183,7 +201,7 @@ const ListScreen = () => {
           } */}
           {
             !error && <ERPIcon
-              name={!hasDateField ? 'search' : isFilterVisible ? 'filter-alt' : 'filter-alt'}
+              name={!hasDateField ? 'search' : isFilterVisible ? 'close' : 'filter-alt'}
               onPress={() => {
                 setIsFilterVisible(!isFilterVisible);
               }}
@@ -443,7 +461,14 @@ const ListScreen = () => {
   return (
     <View style={[styles.container, theme === 'dark' && { backgroundColor: 'black' }]}>
       {isFilterVisible && (
-        <View>
+        <View style={{
+          backgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR,
+          borderWidth: 1,
+          padding: 8,
+          paddingBottom: 8,
+          borderBottomEndRadius: 12,
+          borderBottomStartRadius: 12
+        }}>
           <View style={styles.searchContainer}>
             <View style={[styles.searchInputContainer,
             theme === 'dark' && {
@@ -638,10 +663,14 @@ const ListScreen = () => {
             onPressIn={onPressIn}
             onPressOut={onPressOut}
             onPress={() => {
+              setTapLoader(true)
               handleItemPressed({}, pageParamsName, pageTitle);
             }}
           >
-            <MaterialIcons size={32} name="add" color={theme === 'dark' ? 'black' : ERP_COLOR_CODE.ERP_WHITE} />
+            {
+
+              tapLoader ? <ActivityIndicator size={'large'} color={'#fff'} /> : <MaterialIcons size={32} name="add" color={theme === 'dark' ? 'black' : ERP_COLOR_CODE.ERP_WHITE} />
+            }
           </TouchableOpacity>
         </Animated.View>
 

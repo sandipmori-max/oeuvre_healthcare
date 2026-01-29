@@ -88,6 +88,10 @@ overlay: {
     padding: 12,
     borderBottomWidth: 1,
     borderBottomColor: ERP_COLOR_CODE.ERP_eee,
+    flexDirection:'row',
+    justifyContent:'space-between',
+    alignContent:'center',
+    alignItems:'center'
   },
   disabledBox: {
     borderWidth: 1,

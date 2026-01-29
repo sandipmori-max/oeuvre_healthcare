@@ -12,6 +12,7 @@ import {
   Image,
   Dimensions,
   ImageBackground,
+  StatusBar,
 } from 'react-native';
 import DeviceInfo from 'react-native-device-info';
 
@@ -122,6 +123,7 @@ const LoginScreen = ({ navigation, route }: any) => {
         style={{ flex: 1, backgroundColor: ERP_COLOR_CODE.ERP_WHITE }}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
+
       <ImageBackground
           source={ERP_GIF.BACK_IMG}
           style={{

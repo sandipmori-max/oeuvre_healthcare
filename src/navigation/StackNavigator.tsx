@@ -17,23 +17,25 @@ import StartupScreen from '../screens/dashboard/startup/StartupScreen';
 import PinSetupScreen from '../screens/dashboard/pinset/Pinset';
 import PinVerifyScreen from '../screens/dashboard/pinset/PinVerify';
 import { useAppSelector } from '../store/hooks';
+import MaterialIcons from '@react-native-vector-icons/material-icons';
 
 const Stack = createStackNavigator<any>();
 
 const StackNavigator = () => {
   const { isPinLoaded } = useAppSelector(state => state?.auth);
   const smoothTransition = {
-    gestureEnabled: false,
+    gestureEnabled: true,
     cardStyleInterpolator: ({ current }) => ({
       cardStyle: {
         opacity: current.progress,
       },
     }),
   };
+ 
 
   const screenOptions = {
     headerShown: true,
-    headerBackImage: () => (
+    headerBackImage: () => ( 
       <Image
         source={ERP_ICON.BACK}
         style={{ width: 24, height: 24, marginLeft: 10, tintColor: 'white' }}
@@ -41,7 +43,6 @@ const StackNavigator = () => {
       />
     ),
     headerStyle: {
-      // headerTitleAlign: 'left',
       backgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR,
     },
     headerTintColor: ERP_COLOR_CODE.ERP_WHITE,
@@ -95,7 +96,7 @@ const StackNavigator = () => {
       <Stack.Screen options={screenOptions} name="Attendance" component={AttendanceScreen} />
       <Stack.Screen options={screenOptions} name="MyAttendance" component={AttendanceScreen} />
       <Stack.Screen options={screenOptions} name="Business" component={DisplayScreen} />
-       {/* <Stack.Screen options={screenOptions} name="File Manager" component={ScanScreen} /> */}
+      {/* <Stack.Screen options={screenOptions} name="File Manager" component={ScanScreen} /> */}
       <Stack.Screen options={screenOptions} name="Privacy Policy" component={PrivacyPolicyScreen} />
       <Stack.Screen options={screenOptions} name="Web" component={WebScreen} />
       <Stack.Screen options={screenOptions} name="Page" component={PageScreen} />
