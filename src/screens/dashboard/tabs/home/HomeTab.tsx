@@ -31,7 +31,7 @@ import {
   Modal,
   Pressable,
   Platform,
-  Image
+  Image,
 } from 'react-native';
 import { ERP_ICON } from '../../../../assets';
 
@@ -53,7 +53,7 @@ const HomeScreen = () => {
     state => state.auth,
   );
 
-
+  
   const [loadingPageId, setLoadingPageId] = useState<any>(null);
   const [isRefresh, setIsRefresh] = useState<boolean>(false);
   const [fromDate, setFromDate] = useState<string>('');
@@ -112,12 +112,12 @@ const HomeScreen = () => {
     ).start();
   }, []);
 
-
+  
   useLayoutEffect(() => {
     navigation.setOptions({
       headerStyle: {
         backgroundColor: theme === 'dark' ? 'black' : ERP_COLOR_CODE.ERP_APP_COLOR,
-        borderBottomWidth: theme === 'dark' ? 1 : 0,
+         borderBottomWidth:  theme === 'dark' ? 1 : 0,
         borderBottomColor: theme === 'dark' ? '#fff' : ERP_COLOR_CODE.ERP_APP_COLOR,
       },
       headerTintColor: '#fff',
@@ -169,14 +169,14 @@ const HomeScreen = () => {
                   setActionLoader(true);
                   setIsRefresh(!isRefresh);
                   dispatch(getERPDashboardThunk({ branch: auth.dashboardBranch, type: auth.dashboardType, fd: auth.dashboardFromDate, td: auth.dashboardToDate }));
-
+                   
                   const timer = setTimeout(() => {
-                    setActionLoader(false);
-                    setControlsLoader(false);
-                    dispatch(setDashboardLoading(false));
-                  }, 3000);
-                  return () => clearTimeout(timer);
-
+                     setActionLoader(false);
+                      setControlsLoader(false);
+                      dispatch(setDashboardLoading(false));
+                    }, 3000);
+                    return () => clearTimeout(timer); 
+                  
                 }}
                 isLoading={actionLoader}
               />
@@ -199,33 +199,33 @@ const HomeScreen = () => {
         <ERPIcon extSize={24} isMenu={true} name="menu" onPress={() => navigation?.openDrawer()} />
       ),
     });
-  }, [actionLoader, navigation, isHorizontal, isRefresh, showSearch, dashboard, searchText, filteredDashboard, isFilterVisible]);
+  }, [actionLoader ,navigation, isHorizontal, isRefresh, showSearch, dashboard, searchText, filteredDashboard, isFilterVisible]);
 
-  useFocusEffect(
-    useCallback(() => {
-      let timer;
+ useFocusEffect(
+  useCallback(() => {
+    let timer;
 
-      if (isAuthenticated) {
-        setLoadingPageId(true);
+    if (isAuthenticated) {
+      setLoadingPageId(true);
 
-        // dispatch(getERPAppConfigMenuThunk());
-        const params = { branch: '', type: '', fd: '', td: '' }
-        dispatch(getERPDashboardThunk(params));
-        dispatch(getERPMenuThunk());
+      // dispatch(getERPAppConfigMenuThunk());
+      const params = {branch: '', type: '', fd: '', td: ''}
+      dispatch(getERPDashboardThunk(params));
+      dispatch(getERPMenuThunk());
 
-        timer = setTimeout(() => {
-          dispatch(setDashboardLoading(false));
-        }, 3000);
+      timer = setTimeout(() => {
+        dispatch(setDashboardLoading(false));
+      }, 3000);
+    }
+
+    // ✅ single cleanup function
+    return () => {
+      if (timer) {
+        clearTimeout(timer);
       }
-
-      // ✅ single cleanup function
-      return () => {
-        if (timer) {
-          clearTimeout(timer);
-        }
-      };
-    }, [isAuthenticated, dispatch])
-  );
+    };
+  }, [isAuthenticated, dispatch])
+);
 
 
   const dummyUpcomingEvents = [];
@@ -433,7 +433,7 @@ const HomeScreen = () => {
   };
 
   const scrollY = useRef(new Animated.Value(0)).current;
-
+  
   const getCurrentMonthRange = useCallback(() => {
     const now = new Date();
     const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -527,10 +527,10 @@ const HomeScreen = () => {
   useEffect(() => {
     dispatch(getERPDashboardThunk({ branch: auth?.dashboardBranch || "", type: auth?.dashboardType || "", fd: auth?.dashboardFromDate || "", td: auth?.dashboardToDate || "" }));
     const timer = setTimeout(() => {
-      dispatch(setDashboardLoading(false));
-    }, 3000);
-    return () => clearTimeout(timer);
-
+    dispatch(setDashboardLoading(false));
+  }, 3000);
+  return () => clearTimeout(timer);
+  
   }, [auth.dashboardBranch, auth.dashboardType, auth.dashboardFromDate, auth.dashboardToDate])
 
   function SmallItem({ left, primary, secondary, type }) {
@@ -561,7 +561,7 @@ const HomeScreen = () => {
     );
   }
 
-  if (isDashboardLoading) return <FullViewLoader />
+  if (isDashboardLoading ) return <FullViewLoader />
   if (!actionLoader && filteredDashboard?.length === 0) {
     return <View
       style={{
@@ -575,16 +575,14 @@ const HomeScreen = () => {
 
       <View
         style={{
-          marginTop: 1,
           backgroundColor: theme === 'dark' ? 'black' : ERP_COLOR_CODE.ERP_APP_COLOR,
           padding: 12,
           // width: width,
           borderBottomRightRadius: 24,
           borderBottomLeftRadius: 24,
-          borderWidth: 1,
           borderColor: 'white',
           width: '100%',
-
+          marginBottom: 10
         }}
       >
         <Animated.View
@@ -931,7 +929,7 @@ const HomeScreen = () => {
                 <ErrorMessage message={error} />{' '}
               </View>
             ) : controls?.length === 0 && !isDashboardLoading ? (
-              <View
+               <View
                 style={{
                   height: Dimensions.get('screen').height * 0.75,
                   justifyContent: 'center',
@@ -956,7 +954,6 @@ const HomeScreen = () => {
                   }}>Welcome</Text>
                 </View>
               </View>
-
             ) : (
               <View style={{
                 backgroundColor: theme === 'dark' ? 'black' : 'white',
@@ -998,6 +995,7 @@ const HomeScreen = () => {
                             }
                             showsVerticalScrollIndicator={false}
                           />
+
                         </View>
 
                         <View style={styles.dashboardSection}>
@@ -1012,7 +1010,8 @@ const HomeScreen = () => {
                             }
                             showsVerticalScrollIndicator={false}
                           />
-                          <View style={{
+
+<View style={{
                             height: 350, width: '100%',
                             alignContent: 'center',
                             alignItems: 'center',
@@ -1030,8 +1029,8 @@ const HomeScreen = () => {
                               fontFamily: "Handlee-Regular",
                             }}>Welcome</Text>
                           </View>
-
                         </View>
+
                         {/* <View>
                     <Animated.FlatList
                       showsVerticalScrollIndicator={false}

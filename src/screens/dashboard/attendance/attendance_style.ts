@@ -2,7 +2,7 @@ import { StyleSheet } from 'react-native';
 import { ERP_COLOR_CODE } from '../../../utils/constants';
 
 export const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: ERP_COLOR_CODE.ERP_WHITE },
+  container: { flex: 1 },
   backBtn: { marginRight: 8 },
   backIcon: { fontSize: 20, color: ERP_COLOR_CODE.ERP_222 },
   dateContainer: {
@@ -55,7 +55,7 @@ export const styles = StyleSheet.create({
   },
   dateRow: {
     flex: 1,
-    marginRight: 8,
+
   },
   dateLabel: {
     fontSize: 14,
@@ -70,6 +70,7 @@ export const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: ERP_COLOR_CODE.ERP_BORDER_LINE,
     alignItems: 'center',
+    width: '98%'
   },
   dateButtonText: {
     fontSize: 14,

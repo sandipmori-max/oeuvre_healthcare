@@ -102,7 +102,7 @@ const CustomPicker = ({
 
   return (
     <View style={{ marginBottom: 16 }}>
-      
+
       {/* Label */}
       {!isForceOpen && (
         <Text style={{ color: 'white', marginBottom: 4 }}>{label}</Text>
@@ -136,30 +136,30 @@ const CustomPicker = ({
           styles.pickerBox,
           item?.disabled === '1' && styles.disabledBox,
           item?.disabled === '1' && theme === 'dark' && {
-                      backgroundColor: DARK_COLOR,
-                      borderWidth: 1,
-                    },
+            backgroundColor: DARK_COLOR,
+            borderWidth: 1,
+          },
           isForceOpen &&
-            errors[item?.field] && {
-              borderColor: ERP_COLOR_CODE.ERP_ERROR,
-            },
+          errors[item?.field] && {
+            borderColor: ERP_COLOR_CODE.ERP_ERROR,
+          },
           isForceOpen &&
-            isValidate &&
-            item?.mandatory === '1' &&
-            selectedOption && {
-              borderColor: 'green',
-              borderWidth: 0.8,
-            },
+          isValidate &&
+          item?.mandatory === '1' &&
+          selectedOption && {
+            borderColor: 'green',
+            borderWidth: 0.8,
+          },
           isForceOpen &&
-            theme === 'dark' && {
-              backgroundColor: DARK_COLOR,
-            },
-            item?.background && {
-              backgroundColor: item?.background
-            },
-            theme === 'dark' && {
-              backgroundColor: 'black',
-            },
+          theme === 'dark' && {
+            backgroundColor: DARK_COLOR,
+          },
+          item?.background && {
+            backgroundColor: item?.background
+          },
+          theme === 'dark' && {
+            backgroundColor: 'black',
+          },
         ]}
         onPress={() => {
           if (item?.disabled !== '1') handleOpen();
@@ -173,9 +173,9 @@ const CustomPicker = ({
               theme === 'dark'
                 ? 'white'
                 : selectedOption
-                ? ERP_COLOR_CODE.ERP_BLACK
-                : ERP_COLOR_CODE.ERP_888,
-            flex: 1,            
+                  ? ERP_COLOR_CODE.ERP_BLACK
+                  : ERP_COLOR_CODE.ERP_888,
+            flex: 1,
           }}
         >
           {selectedOption || `Select ${label}`}
@@ -211,29 +211,29 @@ const CustomPicker = ({
             borderColor: theme === 'dark' ? 'white' : 'black',
           }}
         >
-          <View style={{flexDirection:'row', justifyContent:'space-between', padding : 12}}>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', padding: 4 }}>
             <Text
-            style={{
-              color: theme === 'dark' ? 'white' : ERP_COLOR_CODE.ERP_BLACK,
-              fontSize: 16,
-              fontWeight: '600',
-              marginBottom: 12,
-            }}
-          >
-            {t("text.text34")} {label}
-          </Text>
+              style={{
+                color: theme === 'dark' ? 'white' : ERP_COLOR_CODE.ERP_BLACK,
+                fontSize: 16,
+                fontWeight: '800',
+                marginBottom: 2,
+              }}
+            >
+              {t("text.text34")} {label}
+            </Text>
 
-           <TouchableOpacity
-           onPress={()=>{
-            setOpen(false)
-           }}
-           >
-            <MaterialIcons
-          name={'close'}
-          size={24}
-          color={ERP_COLOR_CODE.ERP_555}
-        />
-           </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                setOpen(false)
+              }}
+            >
+              <MaterialIcons
+                name={'close'}
+                size={24}
+                color={ERP_COLOR_CODE.ERP_555}
+              />
+            </TouchableOpacity>
           </View>
 
           {loader ? (
@@ -249,42 +249,54 @@ const CustomPicker = ({
                       {
                         backgroundColor:
                           selectedOption === opt?.name
-                            ? ERP_COLOR_CODE.ERP_APP_COLOR
+                            ? ERP_COLOR_CODE.ERP_F8F9FA
                             : ERP_COLOR_CODE.ERP_WHITE,
                         marginBottom: 4,
                         borderRadius: 8,
                         padding: 12,
+
                       },
                       theme === 'dark' &&
-                        selectedOption === opt?.name && {
-                          backgroundColor: 'white',
-                        },
+                      selectedOption === opt?.name && {
+                        backgroundColor: 'white',
+                      },
                       theme === 'dark' && {
                         backgroundColor: 'black',
                       },
                     ]}
                     onPress={() => {
-                      if(!isForceOpen){
-                      onValueChange(opt);
-                      }else{
-                      onValueChange(opt?.value);
+                      if (!isForceOpen) {
+                        onValueChange(opt);
+                      } else {
+                        onValueChange(opt?.value);
                       }
                       setSelectedOption(opt?.name);
                       closeBottomSheet();
                     }}
                   >
                     <Text
-                      style={{
-                        color:
-                          theme === 'dark'
-                            ? 'white'
-                            : selectedOption === opt?.name
-                            ? ERP_COLOR_CODE.ERP_WHITE
-                            : ERP_COLOR_CODE.ERP_BLACK,
-                      }}
+                      style={[
+                        {
+                          color:
+                            theme === 'dark'
+                              ? 'white'
+                              : selectedOption === opt?.name
+                                ? ERP_COLOR_CODE.ERP_APP_COLOR
+                                : ERP_COLOR_CODE.ERP_BLACK,
+
+                        },
+                        selectedOption === opt?.name && {
+                          fontSize: 16,
+                          fontWeight: '600'
+                        }
+                      ]}
+
                     >
                       {opt?.name}
                     </Text>
+                    {
+                      selectedOption === opt?.name && <MaterialIcons name='done' size={24} color={ERP_COLOR_CODE.ERP_APP_COLOR} />
+                    }
                   </TouchableOpacity>
                 ))
               ) : (
@@ -299,8 +311,6 @@ const CustomPicker = ({
                   <Text style={{ color: theme === 'dark' ? 'white' : 'black' }}>
                     {t("text.text20")}
                   </Text>
- 
-                  
                 </View>
               )}
             </ScrollView>
@@ -310,7 +320,7 @@ const CustomPicker = ({
 
       {/* Error */}
       {isForceOpen && errors[item?.field] && (
-                <InputError error = {errors[item?.field]}/>
+        <InputError error={errors[item?.field]} />
 
       )}
     </View>

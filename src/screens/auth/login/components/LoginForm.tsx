@@ -115,7 +115,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
         );
       } else {
         showAlert({
-          title: t('auth.error'),
+          title: "Authentication failed",
           message: loginResult?.message || t('auth.loginFailed'),
           type: 'error',
         });
@@ -142,7 +142,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
       >
         {({ handleChange, handleBlur, values, errors, touched, handleSubmit }) => (
           <>
-            {['user', 'password'].map((field, index) => (
+            {[ 'user', 'password'].map((field, index) => (
               <Animated.View
                 key={field}
                 style={{

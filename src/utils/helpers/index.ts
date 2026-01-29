@@ -4,8 +4,6 @@ import moment from 'moment';
 import { Dimensions, Linking, PermissionsAndroid, Platform } from 'react-native';
 import RNFS from 'react-native-fs';
 import FastImage from 'react-native-fast-image';
-import DeviceInfo from 'react-native-device-info';
-import axios from 'axios';
 
 export const getBottomTabIcon = (iconName: string, focused: boolean) => {
   switch (iconName) {
@@ -45,14 +43,20 @@ export const firstLetterUpperCase = (str: string): string => {
   return str.charAt(0).toUpperCase() + str.slice(1);
 };
 
-export const getGifSource = (type: 'error' | 'success' | 'info') => {
+export const getGifSource = (type: 'error' | 'success' | 'info' | 'location' | 'confirmation' | 'exit') => {
   switch (type) {
     case 'error':
       return ERP_GIF.ERROR;
+    case 'location':
+      return ERP_GIF.LOCATION;
     case 'success':
       return ERP_GIF.SUCCESS;
+     case 'confirmation':
+      return ERP_ICON.ALERT;
+       case 'exit':
+      return ERP_ICON.EXITS;
     default:
-      return ERP_GIF.SEARCH_LOADER;
+      return ERP_GIF.SUCCESS;
   }
 };
 
@@ -468,7 +472,7 @@ export async function requestLocationPermissions(): Promise<
       return 'denied';
     }
   }
-  return 'granted'; 
+  return 'granted';
 }
 
 
@@ -603,11 +607,11 @@ export const goToSettings = () => {
 };
 
 export const handlePhonePress = (phoneNumber: string) => {
-      Linking.openURL(`tel:${phoneNumber}`);
+  Linking.openURL(`tel:${phoneNumber}`);
 };
-  
-export  const handleEmailPress = (emailAddress: any) => {
-      Linking.openURL(`mailto:${emailAddress}`);
+
+export const handleEmailPress = (emailAddress: any) => {
+  Linking.openURL(`mailto:${emailAddress}`);
 };
 export const handleLocationPress = (location: string) => {
   if (!location) return;
@@ -670,14 +674,55 @@ const operators = {
   isBeforeDate: (a, b) => new Date(a) < new Date(b),
   isAfterDate: (a, b) => new Date(a) > new Date(b),
 
-  locationWithin : (a, b, meters = 50) => {
-  if (!a || !b) return false;
+  locationWithin: (a, b, meters = 50) => {
+    if (!a || !b) return false;
 
-  const [lat1, lon1] = a.split(',').map(Number);
-  const [lat2, lon2] = b.split(',').map(Number);
+    const [lat1, lon1] = a.split(',').map(Number);
+    const [lat2, lon2] = b.split(',').map(Number);
 
-  return getDistanceInMeters(lat1, lon1, lat2, lon2) <= meters;
-}
+    return getDistanceInMeters(lat1, lon1, lat2, lon2) <= meters;
+  },
+  between: (a, min, max) => {
+    const num = Number(a);
+    return num >= Number(min) && num <= Number(max);
+  },
+
+  notBetween: (a, min, max) => {
+    const num = Number(a);
+    return num < Number(min) || num > Number(max);
+  },
+
+  isNumber: (a) => !isNaN(a) && a !== null && a !== '',
+  equalsIgnoreCase: (a, b) =>
+    typeof a === 'string' && typeof b === 'string' &&
+    a.toLowerCase() === b.toLowerCase(),
+
+  notContainsString: (a, b) =>
+    typeof a === 'string' && typeof b === 'string' && !a.includes(b),
+
+  stringLengthEquals: (a, b) =>
+    typeof a === 'string' && a.length === Number(b),
+
+  stringLengthGreaterThan: (a, b) =>
+    typeof a === 'string' && a.length > Number(b),
+
+  stringLengthLessThan: (a, b) =>
+    typeof a === 'string' && a.length < Number(b),
+  isToday: (a) => {
+    const d = new Date(a);
+    const t = new Date();
+    return d.toDateString() === t.toDateString();
+  },
+
+  isPast: (a) => new Date(a) < new Date(),
+
+  isFuture: (a) => new Date(a) > new Date(),
+
+  daysDifferenceGreaterThan: (a, b) => {
+    const diff = Math.abs(new Date(a) - new Date());
+    return diff / (1000 * 60 * 60 * 24) > Number(b);
+  },
+
 };
 
 const getDistanceInMeters = (lat1, lon1, lat2, lon2) => {
@@ -688,9 +733,9 @@ const getDistanceInMeters = (lat1, lon1, lat2, lon2) => {
   const a =
     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
     Math.cos(lat1 * Math.PI / 180) *
-      Math.cos(lat2 * Math.PI / 180) *
-      Math.sin(dLon / 2) *
-      Math.sin(dLon / 2);
+    Math.cos(lat2 * Math.PI / 180) *
+    Math.sin(dLon / 2) *
+    Math.sin(dLon / 2);
 
   return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
 };
@@ -844,7 +889,7 @@ export const applyActionsToControls = (controls, actions) => {
         case "enable":
           return { ...updatedCtrl, disabled: "0" };
         case "setValue":
-          return { ...updatedCtrl, text: action.value , };
+          return { ...updatedCtrl, text: action.value, dtext: action.value, };
         case "setBoolValue":
           return { ...updatedCtrl, text: action.value, field: action.value };
         default:

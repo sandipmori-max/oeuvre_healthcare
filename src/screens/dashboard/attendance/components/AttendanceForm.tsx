@@ -302,7 +302,7 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
                 navigation?.goBack();
                 setAlertVisible(false);
                 dispatch(setReloadApp())
-              }, 1000);
+              }, 1800);
             })
             .catch(err => {
               setAttendanceDone(false);

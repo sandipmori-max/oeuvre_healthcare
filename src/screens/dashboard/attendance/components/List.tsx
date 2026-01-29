@@ -34,8 +34,6 @@ import {
 import DetailsBottomSheet from './DetailsModal';
 import useTranslations from '../../../../hooks/useTranslations';
 
-
-
 const styles = StyleSheet.create({
   recordCard: {
     backgroundColor: ERP_COLOR_CODE.ERP_WHITE,
@@ -418,10 +416,7 @@ const styles = StyleSheet.create({
                         const selectedData = listData?.find(
                           d => normalizeDate(d?.date) === day?.dateString,
                         );
-                        Alert.alert(
-                          `${t("text.text19")} ${day?.dateString}`,
-                          selectedData ? JSON.stringify(selectedData, null, 2) : t("text.text20"),
-                        );
+                       openDetails(selectedData)
                       }}
                       markingType={'custom'}
                       markedDates={markedDates}
@@ -769,7 +764,8 @@ const styles = StyleSheet.create({
               )}
             </>
           )}
-        /> : <>
+        /> : 
+        <>
           <View style={{
             height: Dimensions.get('screen').height * 0.75,
             flex: 1, justifyContent: 'center', alignContent: 'center', alignItems: 'center'

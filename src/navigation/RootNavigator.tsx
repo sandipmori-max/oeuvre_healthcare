@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
   PermissionsAndroid,
   Platform,
@@ -20,10 +20,9 @@ import FullViewLoader from '../components/loader/FullViewLoader';
 import DeviceInfo from 'react-native-device-info';
 import CustomAlert from '../components/alert/CustomAlert';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useFocusEffect } from '@react-navigation/native';
 import { ERP_COLOR_CODE } from '../utils/constants';
 import { changeLanguage } from '../i18n';
-import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
+import { request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 import { getLastPunchInThunk } from '../store/slices/attendance/thunk';
 import { setReloadApp } from '../store/slices/reloadApp/reloadAppSlice';
 import { updatePinVerifyLoadedState } from '../store/slices/auth/authSlice';
@@ -90,7 +89,7 @@ const RootNavigator = () => {
   const [alertConfig, setAlertConfig] = useState({
     title: '',
     message: '',
-    type: 'error' as 'error' | 'success' | 'info',
+    type: 'error' as 'error' | 'success' | 'info' | 'location',
   });
 
   const locationModalShownRef = useRef(false);
@@ -99,54 +98,52 @@ const RootNavigator = () => {
   const locationServiceIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const gpsModalShownRef = useRef(false);
 
-
   const checkLocationServiceOnly = async () => {
-  if (!isAuthenticated) return;
+    if (!isAuthenticated) return;
 
-  const enabled = await DeviceInfo.isLocationEnabled();
+    const enabled = await DeviceInfo.isLocationEnabled();
 
-  // GPS OFF → show modal once & stop features
-  if (!enabled && !gpsModalShownRef.current) {
-    setAlertConfig({
-      title: 'Location service disabled (GPS OFF)',
-      message: LOCATION_MESSAGES.SERVICE_DISABLED,
-      type: 'error',
-    });
+    // GPS OFF → show modal once & stop features
+    if (!enabled && !gpsModalShownRef.current) {
+      setAlertConfig({
+        title: 'Location service disabled (GPS OFF)',
+        message: LOCATION_MESSAGES.SERVICE_DISABLED,
+        type: 'location',
+      });
 
-    setAlertVisible(true);
-    setOpenSettings(false);
-    setBackgroundDeniedModal(false);
+      setAlertVisible(true);
+      setOpenSettings(false);
+      setBackgroundDeniedModal(false);
 
-    gpsModalShownRef.current = true;
-    locationModalShownRef.current = true; // reuse existing stop-flow logic
-    return;
-  }
+      gpsModalShownRef.current = true;
+      locationModalShownRef.current = true; // reuse existing stop-flow logic
+      return;
+    }
 
-  // GPS ON again → reset flags & resume
-  if (enabled && gpsModalShownRef.current) {
-    gpsModalShownRef.current = false;
-    locationModalShownRef.current = false;
-    setAlertVisible(false);
-  }
-};
-
-
-useEffect(() => {
-  if (!isAuthenticated) return;
-
-  // Start checking every 1 second
-  locationServiceIntervalRef.current = setInterval(() => {
-    checkLocationServiceOnly();
-  }, 1000);
-
-  return () => {
-    // Cleanup on logout / unmount
-    if (locationServiceIntervalRef.current) {
-      clearInterval(locationServiceIntervalRef.current);
-      locationServiceIntervalRef.current = null;
+    // GPS ON again → reset flags & resume
+    if (enabled && gpsModalShownRef.current) {
+      gpsModalShownRef.current = false;
+      locationModalShownRef.current = false;
+      setAlertVisible(false);
     }
   };
-}, [isAuthenticated]);
+
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
+    // Start checking every 1 second
+    locationServiceIntervalRef.current = setInterval(() => {
+      checkLocationServiceOnly();
+    }, 1000);
+
+    return () => {
+      // Cleanup on logout / unmount
+      if (locationServiceIntervalRef.current) {
+        clearInterval(locationServiceIntervalRef.current);
+        locationServiceIntervalRef.current = null;
+      }
+    };
+  }, [isAuthenticated]);
   const app_id = user?.app_id;
 
   useEffect(() => {
@@ -167,6 +164,7 @@ useEffect(() => {
     };
     fetchDeviceName();
   }, [dispatch,]);
+
   // ------------------------- AppState Listener -------------------------
   useEffect(() => {
     const handleAppStateChange = async nextAppState => {
@@ -189,7 +187,6 @@ useEffect(() => {
   }, [langCode]);
 
   // ------------------------- Device Setup -------------------------
-
   const init = async () => {
     const name = await DeviceInfo.getDeviceName();
     await AsyncStorage.setItem('device', name);
@@ -197,25 +194,39 @@ useEffect(() => {
     await dispatch(checkAuthStateThunk());
   };
 
-
   // ------------------------- Check Location -------------------------
   const checkLocation = async () => {
+    console.log("isAuthenticated ---------------- ", isAuthenticated)
     if (!isAuthenticated) return;
 
     const enabled = await DeviceInfo.isLocationEnabled();
+    console.log("enabled ---------------- ", enabled)
+
     const permission = await requestLocationPermissions();
+    console.log("permission ---------------- ", permission)
 
     if (enabled && permission === 'granted') {
       locationModalShownRef.current = false;
       setAlertVisible(false);
       setBackgroundDeniedModal(false);
+      console.log("testtetseteeee------------------------------------accounts", accounts, user)
 
       if (accounts.length) {
-        const data = accounts.map(u => ({
-          token: u.user.token,
-          link: u.user.companyLink.replace(/^https:\/\//i, 'http://'),
-        }));
-        console.log("testtetseteeee")
+        const data = accounts
+          .map(u => {
+            if (user?.id.toString() === u?.user?.id.toString()) {
+              return {
+                token: u.user.token,
+                link: u.user.companyLink.replace(/^https:\/\//i, 'http://'),
+              };
+            }
+            return null;
+          })
+          .filter(Boolean);
+
+        console.log(data);
+
+        console.log("data------------------+++++++++++------------------", data)
         NativeModules.LocationModule.setUserTokens(data);
         NativeModules.LocationModule.startService();
         console.log("testtetseteeee")
@@ -238,7 +249,7 @@ useEffect(() => {
         setAlertConfig({
           title: 'Location service disabled (GPS OFF)',
           message: LOCATION_MESSAGES.SERVICE_DISABLED,
-          type: 'error',
+          type: 'location',
         });
 
         setAlertVisible(true);
@@ -253,7 +264,7 @@ useEffect(() => {
         setAlertConfig({
           title: 'Permission Denied',
           message: LOCATION_MESSAGES.PERMISSION_DENIED,
-          type: 'error',
+          type: 'location',
         });
 
         setAlertVisible(true);
@@ -265,27 +276,27 @@ useEffect(() => {
     }
   };
 
-
-  useEffect(()=>{
+  useEffect(() => {
     init();
-    return(()=>{
+    return (() => {
       dispatch(setReloadApp())
       dispatch(updatePinVerifyLoadedState(false))
     })
-  },[])
+  }, [])
+
   // ------------------------- Focus -------------------------
-   useEffect(() => {
-      setTimeout(async () => {
-        if (isAuthenticated) {
-          // dispatch(getERPAppConfigMenuThunk())
-          
-         try {
-           dispatch(getLastPunchInThunk())
+  useEffect(() => {
+    if (isAuthenticated) {
+      // Optional: cancel timeout if component unmounts
+      const timer = setTimeout(() => {
+        try {
+          dispatch(getLastPunchInThunk())
             .unwrap()
             .then(res => {
               if (res?.success === 1 || res?.success === '1') {
+                console.log("res-----------------------+++++++++++++++++++++++++++++++++++++++------------------------------+++++++");
                 checkLocation();
-              }else{
+              } else {
                 setAlertVisible(false);
                 setOpenSettings(false);
                 setBackgroundDeniedModal(false);
@@ -300,12 +311,14 @@ useEffect(() => {
               NativeModules.LocationModule.setUserTokens([]);
               NativeModules.LocationModule.stopService();
             });
-         } catch (error) {
-          
-         }
+        } catch (error) {
+          console.log(error);
         }
-      }, 1200)
-    }, [isAuthenticated,reLoading])
+      }, 2500);
+      // Cleanup to avoid memory leaks
+      return () => clearTimeout(timer);
+    }
+  }, [isAuthenticated, reLoading]);
 
   // ------------------------- Render -------------------------
   if (isLoading) return <FullViewLoader />;

@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Text, Image, Animated } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 
-import { ERP_ICON } from '../../assets';
+import { ERP_GIF, ERP_ICON } from '../../assets';
 import { styles } from './error_style';
 import { ErrorMessageProps } from '../types';
 import { useAppSelector } from '../../store/hooks';
@@ -13,7 +13,6 @@ const ErrorMessage: React.FC<ErrorMessageProps> = ({ message, visible = true }) 
   const opacity = useRef(new Animated.Value(0)).current;
   const imageTranslateX = useRef(new Animated.Value(-15)).current;
   const textTranslateX = useRef(new Animated.Value(15)).current;
-
   const [shouldRender, setShouldRender] = useState(false);
 
   // 🔁 Reset values on screen focus
@@ -91,7 +90,6 @@ const ErrorMessage: React.FC<ErrorMessageProps> = ({ message, visible = true }) 
           { transform: [{ translateX: imageTranslateX }] },
         ]}
       />
-
       <Animated.Text
         style={[
           styles.errorText,

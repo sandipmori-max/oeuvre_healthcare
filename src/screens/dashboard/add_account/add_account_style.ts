@@ -5,7 +5,7 @@ export const styles = StyleSheet.create({
   container: {
     marginTop: Platform.OS === 'ios' ? 40 : 10,
     flex: 1,
-    backgroundColor: ERP_COLOR_CODE.ERP_WHITE,
+    // backgroundColor: ERP_COLOR_CODE.ERP_WHITE,
   },
   iconWrapper: {
     flexDirection: 'row',
@@ -25,6 +25,7 @@ export const styles = StyleSheet.create({
     padding: 12,
      borderBottomWidth: 1,
     borderBottomColor: ERP_COLOR_CODE.ERP_e0e0e0,
+    marginTop: Platform?.OS === 'android' ? 25 : 45
   },
   title: {
     fontSize: 18,

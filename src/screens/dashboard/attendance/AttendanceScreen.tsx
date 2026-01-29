@@ -149,17 +149,17 @@ const AttendanceScreen = () => {
       .unwrap()
       .then(res => {
         setResData(res);
-       
-        setActionLoader(false); 
+
+        setActionLoader(false);
         setError(null);
-         setIsLoading(false);
+        setIsLoading(false);
 
       })
       .catch(err => {
-        
+
         setActionLoader(false);
         setError(err);
-         setIsLoading(false);
+        setIsLoading(false);
 
       });
   };
@@ -208,179 +208,196 @@ const AttendanceScreen = () => {
     setShowDatePicker(null);
   };
 
+  if (isLoading) {
+    return (
+      <View
+        style={{
+          justifyContent: 'center',
+          alignContent: 'center',
+          alignItems: 'center',
+          height: Dimensions.get('screen').height * 0.85,
+
+        }}
+      >
+        <FullViewLoader />
+      </View>
+    )
+  }
   return (
     <TouchableWithoutFeedback
       onPress={() => {
         Keyboard.dismiss();
       }}
     >
-      <ScrollView showsVerticalScrollIndicator={false} style={[styles.container, theme === 'dark' && { backgroundColor: 'black' }]}>
-        {isLoading ? (
-          <View
-            style={{
-              flex: 1,
-              justifyContent: 'center',
-              alignContent: 'center',
-              alignItems: 'center',
-              height: Dimensions.get('screen').height * 0.85,
-            }}
-          >
-            <FullViewLoader />
-          </View>
-        ) : (
-          <>
-            {isListVisible && showDateFilter && (
-              <View style={[styles.dateContainer, theme === 'dark' && {
-                backgroundColor: 'black'
-              }]}>
-                <View style={[styles.dateRow, theme === 'dark' && {
+      <View
+        style={[
+          {
+            height: Dimensions.get('screen').height,
+            width: Dimensions.get('screen').width,
+            flex: 1,
+            backgroundColor:'white'
+          },
+          theme === 'dark' && { backgroundColor: 'black' }]}
+      >
+        {isListVisible && showDateFilter && (
+          <View style={[styles.dateContainer, theme === 'dark' && {
+            backgroundColor: 'black'
+          },
+          
+          ]}>
+            <View style={[styles.dateRow, theme === 'dark' && {
+              backgroundColor: 'black'
+            },
+            
+            
+            ]}>
+
+              <TouchableOpacity
+                onPress={() => setShowDatePicker({ type: 'from', show: true })}
+                style={[styles.dateButton, theme === 'dark' && {
                   backgroundColor: 'black'
-                }]}>
-
-                  <TouchableOpacity
-                    onPress={() => setShowDatePicker({ type: 'from', show: true })}
-                    style={[styles.dateButton, theme === 'dark' && {
-                      backgroundColor: 'black'
-                    }]}
-                  >
-                    <View style={{ flexDirection: "row", alignItems: "center" }}>
-                      <MaterialIcons
-                        name="calendar-today"
-                        size={18}
-                        color={ theme === 'dark' ? '#fff' : "#000"}
-                        style={{ marginRight: 8 }}
-                      />
-                      <Text style={[styles.dateButtonText,
-                      {
-                        color: theme === 'dark' ? '#fff' : "#000"
-
-                      }
-                      ]}>{fromDate || t("text.text27")}</Text>
-                    </View>
-
-
-                  </TouchableOpacity>
-                </View>
-                <View style={[styles.dateRow, theme === 'dark' && {
-                  backgroundColor: 'black'
-                }]}>
-
-                  <TouchableOpacity
-                    onPress={() => setShowDatePicker({ type: 'to', show: true })}
-                    style={[styles.dateButton, theme === 'dark' && {
-                      backgroundColor: 'black'
-                    }]}
-                  >
-                    <View style={{ flexDirection: "row", alignItems: "center" }}>
-                      <MaterialIcons
-                        name="calendar-today"
-                        size={18}
-                        color={ theme === 'dark' ? '#fff' : "#000"}
-                        style={{ marginRight: 8 }}
-                      />
-                      <Text style={[styles.dateButtonText, {
-                        color: theme === 'dark' ? '#fff' : "#000"
-
-                      }]}>{toDate || ''}</Text>
-                    </View>
-
-                  </TouchableOpacity>
-                </View>
-              </View>
-            )}
-
-            {showDatePicker?.show && Platform.OS === 'ios' && (
-              <Modal transparent animationType="slide" statusBarTranslucent>
-                <View style={styles.overlay}>
-                  <View style={styles.sheet}>
-                    {/* Divider */}
-                    <View style={styles.divider} />
-
-                    {/* Date Picker */}
-                    <DateTimePicker
-                      value={
-                        showDatePicker.type === 'from' && fromDate
-                          ? parseCustomDate(fromDate)
-                          : showDatePicker.type === 'to' && toDate
-                            ? parseCustomDate(toDate)
-                            : new Date()
-                      }
-                      mode="date"
-                      display="spinner"
-                      onChange={handleDateChange}
-                      style={styles.picker}
-                    />
-                  </View>
-                </View>
-              </Modal>
-
-            )}
-
-
-
-            {Platform.OS !== 'ios' && showDatePicker?.show && (
-              <DateTimePicker
-                value={
-                  showDatePicker?.type === 'from' && fromDate
-                    ? parseCustomDate(fromDate)
-                    : showDatePicker?.type === 'to' && toDate
-                      ? parseCustomDate(toDate)
-                      : new Date()
-                }
-                mode="date"
-                display="spinner"
-                is24Hour={false}
-                onChange={handleDateChange}
-
-              />
-            )}
-            {isListVisible ? (
-              <View style={{ flex: 1,height: '100%' }}>
-                 
-              <List
-                  selectedMonth={formattedMonth}
-                  showFilter={showFilter}
-                  fromDate={fromDate}
-                  toDate={toDate}
-                />
-
-                {showPicker && (
-                  <DateTimePicker
-                    value={selectedDate}
-                    mode="date"
-                    display="spinner"
-                    is24Hour={false}
-                    onChange={onChangeDate}
-                  />
-                )}
-              </View>
-            ) : (
-              <View
-                style={[
-                  {
-                     height: Dimensions.get('screen').height,
-                                          width: Dimensions.get('screen').width,
-                                          flex: 1 
-                  },
-                  theme === 'dark' && { backgroundColor: 'black' }]}
+                }]}
               >
-                <ImageBackground
-                              source={ERP_GIF.BACK_IMG}
-                              resizeMode='cover'
-                               style={{
-                                          height: Dimensions.get('screen').height * 0.85,
-                                          width: Dimensions.get('screen').width,
-                                          flex: 1 
-                                        }}
-                            >
-                <AttendanceForm setBlockAction={setBlockAction} resData={resData} />
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                  <MaterialIcons
+                    name="calendar-today"
+                    size={18}
+                    color={theme === 'dark' ? '#fff' : "#000"}
+                    style={{ marginRight: 8 }}
+                  />
+                  <Text style={[styles.dateButtonText,
+                  {
+                    color: theme === 'dark' ? '#fff' : "#000"
 
-                            </ImageBackground>
-              </View>
-            )}
-          </>
+                  }
+                  ]}>{fromDate || t("text.text27")}</Text>
+                </View>
+
+
+              </TouchableOpacity>
+            </View>
+            <View style={[styles.dateRow, theme === 'dark' && {
+              backgroundColor: 'black'
+            }]}>
+
+              <TouchableOpacity
+                onPress={() => setShowDatePicker({ type: 'to', show: true })}
+                style={[styles.dateButton, theme === 'dark' && {
+                  backgroundColor: 'black'
+                }]}
+              >
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                  <MaterialIcons
+                    name="calendar-today"
+                    size={18}
+                    color={theme === 'dark' ? '#fff' : "#000"}
+                    style={{ marginRight: 8 }}
+                  />
+                  <Text style={[styles.dateButtonText, {
+                    color: theme === 'dark' ? '#fff' : "#000"
+
+                  }]}>{toDate || ''}</Text>
+                </View>
+
+              </TouchableOpacity>
+            </View>
+          </View>
         )}
-      </ScrollView>
+
+        {showDatePicker?.show && Platform.OS === 'ios' && (
+          <Modal transparent animationType="slide" statusBarTranslucent>
+            <View style={styles.overlay}>
+              <View style={styles.sheet}>
+                {/* Divider */}
+                <View style={styles.divider} />
+
+                {/* Date Picker */}
+                <DateTimePicker
+                  value={
+                    showDatePicker.type === 'from' && fromDate
+                      ? parseCustomDate(fromDate)
+                      : showDatePicker.type === 'to' && toDate
+                        ? parseCustomDate(toDate)
+                        : new Date()
+                  }
+                  mode="date"
+                  display="spinner"
+                  onChange={handleDateChange}
+                  style={styles.picker}
+                />
+              </View>
+            </View>
+          </Modal>
+
+        )}
+
+        {Platform.OS !== 'ios' && showDatePicker?.show && (
+          <DateTimePicker
+            value={
+              showDatePicker?.type === 'from' && fromDate
+                ? parseCustomDate(fromDate)
+                : showDatePicker?.type === 'to' && toDate
+                  ? parseCustomDate(toDate)
+                  : new Date()
+            }
+            mode="date"
+            display="spinner"
+            is24Hour={false}
+            onChange={handleDateChange}
+
+          />
+        )}
+        {
+          isListVisible ? <>
+
+            <View style={{ flex: 1,
+              width:'100%',
+              backgroundColor:'white',
+              height: '100%' }}>
+              <List
+                selectedMonth={formattedMonth}
+                showFilter={showFilter}
+                fromDate={fromDate}
+                toDate={toDate}
+              />
+              {showPicker && (
+                <DateTimePicker
+                  value={selectedDate}
+                  mode="date"
+                  display="spinner"
+                  is24Hour={false}
+                  onChange={onChangeDate}
+                />
+              )}
+            </View>
+          </> : <>
+            <ImageBackground
+              source={ERP_GIF.BACK_IMG}
+              resizeMode='cover'
+              style={{
+                height: Dimensions.get('screen').height * 0.85,
+                width: Dimensions.get('screen').width,
+                flex: 1
+              }}
+            >
+              <ScrollView showsVerticalScrollIndicator={false} style={[styles.container, theme === 'dark' && { backgroundColor: 'black' }]}>
+
+
+                <>
+
+
+
+                  <AttendanceForm setBlockAction={setBlockAction} resData={resData} />
+
+
+                </>
+              </ScrollView>
+            </ImageBackground>
+          </>
+        }
+
+      </View>
+
     </TouchableWithoutFeedback>
   );
 };
