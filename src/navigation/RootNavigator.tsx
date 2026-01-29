@@ -26,6 +26,7 @@ import { changeLanguage } from '../i18n';
 import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 import { getLastPunchInThunk } from '../store/slices/attendance/thunk';
 import { setReloadApp } from '../store/slices/reloadApp/reloadAppSlice';
+import { updatePinVerifyLoadedState } from '../store/slices/auth/authSlice';
 
 // ------------------------- Location Permission Helper -------------------------
 export async function requestLocationPermissions(): Promise<
@@ -80,7 +81,6 @@ const RootNavigator = () => {
 
   const { isLoading, isAuthenticated, accounts, user, appColorCode } = useAppSelector(state => state.auth);
   const { reLoading } = useAppSelector(state => state.reloadApp);
-  console.log("res reLoading =======================================", reLoading);
 
   const langCode = useAppSelector(state => state.theme.langcode);
 
@@ -147,8 +147,26 @@ useEffect(() => {
     }
   };
 }, [isAuthenticated]);
+  const app_id = user?.app_id;
 
+  useEffect(() => {
+    const fetchDeviceName = async () => {
+      const name = await DeviceInfo.getDeviceName();
+      let appid = await AsyncStorage.getItem('appid');
+      if (!appid) {
+        appid = app_id;
+        await AsyncStorage.setItem('appid', appid || '');
+      }
+      await AsyncStorage.setItem('device', name);
 
+      DevERPService.initialize();
+      DevERPService.setAppId(appid || '');
+      DevERPService.setDevice(name);
+
+      dispatch(checkAuthStateThunk());
+    };
+    fetchDeviceName();
+  }, [dispatch,]);
   // ------------------------- AppState Listener -------------------------
   useEffect(() => {
     const handleAppStateChange = async nextAppState => {
@@ -176,9 +194,7 @@ useEffect(() => {
     const name = await DeviceInfo.getDeviceName();
     await AsyncStorage.setItem('device', name);
     await DevERPService.initialize();
-    setTimeout(async () =>{
-      await dispatch(checkAuthStateThunk());
-    }, 1200)
+    await dispatch(checkAuthStateThunk());
   };
 
 
@@ -194,13 +210,16 @@ useEffect(() => {
       setAlertVisible(false);
       setBackgroundDeniedModal(false);
 
-      if (accounts.length && Platform.OS === 'android') {
+      if (accounts.length) {
         const data = accounts.map(u => ({
           token: u.user.token,
           link: u.user.companyLink.replace(/^https:\/\//i, 'http://'),
         }));
+        console.log("testtetseteeee")
         NativeModules.LocationModule.setUserTokens(data);
         NativeModules.LocationModule.startService();
+        console.log("testtetseteeee")
+
       }
       return;
     }
@@ -248,37 +267,45 @@ useEffect(() => {
 
 
   useEffect(()=>{
+    init();
     return(()=>{
-      console.log("F----A----L----S-----E--------0=======================================",);
       dispatch(setReloadApp())
+      dispatch(updatePinVerifyLoadedState(false))
     })
   },[])
   // ------------------------- Focus -------------------------
-  useFocusEffect(
-    useCallback(() => {
-      init();
-      setTimeout(() => {
+   useEffect(() => {
+      setTimeout(async () => {
         if (isAuthenticated) {
           // dispatch(getERPAppConfigMenuThunk())
-          dispatch(getLastPunchInThunk())
+          
+         try {
+           dispatch(getLastPunchInThunk())
             .unwrap()
             .then(res => {
               if (res?.success === 1 || res?.success === '1') {
                 checkLocation();
               }else{
+                setAlertVisible(false);
+                setOpenSettings(false);
+                setBackgroundDeniedModal(false);
                 NativeModules.LocationModule.setUserTokens([]);
                 NativeModules.LocationModule.stopService();
               }
             })
             .catch(err => {
-              console.log("err=======================================", err);
+              setAlertVisible(false);
+              setOpenSettings(false);
+              setBackgroundDeniedModal(false);
               NativeModules.LocationModule.setUserTokens([]);
               NativeModules.LocationModule.stopService();
             });
+         } catch (error) {
+          
+         }
         }
       }, 1200)
-    }, [isAuthenticated,reLoading]),
-  );
+    }, [isAuthenticated,reLoading])
 
   // ------------------------- Render -------------------------
   if (isLoading) return <FullViewLoader />;

@@ -1,11 +1,11 @@
 import MaterialIcons from '@react-native-vector-icons/material-icons';
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { ERP_COLOR_CODE } from '../../../../utils/constants';
 import { useAppSelector } from '../../../../store/hooks';
 
-const ProfileSection = ({ baseLink, user, onEditPress }) => {
+const ProfileSection = ({ baseLink, user, onEditPress }: any) => {
   const theme = useAppSelector(state => state?.theme.mode);
 
   if (!user) return null;

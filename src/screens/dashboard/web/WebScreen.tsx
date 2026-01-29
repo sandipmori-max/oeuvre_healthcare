@@ -185,7 +185,6 @@ const WebScreen = () => {
             `}
             onMessage={event => {
               const data = JSON.parse(event.nativeEvent.data);
-              console.log('All IDs in WebView:-----------------------', data.ids);
              }}
           />
         </>

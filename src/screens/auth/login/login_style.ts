@@ -20,17 +20,19 @@ export const styles = StyleSheet.create({
     marginLeft: 2,
   },
   logo: {
-    width: 148,
-    height: 148,
+    width: 160,
+    height: 160,
     alignSelf: 'center',
     marginBottom: 25,
     borderRadius: 20,
   },
   title: {
     fontSize: 28,
+    // fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 6,
     color: ERP_COLOR_CODE.ERP_333,
+    fontFamily: "Handlee-Regular",
   },
   subtitle: {
     fontSize: 16,

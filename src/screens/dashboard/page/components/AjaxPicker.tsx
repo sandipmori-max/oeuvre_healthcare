@@ -7,12 +7,13 @@ import { getAjaxThunk } from '../../../../store/slices/ajax/thunk';
 import MaterialIcons from '@react-native-vector-icons/material-icons';
 import FullViewLoader from '../../../../components/loader/FullViewLoader';
 import useTranslations from '../../../../hooks/useTranslations';
+import InputError from '../../../../components/error/InputError';
 
 const AjaxPicker = ({ isValidate, label, onValueChange, item, errors, dtext, formValues }: any) => {
   const dispatch = useAppDispatch();
 
   const [selectedOption, setSelectedOption] = useState(dtext || item?.text || item?.value);
-   const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(false);
   const [options, setOptions] = useState<any[]>([]);
   const [loader, setLoader] = useState(false);
   const [search, setSearch] = useState('');
@@ -272,8 +273,9 @@ const AjaxPicker = ({ isValidate, label, onValueChange, item, errors, dtext, for
       </Modal>
 
       {errors[item.field] && (
-        <Text style={{ color: ERP_COLOR_CODE.ERP_ERROR, marginTop: 4 }}>{errors[item?.field]}</Text>
+        <InputError error = {errors[item?.field]}/>
       )}
+
     </View>
   );
 };

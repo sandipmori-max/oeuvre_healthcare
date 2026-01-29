@@ -176,7 +176,7 @@ export const styles = StyleSheet.create({
   formRow: { flexDirection: 'row' },
   label: { fontSize: 14, color: ERP_COLOR_CODE.ERP_BLACK, fontWeight: '600', marginBottom: 6 },
   input: {
-    backgroundColor: ERP_COLOR_CODE.ERP_WHITE,
+    backgroundColor: 'transparent',
     borderWidth: 1,
     borderColor: ERP_COLOR_CODE.ERP_e0e0e0,
     borderRadius: 8,

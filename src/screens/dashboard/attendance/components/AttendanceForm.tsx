@@ -1,4 +1,4 @@
-import { View, Text, Image, TextInput, AppState, Dimensions } from 'react-native';
+import { View, Text, Image, TextInput, AppState, Dimensions, Animated } from 'react-native';
 import React, { useState, useRef, useEffect } from 'react';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
@@ -19,6 +19,7 @@ import { useBaseLink } from '../../../../hooks/useBaseLink';
 import ProfileImage from '../../../../components/profile/ProfileImage';
 import DeviceInfo from 'react-native-device-info';
 import { setReloadApp } from '../../../../store/slices/reloadApp/reloadAppSlice';
+import { Easing } from 'react-native';
 
 const AttendanceForm = ({ setBlockAction, resData }: any) => {
   const { t } = useTranslations();
@@ -167,18 +168,98 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
   };
 
   const formatName = (name = '') =>
-  name
-    .toLowerCase()
-    .split(' ')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ');
+    name
+      .toLowerCase()
+      .split(' ')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
 
+  const animProfile = useRef(new Animated.Value(20)).current;
+  const animName = useRef(new Animated.Value(20)).current;
+  const animRemark = useRef(new Animated.Value(20)).current;
+  const animImage = useRef(new Animated.Value(20)).current;
+  const animButton = useRef(new Animated.Value(20)).current;
+
+  const fadeProfile = useRef(new Animated.Value(0)).current;
+  const fadeName = useRef(new Animated.Value(0)).current;
+  const fadeRemark = useRef(new Animated.Value(0)).current;
+  const fadeImage = useRef(new Animated.Value(0)).current;
+  const fadeButton = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    Animated.stagger(120, [
+      Animated.parallel([
+        Animated.timing(animProfile, {
+          toValue: 0,
+          duration: 350,
+          easing: Easing.out(Easing.ease),
+          useNativeDriver: true,
+        }),
+        Animated.timing(fadeProfile, {
+          toValue: 1,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+      ]),
+
+      Animated.parallel([
+        Animated.timing(animName, {
+          toValue: 0,
+          duration: 350,
+          useNativeDriver: true,
+        }),
+        Animated.timing(fadeName, {
+          toValue: 1,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+      ]),
+
+      Animated.parallel([
+        Animated.timing(animRemark, {
+          toValue: 0,
+          duration: 350,
+          useNativeDriver: true,
+        }),
+        Animated.timing(fadeRemark, {
+          toValue: 1,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+      ]),
+
+      Animated.parallel([
+        Animated.timing(animImage, {
+          toValue: 0,
+          duration: 350,
+          useNativeDriver: true,
+        }),
+        Animated.timing(fadeImage, {
+          toValue: 1,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+      ]),
+
+      Animated.parallel([
+        Animated.timing(animButton, {
+          toValue: 0,
+          duration: 350,
+          useNativeDriver: true,
+        }),
+        Animated.timing(fadeButton, {
+          toValue: 1,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+      ]),
+    ]).start();
+  }, []);
 
   return (
     <View style={{
       width: '100%',
-      height: Dimensions.get('screen').height,
-      padding: 16, backgroundColor: theme === 'dark' ? 'black' : 'white'
+      padding: 16, 
+      // backgroundColor: theme === 'dark' ? 'black' : 'white'
     }}>
       <Formik
         initialValues={{
@@ -237,13 +318,27 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
         }}
       >
         {({ values, errors, touched, setFieldValue, handleSubmit }) => (
-          <View style={[styles.profileCard, {
-            backgroundColor: theme === 'dark' ? 'black' : 'white'
-          }]}>
+          <View style={[styles.profileCard, 
+            {
+            backgroundColor: theme === 'dark' ? 'black' : 'transparent'
+          }
+          ]}>
             <View style={styles.profileRow}>
               <View style={styles.imageCol}>
                 {`${baseLink}/FileUpload/1/UserMaster/${user?.id}/profileimage.jpeg` ? (
-                  <ProfileImage userId={user?.id} baseLink={baseLink} userName={user?.name} />
+                  <Animated.View
+                    style={{
+                      opacity: fadeProfile,
+                      transform: [{ translateY: animProfile }],
+                    }}
+                  >
+                    <View style={styles.profileRow}>
+                      <ProfileImage userId={user?.id} baseLink={baseLink} userName={user?.name} />
+
+                    </View>
+                  </Animated.View>
+
+
                 ) : (
                   <View
                     style={[
@@ -255,54 +350,78 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
                       },
                     ]}
                   >
-                    <Text
-                      style={{ color: ERP_COLOR_CODE.ERP_WHITE, fontWeight: 'bold', fontSize: 26 }}
+                    <Animated.View
+                      style={{
+                        opacity: fadeName,
+                        transform: [{ translateY: animName }],
+                      }}
                     >
-                      {user?.name ? user?.name.substring(0, 2).toUpperCase() : ''}
-                    </Text>
+                      <Text
+                        style={{ color: ERP_COLOR_CODE.ERP_WHITE, fontWeight: 'bold', fontSize: 26 }}
+                      >
+                        {user?.name ? user?.name.substring(0, 2).toUpperCase() : ''}
+                      </Text>
+                    </Animated.View>
+
+
+
                   </View>
                 )}
               </View>
             </View>
 
             <View style={{}}>
-              <View style={styles.formGroup}>
-                <Text style={[styles.label, theme === 'dark' && {
-                  color: 'white'
-                }]}>{t('attendance.employeeName')}</Text>
-                <TextInput
-                  style={[styles.input, styles.inputReadonly, theme === 'dark' && {
-                    borderWidth: 1,
-                    borderColor: 'white',
-                    color: 'white',
-                    backgroundColor: 'black'
-                  }]}
-                  value={formatName(values?.name)}
-                  editable={false}
-                />
-                {touched?.name && errors?.name ? (
-                  <Text style={styles.errorText}>{errors?.name}</Text>
-                ) : null}
-              </View>
 
-              <View style={styles.formGroup}>
-                <Text style={[styles.label, theme === 'dark' && {
-                  color: 'white'
-                }]}>{t('attendance.remark')}</Text>
-                <TextInput
-                  style={[styles.input, { minHeight: 100, textAlignVertical: 'top' }, theme === 'dark' && {
-                    borderWidth: 1,
-                    borderColor: 'white',
-                    color: 'white',
-                    backgroundColor: 'black'
-                  }]}
-                  value={values?.remark}
-                  onChangeText={text => setFieldValue('remark', text)}
-                  placeholder={t('attendance.enterRemark')}
-                  multiline
-                  numberOfLines={3}
-                />
-              </View>
+              <Animated.View
+                style={{
+                  opacity: fadeRemark,
+                  transform: [{ translateY: animRemark }],
+                }}
+              >
+                <View style={styles.formGroup}>
+                  <Text style={[styles.label, theme === 'dark' && {
+                    color: 'white'
+                  }]}>{t('attendance.employeeName')}</Text>
+                  <TextInput
+                    style={[styles.input, styles.inputReadonly, theme === 'dark' && {
+                      borderWidth: 1,
+                      borderColor: 'white',
+                      color: 'white',
+                      backgroundColor: 'black'
+                    },
+                    {backgroundColor: ERP_COLOR_CODE.ERP_BORDER_LINE}
+                  
+                  ]}
+                    value={formatName(values?.name)}
+                    editable={false}
+                  />
+                  {touched?.name && errors?.name ? (
+                    <Text style={styles.errorText}>{errors?.name}</Text>
+                  ) : null}
+                </View>
+
+                <View style={styles.formGroup}>
+                  <Text style={[styles.label, theme === 'dark' && {
+                    color: 'white'
+                  }]}>{t('attendance.remark')}</Text>
+                  <TextInput
+                    style={[styles.input, { minHeight: 100, textAlignVertical: 'top' }, theme === 'dark' && {
+                      borderWidth: 1,
+                      borderColor: 'white',
+                      color: 'white',
+                      backgroundColor: 'black'
+                    }]}
+                    value={values?.remark}
+                    onChangeText={text => setFieldValue('remark', text)}
+                    placeholder={t('attendance.enterRemark')}
+                    multiline
+                    numberOfLines={3}
+                  />
+                </View>
+              </Animated.View>
+
+
+
 
               {statusImage && (
                 <View>
@@ -311,24 +430,34 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
                 </View>
               )}
 
-              <View>
-                <SlideButton
-                  label={
-                    resData?.success === 1 || resData?.success === '1'
-                      ? `${t("text.text3")} ${t('attendance.checkOut')}`
-                      : `${t("text.text3")} ${t('attendance.checkIn')}`
-                  }
-                  successColor={
-                    resData?.success === 1 || resData?.success === '1'
-                      ? ERP_COLOR_CODE.ERP_ERROR
-                      : ERP_COLOR_CODE.ERP_APP_COLOR
-                  }
-                  loading={locationLoading}
-                  completed={attendanceDone}
-                  blocked={blocked}
-                  onSlideSuccess={() => handleStatusToggle(setFieldValue, handleSubmit)}
-                />
-              </View>
+              <Animated.View
+                style={{
+                  opacity: fadeButton,
+                  transform: [{ translateY: animButton }],
+                }}
+              >
+                <View>
+                  <SlideButton
+                    label={
+                      resData?.success === 1 || resData?.success === '1'
+                        ? `${t("text.text3")} ${t('attendance.checkOut')}`
+                        : `${t("text.text3")} ${t('attendance.checkIn')}`
+                    }
+                    successColor={
+                      resData?.success === 1 || resData?.success === '1'
+                        ? ERP_COLOR_CODE.ERP_ERROR
+                        : ERP_COLOR_CODE.ERP_APP_COLOR
+                    }
+                    loading={locationLoading}
+                    completed={attendanceDone}
+                    blocked={blocked}
+                    onSlideSuccess={() => handleStatusToggle(setFieldValue, handleSubmit)}
+                  />
+                </View>
+              </Animated.View>
+
+
+
             </View>
           </View>
         )}

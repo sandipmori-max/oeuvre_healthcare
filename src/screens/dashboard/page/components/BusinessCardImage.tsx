@@ -359,8 +359,6 @@ if (addrStart !== -1) {
         result[k] = result[k].replace(/\s{2,}/g, ' ').replace(/[,;]+$/, '').trim();
     }
 
-
-    // console.log('✅ Parsed OCR Result:', result);
     setValue(result);
     return result;
   };
@@ -369,7 +367,6 @@ if (addrStart !== -1) {
   return (
     <ScrollView>
       <Text style={styles.title}>{t("title.title9")}</Text>
-
 
       <View style={{ alignItems: 'center', marginVertical: 12 }}>
         <TouchableOpacity
@@ -392,7 +389,6 @@ if (addrStart !== -1) {
         </TouchableOpacity>
       </View>
 
-
       <Modal
         visible={showPicker}
         transparent
@@ -403,7 +399,6 @@ if (addrStart !== -1) {
           <View style={styles.modalOverlay} />
         </TouchableWithoutFeedback>
 
-
         <View style={styles.bottomSheet}>
           <View style={styles.sheetHeader}>
             <Text style={styles.sheetTitle}>{t("title.title10")}</Text>
@@ -412,13 +407,11 @@ if (addrStart !== -1) {
             </TouchableOpacity>
           </View>
 
-
           <View style={styles.optionRow}>
             <TouchableOpacity style={styles.optionCard} onPress={pickFromCamera}>
               <MaterialIcons name="photo-camera" size={40} color="#000" />
               <Text style={styles.optionText}>{t("title.title11")}</Text>
             </TouchableOpacity>
-
 
             <TouchableOpacity style={styles.optionCard} onPress={pickFromGallery}>
               <MaterialIcons name="photo-library" size={40} color="#000" />

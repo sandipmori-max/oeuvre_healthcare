@@ -1,9 +1,10 @@
-import { StyleSheet } from 'react-native';
+import { Platform, StyleSheet } from 'react-native';
 import { ERP_COLOR_CODE } from '../../../../../utils/constants';
 
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
+    marginTop: Platform.OS === 'ios' ? 40 : 10,
     backgroundColor: ERP_COLOR_CODE.ERP_WHITE,
   },
   header: {
@@ -54,7 +55,7 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
   },
   avatar: {
-    backgroundColor: ERP_COLOR_CODE.ERP_999,
+    backgroundColor: ERP_COLOR_CODE.ERP_e0e0e0,
     width: 50,
     height: 50,
     borderRadius: 25,

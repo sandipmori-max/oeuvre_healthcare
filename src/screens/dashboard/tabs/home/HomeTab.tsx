@@ -31,7 +31,7 @@ import {
   Modal,
   Pressable,
   Platform,
-  Image,
+  Image
 } from 'react-native';
 import { ERP_ICON } from '../../../../assets';
 
@@ -60,7 +60,6 @@ const HomeScreen = () => {
   const [toDate, setToDate] = useState<string>('');
 
   const auth = useAppSelector(state => state?.auth);
-  console.log("dashboard------------------------------------", auth)
 
   const [showDatePicker, setShowDatePicker] = useState<null | {
     type: 'from' | 'to';
@@ -113,12 +112,13 @@ const HomeScreen = () => {
     ).start();
   }, []);
 
+
   useLayoutEffect(() => {
     navigation.setOptions({
       headerStyle: {
         backgroundColor: theme === 'dark' ? 'black' : ERP_COLOR_CODE.ERP_APP_COLOR,
-        borderBottomWidth: 1,
-        borderBottomColor: '#fff',
+        borderBottomWidth: theme === 'dark' ? 1 : 0,
+        borderBottomColor: theme === 'dark' ? '#fff' : ERP_COLOR_CODE.ERP_APP_COLOR,
       },
       headerTintColor: '#fff',
       headerTitle: () =>
@@ -209,7 +209,8 @@ const HomeScreen = () => {
         setLoadingPageId(true);
 
         // dispatch(getERPAppConfigMenuThunk());
-        dispatch(getERPDashboardThunk({ branch: '', type: '', fd: '', td: '' }));
+        const params = { branch: '', type: '', fd: '', td: '' }
+        dispatch(getERPDashboardThunk(params));
         dispatch(getERPMenuThunk());
 
         timer = setTimeout(() => {
@@ -524,7 +525,7 @@ const HomeScreen = () => {
   }, []);
 
   useEffect(() => {
-    dispatch(getERPDashboardThunk({ branch: auth.dashboardBranch, type: auth.dashboardType, fd: auth.dashboardFromDate, td: auth.dashboardToDate }));
+    dispatch(getERPDashboardThunk({ branch: auth?.dashboardBranch || "", type: auth?.dashboardType || "", fd: auth?.dashboardFromDate || "", td: auth?.dashboardToDate || "" }));
     const timer = setTimeout(() => {
       dispatch(setDashboardLoading(false));
     }, 3000);
@@ -755,8 +756,6 @@ const HomeScreen = () => {
           padding: 12,
           borderBottomRightRadius: 24,
           borderBottomLeftRadius: 24,
-          borderWidth: 0.5,
-          borderColor: 'white'
         }}
       >
         <Animated.View
@@ -954,9 +953,10 @@ const HomeScreen = () => {
                   <Text style={{
                     fontSize: 30,
                     fontFamily: "Handlee-Regular",
-                  }}>Welocome</Text>
+                  }}>Welcome</Text>
                 </View>
               </View>
+
             ) : (
               <View style={{
                 backgroundColor: theme === 'dark' ? 'black' : 'white',
@@ -1014,7 +1014,6 @@ const HomeScreen = () => {
                           />
                           <View style={{
                             height: 350, width: '100%',
-
                             alignContent: 'center',
                             alignItems: 'center',
                             alignSelf: 'center',
@@ -1029,7 +1028,7 @@ const HomeScreen = () => {
                             <Text style={{
                               fontSize: 30,
                               fontFamily: "Handlee-Regular",
-                            }}>Welocome</Text>
+                            }}>Welcome</Text>
                           </View>
 
                         </View>

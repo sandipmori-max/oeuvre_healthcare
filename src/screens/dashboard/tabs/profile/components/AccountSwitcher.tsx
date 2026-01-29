@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Modal, FlatList, Image } from 'react-native';
+import React, { useState, useRef, useEffect } from 'react';
+import { View, Text, TouchableOpacity, Modal, FlatList, Image, Animated, Easing, Platform } from 'react-native';
 import { styles } from './components_style';
 import { useAppDispatch, useAppSelector } from '../../../../../store/hooks';
 import { removeAccountThunk, switchAccountThunk } from '../../../../../store/slices/auth/thunk';
@@ -41,11 +41,86 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
     type: 'info' as 'error' | 'success' | 'info',
   });
 
+  // Animated values
+  const slideAnim = useRef(new Animated.Value(0)).current; // modal
+  const buttonAnim = useRef(new Animated.Value(0)).current; // add account button
+  const listAnim = useRef(accounts.map(() => new Animated.Value(0))).current; // flatlist items
+
+  const pressAnim = useRef(new Animated.Value(1)).current;
+  const pressItemAnim = useRef(new Animated.Value(1)).current;
+  const onPressItemIn = () => {
+    Animated.spring(pressItemAnim, {
+      toValue: 0.86,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const onPressItemOut = () => {
+    Animated.spring(pressItemAnim, {
+      toValue: 1,
+      friction: 4,
+      tension: 150,
+      useNativeDriver: true,
+    }).start();
+  };
+  const onPressIn = () => {
+    Animated.spring(pressItemAnim, {
+      toValue: 0.86,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const onPressOut = () => {
+    Animated.spring(pressAnim, {
+      toValue: 1,
+      friction: 4,
+      tension: 150,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  // Animate modal in/out
+  useEffect(() => {
+    if (visible) {
+      slideAnim.setValue(0);
+      Animated.timing(slideAnim, {
+        toValue: 1,
+        duration: 400,
+        easing: Easing.out(Easing.ease),
+        useNativeDriver: true,
+      }).start();
+
+      // Animate Add Account button
+      buttonAnim.setValue(0);
+      Animated.timing(buttonAnim, {
+        toValue: 1,
+        duration: 600,
+        delay: 600,
+        easing: Easing.out(Easing.ease),
+        useNativeDriver: true,
+      }).start();
+
+      // Animate FlatList items staggered
+      listAnim.forEach((anim, index) => {
+        anim.setValue(0);
+        Animated.timing(anim, {
+          toValue: 1,
+          duration: 700,
+          delay: 100 + index * 100,
+          easing: Easing.out(Easing.ease),
+          useNativeDriver: true,
+        }).start();
+      });
+    }
+  }, [visible, slideAnim, buttonAnim, listAnim]);
+
   const handleSwitchAccount = (accountId: string) => {
     if (accountId !== activeAccountId) {
       dispatch(switchAccountThunk(accountId));
-      dispatch(getLastPunchInThunk())
-      dispatch(setReloadApp())
+      dispatch(getLastPunchInThunk());
+      setTimeout(() => {
+        dispatch(setReloadApp())
+      }, 1000);
     }
     onClose();
   };
@@ -67,149 +142,169 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
     setAlertVisible(true);
   };
 
-  const renderAccount = ({ item }: { item: any }) => {
-    const isActive = user?.id.toString() === item?.user?.id.toString() || user?.id.toString() == item?.user?.id.toString();
+  const renderAccount = ({ item, index }: { item: any; index: number }) => {
+    const isActive = user?.id.toString() === item?.user?.id.toString();
     const lastLogin = formatDateHr(item?.lastLoginAt, false);
     const lastLoginHr = formatTimeTo12Hour(item?.lastLoginAt);
 
     let normalizedBase = (item?.user?.companyLink || '').replace(/\/+$/, '');
     normalizedBase = normalizedBase.replace(/\/devws\/?/, '/');
-    normalizedBase = normalizedBase.replace(/^https:\/\//i, 'http://');
+    normalizedBase = normalizedBase.replace(/^https:\/\//i, Platform.OS === 'ios' ? 'https://' : 'http://');
 
+    console.log("normalizedBase", `${normalizedBase}/FileUpload/1/UserMaster/${item?.user?.id}/profileimage.jpeg?ts=${new Date().getTime()}`)
     return (
-      <TouchableOpacity
-        style={[styles.accountItem, isActive && styles.activeAccount, theme === 'dark' && {
-          backgroundColor: 'black',
-          borderWidth: 1,
-          borderColor: 'white'
-        }]}
-        onPress={async () => {
-          dispatch(setDashboard([]));
-          dispatch(setEmptyMenu([]));
-          dispatch(resetAjaxState());
-          dispatch(resetAttendanceState())
-          dispatch(clearAuthState())
-          dispatch(resetDropdownState())
-          dispatch(resetSyncLocationState())
-          DevERPService.setAppId(item?.user?.app_id || '');
-          await AsyncStorage.setItem('appid', item?.user?.app_id);
-
-          if (isTokenValid(item?.user?.tokenValidTill)) {
-            DevERPService.setToken(item?.user?.token || '');
-            await AsyncStorage.setItem('erp_token', item?.user?.token || '');
-            await AsyncStorage.setItem('auth_token', item?.user?.token || '');
-            await AsyncStorage.setItem('erp_token_valid_till', item?.user?.token || '');
-            const validation = await validateCompanyCode(() =>
-              DevERPService.validateCompanyCode(item?.user?.company_code),
-            );
-            if (!validation?.isValid) {
-              return;
-            }
-            handleSwitchAccount(item?.id);
-          } else {
-            const validation = await validateCompanyCode(() =>
-              DevERPService.validateCompanyCode(item?.user?.company_code),
-            );
-            if (!validation?.isValid) {
-              return;
-            }
-            handleSwitchAccount(item?.id);
-          }
- 
+      <Animated.View
+        style={{
+          opacity: listAnim[index],
+          transform: [
+            {
+              translateY: listAnim[index].interpolate({
+                inputRange: [0, 1],
+                outputRange: [50, 0],
+              }),
+            },
+            //  { scale: pressItemAnim },
+          ],
         }}
       >
-        <View style={styles.accountContent}>
-          <FastImage
-            source={{
-              uri: `${normalizedBase}/FileUpload/1/UserMaster/${item?.user?.id
-                }/profileimage.jpeg?ts=${new Date().getTime()}`,
-              priority: FastImage.priority.normal,
-              cache: FastImage.cacheControl.web,
-            }}
-            style={styles.avatar}
-          />
+        <TouchableOpacity
+          style={[styles.accountItem, isActive && styles.activeAccount, theme === 'dark' && {
+            backgroundColor: 'black',
+            borderWidth: 1,
+            borderColor: 'white'
+          }]}
+          onPressIn={onPressItemIn}
+          onPressOut={onPressItemOut}
+          onPress={async () => {
+            // setTimeout(async ()=>{
+            dispatch(setDashboard([]));
+            dispatch(setEmptyMenu([]));
+            dispatch(resetAjaxState());
+            dispatch(resetAttendanceState());
+            dispatch(clearAuthState());
+            dispatch(resetDropdownState());
+            dispatch(resetSyncLocationState());
+            DevERPService.setAppId(item?.user?.app_id || '');
+            await AsyncStorage.setItem('appid', item?.user?.app_id);
 
-          <View style={styles.accountInfo}>
-            <Text style={[styles.accountName, isActive && styles.activeText, theme === 'dark' && {
-              color: 'white'
-            }]}>
-              {item?.user?.name.charAt(0).toUpperCase() + item?.user?.name.slice(1)}
-            </Text>
-            <Text numberOfLines={1} style={[styles.accountEmail, isActive && styles.activeText, theme === 'dark' && {
-              color: 'white'
-            }]}>
-              {item?.user?.companyName}
-            </Text>
-
-            <View
-              style={{
-                width: isActive ? '100%' : '80%',
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                alignContent: 'center',
-                alignItems: 'center',
+            if (isTokenValid(item?.user?.tokenValidTill)) {
+              DevERPService.setToken(item?.user?.token || '');
+              await AsyncStorage.setItem('erp_token', item?.user?.token || '');
+              await AsyncStorage.setItem('auth_token', item?.user?.token || '');
+              await AsyncStorage.setItem('erp_token_valid_till', item?.user?.token || '');
+              const validation = await validateCompanyCode(() =>
+                DevERPService.validateCompanyCode(item?.user?.company_code),
+              );
+              if (!validation?.isValid) return;
+              handleSwitchAccount(item?.id);
+            } else {
+              const validation = await validateCompanyCode(() =>
+                DevERPService.validateCompanyCode(item?.user?.company_code),
+              );
+              if (!validation?.isValid) return;
+              handleSwitchAccount(item?.id);
+            }
+            // },600)
+          }}
+        >
+          <View style={styles.accountContent}>
+            <FastImage
+              style={styles.avatar}
+              source={{
+                uri: `${normalizedBase}/FileUpload/1/UserMaster/${item?.user?.id}/profileimage.jpeg?ts=${new Date().getTime()}`,
+                priority: FastImage.priority.normal,
+                cache: FastImage.cacheControl.web,
               }}
-            >
-              <View
-                style={{
-                  gap: 2,
-                  flexDirection: 'row',
-                  alignContent: 'center',
-                  alignItems: 'center',
-                }}
-              >
-                <MaterialIcons name={'date-range'} color={theme === 'dark' ? 'white' : ERP_COLOR_CODE.ERP_BLACK} size={18} />
-                <Text style={styles.lastLogin}> {lastLogin}</Text>
-              </View>
-
-              <View
-                style={{
-                  gap: 2,
-                  flexDirection: 'row',
-                  alignContent: 'center',
-                  alignItems: 'center',
-                }}
-              >
-                <MaterialIcons name={'access-alarm'} color={theme === 'dark' ? 'white' : ERP_COLOR_CODE.ERP_BLACK} size={18} />
-                <Text style={styles.lastLogin}>{lastLoginHr}</Text>
+            />
+            <View style={styles.accountInfo}>
+              <Text style={[styles.accountName, isActive && styles.activeText, theme === 'dark' && { color: 'white' }]}>
+                {item?.user?.name.charAt(0).toUpperCase() + item?.user?.name.slice(1)}
+              </Text>
+              <Text numberOfLines={1} style={[styles.accountEmail, isActive && styles.activeText, theme === 'dark' && { color: 'white' }]}>
+                {item?.user?.companyName}
+              </Text>
+               
+              <View style={{ width: isActive ? '100%' : '80%', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                <View style={{ gap: 2, flexDirection: 'row', alignItems: 'center' }}>
+                  <MaterialIcons name={'date-range'} color={theme === 'dark' ? 'white' : ERP_COLOR_CODE.ERP_BLACK} size={18} />
+                  <Text style={styles.lastLogin}>{lastLogin}</Text>
+                </View>
+                <View style={{ gap: 2, flexDirection: 'row', alignItems: 'center' }}>
+                  <MaterialIcons name={'access-alarm'} color={theme === 'dark' ? 'white' : ERP_COLOR_CODE.ERP_BLACK} size={18} />
+                  <Text style={styles.lastLogin}>{lastLoginHr}</Text>
+                </View>
               </View>
             </View>
+            {isActive && (
+              <View style={[styles.activeIndicator, theme === 'dark' && { backgroundColor: 'white' }]}>
+                <Text style={[styles.activeLabel, theme === 'dark' && { color: 'black' }]}>Active</Text>
+              </View>
+            )}
           </View>
-          {isActive && (
-            <View style={[styles.activeIndicator, theme === 'dark' && {
-              backgroundColor: 'white'
-            }]}>
-              <Text style={[styles.activeLabel, theme === 'dark' && {
-                color: 'black'
-              }]}>Active</Text>
-            </View>
+          {!isActive && accounts?.length > 1 && (
+            <TouchableOpacity style={styles.removeButton} onPress={() => handleRemoveAccount(item)}>
+              <Text style={[styles.removeButtonText, theme === 'dark' && { color: 'black' }]}>✕</Text>
+            </TouchableOpacity>
           )}
-        </View>
-        {!isActive && accounts?.length > 1 && (
-          <TouchableOpacity style={styles.removeButton} onPress={() => handleRemoveAccount(item)}>
-            <Text style={[styles.removeButtonText, theme === 'dark' && {
-              color: 'black'
-            }]}>✕</Text>
-          </TouchableOpacity>
-        )}
-      </TouchableOpacity>
+        </TouchableOpacity>
+      </Animated.View>
     );
   };
 
+  const handleClose = () => {
+    // Reverse FlatList items
+    listAnim
+      .slice()
+      .reverse()
+      .forEach((anim, index) => {
+        Animated.timing(anim, {
+          toValue: 0,
+          duration: 550,
+          delay: index * 60,
+          easing: Easing.in(Easing.ease),
+          useNativeDriver: true,
+        }).start();
+      });
+
+    // Reverse button animation
+    Animated.timing(buttonAnim, {
+      toValue: 0,
+      duration: 450,
+      delay: 120,
+      easing: Easing.in(Easing.ease),
+      useNativeDriver: true,
+    }).start();
+
+    // Reverse main slide
+    Animated.timing(slideAnim, {
+      toValue: 0,
+      duration: 300,
+      delay: 650,
+      easing: Easing.in(Easing.ease),
+      useNativeDriver: true,
+    }).start(onClose);
+  };
+
+
   return (
-    <Modal
-      visible={visible}
-      animationType="slide"
-      presentationStyle="pageSheet"
-      onRequestClose={onClose}
-    >
-      <View style={[styles.container, theme === 'dark' && {
-        backgroundColor: 'black'
-      }]}>
-        <View style={[styles.header, theme === 'dark' && {
-          backgroundColor: 'black'
-        }]}>
-          <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+    <Modal visible={visible} transparent onRequestClose={handleClose}>
+      <Animated.View
+        style={[
+          styles.container,
+          theme === 'dark' && { backgroundColor: 'black' },
+          {
+            transform: [{
+              translateY: slideAnim.interpolate({
+                inputRange: [0, 1],
+                outputRange: [800, 0],
+              }),
+            }],
+            opacity: slideAnim,
+          },
+        ]}
+      >
+        <View style={[styles.header, theme === 'dark' && { backgroundColor: 'black' }]}>
+          <TouchableOpacity onPress={handleClose} style={styles.closeButton}>
             <Image source={ERP_ICON.BACK} style={styles.back} />
           </TouchableOpacity>
           <Text style={styles.title}>Switch Account</Text>
@@ -223,35 +318,55 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
           showsVerticalScrollIndicator={false}
         />
 
-        <TouchableOpacity style={[styles.addAccountButton, theme === 'dark' && {
-          backgroundColor: 'white',
+        <Animated.View
+          style={{
+            opacity: buttonAnim,
+            transform: [
+              {
+                translateY: buttonAnim.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [50, 0],
+                }),
+              },
+              { scale: pressAnim },
+            ],
+          }}
+        >
+          <TouchableOpacity
+            style={[styles.addAccountButton, theme === 'dark' && { backgroundColor: 'white' }]}
+            onPress={() => {
+              setTimeout(() => {
+                onAddAccount()
+              }, 600)
+            }}
+            onPressIn={onPressIn}
+            onPressOut={onPressOut}
+          >
+            <MaterialIcons
+              name="person-add-alt"
+              size={24}
+              color={theme === 'dark' ? 'black' : 'white'}
+            />
+            <Text style={[styles.addAccountText, theme === 'dark' && { color: 'black' }]}>
+              Add account
+            </Text>
+          </TouchableOpacity>
+        </Animated.View>
 
-        }]} onPress={onAddAccount}>
-          <MaterialIcons
-            name="person-add-alt"
-            size={24}
-            color={theme === 'dark' ? 'black' : 'white'}
-          />
-          <Text style={[styles.addAccountText, theme === 'dark' && {
-            color: 'black'
-          }]}>Add account</Text>
-        </TouchableOpacity>
-      </View>
-      <CustomAlert
-        visible={alertVisible}
-        title={alertConfig.title}
-        message={alertConfig.message}
-        type={alertConfig.type}
-        isBottomButtonVisible={true}
-        onClose={() => setAlertVisible(false)}
-        onCancel={() => setAlertVisible(false)}
-        onDone={() => {
-          handleRemovedAccount(selectedAccount);
-        }}
-        doneText="Remove"
-        color={ERP_COLOR_CODE.ERP_ERROR}
-        actionLoader={undefined}
-      />
+        <CustomAlert
+          visible={alertVisible}
+          title={alertConfig.title}
+          message={alertConfig.message}
+          type={alertConfig.type}
+          isBottomButtonVisible={true}
+          onClose={() => setAlertVisible(false)}
+          onCancel={() => setAlertVisible(false)}
+          onDone={() => handleRemovedAccount(selectedAccount)}
+          doneText="Remove"
+          color={ERP_COLOR_CODE.ERP_ERROR}
+          actionLoader={undefined}
+        />
+      </Animated.View>
     </Modal>
   );
 };

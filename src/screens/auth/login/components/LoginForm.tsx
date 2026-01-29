@@ -85,7 +85,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
   const handleLoginSubmit = async (values: typeof initialFormValues) => {
     try {
       const companyValidation = await validateCompanyCode(() =>
-        DevERPService.validateCompanyCode('oeuvre01'),
+        DevERPService.validateCompanyCode(values.company_code),
       );
 
       if (!companyValidation?.isValid) return;
@@ -107,7 +107,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
       if (loginResult?.success === 1) {
         await DevERPService.getAuth();
         await onLoginSuccess(
-          'oeuvre01',
+          values?.company_code,
           values?.password,
           { user: values?.user, name: values?.user },
           loginResult,

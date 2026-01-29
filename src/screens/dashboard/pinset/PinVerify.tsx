@@ -1,5 +1,5 @@
 import MaterialIcons from '@react-native-vector-icons/material-icons';
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -9,15 +9,21 @@ import {
   Animated,
   Platform,
   NativeModules,
+  Easing,
+  ImageBackground,
 } from 'react-native';
 import { ERP_COLOR_CODE } from '../../../utils/constants';
 import { getDBConnection, getPinCode } from '../../../utils/sqlite';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import CustomAlert from '../../../components/alert/CustomAlert';
+import { useAppDispatch } from '../../../store/hooks';
+import { updatePinVerifyLoadedState } from '../../../store/slices/auth/authSlice';
+import { ERP_GIF } from '../../../assets';
 
 const { width } = Dimensions.get('screen');
 
 const PinVerifyScreen = () => {
+  const dispatch = useAppDispatch()
   const [pin, setPin] = useState<string>('');
   const [attempts, setAttempts] = useState(0);
   const [isBlocked, setIsBlocked] = useState(false);
@@ -106,8 +112,8 @@ const PinVerifyScreen = () => {
     if (pin.length < 4) {
       setAlertVisible(true);
       setAlertConfig({
-        title: 'Error',
-        message: 'Enter 4-digit PIN',
+        title: 'PIN Validation Failed',
+        message: 'The PIN must be exactly 4 digits.',
         type: 'error',
       });
       return;
@@ -118,6 +124,7 @@ const PinVerifyScreen = () => {
       const savedPin = await getPinCode(db);
 
       if (savedPin === pin) {
+        dispatch(updatePinVerifyLoadedState(true))
         navigation.replace('Drawer');
       } else {
         const newAttempts = attempts + 1;
@@ -125,8 +132,8 @@ const PinVerifyScreen = () => {
 
         setAlertVisible(true);
         setAlertConfig({
-          title: 'Error',
-          message: 'Incorrect PIN, try again',
+          title: 'Authentication Failed',
+          message: 'The PIN you entered is incorrect. Please try again.',
           type: 'error',
         });
         setPin('');
@@ -154,35 +161,220 @@ const PinVerifyScreen = () => {
     ['del', '0', 'ok'],
   ];
 
+  const titleAnim = useRef(new Animated.Value(0)).current;
+  const subtitleAnim = useRef(new Animated.Value(0)).current;
+
+  const pinAnims = useRef(
+    Array(4).fill(0).map(() => new Animated.Value(0))
+  ).current;
+
+  const pinPulseAnims = useRef(
+    Array(4).fill(0).map(() => new Animated.Value(0))
+  ).current;
+
+  const keyAnims = useRef(
+    Array(12).fill(0).map(() => new Animated.Value(0))
+  ).current;
+
+  const keyPulseAnims = useRef(
+    Array(12).fill(0).map(() => new Animated.Value(0))
+  ).current;
+
+  /** ---------------- Screen load animation ---------------- */
+  useFocusEffect(
+    useCallback(() => {
+      titleAnim.setValue(0);
+      subtitleAnim.setValue(0);
+      pinAnims.forEach(a => a.setValue(0));
+      keyAnims.forEach(a => a.setValue(0));
+
+      Animated.sequence([
+        Animated.timing(titleAnim, {
+          toValue: 1,
+          duration: 350,
+          easing: Easing.out(Easing.cubic),
+          useNativeDriver: true,
+        }),
+        Animated.timing(subtitleAnim, {
+          toValue: 1,
+          duration: 300,
+          easing: Easing.out(Easing.cubic),
+          useNativeDriver: true,
+        }),
+        Animated.parallel([
+          Animated.stagger(
+            60,
+            pinAnims.map(anim =>
+              Animated.spring(anim, {
+                toValue: 1,
+                damping: 14,
+                stiffness: 160,
+                useNativeDriver: true,
+              })
+            )
+          ),
+          Animated.sequence([
+            Animated.delay(120),
+            Animated.stagger(
+              40,
+              keyAnims.map(anim =>
+                Animated.timing(anim, {
+                  toValue: 1,
+                  duration: 220,
+                  easing: Easing.out(Easing.ease),
+                  useNativeDriver: true,
+                })
+              )
+            ),
+          ]),
+        ]),
+      ]).start();
+    }, [])
+  );
+
+  /** ---------------- PIN dot pulse ---------------- */
+  useEffect(() => {
+    if (pin.length === 0 || pin.length > 4) return;
+
+    const index = pin.length - 1;
+    pinPulseAnims[index].setValue(0);
+
+    Animated.sequence([
+      Animated.timing(pinPulseAnims[index], {
+        toValue: 1,
+        duration: 300,
+        easing: Easing.out(Easing.ease),
+        useNativeDriver: true,
+      }),
+      Animated.timing(pinPulseAnims[index], {
+        toValue: 0,
+        duration: 700,
+        easing: Easing.in(Easing.ease),
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [pin.length]);
+
+  /** ---------------- Key press pulse ---------------- */
+  const triggerKeyPulse = (index) => {
+    keyPulseAnims[index].setValue(0);
+
+    Animated.sequence([
+      Animated.timing(keyPulseAnims[index], {
+        toValue: 1,
+        duration: 180,
+        easing: Easing.out(Easing.ease),
+        useNativeDriver: true,
+      }),
+      Animated.timing(keyPulseAnims[index], {
+        toValue: 0,
+        duration: 820,
+        easing: Easing.in(Easing.ease),
+        useNativeDriver: true,
+      }),
+    ]).start();
+  };
+
+
   return (
-    <View style={styles.container}>
+    
+   <View >
+      
+       <ImageBackground
+              source={ERP_GIF.BACK_IMG}
+              style={styles.container}
+              resizeMode='cover'
+            >
+
       {/* Header */}
-      <Text style={styles.title}>Enter PIN</Text>
-      <Text style={styles.subtitle}>Enter your 4-digit PIN to continue</Text>
+      <Animated.Text
+        style={[
+          styles.title,
+          {
+            opacity: titleAnim,
+            transform: [
+              {
+                translateY: titleAnim.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [-10, 0],
+                }),
+              },
+            ],
+          },
+        ]}
+      >
+        Enter PIN
+      </Animated.Text>
+
+      <Animated.Text
+        style={[
+          styles.subtitle,
+          {
+            opacity: subtitleAnim,
+            transform: [
+              {
+                translateY: subtitleAnim.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [-6, 0],
+                }),
+              },
+            ],
+          },
+        ]}
+      >
+        Enter your 4-digit PIN to continue
+      </Animated.Text>
 
       {/* Countdown if blocked */}
       {isBlocked && (
-        <Text
+        <View style={{flexDirection:'row'}}>
+          <Text
           style={{
-            color: 'red',
             fontSize: 16,
             marginBottom: 20,
             paddingHorizontal: 30,
             textAlign: 'center',
           }}
         >
-          Too many wrong attempts.{'\n'}Try again in {countdown} seconds
+          Too many wrong attempts.{'\n'}Try again in <Text  style={{
+            fontSize: 18,
+            marginBottom: 20,
+            paddingHorizontal: 30,
+            textAlign: 'center',
+            color: ERP_COLOR_CODE.ERP_ERROR
+          }}>{countdown}</Text> seconds
         </Text>
+        </View>
       )}
 
       {/* PIN Circles */}
       <View style={styles.pinRow}>
         {[0, 1, 2, 3].map(i => (
-          <View
+          <Animated.View
             key={i}
             style={[
               styles.pinCircle,
-              { backgroundColor: i < pin.length ? ERP_COLOR_CODE.ERP_APP_COLOR : '#e5e7eb' },
+              {
+                backgroundColor:
+                  i < pin.length
+                    ? ERP_COLOR_CODE.ERP_APP_COLOR
+                    : '#e5e7eb',
+                opacity: pinAnims[i],
+                transform: [
+                  {
+                    scale: Animated.multiply(
+                      pinAnims[i].interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [0.6, 1],
+                      }),
+                      pinPulseAnims[i].interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [1, 1.25],
+                      })
+                    ),
+                  },
+                ],
+              },
             ]}
           />
         ))}
@@ -192,32 +384,57 @@ const PinVerifyScreen = () => {
       <View style={styles.keypad}>
         {keypadRows.map((row, rowIndex) => (
           <View key={rowIndex} style={styles.keypadRow}>
-            {row.map(key => (
-              <TouchableOpacity
-                key={key}
-                style={styles.key}
-                onPress={() => {
-                  if (isBlocked) return;
-                  if (key === 'del') handleDelete();
-                  else if (key === 'ok') handleVerifyPin();
-                  else handleKeyPress(key);
-                }}
-              >
-                <Animated.View style={{ transform: [{ scale: getScale(key) }] }}>
-                  {key === 'del' ? (
-                    <MaterialIcons name="backspace" size={28} color="#374151" />
-                  ) : key === 'ok' ? (
-                    <MaterialIcons
-                      name="check-circle"
-                      size={36}
-                      color={pin.length === 4 ? '#16a34a' : '#9ca3af'}
-                    />
-                  ) : (
-                    <Text style={styles.keyText}>{key}</Text>
-                  )}
+            {row.map((key, colIndex) => {
+              const keyIndex = rowIndex * 3 + colIndex;
+
+              return (
+                <Animated.View
+                  key={key}
+                  style={{
+                    opacity: keyAnims[keyIndex],
+                    transform: [
+                      {
+                        scale: Animated.multiply(
+                          keyAnims[keyIndex].interpolate({
+                            inputRange: [0, 1],
+                            outputRange: [0.85, 1],
+                          }),
+                          keyPulseAnims[keyIndex].interpolate({
+                            inputRange: [0, 1],
+                            outputRange: [1, 1.2],
+                          })
+                        ),
+                      },
+                    ],
+                  }}
+                >
+                  <TouchableOpacity
+                    style={styles.key}
+                    onPress={() => {
+                      if (isBlocked) return;
+
+                      triggerKeyPulse(keyIndex);
+
+                      if (key === 'del') handleDelete();
+                      else if (key === 'ok') handleVerifyPin();
+                      else handleKeyPress(key);
+                    }}
+                  >
+                    {key === 'del' ? (
+                      <MaterialIcons name="backspace" size={28} color="#374151" />
+                    ) : key === 'ok' ? (
+                      <MaterialIcons
+                        name="check-circle"
+                        size={36}
+                        color={pin.length === 4 ? '#16a34a' : '#9ca3af'}
+                      />
+                    ) : (
+                      <Text style={styles.keyText}>{key}</Text>
+                    )}
+                  </TouchableOpacity>
                 </Animated.View>
-              </TouchableOpacity>
-            ))}
+              );
+            })}
           </View>
         ))}
       </View>
@@ -230,13 +447,17 @@ const PinVerifyScreen = () => {
         onClose={() => setAlertVisible(false)}
         actionLoader={undefined}
       />
+            </ImageBackground>
+
     </View>
+ 
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    height: Dimensions.get('screen').height,
+    width:Dimensions.get('screen').width,
     backgroundColor: ERP_COLOR_CODE.ERP_WHITE,
     paddingTop: 80,
     alignItems: 'center',
@@ -261,6 +482,7 @@ const styles = StyleSheet.create({
     height: 18,
     borderRadius: 9,
     marginHorizontal: 8,
+    borderWidth: 1
   },
   keypad: {
     width: width * 0.8,
@@ -274,9 +496,9 @@ const styles = StyleSheet.create({
     width: 70,
     height: 70,
     borderRadius: 35,
-    backgroundColor: '#f3f4f6',
     justifyContent: 'center',
     alignItems: 'center',
+    borderWidth: 1
   },
   keyText: {
     fontSize: 22,

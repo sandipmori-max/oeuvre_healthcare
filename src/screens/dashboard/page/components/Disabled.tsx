@@ -26,14 +26,22 @@ const Disabled = ({ item, value, type }: any) => {
 
   return (
     <View style={{ marginBottom: 16 }}>
-      <View style={{ flexDirection: 'row', }}>
-        <Text style={[styles.label, theme === 'dark' && {
+      <View style={{ 
+        flexDirection: 'row',  
+        justifyContent:'space-between'
+         }}>
+        <View  style={{ 
+        flexDirection: 'row',  
+        
+         }}>
+          <Text style={[styles.label, theme === 'dark' && {
           color: 'white'
         }]}>{item?.fieldtitle}</Text>
         {item?.fieldtitle !== item?.tooltip && <Text style={[styles.label, theme === 'dark' && {
           color: 'white'
         }]}> - ( {item?.tooltip} )</Text>}
         {item?.mandatory === '1' && <Text style={{ color: ERP_COLOR_CODE.ERP_ERROR }}>*</Text>}
+        </View>
         <ShortAction item={item} value={value}/>
       </View>
       <View style={[styles.disabledBox, theme === 'dark' && {

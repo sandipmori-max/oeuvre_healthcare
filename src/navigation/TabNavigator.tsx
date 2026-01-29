@@ -6,7 +6,7 @@ import HomeScreen from "../screens/dashboard/tabs/home/HomeTab";
 import ProfileTab from "../screens/dashboard/tabs/profile/ProfileTab";
 import useTranslations from "../hooks/useTranslations";
 import { useAppSelector } from "../store/hooks";
-import TabIcon from "../components/tab_icon/TabIcon";
+import AnimatedTabIcon from "../components/tab_icon/AnimatedTabIcon";
 
 const Tab = createBottomTabNavigator();
 
@@ -104,7 +104,7 @@ const TabNavigator = () => {
               marginTop: 8,
             },
             tabBarIcon: ({ color, size, focused }) => (
-              <TabIcon
+              <AnimatedTabIcon
                 name={tab.icon}
                 color={color}
                 size={size}

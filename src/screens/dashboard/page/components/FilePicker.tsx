@@ -22,8 +22,16 @@ interface FileType {
   type?: string;
 }
 
-const FilePickerRow = ({ item, handleAttachment, baseLink, infoData, isFromFileManager = false , onFilePicked}) => {
-   const { t } = useTranslations();
+const FilePickerRow = ({ item, handleAttachment, baseLink, infoData, isFromFileManager = false, onFilePicked }) => {
+  const { t } = useTranslations();
+  const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25MB
+  const ALLOWED_EXTENSIONS = [
+    'jpg', 'jpeg', 'png',
+    'mov', 'avi',
+    'pdf',
+    'doc', 'docx',
+    'xls', 'xlsx',
+  ];
 
   const base = `${baseLink}fileupload/1/${infoData?.tableName}/${infoData?.id}/${item?.text}`;
   const [selectedFiles, setSelectedFiles] = useState<FileType[]>([]);
@@ -34,18 +42,34 @@ const FilePickerRow = ({ item, handleAttachment, baseLink, infoData, isFromFileM
         type: [types.allFiles],
       });
       setSelectedFiles(prev => [...prev, ...files]);
+      const file = files[0];
 
       let filePath = files[0].uri;
+      const extension = file.name?.split('.').pop()?.toLowerCase();
 
+      if (!extension || !ALLOWED_EXTENSIONS.includes(extension)) {
+        Alert.alert(
+          t("title.title1"),
+          t("Selected file type is not supported")
+        );
+        return;
+      }
+      if (file.size && file.size > MAX_FILE_SIZE) {
+        Alert.alert(
+          t("title.title1"),
+          t("File size must be less than or equal to 25MB")
+        );
+        return;
+      }
       if (Platform.OS === 'android' && files[0].uri.startsWith('content://')) {
         const destPath = `${RNFS.TemporaryDirectoryPath}/${files[0].name}`;
         await RNFS.copyFile(files[0].uri, destPath);
         filePath = destPath;
       }
-    if (isFromFileManager && onFilePicked) {
-      onFilePicked(files[0]);
-      return;
-    }
+      if (isFromFileManager && onFilePicked) {
+        onFilePicked(files[0]);
+        return;
+      }
       const fileBase64 = await RNFS.readFile(filePath, 'base64');
 
       handleAttachment(
@@ -54,8 +78,8 @@ const FilePickerRow = ({ item, handleAttachment, baseLink, infoData, isFromFileM
       );
     } catch (err: any) {
       if (err.code === 'USER_CANCELED') {
-       } else {
-         Alert.alert(t("title.title1"), t("msg.msg12"));
+      } else {
+        Alert.alert(t("title.title1"), t("msg.msg12"));
       }
     }
   };
@@ -70,7 +94,7 @@ const FilePickerRow = ({ item, handleAttachment, baseLink, infoData, isFromFileM
       setSelectedFiles(prev => prev.map((f, i) => (i === index ? file : f)));
     } catch (err: any) {
       if (err.code === 'USER_CANCELED') return;
-        Alert.alert(t("title.title1"), t("msg.msg13"));
+      Alert.alert(t("title.title1"), t("msg.msg13"));
     }
   };
 

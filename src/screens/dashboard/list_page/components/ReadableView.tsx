@@ -26,6 +26,7 @@ import MemoizedFooterView from './MemoizedFooterView';
 import RemarksView from './RemarksView';
 import { useAppSelector } from '../../../../store/hooks';
 import useTranslations from '../../../../hooks/useTranslations';
+import { Easing } from 'react-native';
 
 // enable LayoutAnimation on Android
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -101,15 +102,34 @@ const ReadableView = ({
   isLoadingMore
 }: any) => {
   const { t } = useTranslations();
-
-  const navigation = useNavigation();
+   const navigation = useNavigation();
   const screenWidth = Dimensions.get('window').width;
   const [listData, setListData] = useState(filteredData || []);
   const theme = useAppSelector(state => state?.theme?.mode);
 
-  useEffect(() =>{
+   
+const slideAnim = useRef(new Animated.Value(300)).current; // right se start
+
+const fadeAnim = useRef(new Animated.Value(0)).current;
+
+useEffect(() => {
+  Animated.parallel([
+    Animated.timing(slideAnim, {
+      toValue: 0,
+      duration: 600,
+      useNativeDriver: true,
+    }),
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 600,
+      useNativeDriver: true,
+    }),
+  ]).start();
+}, []);
+
+  useEffect(() => {
     setListData(filteredData)
-  },[filteredData])
+  }, [filteredData])
   const handleDelete = (item) => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     handleDeleteNotification(item)
@@ -130,7 +150,6 @@ const ReadableView = ({
 
   const RenderCard = ({ item, index }: any) => {
 
-    console.log("---------------------------", item);
     if (!item) return null;
     const name = item?.name?.toString() || `-`;
     const subName = item?.number || `-`;
@@ -179,12 +198,12 @@ const ReadableView = ({
           activeOpacity={0.8}
           style={[
             {
-            flexDirection: 'row', 
-          },
-          status && {
-            alignItems: 'center',
+              flexDirection: 'row',
+            },
+            status && {
+              alignItems: 'center',
 
-          }
+            }
           ]}
           onPress={async () => {
             if (authUser) return;
@@ -261,8 +280,8 @@ const ReadableView = ({
                 style={{
                   fontWeight: '600',
                   fontSize: 12,
-                  width:'100%',
-                  textAlign:'right',
+                  width: '100%',
+                  textAlign: 'right',
                   color: theme === 'dark' ? 'white' : ERP_COLOR_CODE.ERP_ERROR,
                 }}
               >
@@ -276,14 +295,14 @@ const ReadableView = ({
                   fontWeight: '800',
                   fontSize: 12,
                   color: theme === 'dark' ? 'white' : ERP_COLOR_CODE.ERP_BLACK,
-                  alignSelf:'flex-end',
-                  alignItems:'flex-end',
-                  textAlign:'right'
+                  alignSelf: 'flex-end',
+                  alignItems: 'flex-end',
+                  textAlign: 'right'
                 }}
               >
-                    {
-                      formatDateList(date)
-                    }    
+                {
+                  formatDateList(date)
+                }
               </Text>
             )}
           </View>
@@ -347,22 +366,22 @@ const ReadableView = ({
                     size={16}
                     color={theme === 'dark' ? 'white' : ERP_COLOR_CODE.ERP_APP_COLOR}
                   />
-                  <Text 
-                  numberOfLines={2}
-                  style={{
-                     width: '96%',
-                    color: theme === 'dark' ? 'white' : 'black'
-                  }}>{address}</Text>
+                  <Text
+                    numberOfLines={2}
+                    style={{
+                      width: '96%',
+                      color: theme === 'dark' ? 'white' : 'black'
+                    }}>{address}</Text>
                 </View>
               )}
             </View>
           )}
         </TouchableOpacity>
         {
-            <View style={{
-            justifyContent:  qty && amount ?'space-between' : 'flex-start',
+          <View style={{
+            justifyContent: qty && amount ? 'space-between' : 'flex-start',
             width: '100%', flexDirection: 'row',
-            
+
           }}>
             {!!qty && (
               <View style={{ flexDirection: 'row', width: '50%' }}>
@@ -392,9 +411,9 @@ const ReadableView = ({
             )}
             {!!amount && !!qty && (
               <View style={{
-                flexDirection: 'row', 
+                flexDirection: 'row',
               }}>
-                
+
                 <Text
                   numberOfLines={1}
                   style={{
@@ -405,7 +424,7 @@ const ReadableView = ({
 
                   }}
                 >
-                    {t("text.text29")}:
+                  {t("text.text29")}:
                 </Text>
                 <Text
                   numberOfLines={1}
@@ -416,8 +435,8 @@ const ReadableView = ({
                     color: 'green',
                   }}
                 >  {
-                  amount
-                }
+                    amount
+                  }
                 </Text>
               </View>
             )}
@@ -429,42 +448,42 @@ const ReadableView = ({
         </View>
 
         {('btn_edit' in item ? item?.btn_edit !== '' : true) && btnKeys?.length > 0 && (
-  <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginTop: 0, gap: 1 }}>
-    {btnKeys?.map((key, idx) => {
-      const actionValue = item[key];
-      const { label, color } = getButtonMeta(key);
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginTop: 0, gap: 1 }}>
+            {btnKeys?.map((key, idx) => {
+              const actionValue = item[key];
+              const { label, color } = getButtonMeta(key);
 
-      return (
-        <TouchableOpacity
-          key={`${key}-${idx}`}
-          style={{
-            backgroundColor: authUser ? '#C6C6C6' : color,
-            paddingHorizontal: 6,
-            paddingVertical: 4,
-            borderRadius: 4,
-            flexGrow: 1,
-            maxWidth: screenWidth / 4,
-            alignItems: 'center',
-          }}
-          onPress={() => {
-            if (authUser) return;
-            handleActionButtonPressed(actionValue, label, color, item?.id, item);
-          }}
-        >
-          <Text
-            style={{
-              color: ERP_COLOR_CODE.ERP_WHITE,
-              fontWeight: '600',
-              fontSize: 12,
-            }}
-          >
-            {label}
-          </Text>
-        </TouchableOpacity>
-      );
-    })}
-  </View>
-)}
+              return (
+                <TouchableOpacity
+                  key={`${key}-${idx}`}
+                  style={{
+                    backgroundColor: authUser ? '#C6C6C6' : color,
+                    paddingHorizontal: 6,
+                    paddingVertical: 4,
+                    borderRadius: 4,
+                    flexGrow: 1,
+                    maxWidth: screenWidth / 4,
+                    alignItems: 'center',
+                  }}
+                  onPress={() => {
+                    if (authUser) return;
+                    handleActionButtonPressed(actionValue, label, color, item?.id, item);
+                  }}
+                >
+                  <Text
+                    style={{
+                      color: ERP_COLOR_CODE.ERP_WHITE,
+                      fontWeight: '600',
+                      fontSize: 12,
+                    }}
+                  >
+                    {label}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        )}
 
       </View>
     );
@@ -510,19 +529,25 @@ const ReadableView = ({
         renderItem={({ item, index }) => <RenderCard item={item} index={index} />}
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
-         onEndReached={loadMore}
-          onEndReachedThreshold={0.2} // trigger when 80% scrolled
-          ListFooterComponent={
-            isLoadingMore ? (
-              <View style={{ padding: 20 }}>
-                <Text style={{ textAlign: 'center', color: 'gray' }}>{t("text.text30")}</Text>
-              </View>
-            ) : null
-          }
+        onEndReached={loadMore}
+        onEndReachedThreshold={0.2} // trigger when 80% scrolled
+        ListFooterComponent={
+          isLoadingMore ? (
+            <View style={{ padding: 20 }}>
+              <Text style={{ textAlign: 'center', color: 'gray' }}>{t("text.text30")}</Text>
+            </View>
+          ) : null
+        }
       />
 
       {listData?.length > 0 && (
-        <View
+        <Animated.View
+  style={{
+    opacity: fadeAnim,
+    transform: [{ translateX: slideAnim }],
+  }}
+>
+ <View
           style={{
             marginTop: 6,
             padding: 8,
@@ -556,7 +581,7 @@ const ReadableView = ({
                   style={{
                     fontSize: 16,
                     fontWeight: 'bold',
-                    color: theme === 'dark' ? 'white'  : '#28a745',
+                    color: theme === 'dark' ? 'white' : '#28a745',
                     marginLeft: 8,
                   }}
                 >
@@ -584,7 +609,7 @@ const ReadableView = ({
                   style={{
                     fontSize: 16,
                     fontWeight: 'bold',
-                    color: theme === 'dark' ? 'white'  : '#28a745',
+                    color: theme === 'dark' ? 'white' : '#28a745',
                     marginLeft: 8,
 
                   }}
@@ -607,6 +632,8 @@ const ReadableView = ({
             </Text>
           </View>
         </View>
+</Animated.View>
+       
       )}
     </View>
   );

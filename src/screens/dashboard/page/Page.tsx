@@ -146,6 +146,7 @@ const PageScreen = () => {
   const [locationEnabled, setLocationEnabled] = useState<boolean | null>(null);
   const [modalClose, setModalClose] = useState(false);
   const [isSettingVisible, setIsSettingVisible] = useState(false);
+  const [myScript, setMyScript] = useState("");
   const [backgroundDeniedModal, setBackgroundDeniedModal] = useState(false);
 
   const isCheckingPermission = useRef(false);
@@ -153,7 +154,6 @@ const PageScreen = () => {
   const lastLocationEnabled = useRef<boolean | null>(null);
   const appState = useRef(AppState.currentState);
 
-  console.log("controls-==-=================================", controls)
   const hasLocationField = controls.some(
     item => item?.defaultvalue && item?.defaultvalue === '#location' && item?.visible === "0",
   );
@@ -304,7 +304,9 @@ const PageScreen = () => {
 
     setErrors(validationErrors);
     setErrorsList(errorMessages);
-    if (errorMessages?.length > 0) setShowErrorModal(true);
+    setTimeout(() => {
+      if (errorMessages?.length > 0) setShowErrorModal(true);
+    }, 780)
 
     return errorMessages?.length === 0;
   }, [controls, formValues]);
@@ -344,11 +346,12 @@ const PageScreen = () => {
       ),
       headerRight: () => (
         <>
-          {!isFromNew && (
+          {!error && !isFromNew && (
             <ERPIcon
               name="refresh"
               isLoading={actionLoader}
               onPress={() => {
+                setButtonSave(true)
                 setActionLoader(true);
                 fetchPageData();
                 setErrors({});
@@ -373,6 +376,8 @@ const PageScreen = () => {
     actionLoader,
     actionSaveLoader,
     buttonSave,
+    error
+
   ]);
 
   const fetchPageData = useCallback(async () => {
@@ -384,7 +389,9 @@ const PageScreen = () => {
         getERPPageThunk({ page: url, id: isFromNew ? 0 : id }),
       ).unwrap();
 
-      console.log("-----parsed------parsed--------parsed------", parsed)
+      console.log("parsed", parsed?.script);
+      setMyScript(parsed?.script);
+
       if (!isFromNew) {
         setInfoData({
           id: id?.toString(),
@@ -456,59 +463,43 @@ const PageScreen = () => {
     hideDateTimePicker();
   };
 
-  const checkScript = () => {
-    const scriptRules = {
-      logic: "AND",
-      rules: [
-        {
-          left: "btid",
-          operator: "lessThan",
-          right: "muid"
-        },
-        {
-          logic: "OR",
-          rules: [
-            { left: "termhead", operator: "equals", right: "POterms12" },
-            { left: "active", operator: "isTruthy" }
-          ]
-        }
-      ],
-      validActions: [
-        { field: "termhead", action: "background", background: 'red' },
-        { field: "termhead", action: "borderColor", borderColor: 'red' },
-        { field: "btid", action: "hide" },
-        { field: "active", action: "setBoolValue", value: false },
-        { field: "businessterm", action: "hide", },
-        { field: "businessterm", action: "setValue", value: 'Test123' },
-        { field: "cdt", action: "enable" },
-        { field: "cdt", action: "borderColor", borderColor: 'red' },
-        { field: "buttonSave", action: "disable" },
-      ],
-      invalidActions: [
-        { field: "termhead", action: "disable" },
-        { field: "buttonSave", action: "enable" },
-      ]
-    }
+  // useEffect(() => {
 
-    const { actions } = evaluateRulesWithActions(scriptRules, formValues);
-    console.log("actions+++++++++", actions)
-    const hasButtonSaveEnable = actions.some(
-      item => item?.field === "buttonSave"
-    );
-    if (hasButtonSaveEnable) {
-      const hasButtonSaveEnable = actions.some(
-        item => item?.field === "buttonSave" && item.action === "enable"
-      );
-      setButtonSave(hasButtonSaveEnable)
-    }
-    const updatedControls = applyActionsToControls(controls, actions);
-    console.log("updated-----------------Controls", updatedControls)
-    setControls(updatedControls)
-  }
+  //           // let sccc = { "onClick_buttonSave": { "logic": "OR", "rules": [ { "left": "doctorlocation", "operator": "locationWithin", "right": "inlocation", "meters": 50 } ], "validActions": [ { "field": "buttonSave", "action": "disable" } ], "invalidActions": [ { "field": "buttonSave", "action": "enable" } ] }, "onpage_load": { "logic": "OR", "rules": [ { "left": "doctorname", "operator": "equals", "right": "Dr Sps Aneja " } ], "validActions": [ { "field": "doctorname", "action": "disable" } ], "invalidActions": [ { "field": "doctorname", "action": "disable" } ] }, }
+  //           //               let rules;
+  //           //               if (typeof myScript === "string") {
+  //           //                 try {
+  //           //                   rules = sccc.onpage_load;
+  //           //                 } catch (e) {
+  //           //                   console.error("Invalid JSON from backend", e);
+  //           //                   return;
+  //           //                 }
+  //           //               } else {
+  //           //                 rules = myScript;
+  //           //               }
+  //           //               console.log("rules type:", typeof rules); 
+  //           //               const { actions } = evaluateRulesWithActions(rules, formValues);
+  //           //               const hasButtonSaveEnable = actions.some(
+  //           //                 item => item?.field === "buttonSave"
+  //           //               );
+  //           //               console.log("actions", actions, hasButtonSaveEnable)
+  //           //               if (hasButtonSaveEnable) {
+  //           //                 const hasButtonSaveEnable = actions.some(
+  //           //                   item => item?.field === "buttonSave" && item.action === "enable"
+  //           //                 );
+  //           //                 console.log("hasButtonSaveEnablehasButtonSaveEnable", hasButtonSaveEnable)
+  //           //                 const updatedControls = applyActionsToControls(controls, actions);
+  //           //                 setControls(updatedControls)
+  //           //                 setButtonSave(hasButtonSaveEnable)
+  //           //                 if(!hasButtonSaveEnable){
+  //           //                   return;
+  //           //                 }
+  //           //               }
+  //           //               console.log("hasButtonSaveEnable-------------------")
+  //           //               const updatedControls = applyActionsToControls(controls, actions);
+  //           //               setControls(updatedControls)
 
-  useEffect(() => {
-    // checkScript()
-  }, [formValues]);
+  //  }, [formValues]);
 
 
   const renderItem = useCallback(
@@ -531,7 +522,6 @@ const PageScreen = () => {
       //BoolInput
       if (item?.ctltype === 'BOOL') {
         const rawVal = formValues[item?.field] ?? item?.text;
-        console.log("rawVal", rawVal)
         const boolVal = String(rawVal).toLowerCase() === 'true';
         content = (
           <BoolInput
@@ -801,118 +791,158 @@ const PageScreen = () => {
               contentContainerStyle={{ paddingBottom: keyboardHeight }}
               keyboardShouldPersistTaps="handled"
             />
-{!authUser && controls.length > 0 && (
-             <TouchableOpacity
-               style={{
-                 height: 46,
-                 width: '100%',
-                 backgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR,
-                 justifyContent: 'center',
-                 alignContent: 'center',
-                 alignItems: 'center',
-                 borderRadius: 6,
-               }}
-               onPress={async () => {
-                 try {
-                   const locationEnabled = hasLocationField ? await DeviceInfo.isLocationEnabled() : true;
-                   const permissionStatus = hasLocationField
-                     ? await requestLocationPermissions()
-                     : 'granted';
-                   const hasCameraPermission = hasMediaField ? await requestCameraPermission() : true;
-                   if (!hasCameraPermission && hasMediaField) {
-                     setAlertConfig({
-                       title: t('title.title16'),
-                       message: t("msg.msg15"),
-                       type: 'error',
-                     });
-                     setAlertVisible(true);
-                     setModalClose(false);
-                     return;
-                   }
-                   if (hasLocationField && !locationEnabled) {
-                     setAlertConfig({
-                       title: t("title.title13"),
-                       message: t('title.title15'),
-                       type: 'error',
-                     });
-                     setAlertVisible(true);
-                     setModalClose(false);
-                     return;
-                   }
-                   if (hasLocationField && (permissionStatus === 'denied' || permissionStatus === 'blocked')) {
-                     setAlertConfig({
-                       title: t("title.title13"),
-                       message: t('title.title15'),
-                       type: 'error',
-                     });
-                     setAlertVisible(true);
-                     setModalClose(false);
-                     return;
-                   }
-                   setLocationVisible(true);
-                   setActionSaveLoader(true);
-                   setIsValidate(true);
 
+            {!authUser && controls.length > 0 && (
+              <TouchableOpacity
+                style={{
+                  height: 46,
+                  width: '100%',
+                  backgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR,
+                  justifyContent: 'center',
+                  alignContent: 'center',
+                  alignItems: 'center',
+                  borderRadius: 6,
+                }}
+                onPress={async () => {
+                    try {
+                  if(myScript){
+                    let rules;
+                  if (myScript && typeof myScript === "string") {
+                    try {
+                      rules = JSON.parse(myScript);
+                    } catch (e) {
+                      console.error("Invalid JSON from backend", e);
+                      return;
+                    }
+                  } else {
+                    rules = myScript;
+                  }
+                  const { actions } = evaluateRulesWithActions(rules, formValues);
+                  const hasButtonSaveEnable = actions.some(
+                    item => item?.field === "buttonSave"
+                  );
+                  if (hasButtonSaveEnable) {
+                    const hasButtonSaveEnable = actions.some(
+                      item => item?.field === "buttonSave" && item.action === "enable"
+                    );
+                    const updatedControls = applyActionsToControls(controls, actions);
+                    setControls(updatedControls)
+                    setButtonSave(hasButtonSaveEnable)
+                    if (!hasButtonSaveEnable) {
+                      Alert.alert("Error", myScript?.message)
+                      return;
+                    }
+                  }
+                  const updatedControls = applyActionsToControls(controls, actions);
+                  setControls(updatedControls)
+                  }  
 
-                   if (validateForm()) {
-                     const submitValues: Record<string, any> = {};
-                     controls?.forEach(f => {
-                       if (f.refcol !== '1') submitValues[f?.field] = formValues[f?.field];
-                     });
+                  // 1️⃣ Check if location services are enabled
+                  const locationEnabled = hasLocationField ? await DeviceInfo.isLocationEnabled() : true;
 
+                  // 2️⃣ Request location permissions if needed
+                  const permissionStatus = hasLocationField
+                    ? await requestLocationPermissions()
+                    : 'granted';
 
-                     try {
-                       setLoader(true);
-                       await dispatch(savePageThunk({ page: url, id, data: { ...submitValues } })).unwrap();
-                       setLoader(false);
-                       setIsValidate(false);
+                  // 3️⃣ Request camera/media permission if needed
+                  const hasCameraPermission = hasMediaField ? await requestCameraPermission() : true;
 
+                  // 4️⃣ Handle permission errors
+                  if (!hasCameraPermission && hasMediaField) {
+                    setAlertConfig({
+                      title: t('title.title16'),
+                      message: t("msg.msg15"),
+                      type: 'error',
+                    });
+                    setAlertVisible(true);
+                    setModalClose(false);
+                    return;
+                  }
 
-                       fetchPageData();
-                       setAlertConfig({
-                         title: t('title.title17'),
-                         message: t("title.title18"),
-                         type: 'success',
-                       });
-                       setAlertVisible(true);
-                       setGoBack(true);
+                  if (hasLocationField && !locationEnabled) {
+                    setAlertConfig({
+                      title: t("title.title13"),
+                      message: t('title.title15'),
+                      type: 'error',
+                    });
+                    setAlertVisible(true);
+                    setModalClose(false);
+                    return;
+                  }
 
+                  if (hasLocationField && (permissionStatus === 'denied' || permissionStatus === 'blocked')) {
+                    setAlertConfig({
+                      title: t("title.title13"),
+                      message: t('title.title15'),
+                      type: 'error',
+                    });
+                    setAlertVisible(true);
+                    setModalClose(false);
+                    return;
+                  }
 
-                       setTimeout(() => {
-                         setAlertVisible(false);
-                         navigation.goBack();
-                       }, 1500);
-                     } catch (err: any) {
-                       setLoader(false);
-                       setAlertConfig({
-                         title: t('title.title17'),
-                         message: err,
-                         type: 'error',
-                       });
-                       setAlertVisible(true);
-                       setGoBack(false);
-                     }
-                   }
+                  // ✅ Permissions are granted, proceed
+                  setLocationVisible(true);
+                  setActionSaveLoader(true);
+                  setIsValidate(true);
 
+                  if (validateForm()) {
+                    const submitValues: Record<string, any> = {};
+                    controls?.forEach(f => {
+                      if (f.refcol !== '1') submitValues[f?.field] = formValues[f?.field];
+                    });
 
-                   setActionSaveLoader(false);
-                 } catch (error) {
-                   console.error("Save error:", error);
-                   setActionSaveLoader(false);
-                 }
-               }}
-             >
-               <Text
-                 style={{
-                   color: ERP_COLOR_CODE.ERP_WHITE,
-                   fontSize: 16,
-                   fontWeight: '800',
-                 }}
-               >
-                 {actionSaveLoader ? 'Loading' : 'Save'}
-               </Text>
-             </TouchableOpacity>
-           )}
+                    try {
+                      setLoader(true);
+                      await dispatch(savePageThunk({ page: url, id, data: { ...submitValues } })).unwrap();
+                      setLoader(false);
+                      setIsValidate(false);
+
+                      fetchPageData();
+                      setAlertConfig({
+                        title: t('title.title17'),
+                        message: t("title.title18"),
+                        type: 'success',
+                      });
+                      setAlertVisible(true);
+                      setGoBack(true);
+
+                      setTimeout(() => {
+                        setAlertVisible(false);
+                        navigation.goBack();
+                      }, 1500);
+                    } catch (err: any) {
+                      setLoader(false);
+                      setAlertConfig({
+                        title: t('title.title17'),
+                        message: err,
+                        type: 'error',
+                      });
+                      setAlertVisible(true);
+                      setGoBack(false);
+                    }
+                  }
+
+                  setActionSaveLoader(false);
+                } catch (error) {
+                  console.error("Save error:", error);
+                  setActionSaveLoader(false);
+                }
+                }}
+              >
+                <Text
+                  style={{
+                    color: ERP_COLOR_CODE.ERP_WHITE,
+                    fontSize: 16,
+                    fontWeight: '800',
+                  }}
+                >
+                  {actionSaveLoader ? 'Loading' : 'Save'}
+                </Text>
+              </TouchableOpacity>
+            )}
+
 
 
           </View>
@@ -968,7 +998,7 @@ const PageScreen = () => {
                 isVisible={dateTimePickerVisible}
                 mode="datetime"
                 display='spinner'
-                   is24Hour={false}
+                is24Hour={false}
                 date={activeDateTime ? parseCustomDatePage(activeDateTime) : new Date()}
                 onConfirm={handleDateTimeConfirm}
                 onCancel={hideDateTimePicker}
@@ -991,7 +1021,7 @@ const PageScreen = () => {
               <DateTimePicker
                 isVisible={datePickerVisible}
                 mode="date"
-                 date={activeDate ? parseCustomDatePage(activeDate) : new Date()}
+                date={activeDate ? parseCustomDatePage(activeDate) : new Date()}
                 onConfirm={handleConfirm}
                 onCancel={hideDatePicker}
                 display="spinner"

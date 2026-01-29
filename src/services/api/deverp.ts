@@ -53,7 +53,7 @@ class DevERPService {
       await this.ensureAuthToken();
 
       const response = await apiClient.post<T>(`${this.link}${endpoint}`, payload);
-
+      console.log("response",response)
       if (
         (response as any).data?.success === 0 &&
         (response as any).data?.message?.includes('Token Expire')
@@ -68,6 +68,7 @@ class DevERPService {
 
       return response.data;
     } catch (error) {
+      console.log("error",error)
       throw error;
     }
   }
@@ -78,7 +79,6 @@ class DevERPService {
     const response = await apiClient.post<DevERPResponse>(`${this.baseUrl}/appcode.aspx/getLink`, {
       code,
     });
-    console.log("response--------------------", response)
     if (response.data.success === 1 && response.data.link) {
 
       if (Platform.OS !== 'ios' && response.data.link.startsWith('https://')) {
@@ -205,6 +205,7 @@ class DevERPService {
     fd: string,
     td: string
   ): Promise<DashboardResponse> {
+    console.log("this.token", this.token,'branch', branch)
     return this.apiCall<DashboardResponse>(
       'msp_api.aspx/getDB',
       {
@@ -274,7 +275,7 @@ class DevERPService {
   }
 
   getLastPunchIn() {
-    console.log("TOKEN___________________", this.token)
+    console.log("this.token getLastPunchIn", this.token)
     return this.apiCall<any>('msp_api.aspx/getLastPunchIn', { token: this.token });
   }
 
@@ -333,11 +334,13 @@ class DevERPService {
     this.token = token;
     AsyncStorage.setItem('erp_token', token);
   }
+
   setDevice(device: string) {
     AsyncStorage.setItem('device', device);
 
     this.device = device;
   }
+  
   setAppId(appId: string) {
     AsyncStorage.setItem('erp_appid', appId);
     this.appid = appId;

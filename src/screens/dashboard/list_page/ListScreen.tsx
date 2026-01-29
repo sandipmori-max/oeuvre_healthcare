@@ -1,5 +1,5 @@
-import { Text, View, TextInput, TouchableOpacity, Alert, Modal, Platform } from 'react-native';
-import React, { useEffect, useLayoutEffect, useState, useCallback, useMemo } from 'react';
+import { Text, View, TextInput, TouchableOpacity, Alert, Modal, Platform, Animated } from 'react-native';
+import React, { useEffect, useLayoutEffect, useState, useCallback, useMemo, useRef } from 'react';
 import { RouteProp, useFocusEffect, useNavigation, useRoute } from '@react-navigation/native';
 
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
@@ -75,7 +75,22 @@ const ListScreen = () => {
   const [pageSize] = useState(100);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
+  const pressAnim = useRef(new Animated.Value(1)).current;
+  const onPressIn = () => {
+    Animated.spring(pressAnim, {
+      toValue: 0.86,
+      useNativeDriver: true,
+    }).start();
+  };
 
+  const onPressOut = () => {
+    Animated.spring(pressAnim, {
+      toValue: 1,
+      friction: 4,
+      tension: 150,
+      useNativeDriver: true,
+    }).start();
+  };
   // useEffect(() => {
   //   if (!filteredData) return;
   //   setPage(1);
@@ -129,7 +144,7 @@ const ListScreen = () => {
     navigation.setOptions({
       headerStyle: {
         backgroundColor: theme === 'dark' ? 'black' : ERP_COLOR_CODE.ERP_APP_COLOR,
-         borderBottomWidth: 1,
+        borderBottomWidth: 1,
         borderBottomColor: '#fff',
       },
       headerTintColor: '#fff',
@@ -148,14 +163,16 @@ const ListScreen = () => {
       ),
       headerRight: () => (
         <>
-          <ERPIcon
-            name="refresh"
-            onPress={() => {
-              setActionLoader(true);
-              onRefresh();
-            }}
-            isLoading={actionLoaders}
-          />
+          {
+            !error && <ERPIcon
+              name="refresh"
+              onPress={() => {
+                setActionLoader(true);
+                onRefresh();
+              }}
+              isLoading={actionLoaders}
+            />
+          }
           {/* {
             !isFromAlertCard && <ERPIcon
               name={isTableView ? 'list' : 'apps'}
@@ -164,16 +181,18 @@ const ListScreen = () => {
               }}
             />
           } */}
-          <ERPIcon
-            name={!hasDateField ? 'search' : isFilterVisible ? 'filter-alt' : 'filter-alt'}
-            onPress={() => {
-              setIsFilterVisible(!isFilterVisible);
-            }}
-          />
+          {
+            !error && <ERPIcon
+              name={!hasDateField ? 'search' : isFilterVisible ? 'filter-alt' : 'filter-alt'}
+              onPress={() => {
+                setIsFilterVisible(!isFilterVisible);
+              }}
+            />
+          }
         </>
       ),
     });
-  }, [navigation, pageTitle, isFilterVisible, hasDateField, isTableView, actionLoaders]);
+  }, [navigation, pageTitle, isFilterVisible, hasDateField, isTableView, actionLoaders, error]);
 
   const getCurrentMonthRange = useCallback(() => {
     const now = new Date();
@@ -197,7 +216,6 @@ const ListScreen = () => {
           const trimmedQuery = query.trim();
 
           if (trimmedQuery === '') {
-            console.log("Data", data);
             setFilteredData(data);
             return;
           }
@@ -252,7 +270,6 @@ const ListScreen = () => {
 
   const clearSearch = () => {
     setSearchQuery('');
-    console.log("------------------listData*******************", listData)
     setFilteredData(listData);
   };
 
@@ -328,6 +345,7 @@ const ListScreen = () => {
             configArray = parsed.config || [];
           }
         }
+
         setConfigData(configArray);
         setListData(dataArray);
         setFilteredData(dataArray);
@@ -364,7 +382,6 @@ const ListScreen = () => {
   );
 
   const handleItemPressed = (item, page, pageTitle = '') => {
-
     setIsFilterVisible(false);
     setSearchQuery('');
     navigation.navigate('Page', {
@@ -422,6 +439,7 @@ const ListScreen = () => {
       </View>
     );
   }
+
   return (
     <View style={[styles.container, theme === 'dark' && { backgroundColor: 'black' }]}>
       {isFilterVisible && (
@@ -432,7 +450,7 @@ const ListScreen = () => {
               backgroundColor: 'black'
             }
             ]}>
-              <MaterialIcons size={24} name="search" color={theme === 'dark' ? 'white': 'black'} />
+              <MaterialIcons size={24} name="search" color={theme === 'dark' ? 'white' : 'black'} />
               <TextInput
                 style={[styles.searchInput,
                 theme === 'dark' && {
@@ -457,7 +475,10 @@ const ListScreen = () => {
               {/* Start Date */}
               <View style={styles.dateRow}>
                 <TouchableOpacity
-                  onPress={() => setShowDatePicker({ type: 'from', show: true })}
+                  onPress={() => {
+                    setSearchQuery('');
+                    setShowDatePicker({ type: 'from', show: true })
+                  }}
                   style={styles.dateButton}
                 >
                   <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -476,7 +497,10 @@ const ListScreen = () => {
               {/* End Date */}
               <View style={styles.dateRow}>
                 <TouchableOpacity
-                  onPress={() => setShowDatePicker({ type: 'to', show: true })}
+                  onPress={() => {
+                    setSearchQuery('');
+                    setShowDatePicker({ type: 'to', show: true })
+                  }}
                   style={styles.dateButton}
                 >
                   <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -594,22 +618,33 @@ const ListScreen = () => {
       )}
 
       {hasIdField && !isFromAlertCard && !loadingListId && configData && (
-        <TouchableOpacity
-          style={[
-            styles.addButton,
-            {
-              bottom: filteredData.length === 0 ? 40 : totalAmount === 0 ? 64 : 78,
-            },
-            theme === 'dark' && {
-              backgroundColor: 'white'
-            }
-          ]}
-          onPress={() => {
-            handleItemPressed({}, pageParamsName, pageTitle);
+        <Animated.View
+          style={{
+            transform: [
+              { scale: pressAnim },
+            ],
           }}
         >
-          <MaterialIcons size={32} name="add" color={theme === 'dark' ? 'black' : ERP_COLOR_CODE.ERP_WHITE} />
-        </TouchableOpacity>
+          <TouchableOpacity
+            style={[
+              styles.addButton,
+              {
+                bottom: filteredData.length === 0 ? 40 : totalAmount === 0 ? 64 : 78,
+              },
+              theme === 'dark' && {
+                backgroundColor: 'white'
+              }
+            ]}
+            onPressIn={onPressIn}
+            onPressOut={onPressOut}
+            onPress={() => {
+              handleItemPressed({}, pageParamsName, pageTitle);
+            }}
+          >
+            <MaterialIcons size={32} name="add" color={theme === 'dark' ? 'black' : ERP_COLOR_CODE.ERP_WHITE} />
+          </TouchableOpacity>
+        </Animated.View>
+
       )}
 
       <CustomAlert

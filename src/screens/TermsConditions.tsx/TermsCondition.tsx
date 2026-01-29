@@ -36,7 +36,7 @@ const TermsAndConsent = ({ onAccept }: any) => {
 
   return (
     <>
-    <View style={{height: 12, marginTop: 40}}/>
+    <View style={{height: 12, marginTop: 4}}/>
       <Text style={[styles.title, {
         borderBottomWidth: 0.4,
         paddingBottom: 4

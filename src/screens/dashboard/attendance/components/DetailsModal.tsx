@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
   Modal,
   View,
@@ -7,6 +7,7 @@ import {
   Animated,
   Dimensions,
   ScrollView,
+  Easing, // ⭐
 } from 'react-native';
 import { formatTo12Hour, getWorkedHours2 } from '../../../../utils/helpers';
 import MaterialIcons from '@react-native-vector-icons/material-icons';
@@ -18,21 +19,58 @@ import useTranslations from '../../../../hooks/useTranslations';
 const { height } = Dimensions.get('screen');
 
 const DetailsBottomSheet = ({ visible, onClose, item, baseLink }: any) => {
-  const translateY = new Animated.Value(height);
   const theme = useAppSelector(state => state?.theme.mode);
   const { t } = useTranslations();
 
-  if (visible) {
-    Animated.timing(translateY, {
-      toValue: 0,
-      duration: 250,
-      useNativeDriver: true,
-    }).start();
-  }
+  // ⭐ DO NOT recreate values
+  const sheetTranslateY = useRef(new Animated.Value(height)).current;
+  const backdropOpacity = useRef(new Animated.Value(0)).current;
+  const contentOpacity = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    if (visible) {
+      Animated.sequence([ 
+        Animated.parallel([
+          Animated.timing(backdropOpacity, {
+            toValue: 1,
+            duration: -350,
+            useNativeDriver: true,
+          }),
+          Animated.timing(sheetTranslateY, {
+            toValue: 0,
+            duration: -950, 
+            easing: Easing.out(Easing.cubic), 
+            useNativeDriver: true,
+          }),
+        ]),
+        Animated.timing(contentOpacity, {
+          toValue: 1,
+          duration: 350,
+          delay: 60, 
+          useNativeDriver: true,
+        }),
+      ]).start();
+    } else {
+      sheetTranslateY.setValue(height);
+      backdropOpacity.setValue(0);
+      contentOpacity.setValue(0);
+    }
+  }, [visible]);
 
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
-      <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' }}>
+    <Modal
+      visible={visible}
+      transparent
+       onRequestClose={onClose}
+    >
+      <Animated.View
+        style={{
+          flex: 1,
+          backgroundColor: 'rgba(0,0,0,0.6)', 
+          justifyContent: 'flex-end',
+          opacity: backdropOpacity,
+        }}
+      >
         <Animated.View
           style={{
             height: height * 0.45,
@@ -40,83 +78,105 @@ const DetailsBottomSheet = ({ visible, onClose, item, baseLink }: any) => {
             borderTopLeftRadius: 20,
             borderTopRightRadius: 20,
             padding: 16,
-            borderColor: 'white',
-            borderWidth: 1,
-            transform: [{ translateY }],
+            transform: [{ translateY: sheetTranslateY }],
           }}
         >
-          <TouchableOpacity onPress={onClose} style={{ alignSelf: 'flex-end', padding: 6 }}>
-            <MaterialIcons name="close" size={28} color={ERP_COLOR_CODE.ERP_333} />
-          </TouchableOpacity>
+          {/* Close */}
+          <Animated.View style={{ opacity: contentOpacity }}>
+            <TouchableOpacity onPress={onClose} style={{ alignSelf: 'flex-end', padding: 6 }}>
+              <MaterialIcons name="close" size={28} color={ERP_COLOR_CODE.ERP_333} />
+            </TouchableOpacity>
+          </Animated.View>
 
           {item ? (
             <ScrollView showsVerticalScrollIndicator={false}>
-              <View style={{ flexDirection: 'row', justifyContent: 'center', marginBottom: 16 }}>
-                {item?.image && (
-                  <FastImage
-                    source={{
-                      uri: baseLink + '/' + item?.image,
-                      priority: FastImage.priority.normal,
-                      cache: FastImage.cacheControl.web,
-                    }}
-                    style={{
-                      width: 80,
-                      height: 80,
-                      borderRadius: 40,
-                      borderWidth: 2,
-                      borderColor: ERP_COLOR_CODE.ERP_WHITE,
-                      backgroundColor: ERP_COLOR_CODE.ERP_eee,
-                    }}
-                  />
-                )}
-                {item?.image2 && (
-                  <FastImage
-                    source={{
-                      uri: baseLink + '/' + item?.image2,
-                      priority: FastImage.priority.normal,
-                      cache: FastImage.cacheControl.web,
-                    }}
-                    style={{
-                      width: 80,
-                      height: 80,
-                      borderRadius: 40,
-                      borderWidth: 2,
-                      borderColor: ERP_COLOR_CODE.ERP_WHITE,
-                      backgroundColor: ERP_COLOR_CODE.ERP_eee,
-                      marginLeft: -20,
-                    }}
-                  />
-                )}
-              </View>
+              {/* Images */}
+              <Animated.View
+                style={{
+                  opacity: contentOpacity,
+                  transform: [
+                    {
+                      translateY: contentOpacity.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [30, 0], // ⭐ visible movement
+                      }),
+                    },
+                  ],
+                }}
+              >
+                <View style={{ flexDirection: 'row', justifyContent: 'center', marginBottom: 16 }}>
+                  {item?.image && (
+                    <FastImage
+                      source={{ uri: baseLink + '/' + item?.image }}
+                      style={{ width: 80, height: 80, borderRadius: 40 }}
+                    />
+                  )}
+                  {item?.image2 && (
+                    <FastImage
+                      source={{ uri: baseLink + '/' + item?.image2 }}
+                      style={{
+                        width: 80,
+                        height: 80,
+                        borderRadius: 40,
+                        marginLeft: -20,
+                      }}
+                    />
+                  )}
+                </View>
+              </Animated.View>
 
-              <Text
-                style={{ 
+              {/* Name */}
+              <Animated.Text
+                style={{
+                  opacity: contentOpacity,
+                  transform: [
+                    {
+                      translateY: contentOpacity.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [20, 0],
+                      }),
+                    },
+                  ],
+                  textAlign: 'center',
+                  fontSize: 20,
+                  fontWeight: '700',
                   color: theme === 'dark' ? 'white' : 'black',
-                  fontSize: 20, fontWeight: '700', textAlign: 'center', marginBottom: 4 }}
+                }}
               >
                 {item?.employee}
-              </Text>
-              <Text
+              </Animated.Text>
+
+              {/* Status */}
+              <Animated.Text
                 style={{
-                  fontSize: 14,
+                  opacity: contentOpacity,
                   textAlign: 'center',
-                  color: ERP_COLOR_CODE.ERP_666,
                   marginBottom: 16,
+                  color: ERP_COLOR_CODE.ERP_666,
                 }}
               >
                 {item?.status?.toUpperCase()}
-              </Text>
+              </Animated.Text>
 
-              <View
+              {/* Card */}
+              <Animated.View
                 style={{
-                  backgroundColor: theme === 'dark' ? 'black' :'#f5f5f5',
+                  opacity: contentOpacity,
+                  transform: [
+                    {
+                      translateY: contentOpacity.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [40, 0],
+                      }),
+                    },
+                  ],
+                  backgroundColor: theme === 'dark' ? 'black' : '#f5f5f5',
                   borderRadius: 12,
                   padding: 12,
-                  marginBottom: 12,
-                  borderWidth: 1,
-                  borderColor:  theme === 'dark' ? 'white' :'#f5f5f5',
                 }}
               >
+                {/* content unchanged */}
+
                 <View
                   style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 6 }}
                 >
@@ -141,13 +201,15 @@ const DetailsBottomSheet = ({ visible, onClose, item, baseLink }: any) => {
                     {getWorkedHours2(item?.intime, item?.outtime)}
                   </Text>
                 </View>
-              </View>
+              </Animated.View>
             </ScrollView>
           ) : (
-            <Text style={{ textAlign: 'center', marginTop: 20 }}>{t("text.text8")}</Text>
+            <Animated.Text style={{ opacity: contentOpacity }}>
+              {t('text.text8')}
+            </Animated.Text>
           )}
         </Animated.View>
-      </View>
+      </Animated.View>
     </Modal>
   );
 };
