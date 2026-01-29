@@ -460,3 +460,221 @@ Play Console — Add preview assets / screenshots requirements.
 Google Support
 
 =
+
+
+Login screen
+-----------
+login_style - 
+ title: {
+    fontSize: 28,
+    // fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 6,
+    color: ERP_COLOR_CODE.ERP_333,
+    fontFamily: "Handlee-Regular",
+  },
+
+HomeTab
+Below flatlist - 1014
+
+<View style={{
+                            height: 350, width: '100%',
+                            alignContent: 'center',
+                            alignItems: 'center',
+                            alignSelf: 'center',
+                            justifyContent: "center"
+                          }}>
+                            <Image source={ERP_ICON.APP_LOGO} style={[styles.logo,
+                            {
+                              height: 140,
+                              width: 140, marginBottom: 12
+                            }
+                            ]} resizeMode="contain" />
+                            <Text style={{
+                              fontSize: 30,
+                              fontFamily: "Handlee-Regular",
+                            }}>Welcome</Text>
+                          </View>
+
+inside controls?.length === 0 && !isDashboardLoading - 934
+  <View
+                style={{
+                  height: Dimensions.get('screen').height * 0.75,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  backgroundColor: theme === 'dark' ? 'black' : 'white',
+                }}
+              >
+                <View style={{
+                  height: 140, width: '100%',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
+                  <Image source={ERP_ICON.APP_LOGO} style={[styles.logo,
+                  {
+                    height: 140,
+                    width: 140, marginBottom: 12
+                  }
+                  ]} resizeMode="contain" />
+                  <Text style={{
+                    fontSize: 30,
+                    fontFamily: "Handlee-Regular",
+                  }}>Welcome</Text>
+                </View>
+              </View>
+
+Page save button - 795 below flatlist
+
+{!authUser && controls.length > 0 && (
+              <TouchableOpacity
+                style={{
+                  height: 46,
+                  width: '100%',
+                  backgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR,
+                  justifyContent: 'center',
+                  alignContent: 'center',
+                  alignItems: 'center',
+                  borderRadius: 6,
+                }}
+                onPress={async () => {
+                    try {
+                  if(myScript){
+                    let rules;
+                  if (myScript && typeof myScript === "string") {
+                    try {
+                      rules = JSON.parse(myScript);
+                    } catch (e) {
+                      console.error("Invalid JSON from backend", e);
+                      return;
+                    }
+                  } else {
+                    rules = myScript;
+                  }
+                  const { actions } = evaluateRulesWithActions(rules, formValues);
+                  const hasButtonSaveEnable = actions.some(
+                    item => item?.field === "buttonSave"
+                  );
+                  if (hasButtonSaveEnable) {
+                    const hasButtonSaveEnable = actions.some(
+                      item => item?.field === "buttonSave" && item.action === "enable"
+                    );
+                    const updatedControls = applyActionsToControls(controls, actions);
+                    setControls(updatedControls)
+                    setButtonSave(hasButtonSaveEnable)
+                    if (!hasButtonSaveEnable) {
+                      Alert.alert("Error", myScript?.message)
+                      return;
+                    }
+                  }
+                  const updatedControls = applyActionsToControls(controls, actions);
+                  setControls(updatedControls)
+                  }  
+
+                  // 1️⃣ Check if location services are enabled
+                  const locationEnabled = hasLocationField ? await DeviceInfo.isLocationEnabled() : true;
+
+                  // 2️⃣ Request location permissions if needed
+                  const permissionStatus = hasLocationField
+                    ? await requestLocationPermissions()
+                    : 'granted';
+
+                  // 3️⃣ Request camera/media permission if needed
+                  const hasCameraPermission = hasMediaField ? await requestCameraPermission() : true;
+
+                  // 4️⃣ Handle permission errors
+                  if (!hasCameraPermission && hasMediaField) {
+                    setAlertConfig({
+                      title: t('title.title16'),
+                      message: t("msg.msg15"),
+                      type: 'error',
+                    });
+                    setAlertVisible(true);
+                    setModalClose(false);
+                    return;
+                  }
+
+                  if (hasLocationField && !locationEnabled) {
+                    setAlertConfig({
+                      title: t("title.title13"),
+                      message: t('title.title15'),
+                      type: 'error',
+                    });
+                    setAlertVisible(true);
+                    setModalClose(false);
+                    return;
+                  }
+
+                  if (hasLocationField && (permissionStatus === 'denied' || permissionStatus === 'blocked')) {
+                    setAlertConfig({
+                      title: t("title.title13"),
+                      message: t('title.title15'),
+                      type: 'error',
+                    });
+                    setAlertVisible(true);
+                    setModalClose(false);
+                    return;
+                  }
+
+                  // ✅ Permissions are granted, proceed
+                  setLocationVisible(true);
+                  setActionSaveLoader(true);
+                  setIsValidate(true);
+
+                  if (validateForm()) {
+                    const submitValues: Record<string, any> = {};
+                    controls?.forEach(f => {
+                      if (f.refcol !== '1') submitValues[f?.field] = formValues[f?.field];
+                    });
+
+                    try {
+                      setLoader(true);
+                      await dispatch(savePageThunk({ page: url, id, data: { ...submitValues } })).unwrap();
+                      setLoader(false);
+                      setIsValidate(false);
+
+                      fetchPageData();
+                      setAlertConfig({
+                        title: t('title.title17'),
+                        message: t("title.title18"),
+                        type: 'success',
+                      });
+                      setAlertVisible(true);
+                      setGoBack(true);
+
+                      setTimeout(() => {
+                        setAlertVisible(false);
+                        navigation.goBack();
+                      }, 1500);
+                    } catch (err: any) {
+                      setLoader(false);
+                      setAlertConfig({
+                        title: t('title.title17'),
+                        message: err,
+                        type: 'error',
+                      });
+                      setAlertVisible(true);
+                      setGoBack(false);
+                    }
+                  }
+
+                  setActionSaveLoader(false);
+                } catch (error) {
+                  console.error("Save error:", error);
+                  setActionSaveLoader(false);
+                }
+                }}
+              >
+                <Text
+                  style={{
+                    color: ERP_COLOR_CODE.ERP_WHITE,
+                    fontSize: 16,
+                    fontWeight: '800',
+                  }}
+                >
+                  {actionSaveLoader ? 'Loading' : 'Save'}
+                </Text>
+              </TouchableOpacity>
+            )}
+
+Login - Add account 
+company_code - oeuvre01
