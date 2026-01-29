@@ -126,4 +126,9 @@ export const styles = StyleSheet.create({
     fontWeight: '600',
     fontSize: 14,
   },
+  cancelButtonText: {
+    color: ERP_COLOR_CODE.ERP_BLACK,
+    fontWeight: '600',
+    fontSize: 14,
+  },
 });

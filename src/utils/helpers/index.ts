@@ -4,6 +4,8 @@ import moment from 'moment';
 import { Dimensions, Linking, PermissionsAndroid, Platform } from 'react-native';
 import RNFS from 'react-native-fs';
 import FastImage from 'react-native-fast-image';
+import DeviceInfo from 'react-native-device-info';
+import axios from 'axios';
 
 export const getBottomTabIcon = (iconName: string, focused: boolean) => {
   switch (iconName) {
@@ -667,7 +669,32 @@ const operators = {
   // Dates
   isBeforeDate: (a, b) => new Date(a) < new Date(b),
   isAfterDate: (a, b) => new Date(a) > new Date(b),
+
+  locationWithin : (a, b, meters = 50) => {
+  if (!a || !b) return false;
+
+  const [lat1, lon1] = a.split(',').map(Number);
+  const [lat2, lon2] = b.split(',').map(Number);
+
+  return getDistanceInMeters(lat1, lon1, lat2, lon2) <= meters;
+}
 };
+
+const getDistanceInMeters = (lat1, lon1, lat2, lon2) => {
+  const R = 6371000;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1 * Math.PI / 180) *
+      Math.cos(lat2 * Math.PI / 180) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+
+  return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
+};
+
 
 // =======================
 // Evaluate Condition
@@ -826,4 +853,3 @@ export const applyActionsToControls = (controls, actions) => {
     }, ctrl);
   });
 };
-

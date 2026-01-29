@@ -83,9 +83,6 @@ const CustomSplashScreen: React.FC<SplashProps> = ({ onFinish }) => {
           },
           theme === 'dark' && {
             color: 'white'
-          },
-          {
-            fontFamily: "Handlee-Regular",
           }
         ]}
       >

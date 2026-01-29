@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, Animated } from 'react-native';
 import { ERPTextInputProps } from './type';
 import { styles } from './input_style';
 import MaterialIcons from '@react-native-vector-icons/material-icons';
 import { ERP_COLOR_CODE } from '../../utils/constants';
+import { Easing } from 'react-native';
 
 const ERPTextInput: React.FC<ERPTextInputProps> = ({
   label,
@@ -24,7 +25,19 @@ const ERPTextInput: React.FC<ERPTextInputProps> = ({
   ...rest
 }) => {
   const [showPassword, setShowPassword] = useState(!secureTextEntry);
+ const errorAnim = useRef(new Animated.Value(0)).current;
 
+  useEffect(() => {
+    if (touched && error) {
+      errorAnim.setValue(0);
+      Animated.timing(errorAnim, {
+        toValue: 1,
+        duration: 280,
+        easing: Easing.out(Easing.ease),
+        useNativeDriver: true,
+      }).start();
+    }
+  }, [touched, error]);
   return (
     <View style={[styles.inputContainer, containerStyle, ,]}>
       {label ? <Text style={[styles.inputLabel, labelStyle]}>{label}</Text> : null}
@@ -88,7 +101,27 @@ const ERPTextInput: React.FC<ERPTextInputProps> = ({
       </View>
 
       {helperText && !error && <Text style={[styles.helperText, helperStyle]}>{helperText}</Text>}
-      {touched && !!error && <Text style={[styles.errorText, errorStyle]}>{error}</Text>}
+       {touched && !!error && (
+        <Animated.Text
+          style={[
+            styles.errorText,
+            errorStyle,
+            {
+              opacity: errorAnim,
+              transform: [
+                {
+                  translateX: errorAnim.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [-38, 0],
+                  }),
+                },
+              ],
+            },
+          ]}
+        >
+          {error}
+        </Animated.Text>
+      )}
     </View>
   );
 };

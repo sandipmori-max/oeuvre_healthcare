@@ -1,7 +1,21 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, ScrollView, Image } from 'react-native';
-import { DrawerContentComponentProps, DrawerContentScrollView } from '@react-navigation/drawer';
-import { useNavigation } from '@react-navigation/native';
+import React, { useEffect, useRef } from 'react';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  ScrollView,
+  Image,
+  Animated,
+} from 'react-native';
+import {
+  DrawerContentComponentProps,
+  DrawerContentScrollView,
+  useDrawerStatus,
+} from '@react-navigation/drawer';
+import {
+  useNavigation,
+  useNavigationState,
+} from '@react-navigation/native';
 import MaterialIcons from '@react-native-vector-icons/material-icons';
 import FastImage from 'react-native-fast-image';
 
@@ -16,102 +30,169 @@ import { ERP_ICON } from '../../assets';
 
 const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
   const navigation = useNavigation();
-  const { user } = useAppSelector(state => state?.auth);
+  const drawerStatus = useDrawerStatus();
+
+  const { user } = useAppSelector(state => state.auth);
   const theme = useAppSelector(state => state.theme.mode);
   const baseLink = useBaseLink();
-  const currentRoute = props.state.routeNames[props.state.index];
-  const {appDrawerMenuList, appColorCode} = useAppSelector(state => state?.auth);
+
+  /* ================= SAFE CURRENT ROUTE ================= */
+  const currentRoute = useNavigationState(state => {
+    const route = state.routes[state.index];
+    return route?.name;
+  });
+
+  /* ================= ANIMATION VALUES ================= */
+  const menuAnim = useRef(
+    ERP_DRAWER_LIST.map(() => new Animated.Value(-40)),
+  ).current;
+
+  const footerTranslateY = useRef(new Animated.Value(40)).current;
+  const footerOpacity = useRef(new Animated.Value(0)).current;
+
+  /* ================= HEADER ANIMATION ================= */
+  const headerTranslateY = useRef(new Animated.Value(-60)).current;
+  const headerOpacity = useRef(new Animated.Value(0)).current;
+
+  /* ================= RUN ON EVERY DRAWER OPEN ================= */
+  useEffect(() => {
+    if (drawerStatus !== 'open') return;
+
+    // reset menu items
+    menuAnim.forEach(anim => anim.setValue(-40));
+
+    // reset footer
+    footerTranslateY.setValue(40);
+    footerOpacity.setValue(0);
+
+    // reset header
+    headerTranslateY.setValue(-60);
+    headerOpacity.setValue(0);
+
+    // header animation (top → down)
+    Animated.parallel([
+      Animated.timing(headerTranslateY, {
+        toValue: 0,
+        duration: 700,
+        useNativeDriver: true,
+      }),
+      Animated.timing(headerOpacity, {
+        toValue: 1,
+        duration: 500,
+        useNativeDriver: true,
+      }),
+    ]).start();
+
+    // menu animation (left → right)
+    Animated.stagger(
+      70,
+      menuAnim.map(anim =>
+        Animated.timing(anim, {
+          toValue: 0,
+          duration: 800,
+          useNativeDriver: true,
+        }),
+      ),
+    ).start();
+
+    // footer animation (bottom → up)
+    Animated.parallel([
+      Animated.timing(footerTranslateY, {
+        toValue: 0,
+        duration: 850,
+        useNativeDriver: true,
+      }),
+      Animated.timing(footerOpacity, {
+        toValue: 1,
+        duration: 350,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [drawerStatus]);
 
   return (
     <DrawerContentScrollView
       {...props}
-      contentContainerStyle={{ flexGrow: 1, backgroundColor: theme === 'dark' ? DARK_COLOR : 'white' }}
-      showsVerticalScrollIndicator={true}
+      contentContainerStyle={{
+        flexGrow: 1,
+        backgroundColor: theme === 'dark' ? DARK_COLOR : 'white',
+      }}
     >
-      <View style={{ flex: 1, minWidth: '100%', }}>
-        {/* Header */}
-        <View style={[styles.header, theme === 'dark' && {
-          backgroundColor: 'black'
-        }]}>
+      
+      {/* ================= HEADER ================= */}
+      <Animated.View
+        style={{
+          minWidth: '100%',
+          transform: [{ translateY: headerTranslateY }],
+          opacity: headerOpacity,
+        }}
+      >
+        <View
+          style={[
+            styles.header,
+            theme === 'dark' && { backgroundColor: 'black' },
+          ]}
+        >
           <FastImage
             source={{
-              uri: `${baseLink}/FileUpload/1/UserMaster/${user?.id
-                }/profileimage.jpeg?ts=${new Date().getTime()}`,
+              uri: `${baseLink}/FileUpload/1/UserMaster/${user?.id}/profileimage.jpeg?ts=${new Date().getTime()}`,
               priority: FastImage.priority.normal,
               cache: FastImage.cacheControl.web,
             }}
             style={styles.profileImage}
           />
+
           <View style={{ height: 28, width: 100 }} />
+
           <Text style={[styles.username, { top: 8, color: '#FFF' }]}>
             {firstLetterUpperCase(user?.name || '')}
           </Text>
+
           <View style={{ height: 8, width: 100 }} />
+
           <View style={{ top: 4, width: '100%', marginVertical: 1 }}>
-            {/* Phone */}
             {user?.mobileno && (
-              <View
-                style={{ flexDirection: 'row', alignItems: 'center', borderRadius: 8, padding: 6 }}
-              >
-                <MaterialIcons name={'call'} color={'white'} size={14} />
-                <Text style={styles.userPhone}>{user?.mobileno || ''}</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', padding: 6 }}>
+                <MaterialIcons name="call" color="white" size={14} />
+                <Text style={styles.userPhone}>{user.mobileno}</Text>
               </View>
             )}
 
-            {/* Email */}
             {user?.emailid && (
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  borderRadius: 8,
-                  padding: 6,
-                  marginVertical: 2,
-                }}
-              >
-                <MaterialIcons name={'mail-outline'} color={'white'} size={14} />
+              <View style={{ flexDirection: 'row', alignItems: 'center', padding: 6 }}>
+                <MaterialIcons name="mail-outline" color="white" size={14} />
                 <Text numberOfLines={1} style={styles.userPhone}>
-                  {user?.emailid || ''}
+                  {user.emailid}
                 </Text>
               </View>
             )}
 
-            {/* Role */}
             {user?.rolename && (
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  borderRadius: 8,
-                  padding: 6,
-                  marginBottom: 2,
-                }}
-              >
-                <MaterialIcons name={'person'} color={'white'} size={14} />
-                <Text style={styles.userPhone}>{user?.rolename || ''}</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', padding: 6 }}>
+                <MaterialIcons name="person" color="white" size={14} />
+                <Text style={styles.userPhone}>{user.rolename}</Text>
               </View>
             )}
           </View>
         </View>
+      </Animated.View>
 
-        {/* Scrollable Menu */}
-        <ScrollView
-          showsHorizontalScrollIndicator={false}
-          style={{ flex: 1 }}
-          contentContainerStyle={{ paddingBottom: 20 }}
-          showsVerticalScrollIndicator={false}
-        >
-          <View style={styles.menuContainer}>
-            {ERP_DRAWER_LIST.map(item => {
-              const isActive = currentRoute === item?.route;
-              return (
+      {/* ================= MENU ================= */}
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <View style={styles.menuContainer}>
+          {ERP_DRAWER_LIST.map((item, index) => {
+            const isActive = currentRoute === item.route;
+
+            return (
+              <Animated.View
+                key={item.route}
+                style={{ transform: [{ translateX: menuAnim[index] }] }}
+              >
                 <TouchableOpacity
-                  key={item?.route}
-                  style={[styles.drawerItem, isActive && styles.activeItemBackground,
-
-                  isActive && theme === 'dark' && {
-                    backgroundColor: 'black'
-                  }
+                  style={[
+                    styles.drawerItem,
+                    isActive && styles.activeItemBackground,
+                    isActive && theme === 'dark' && { backgroundColor: 'black' },
                   ]}
                   onPress={() => {
                     if (item?.route === 'Alert') {
@@ -163,49 +244,67 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
                 >
                   <View style={styles.itemRow}>
                     <MaterialIcons
-                      name={`${item?.icon}`}
-                      color={theme === 'dark' ? '#FFF' : isActive ? '#FFF' : '#000'}
+                      name={item.icon}
                       size={20}
+                      color={
+                        theme === 'dark'
+                          ? '#FFF'
+                          : isActive
+                          ? '#FFF'
+                          : '#000'
+                      }
                     />
                     <Text
                       style={[
                         styles.itemLabel,
                         isActive && styles.activeText,
-                        { color: theme === 'dark' ? 'white' : isActive ? '#FFF' : '#000' },
+                        {
+                          color:
+                            theme === 'dark'
+                              ? 'white'
+                              : isActive
+                              ? '#FFF'
+                              : '#000',
+                        },
                       ]}
                     >
-                      {item?.label}
+                      {item.label}
                     </Text>
                   </View>
                 </TouchableOpacity>
-              );
-            })}
-          </View>
-        </ScrollView>
-
-        {/* Footer - stays fixed at bottom */}
-        <View style={{
-          width: '100%',
-          justifyContent: 'center',
-          alignContent: 'center',
-          alignItems: 'center',
-          marginBottom: 10
-        }}>
-          <Image source={ERP_ICON.APP_LOGO} style={{
-            height: 40,
-            width: 40,
-
-          }} resizeMode="contain" />
-
+              </Animated.View>
+            );
+          })}
         </View>
+      </ScrollView>
+
+      {/* ================= FOOTER ================= */}
+      <Animated.View
+        style={{
+          transform: [{ translateY: footerTranslateY }],
+          opacity: footerOpacity,
+        }}
+      >
+        <View style={{ alignItems: 'center', marginBottom: 10 }}>
+          <Image
+            source={ERP_ICON.APP_LOGO}
+            style={{ height: 40, width: 40 }}
+            resizeMode="contain"
+          />
+        </View>
+
         <View style={styles.logoutButton}>
-          <Text style={[styles.logoutText,
-          theme === 'dark' && {
-            color: 'white'
-          }]}>(c) DevERP Solutions Pvt. Ltd.</Text>
+          <Text
+            style={[
+              styles.logoutText,
+              theme === 'dark' && { color: 'white' },
+            ]}
+          >
+            (c) DevERP Solutions Pvt. Ltd.
+          </Text>
           <ContactRow />
         </View>
-      </View>
+      </Animated.View>
     </DrawerContentScrollView>
   );
 };

@@ -1,6 +1,6 @@
 import MaterialIcons from '@react-native-vector-icons/material-icons';
-import React, { useEffect, useLayoutEffect, useState, useRef } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Dimensions, Alert } from 'react-native';
+import React, { useEffect, useLayoutEffect, useState, useRef, useCallback } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Dimensions, Alert, Animated, Easing } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { DARK_COLOR, ERP_COLOR_CODE } from '../../../utils/constants';
 import {
@@ -12,7 +12,7 @@ import {
   removePinCode,
   resetPin,
 } from '../../../utils/sqlite';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import CustomAlert from '../../../components/alert/CustomAlert';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { setIsPinLoaded } from '../../../store/slices/auth/authSlice';
@@ -39,6 +39,7 @@ const PinSetupScreen = () => {
 
   // temporary PIN holder for confirm flows
   const tempPinRef = useRef<string>('');
+  const [renderMenu, setRenderMenu] = useState(false);
 
   // alerts
   const [alertVisible, setAlertVisible] = useState(false);
@@ -67,7 +68,7 @@ const PinSetupScreen = () => {
           setScreen('setup');
         }
       } catch (error) {
-       }
+      }
 
       try {
         const attemptsStr = await AsyncStorage.getItem(AS_KEYS.WRONG_ATTEMPTS);
@@ -82,7 +83,7 @@ const PinSetupScreen = () => {
           setScreen('blocked');
         }
       } catch (e) {
-       }
+      }
     };
     bootstrap();
   }, []);
@@ -130,41 +131,41 @@ const PinSetupScreen = () => {
   }, [navigation, theme]);
 
   useLayoutEffect(() => {
-  navigation.setOptions({
-    headerStyle: {
-      backgroundColor: theme === 'dark' ? 'black' : ERP_COLOR_CODE.ERP_APP_COLOR,
-    },
-    headerTintColor: '#fff',
-    headerTitle: () => (
-      <Text
-        numberOfLines={1}
-        style={{
-          maxWidth: 180,
-          fontSize: 18,
-          fontWeight: '700',
-          color: theme === 'dark' ? "white" : ERP_COLOR_CODE.ERP_WHITE,
-        }}
-      >
-        {'Pinset'}
-      </Text>
-    ),
+    navigation.setOptions({
+      headerStyle: {
+        backgroundColor: theme === 'dark' ? 'black' : ERP_COLOR_CODE.ERP_APP_COLOR,
+      },
+      headerTintColor: '#fff',
+      headerTitle: () => (
+        <Text
+          numberOfLines={1}
+          style={{
+            maxWidth: 180,
+            fontSize: 18,
+            fontWeight: '700',
+            color: theme === 'dark' ? "white" : ERP_COLOR_CODE.ERP_WHITE,
+          }}
+        >
+          {'Pinset'}
+        </Text>
+      ),
 
-    // ⭐ NEW — 3-dot menu icon
-    headerRight: () => (
-    <>
-      {
-        screen !== 'blocked' &&  <TouchableOpacity
-        style={{ paddingHorizontal: 12 }}
-        onPress={() => setMenuVisible(!menuVisible)}
-      >
-        <MaterialIcons name=  {menuVisible ? 'close' : "more-vert"} size={28} color="white" />
-      </TouchableOpacity>
-      }
-     
-    </>
-    ),
-  });
-}, [navigation, theme,menuVisible, screen]);
+      // ⭐ NEW — 3-dot menu icon
+      headerRight: () => (
+        <>
+          {
+            screen !== 'blocked' && <TouchableOpacity
+              style={{ paddingHorizontal: 12 }}
+              onPress={() => setMenuVisible(!menuVisible)}
+            >
+              <MaterialIcons name={menuVisible ? 'close' : "more-vert"} size={28} color="white" />
+            </TouchableOpacity>
+          }
+
+        </>
+      ),
+    });
+  }, [navigation, theme, menuVisible, screen]);
 
 
   // helper: persist attempts & block
@@ -475,10 +476,203 @@ const PinSetupScreen = () => {
     return '';
   };
 
+  const screenAnim = useRef(new Animated.Value(0)).current;
+
+  // Menu animation
+  const menuAnim = useRef(new Animated.Value(0)).current;
+  const titleAnim = useRef(new Animated.Value(0)).current;
+  const subtitleAnim = useRef(new Animated.Value(0)).current;
+  const pinPulseAnims = useRef(
+    Array(4).fill(0).map(() => new Animated.Value(0))
+  ).current;
+  const keyPulseAnims = useRef(
+    Array(12).fill(0).map(() => new Animated.Value(0))
+  ).current;
+
+  const pinAnims = useRef(
+    Array(4).fill(0).map(() => new Animated.Value(0))
+  ).current;
+
+  const keyAnims = useRef(
+    Array(12).fill(0).map(() => new Animated.Value(0))
+  ).current;
+  useEffect(() => {
+    if (pin.length === 0 || pin.length > 4) return;
+
+    const index = pin.length - 1;
+
+    pinPulseAnims[index].setValue(0);
+
+    Animated.sequence([
+      Animated.timing(pinPulseAnims[index], {
+        toValue: 1,
+        duration: 300,
+        easing: Easing.out(Easing.ease),
+        useNativeDriver: true,
+      }),
+      Animated.timing(pinPulseAnims[index], {
+        toValue: 0,
+        duration: 700, // total ~1 sec
+        easing: Easing.in(Easing.ease),
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [pin.length]);
+
+  // Screen load animation
+  useFocusEffect(
+    useCallback(() => {
+      screenAnim.setValue(0);
+      Animated.timing(
+        screenAnim,
+        {
+          toValue: 1, duration: 2500,
+          easing: Easing.out(Easing.cubic)
+          , useNativeDriver: true,
+        }).start();
+    }, []));
+
+  // Menu open animation
+  useFocusEffect(
+    useCallback(() => {
+      if (menuVisible) {
+        // OPEN
+        setRenderMenu(true);
+        menuAnim.setValue(0);
+
+        Animated.timing(menuAnim, {
+          toValue: 1,
+          duration: 300,
+          easing: Easing.out(Easing.cubic),
+          useNativeDriver: true,
+        }).start();
+      } else if (renderMenu) {
+        // CLOSE
+        Animated.timing(menuAnim, {
+          toValue: 0,
+          duration: 220,
+          easing: Easing.in(Easing.cubic),
+          useNativeDriver: true,
+        }).start(() => {
+          setRenderMenu(false); // unmount after animation
+        });
+      }
+    }, [menuVisible])
+  );
+
+  useFocusEffect(
+    useCallback(() => {
+      titleAnim.setValue(0);
+      subtitleAnim.setValue(0);
+      pinAnims.forEach(a => a.setValue(0));
+      keyAnims.forEach(a => a.setValue(0));
+
+      Animated.sequence([
+        // Title
+        Animated.timing(titleAnim, {
+          toValue: 1,
+          duration: 250,
+          easing: Easing.out(Easing.cubic),
+          useNativeDriver: true,
+        }),
+
+        // Subtitle
+        Animated.timing(subtitleAnim, {
+          toValue: 1,
+          duration: 250,
+          easing: Easing.out(Easing.cubic),
+          useNativeDriver: true,
+        }),
+
+        // PIN + KEYS together (FIX)
+        Animated.parallel([
+          // PIN circles
+          Animated.stagger(
+            60,
+            pinAnims.map(anim =>
+              Animated.spring(anim, {
+                toValue: 1,
+                damping: 14,
+                stiffness: 160,
+                useNativeDriver: true,
+              })
+            )
+          ),
+
+          // Keypad (starts shortly after PIN begins)
+          Animated.sequence([
+            Animated.delay(150), // 👈 small delay only
+            Animated.stagger(
+              40,
+              keyAnims.map(anim =>
+                Animated.timing(anim, {
+                  toValue: 1,
+                  duration: 220,
+                  easing: Easing.out(Easing.ease),
+                  useNativeDriver: true,
+                })
+              )
+            ),
+          ]),
+        ]),
+      ]).start();
+    }, [])
+  );
+  const triggerKeyPulse = (index) => {
+    keyPulseAnims[index].setValue(0);
+
+    Animated.sequence([
+      Animated.timing(keyPulseAnims[index], {
+        toValue: 1,
+        duration: 180,
+        easing: Easing.out(Easing.ease),
+        useNativeDriver: true,
+      }),
+      Animated.timing(keyPulseAnims[index], {
+        toValue: 0,
+        duration: 820, // total ~1 sec
+        easing: Easing.in(Easing.ease),
+        useNativeDriver: true,
+      }),
+    ]).start();
+  };
+
   return (
-    <View style={[styles.container, theme === 'dark' && { backgroundColor: 'black' }]}>
+    <Animated.View
+      style={[
+        styles.container,
+        theme === 'dark' && { backgroundColor: 'black' },
+        {
+          opacity: screenAnim,
+          transform: [
+            {
+              scale: screenAnim.interpolate({
+                inputRange: [0, 1],
+                outputRange: [0.97, 1],
+              }),
+            },
+          ],
+        },
+      ]}
+    >
       {/* Header */}
-      <Text style={[styles.title, theme === 'dark' && { color: 'white' }]}>
+      <Animated.Text
+        style={[
+          styles.title,
+          theme === 'dark' && { color: 'white' },
+          {
+            opacity: titleAnim,
+            transform: [
+              {
+                translateY: titleAnim.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [-10, 0],
+                }),
+              },
+            ],
+          },
+        ]}
+      >
         {(() => {
           if (screen === 'verify') return 'Verify your old PIN';
           if (screen === 'setup') return 'Set up new PIN';
@@ -493,16 +687,34 @@ const PinSetupScreen = () => {
           if (screen === 'blocked') return 'Blocked';
           return storedPin ? 'PIN Settings' : 'Set up PIN';
         })()}
-      </Text>
+      </Animated.Text>
 
-      <Text style={[styles.subtitle, theme === 'dark' && { color: 'white' }]}>
+
+      <Animated.Text
+        style={[
+          styles.subtitle,
+          theme === 'dark' && { color: 'white' },
+          {
+            opacity: subtitleAnim,
+            transform: [
+              {
+                translateY: subtitleAnim.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [-6, 0],
+                }),
+              },
+            ],
+          },
+        ]}
+      >
         {renderSubtitle()}
-      </Text>
+      </Animated.Text>
 
-      {/* PIN Circles (same visual) */}
+
+      {/* PIN Circles */}
       <View style={styles.pinRow}>
         {[0, 1, 2, 3].map(i => (
-          <View
+          <Animated.View
             key={i}
             style={[
               styles.pinCircle,
@@ -515,107 +727,178 @@ const PinSetupScreen = () => {
                     : theme === 'dark'
                       ? DARK_COLOR
                       : '#e5e7eb',
+
+                transform: [
+                  // Screen-load scale
+                  {
+                    scale: Animated.multiply(
+                      pinAnims[i].interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [0.6, 1],
+                      }),
+                      // Highlight pulse
+                      pinPulseAnims[i].interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [1, 1.25],
+                      })
+                    ),
+                  },
+                ],
+                opacity: pinAnims[i],
               },
             ]}
           />
         ))}
       </View>
 
-      {/* Keypad (same UI) */}
+
+
+      {/* Keypad */}
       <View style={styles.keypad}>
         {[
           ['1', '2', '3'],
           ['4', '5', '6'],
           ['7', '8', '9'],
           ['del', '0', 'ok'],
-        ].map((row, rowIndex) => (
-          <View key={rowIndex} style={styles.keypadRow}>
-            {row.map(key => (
-              <TouchableOpacity
-                key={key}
-                style={styles.key}
-                onPress={() => {
-                  if (screen === 'blocked') return; // disabled while blocked
-                  if (key === 'del') handleDelete();
-                  else if (key === 'ok') handleOk();
-                  else handleKeyPress(key);
-                }}
-              >
-                {key === 'del' ? (
-                  <MaterialIcons name="backspace" size={28} color="#374151" />
-                ) : key === 'ok' ? (
-                  <MaterialIcons
-                    name="check-circle"
-                    size={32}
-                    color={pin.length === 4 ? '#16a34a' : '#9ca3af'}
-                  />
-                ) : (
-                  <Text style={styles.keyText}>{key}</Text>
-                )}
-              </TouchableOpacity>
-            ))}
-          </View>
-        ))}
+        ].flat().map((key, index) => {
+          const rowIndex = Math.floor(index / 3);
+          const colIndex = index % 3;
+
+          return (
+            colIndex === 0 && (
+              <View key={rowIndex} style={styles.keypadRow}>
+                {[0, 1, 2].map(offset => {
+                  const keyIndex = rowIndex * 3 + offset;
+                  const item = [
+                    ['1', '2', '3'],
+                    ['4', '5', '6'],
+                    ['7', '8', '9'],
+                    ['del', '0', 'ok'],
+                  ][rowIndex][offset];
+
+                  return (
+                    <Animated.View
+                      key={item}
+                      style={{
+                        opacity: keyAnims[keyIndex],
+                        transform: [
+                          {
+                            scale: Animated.multiply(
+                              // Screen load animation
+                              keyAnims[keyIndex].interpolate({
+                                inputRange: [0, 1],
+                                outputRange: [0.85, 1],
+                              }),
+                              // Press pulse animation
+                              keyPulseAnims[keyIndex].interpolate({
+                                inputRange: [0, 1],
+                                outputRange: [1, 1.2],
+                              })
+                            ),
+                          },
+                        ],
+                      }}
+                    >
+                      <TouchableOpacity
+                        style={styles.key}
+                        onPress={() => {
+                          if (screen === 'blocked') return;
+
+                          // 🔔 trigger highlight
+                          triggerKeyPulse(keyIndex);
+
+                          if (item === 'del') handleDelete();
+                          else if (item === 'ok') handleOk();
+                          else handleKeyPress(item);
+                        }}
+                      >
+                        {item === 'del' ? (
+                          <MaterialIcons name="backspace" size={28} color="#374151" />
+                        ) : item === 'ok' ? (
+                          <MaterialIcons
+                            name="check-circle"
+                            size={32}
+                            color={pin.length === 4 ? '#16a34a' : '#9ca3af'}
+                          />
+                        ) : (
+                          <Text style={styles.keyText}>{item}</Text>
+                        )}
+                      </TouchableOpacity>
+                    </Animated.View>
+
+                  );
+                })}
+              </View>
+            )
+          );
+        })}
       </View>
+
+
       <CustomAlert
         visible={alertVisible}
         title={alertConfig.title}
         message={alertConfig.message}
         type={alertConfig.type}
-        onClose={() => {
-          setAlertVisible(false);
-        }}
+        onClose={() => setAlertVisible(false)}
         actionLoader={undefined}
       />
 
+      {/* Menu */}
       {menuVisible && (
-  <TouchableOpacity
-    activeOpacity={1}
-    onPress={() => setMenuVisible(false)}
-    style={{
-      position: 'absolute',
-      top: 10,
-      right: 10,
-      width: 160,
-      backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
-      paddingVertical: 6,
-      borderRadius: 10,
-      elevation: 5,
-      shadowColor: '#000',
-      shadowOpacity: 0.2,
-      shadowRadius: 6,
-    }}
-  >
+        <TouchableOpacity
+          activeOpacity={1}
+          onPress={() => setMenuVisible(false)}
+          style={{ position: 'absolute', top: 10, right: 10 }}
+        >
+          <Animated.View
+            style={{
+              width: 160,
+              backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+              paddingVertical: 6,
+              borderRadius: 10,
+              elevation: 5,
+              shadowColor: '#000',
+              shadowOpacity: 0.2,
+              shadowRadius: 6,
+              opacity: menuAnim,
+              transform: [
+                {
+                  scale: menuAnim.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [0.9, 1],
+                  }),
+                },
+              ],
+            }}
+          >
+            <TouchableOpacity
+              onPress={() => {
+                setMenuVisible(false);
+                onChangePinPress();
+              }}
+              style={{ paddingVertical: 10, paddingHorizontal: 14 }}
+            >
+              <Text style={{ color: ERP_COLOR_CODE.ERP_APP_COLOR, fontSize: 15 }}>
+                Change PIN
+              </Text>
+            </TouchableOpacity>
 
-    {/* Change PIN */}
-    <TouchableOpacity
-      onPress={() => {
-        setMenuVisible(false);
-        onChangePinPress();
-      }}
-      style={{ paddingVertical: 10, paddingHorizontal: 14 }}
-    >
-      <Text style={{ color: ERP_COLOR_CODE.ERP_APP_COLOR, fontSize: 15 }}>
-        Change PIN
-      </Text>
-    </TouchableOpacity>
-
-    {/* Remove PIN */}
-    <TouchableOpacity
-      onPress={() => {
-        setMenuVisible(false);
-        onRemovePinPress();
-      }}
-      style={{ paddingVertical: 10, paddingHorizontal: 14 }}
-    >
-      <Text style={{ color: '#dc2626', fontSize: 15 }}>Remove PIN</Text>
-    </TouchableOpacity>
-
-
-  </TouchableOpacity>
-)}
-
-    </View>
+            <TouchableOpacity
+              onPress={() => {
+                setMenuVisible(false);
+                onRemovePinPress();
+              }}
+              style={{ paddingVertical: 10, paddingHorizontal: 14 }}
+            >
+              <Text style={{ color: '#dc2626', fontSize: 15 }}>
+                Remove PIN
+              </Text>
+            </TouchableOpacity>
+          </Animated.View>
+        </TouchableOpacity>
+      )}
+    </Animated.View>
   );
 };
 
@@ -648,6 +931,7 @@ const styles = StyleSheet.create({
     height: 18,
     borderRadius: 9,
     marginHorizontal: 8,
+    borderWidth: 1,
   },
   keypad: {
     width: width * 0.8,
@@ -661,9 +945,9 @@ const styles = StyleSheet.create({
     width: 70,
     height: 70,
     borderRadius: 35,
-    backgroundColor: '#f3f4f6',
     justifyContent: 'center',
     alignItems: 'center',
+    borderWidth: 1
   },
   keyText: {
     fontSize: 22,

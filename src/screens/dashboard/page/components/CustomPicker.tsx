@@ -16,6 +16,7 @@ import { getDDLThunk } from '../../../../store/slices/dropdown/thunk';
 import MaterialIcons from '@react-native-vector-icons/material-icons';
 import FullViewLoader from '../../../../components/loader/FullViewLoader';
 import useTranslations from '../../../../hooks/useTranslations';
+import InputError from '../../../../components/error/InputError';
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 
@@ -30,7 +31,6 @@ const CustomPicker = ({
   isForceOpen,
 }: any) => {
   const { t } = useTranslations();
-  console.log("----------------item------*******-------+++++++++++++-----------", item)
 
   const [open, setOpen] = useState(false);
   const [options, setOptions] = useState<any[]>([]);
@@ -167,6 +167,7 @@ const CustomPicker = ({
         activeOpacity={0.7}
       >
         <Text
+          numberOfLines={1}
           style={{
             color:
               theme === 'dark'
@@ -174,7 +175,7 @@ const CustomPicker = ({
                 : selectedOption
                 ? ERP_COLOR_CODE.ERP_BLACK
                 : ERP_COLOR_CODE.ERP_888,
-            flex: 1,
+            flex: 1,            
           }}
         >
           {selectedOption || `Select ${label}`}
@@ -309,9 +310,8 @@ const CustomPicker = ({
 
       {/* Error */}
       {isForceOpen && errors[item?.field] && (
-        <Text style={{ color: ERP_COLOR_CODE.ERP_ERROR, marginTop: 4 }}>
-          {errors[item?.field]}
-        </Text>
+                <InputError error = {errors[item?.field]}/>
+
       )}
     </View>
   );

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useLayoutEffect } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useRef, useCallback } from 'react';
 import {
   View,
   Text,
@@ -9,8 +9,9 @@ import {
   ScrollView,
   Modal,
   Platform,
+  Animated,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { styles } from './settings_style';
 import CustomAlert from '../../../components/alert/CustomAlert';
 import useTranslations from '../../../hooks/useTranslations';
@@ -39,6 +40,7 @@ import { resetAjaxState } from '../../../store/slices/ajax/ajaxSlice';
 import { resetAttendanceState } from '../../../store/slices/attendance/attendanceSlice';
 import { resetDropdownState } from '../../../store/slices/dropdown/dropdownSlice';
 import { resetSyncLocationState } from '../../../store/slices/location/syncLocationSlice';
+import { Easing } from 'react-native';
 
 interface SettingItem {
   id: string;
@@ -344,91 +346,154 @@ const SettingsScreen = () => {
     dispatch(removeAccountThunk(accountId));
   };
 
+  const sectionAnims = useRef(
+    Array(5).fill(0).map(() => new Animated.Value(0))
+  ).current;
+
+ useFocusEffect(
+  useCallback(() => {
+    // reset animations
+    sectionAnims.forEach(anim => anim.setValue(0));
+
+    Animated.stagger(
+      280,
+      sectionAnims.map(anim =>
+        Animated.timing(anim, {
+          toValue: 1,
+          duration: 780,
+          easing: Easing.out(Easing.cubic),
+          useNativeDriver: true,
+        })
+      )
+    ).start();
+
+    return () => {}; // cleanup not required
+  }, [])
+);
+
+  const animatedStyle = (index) => ({
+    opacity: sectionAnims[index],
+    transform: [
+      {
+        translateY: sectionAnims[index].interpolate({
+          inputRange: [0, 1],
+          outputRange: [20, 0],
+        }),
+      },
+    ],
+  });
+
   return (
     <View style={[styles.container, theme === 'dark' ? {
       backgroundColor: 'black'
     } : {
       backgroundColor: 'white'
     }]}>
-      <ScrollView
-        style={styles.scrollContainer}
-        keyboardShouldPersistTaps="handled"
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
-      >
-        <View style={styles.sectionContainer}>
-          <Text style={[styles.sectionTitle, theme === 'dark' && {
-            backgroundColor: 'black',
-            color: 'white'
-          }]}>{t('settings.notifications')}</Text>
-          <FlatList
-            keyboardShouldPersistTaps="handled"
-            data={settings.filter(item => item.id === '1' || item.id === '2')}
-            renderItem={renderSettingItem}
-            keyExtractor={(item, index) => index.toString()}
-            scrollEnabled={false}
-          />
-        </View>
+   <ScrollView
+      style={styles.scrollContainer}
+      keyboardShouldPersistTaps="handled"
+      showsVerticalScrollIndicator={false}
+      contentContainerStyle={styles.scrollContent}
+    >
+      {/* Notifications */}
+      <Animated.View style={[styles.sectionContainer, animatedStyle(0)]}>
+        <Text
+          style={[
+            styles.sectionTitle,
+            theme === 'dark' && { backgroundColor: 'black', color: 'white' },
+          ]}
+        >
+          {t('settings.notifications')}
+        </Text>
+        <FlatList
+          keyboardShouldPersistTaps="handled"
+          data={settings.filter(item => item.id === '1' || item.id === '2')}
+          renderItem={renderSettingItem}
+          keyExtractor={(item, index) => index.toString()}
+          scrollEnabled={false}
+        />
+      </Animated.View>
 
-        <View style={styles.sectionContainer}>
-          <Text style={[styles.sectionTitle, theme === 'dark' && {
-            backgroundColor: 'black',
-            color: 'white'
-          }]}>{t('settings.appearance')}</Text>
-          <FlatList
-            keyboardShouldPersistTaps="handled"
-            data={settings.filter(item => item.id === '3')}
-            renderItem={renderSettingItem}
-            keyExtractor={(item, index) => index.toString()}
-            scrollEnabled={false}
-          />
-        </View>
+      {/* Appearance */}
+      <Animated.View style={[styles.sectionContainer, animatedStyle(1)]}>
+        <Text
+          style={[
+            styles.sectionTitle,
+            theme === 'dark' && { backgroundColor: 'black', color: 'white' },
+          ]}
+        >
+          {t('settings.appearance')}
+        </Text>
+        <FlatList
+          keyboardShouldPersistTaps="handled"
+          data={settings.filter(item => item.id === '3')}
+          renderItem={renderSettingItem}
+          keyExtractor={(item, index) => index.toString()}
+          scrollEnabled={false}
+        />
+      </Animated.View>
 
-        <View style={styles.sectionContainer}>
-          <Text style={[styles.sectionTitle, theme === 'dark' && {
-            backgroundColor: 'black',
-            color: 'white'
-          }]}>{t('settings.security')}</Text>
-          <FlatList
-            keyboardShouldPersistTaps="handled"
-            data={settings.filter(item => item.id === '4' || item.id === '5')}
-            renderItem={renderSettingItem}
-            keyExtractor={(item, index) => index.toString()}
-            scrollEnabled={false}
-          />
-        </View>
+      {/* Security */}
+      <Animated.View style={[styles.sectionContainer, animatedStyle(2)]}>
+        <Text
+          style={[
+            styles.sectionTitle,
+            theme === 'dark' && { backgroundColor: 'black', color: 'white' },
+          ]}
+        >
+          {t('settings.security')}
+        </Text>
+        <FlatList
+          keyboardShouldPersistTaps="handled"
+          data={settings.filter(item => item.id === '4' || item.id === '5')}
+          renderItem={renderSettingItem}
+          keyExtractor={(item, index) => index.toString()}
+          scrollEnabled={false}
+        />
+      </Animated.View>
 
-        <View style={styles.sectionContainer}>
-          <Text style={[styles.sectionTitle, theme === 'dark' && {
-            backgroundColor: 'black',
-            color: 'white'
-          }]}>{t('settings.general')}</Text>
-          <FlatList
-            keyboardShouldPersistTaps="handled"
-            data={settings.filter(item => item.id === '6' || item.id === '7' || item.id === '8')}
-            renderItem={renderSettingItem}
-            keyExtractor={(item, index) => index.toString()}
-            scrollEnabled={false}
-          />
-        </View>
+      {/* General */}
+      <Animated.View style={[styles.sectionContainer, animatedStyle(3)]}>
+        <Text
+          style={[
+            styles.sectionTitle,
+            theme === 'dark' && { backgroundColor: 'black', color: 'white' },
+          ]}
+        >
+          {t('settings.general')}
+        </Text>
+        <FlatList
+          keyboardShouldPersistTaps="handled"
+          data={settings.filter(item =>
+            item.id === '6' || item.id === '7' || item.id === '8'
+          )}
+          renderItem={renderSettingItem}
+          keyExtractor={(item, index) => index.toString()}
+          scrollEnabled={false}
+        />
+      </Animated.View>
 
-        <View style={styles.sectionContainer}>
-          <Text style={[styles.sectionTitle, theme === 'dark' && {
-            backgroundColor: 'black',
-            color: 'white'
-          }]}>{t('settings.account')}</Text>
-          <FlatList
-            keyboardShouldPersistTaps="handled"
-            data={settings.filter(item => item.id === '9')}
-            renderItem={renderSettingItem}
-            keyExtractor={(item, index) => index.toString()}
-            scrollEnabled={false}
-          />
-        </View>
+      {/* Account */}
+      <Animated.View style={[styles.sectionContainer, animatedStyle(4)]}>
+        <Text
+          style={[
+            styles.sectionTitle,
+            theme === 'dark' && { backgroundColor: 'black', color: 'white' },
+          ]}
+        >
+          {t('settings.account')}
+        </Text>
+        <FlatList
+          keyboardShouldPersistTaps="handled"
+          data={settings.filter(item => item.id === '9')}
+          renderItem={renderSettingItem}
+          keyExtractor={(item, index) => index.toString()}
+          scrollEnabled={false}
+        />
+      </Animated.View>
 
-        <View style={styles.bottomSpacing} />
-      </ScrollView>
-
+      <View style={styles.bottomSpacing} />
+    </ScrollView>
       <Modal
         visible={languageModalVisible}
         transparent

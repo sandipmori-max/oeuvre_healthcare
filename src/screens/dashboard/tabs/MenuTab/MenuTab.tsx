@@ -1,6 +1,6 @@
 import { Dimensions, FlatList, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import React, { useEffect, useLayoutEffect, useState, useRef, useCallback } from 'react';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { useAppDispatch, useAppSelector } from '../../../../store/hooks';
 import NoData from '../../../../components/no_data/NoData';
 import FullViewLoader from '../../../../components/loader/FullViewLoader';
@@ -141,6 +141,16 @@ const MenuTab = ({ type, headerText, searchPlaceholder }: any) => {
     });
   }, [showSearch, showBookmarksOnly, isHorizontal, searchText, allList]);
 
+  useFocusEffect(
+    useCallback(() => {
+      setIsHorizontal(false)
+      setShowSearch(false);
+      setIsRefresh(false);
+      setShowBookmarksOnly(false)
+      return () => {};
+    }, [])
+  );
+
   // Menu loading
   useEffect(() => {
     if (isAuthenticated) {
@@ -151,7 +161,7 @@ const MenuTab = ({ type, headerText, searchPlaceholder }: any) => {
     }
   }, [isAuthenticated, activeToken, isRefresh]);
 
-  const renderItem = ({ item, index }) => {
+  const renderItem = ({ item, index }: any) => {
     const backgroundColor = accentColors[index % accentColors.length];
 
     return (
@@ -174,14 +184,16 @@ const MenuTab = ({ type, headerText, searchPlaceholder }: any) => {
           name={bookmarks[item.id] ? 'bookmark' : 'bookmark-outline'} size={24} />
         </TouchableOpacity>
 
-        <View
+        <View 
           style={[
             styles.iconContainer,
             theme === 'dark' && { borderColor: 'white' },
             { backgroundColor: theme === 'dark' ? DARK_COLOR : ERP_COLOR_CODE.ERP_WHITE },
           ]}
         >
-          <Text style={[styles.iconText, theme === 'dark' && { color: 'white' }]}>
+          <Text style={[styles.iconText, 
+            
+            theme === 'dark' && { color: 'white' }]}>
             {item.icon ||
               getInitials(item?.name)
             }
@@ -189,7 +201,12 @@ const MenuTab = ({ type, headerText, searchPlaceholder }: any) => {
         </View>
 
         <View style={{ marginLeft: isHorizontal ? 16 : 0, marginTop: isHorizontal ? 0 : 12 }}>
-          <Text numberOfLines={2} style={[styles.title, theme === 'dark' && { color: 'white' }]}>
+          <Text numberOfLines={2} style={[styles.title, 
+            {
+              maxWidth: isHorizontal ? '95%' : 'auto',
+              textAlign: isHorizontal ? 'left' : 'center'
+            },
+            theme === 'dark' && { color: 'white' }]}>
             {item.name}
           </Text>
           <Text numberOfLines={2} style={[styles.subtitle, theme === 'dark' && { color: 'white' },

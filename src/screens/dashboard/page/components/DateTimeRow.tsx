@@ -5,6 +5,7 @@ import { ERP_COLOR_CODE } from '../../../../utils/constants';
 import MaterialIcons from '@react-native-vector-icons/material-icons';
 import { formatDateHr } from '../../../../utils/helpers';
 import { useAppSelector } from '../../../../store/hooks';
+import InputError from '../../../../components/error/InputError';
 
 const DateTimeRow = ({ isValidate, item, errors, value, showDateTimePicker }: any) => {
   const theme = useAppSelector(state => state?.theme.mode);
@@ -38,8 +39,9 @@ const DateTimeRow = ({ isValidate, item, errors, value, showDateTimePicker }: an
         </Text>
         <MaterialIcons name="event" size={20} color={ERP_COLOR_CODE.ERP_555} />
       </TouchableOpacity>
-      {!isValidate && !value && errors[item.field] && (
-        <Text style={{ color: ERP_COLOR_CODE.ERP_ERROR, marginTop: 4 }}>{errors[item?.field]}</Text>
+      {!value && errors[item.field] && (
+                <InputError error = {errors[item?.field]}/>
+
       )}
     </View>
   );

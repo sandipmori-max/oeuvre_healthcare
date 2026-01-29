@@ -10,6 +10,7 @@ import {
   ScrollView,
   Dimensions,
   Modal,
+  ImageBackground,
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
@@ -26,11 +27,11 @@ import { formatDateForAPI, parseCustomDate } from '../../../utils/helpers';
 import { ERP_COLOR_CODE } from '../../../utils/constants';
 import useTranslations from '../../../hooks/useTranslations';
 import MaterialIcons from '@react-native-vector-icons/material-icons';
+import { ERP_GIF } from '../../../assets';
 
 const AttendanceScreen = () => {
   const route = useRoute();
   const { isFor } = route?.params || '';
-  console.log("isFor-----------", isFor)
   const navigation = useNavigation<any>();
   const [isListVisible, setIsListVisible] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -139,7 +140,7 @@ const AttendanceScreen = () => {
     refresh,
     actionLoader,
     showDateFilter,
-    theme
+    theme,
   ]);
 
   const checkAttendance = () => {
@@ -335,7 +336,8 @@ const AttendanceScreen = () => {
             )}
             {isListVisible ? (
               <View style={{ flex: 1,height: '100%' }}>
-                <List
+                 
+              <List
                   selectedMonth={formattedMonth}
                   showFilter={showFilter}
                   fromDate={fromDate}
@@ -354,9 +356,26 @@ const AttendanceScreen = () => {
               </View>
             ) : (
               <View
-                style={[theme === 'dark' && { backgroundColor: 'black' }]}
+                style={[
+                  {
+                     height: Dimensions.get('screen').height,
+                                          width: Dimensions.get('screen').width,
+                                          flex: 1 
+                  },
+                  theme === 'dark' && { backgroundColor: 'black' }]}
               >
+                <ImageBackground
+                              source={ERP_GIF.BACK_IMG}
+                              resizeMode='cover'
+                               style={{
+                                          height: Dimensions.get('screen').height * 0.85,
+                                          width: Dimensions.get('screen').width,
+                                          flex: 1 
+                                        }}
+                            >
                 <AttendanceForm setBlockAction={setBlockAction} resData={resData} />
+
+                            </ImageBackground>
               </View>
             )}
           </>

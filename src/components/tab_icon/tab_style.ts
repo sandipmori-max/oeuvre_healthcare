@@ -13,9 +13,9 @@ export const styles = {
   }),
   activeLine: {
     width: 36,
-    height: 3,
+    height: 4,
     borderRadius: 2,
     backgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR,
-    marginBottom: 4,
+    marginBottom: 8,
   },
 };

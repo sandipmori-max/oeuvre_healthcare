@@ -55,5 +55,6 @@ export interface AuthState {
   dashboardTypeId: string,
   appDrawerMenuList: [],
   appBottomMenuList: [],
-  appColorCode: string
+  appColorCode: string,
+  isPinVerifyLoaded: boolean
 }

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   View,
   Keyboard,
@@ -8,6 +8,10 @@ import {
   FlatList,
   KeyboardAvoidingView,
   Platform,
+  Animated,
+  Image,
+  Dimensions,
+  ImageBackground,
 } from 'react-native';
 import DeviceInfo from 'react-native-device-info';
 
@@ -21,6 +25,9 @@ import LoginForm from './components/LoginForm';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ERP_COLOR_CODE } from '../../../utils/constants';
 import { setReloadApp } from '../../../store/slices/reloadApp/reloadAppSlice';
+import FastImage from 'react-native-fast-image';
+import { ERP_GIF } from '../../../assets';
+import { Directions } from 'react-native-gesture-handler';
 
 const LoginScreen = ({ navigation, route }: any) => {
   const { t } = useTranslations();
@@ -76,7 +83,9 @@ const LoginScreen = ({ navigation, route }: any) => {
         companyData,
       }),
     );
-    dispatch(setReloadApp())
+       setTimeout(() => {  
+                          dispatch(setReloadApp())
+                        }, 1000);
     // dispatch(getERPAppConfigMenuThunk())
   };
 
@@ -88,6 +97,24 @@ const LoginScreen = ({ navigation, route }: any) => {
     setAlertConfig(config);
     setAlertVisible(true);
   };
+  const pressAnim = useRef(new Animated.Value(1)).current;
+  const onPressIn = () => {
+    Animated.spring(pressAnim, {
+      toValue: 0.96,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const onPressOut = () => {
+    Animated.spring(pressAnim, {
+      toValue: 1,
+      friction: 4,
+      tension: 150,
+      useNativeDriver: true,
+    }).start();
+  };
+
+
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
@@ -95,6 +122,14 @@ const LoginScreen = ({ navigation, route }: any) => {
         style={{ flex: 1, backgroundColor: ERP_COLOR_CODE.ERP_WHITE }}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
+      <ImageBackground
+          source={ERP_GIF.BACK_IMG}
+          style={{
+            height: Dimensions.get('screen').height,
+            width: Dimensions.get('screen').width
+          }}
+          resizeMode='cover'
+        >
         <FlatList
           data={['']}
           showsVerticalScrollIndicator={false}
@@ -115,13 +150,25 @@ const LoginScreen = ({ navigation, route }: any) => {
                   showAlert={showAlert}
                 />
                 {isAddingAccount && (
-                  <TouchableOpacity
-                    style={styles.cancelButton}
-                    onPress={() => navigation.goBack()}
-                    activeOpacity={0.8}
+                  <Animated.View
+                    style={{
+                      transform: [
+
+                        { scale: pressAnim },
+                      ],
+                    }}
                   >
-                    <Text style={styles.cancelButtonText}>{t('auth.cancel')}</Text>
-                  </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.cancelButton}
+                      onPress={() => navigation.goBack()}
+                      activeOpacity={0.8}
+                      onPressIn={onPressIn}
+                      onPressOut={onPressOut}
+                    >
+                      <Text style={styles.cancelButtonText}>{t('auth.cancel')}</Text>
+                    </TouchableOpacity>
+                  </Animated.View>
+
                 )}
               </View>
 
@@ -137,6 +184,8 @@ const LoginScreen = ({ navigation, route }: any) => {
           )}
           keyExtractor={(item, index) => index.toString()}
         />
+        </ImageBackground>
+       
       </KeyboardAvoidingView>
     </TouchableWithoutFeedback>
   );

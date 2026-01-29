@@ -14,7 +14,6 @@ export const styles = StyleSheet.create({
     width: width * 0.6,
     height: width * 0.6,
     marginBottom: 20,
-    opacity: 0.9,
   },
   title: {
     fontSize: 20,

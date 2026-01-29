@@ -105,6 +105,7 @@ const styles = StyleSheet.create({
   const [selectedItem, setSelectedItem] = useState<any>(null);
   const [currentView, setCurrentView] = useState<'pie' | 'calendar'>('pie');
 
+  console.log("listData", listData);
   const baseLink = useBaseLink();
 
   useEffect(() => {
@@ -274,6 +275,7 @@ const styles = StyleSheet.create({
     return (
       <View
         style={{
+          height: Dimensions.get('screen').height * 0.75,
           justifyContent: 'center',
           alignItems: 'center',
           alignContent:'center',
