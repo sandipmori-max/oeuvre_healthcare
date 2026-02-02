@@ -18,8 +18,7 @@ import { DARK_COLOR, ERP_COLOR_CODE } from '../../../../utils/constants';
 import Toast from '../../../../components/Toast/Toast';
 
 import { StyleSheet } from 'react-native';
-const accentColors = ['#dbe0f5ff', '#c8f3edff', '#faf1e0ff', '#f0e1e1ff', '#f2e3f8ff', '#e0f3edff'];
-
+const accentColors = ['#dbe0f5ff', '#c8f3edff', '#faf1e0ff', '#f0e1e1ff', '#f2e3f8ff', '#e0f3edff',];
 const MenuTab = ({ type, headerText, searchPlaceholder }: any) => {
   const navigation = useNavigation();
   const dispatch = useAppDispatch();
@@ -37,12 +36,12 @@ const MenuTab = ({ type, headerText, searchPlaceholder }: any) => {
   const [showSearch, setShowSearch] = useState(false);
   const [searchText, setSearchText] = useState('');
   const [filteredList, setFilteredList] = useState(allList);
-  const [toast, setToast] = useState({ visible: false, message: '' });
+  const [toast, setToast] = useState({ visible: false, message: '', backgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR });
 
   const searchTimeout = useRef(null);
   const list = showBookmarksOnly ? filteredList.filter(i => bookmarks[i.id]) : filteredList;
 
-  const showToast = msg => setToast({ visible: true, message: msg });
+  const showToast = (msg, backgroundColor) => setToast({ visible: true, message: msg , backgroundColor: backgroundColor});
   const hideToast = () => setToast(t => ({ ...t, visible: false }));
 
   function getInitials(name) {
@@ -70,14 +69,14 @@ const MenuTab = ({ type, headerText, searchPlaceholder }: any) => {
   }, []);
 
   // Toggle bookmark
-  const toggleBookmark = async id => {
+  const toggleBookmark = async (name, id, backgroundColor) =>  {
     const updated = !bookmarks[id];
     setBookmarks(prev => ({ ...prev, [id]: updated }));
 
     const db = await getDBConnection();
     await insertOrUpdateBookmark(db, id, user?.id, updated);
 
-    showToast('Bookmark Updated!');
+    showToast(`${name} - Bookmark Updated!`, backgroundColor);
   };
 
   // Search effect
@@ -99,8 +98,8 @@ const MenuTab = ({ type, headerText, searchPlaceholder }: any) => {
     navigation.setOptions({
       headerStyle: {
         backgroundColor: theme === 'dark' ? 'black' : ERP_COLOR_CODE.ERP_APP_COLOR,
-         borderBottomWidth: 1,
-        borderBottomColor: '#fff',
+        //  borderBottomWidth: 1,
+        // borderBottomColor: '#fff',
       },
       headerTintColor: 'white',
       headerTitle: () =>
@@ -181,12 +180,17 @@ const MenuTab = ({ type, headerText, searchPlaceholder }: any) => {
             backgroundColor: theme === 'dark' ? 'black' : backgroundColor,
             flexDirection: isHorizontal ? 'row' : 'column',
           },
+          isHorizontal && {
+              paddingVertical: 8,
+              paddingHorizontal: 8,
+              marginBottom: 8
+          }
         ]}
         onPress={() =>
           item.url.includes('.') ? navigation.navigate('Web', { item }) : navigation.navigate('List', { item })
         }
       >
-        <TouchableOpacity onPress={() => toggleBookmark(item.id)} style={{ position: 'absolute', top: 0, right: 0 }}>
+        <TouchableOpacity onPress={() => toggleBookmark(getInitials(item?.name) ,item.id, backgroundColor)} style={{ position: 'absolute', top: 0, right: 0 }}>
           <MaterialIcons 
           color={theme === 'dark' ? 'white' : 'black'}
           name={bookmarks[item.id] ? 'bookmark' : 'bookmark-outline'} size={24} />
@@ -209,10 +213,11 @@ const MenuTab = ({ type, headerText, searchPlaceholder }: any) => {
         </View>
 
         <View style={{ marginLeft: isHorizontal ? 16 : 0, marginTop: isHorizontal ? 0 : 12 }}>
-          <Text numberOfLines={2} style={[styles.title, 
+          <Text 
+          numberOfLines={2} style={[styles.title, 
             {
-              maxWidth: isHorizontal ? '95%' : 'auto',
-              textAlign: isHorizontal ? 'left' : 'center'
+              maxWidth: isHorizontal ? 220 : 'auto',
+              textAlign: isHorizontal ? 'left' : 'center',
             },
             theme === 'dark' && { color: 'white' }]}>
             {item.name}
@@ -244,7 +249,7 @@ const MenuTab = ({ type, headerText, searchPlaceholder }: any) => {
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
       />
-      <Toast visible={toast.visible} message={toast.message} onHide={hideToast} />
+      <Toast visible={toast.visible} message={toast.message} onHide={hideToast} tbackgroundColor={toast.backgroundColor} />
     </View>
   );
 };
@@ -273,12 +278,12 @@ export const styles = StyleSheet.create({
   },
   card: {
     flex: 1,
-    borderRadius: 10,
-    paddingVertical: 24,
-    paddingHorizontal: 16,
-    marginBottom: 16,
+    borderRadius: 6,
+    paddingVertical: 20,
+    paddingHorizontal: 12,
+    marginBottom: 10,
     alignItems: 'center',
-    marginHorizontal: 8,
+    marginHorizontal: 6,
   },
   iconContainer: {
     width: 56,

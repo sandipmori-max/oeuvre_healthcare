@@ -57,6 +57,42 @@ const slides = [
   },
 ];
 
+
+const DotIndicator = ({ slides, currentIndex }) => {
+  const animations = useRef(
+    slides.map(() => new Animated.Value(0))
+  ).current;
+
+  useEffect(() => {
+    animations.forEach((a, i) => {
+      Animated.timing(a, {
+        toValue: i === currentIndex ? 1 : 0,
+        duration: 300,
+        useNativeDriver: false,
+      }).start();
+    });
+  }, [currentIndex]);
+
+  return (
+    <View style={styles.dotsContainer}>
+      {slides.map((_, i) => {
+        const width = animations[i].interpolate({
+          inputRange: [0, 1],
+          outputRange: [10, 22],
+        });
+
+        return (
+          <Animated.View
+            key={i}
+            style={[styles.dot, { width }]}
+          />
+        );
+      })}
+    </View>
+  );
+};
+
+
 const Onboarding = ({ navigation }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const scrollX = useRef(new Animated.Value(0)).current;
@@ -83,7 +119,7 @@ const Onboarding = ({ navigation }) => {
 
   const checkOnboardStatus = async () => {
     try {
-      const seen = await AsyncStorage.getItem('onboardSeen');
+      const seen = await AsyncStorage.getItem('onboardSeen'); 
       if (seen) {
         navigation.replace('Login');
       } else {
@@ -136,6 +172,8 @@ const Onboarding = ({ navigation }) => {
     const x = event.nativeEvent.contentOffset.x;
     setCurrentIndex(Math.round(x / width));
   };
+ 
+
 
   const renderItem = ({ item, index }) => {
     const inputRange = [(index - 1) * width, index * width, (index + 1) * width];
@@ -209,6 +247,8 @@ const Onboarding = ({ navigation }) => {
     outputRange: slides.map((s) => s.bgColor[1]),
   });
 
+ 
+
   return (
     <SafeAreaView style={styles.container}>
       <Animated.View style={[StyleSheet.absoluteFill, { backgroundColor: bgColor }]} />
@@ -276,10 +316,11 @@ const Onboarding = ({ navigation }) => {
           </Animated.View>
         ) : (
           <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
-            <Pressable style={[styles.circleBtn, {
+            <Pressable style={[styles.circleBtn,
+             {
               backgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR
             }]} onPress={handleSkip}>
-              <MaterialIcons name="check" size={26} color="#fff" />
+              <MaterialIcons name='done-all' size={26} color="#fff" />
             </Pressable>
           </Animated.View>
         )}

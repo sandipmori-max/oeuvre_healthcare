@@ -7,7 +7,7 @@ import {
   Animated,
   Dimensions,
   ScrollView,
-  Easing, // ⭐
+  Easing,
 } from 'react-native';
 import { formatTo12Hour, getWorkedHours2 } from '../../../../utils/helpers';
 import MaterialIcons from '@react-native-vector-icons/material-icons';
@@ -22,7 +22,6 @@ const DetailsBottomSheet = ({ visible, onClose, item, baseLink }: any) => {
   const theme = useAppSelector(state => state?.theme.mode);
   const { t } = useTranslations();
 
-  // ⭐ DO NOT recreate values
   const sheetTranslateY = useRef(new Animated.Value(height)).current;
   const backdropOpacity = useRef(new Animated.Value(0)).current;
   const contentOpacity = useRef(new Animated.Value(0)).current;
@@ -157,7 +156,6 @@ const DetailsBottomSheet = ({ visible, onClose, item, baseLink }: any) => {
               >
                 {item?.status?.toUpperCase()}
               </Animated.Text>
-
               {/* Card */}
               <Animated.View
                 style={{
@@ -176,7 +174,6 @@ const DetailsBottomSheet = ({ visible, onClose, item, baseLink }: any) => {
                 }}
               >
                 {/* content unchanged */}
-
                 <View
                   style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 6 }}
                 >

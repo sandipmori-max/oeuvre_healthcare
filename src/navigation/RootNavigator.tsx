@@ -26,6 +26,7 @@ import { request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 import { getLastPunchInThunk } from '../store/slices/attendance/thunk';
 import { setReloadApp } from '../store/slices/reloadApp/reloadAppSlice';
 import { updatePinVerifyLoadedState } from '../store/slices/auth/authSlice';
+import { useTranslation } from 'react-i18next';
 
 // ------------------------- Location Permission Helper -------------------------
 export async function requestLocationPermissions(): Promise<
@@ -72,10 +73,11 @@ export async function requestLocationPermissions(): Promise<
 
 // ------------------------- RootNavigator -------------------------
 const RootNavigator = () => {
+  const {t} = useTranslation();
   const dispatch = useAppDispatch();
   const LOCATION_MESSAGES = {
-    PERMISSION_DENIED: 'Location permission has been denied. Please allow it to continue using the app.',
-    SERVICE_DISABLED: 'Location services are disabled. Please enable location services to continue.',
+    PERMISSION_DENIED: t("text1"),
+    SERVICE_DISABLED: t('text2'),
   };
 
   const { isLoading, isAuthenticated, accounts, user, appColorCode } = useAppSelector(state => state.auth);
@@ -106,7 +108,7 @@ const RootNavigator = () => {
     // GPS OFF → show modal once & stop features
     if (!enabled && !gpsModalShownRef.current) {
       setAlertConfig({
-        title: 'Location service disabled (GPS OFF)',
+        title: t('test3'),
         message: LOCATION_MESSAGES.SERVICE_DISABLED,
         type: 'location',
       });
@@ -247,7 +249,7 @@ const RootNavigator = () => {
       // CASE 1: Location service disabled (GPS OFF)
       if (!enabled) {
         setAlertConfig({
-          title: 'Location service disabled (GPS OFF)',
+          title: t('test3'),
           message: LOCATION_MESSAGES.SERVICE_DISABLED,
           type: 'location',
         });
@@ -333,9 +335,14 @@ const RootNavigator = () => {
             title={alertConfig.title}
             message={alertConfig.message}
             type={alertConfig.type}
-            onClose={() => { }}
+            onClose={() => { 
+            console.log("data------------------+++++++++++------------------", 'data')
+            // setAlertVisible(true)
+
+            }}
             isSettingVisible={openSettings}
             actionLoader={undefined}
+            closeHide={true}
           />
         )
       }

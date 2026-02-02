@@ -36,6 +36,7 @@ const CustomAlert: React.FC<CustomAlertProps> = ({
   color = ERP_COLOR_CODE.ERP_BLACK,
   isBottomButtonVisible,
   isSettingVisible,
+  closeHide = false
 }) => {
   const alertStyles = getAlertStyles(type);
   const gifSource = getGifSource(type);
@@ -98,7 +99,7 @@ const CustomAlert: React.FC<CustomAlertProps> = ({
     };
     const backHandler = BackHandler.addEventListener('hardwareBackPress', onBackPress);
     return () => backHandler.remove();
-  }, [visible, onClose]);
+  }, [visible]);
 
   useEffect(() => {
     if (visible) {
@@ -124,7 +125,9 @@ const CustomAlert: React.FC<CustomAlertProps> = ({
      Render
   ======================= */
   return (
-    <Modal visible={visible} transparent animationType="none" onRequestClose={onClose}>
+    <Modal visible={visible} transparent animationType="none" onRequestClose={()=>{
+      onClose()
+    }}>
       <View style={styles.overlay}>
         <Animated.View
           style={[
@@ -153,7 +156,8 @@ const CustomAlert: React.FC<CustomAlertProps> = ({
           <Animated.View style={{ opacity: headerAnim }}>
             <View style={styles.header}>
               <Text style={alertStyles.title}>{title || ''}</Text>
-              <TouchableOpacity onPress={() => {
+              {
+                !closeHide &&  <TouchableOpacity onPress={() => {
                 Animated.parallel([
                   Animated.timing(containerAnim, {
                     toValue: 0,
@@ -172,6 +176,8 @@ const CustomAlert: React.FC<CustomAlertProps> = ({
               }} style={styles.closeIcon}>
                 <Text style={styles.closeIconText}>✕</Text>
               </TouchableOpacity>
+              }
+             
             </View>
           </Animated.View>
 

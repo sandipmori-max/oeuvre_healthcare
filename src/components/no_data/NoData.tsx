@@ -6,8 +6,10 @@ import { useFocusEffect } from '@react-navigation/native';
 import { ERP_GIF } from '../../assets';
 import { styles } from './no_data_style';
 import { useAppSelector } from '../../store/hooks';
+import { useTranslation } from 'react-i18next';
 
 const NoData = () => {
+  const {t} = useTranslation()
   const theme = useAppSelector(state => state?.theme.mode);
 
   const opacity = useRef(new Animated.Value(0)).current;
@@ -86,7 +88,7 @@ const NoData = () => {
           { transform: [{ translateX: titleTranslateX }] },
         ]}
       >
-        No Data Found
+        {t('test8')}
       </Animated.Text>
 
       {/* SUBTITLE */}
@@ -96,7 +98,7 @@ const NoData = () => {
           { transform: [{ translateX: subtitleTranslateX }] },
         ]}
       >
-        Oops! No data available. Please refresh or check again later.
+        {t('test9')}
       </Animated.Text>
     </Animated.View>
   );

@@ -13,7 +13,6 @@ import ERPTextInput from '../../../../components/input/ERPTextInput';
 import ERPButton from '../../../../components/button/ERPButton';
 import useFcmToken from '../../../../hooks/useFcmToken';
 import { ERP_COLOR_CODE } from '../../../../utils/constants';
-import messaging from '@react-native-firebase/messaging';
  
 const LoginForm: React.FC<LoginFormProps> = ({
   deviceId,
@@ -115,7 +114,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
         );
       } else {
         showAlert({
-          title: "Authentication failed",
+          title: t('test4'),
           message: loginResult?.message || t('auth.loginFailed'),
           type: 'error',
         });
@@ -142,7 +141,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
       >
         {({ handleChange, handleBlur, values, errors, touched, handleSubmit }) => (
           <>
-            {[ 'user', 'password'].map((field, index) => (
+            {[  'user', 'password'].map((field, index) => (
               <Animated.View
                 key={field}
                 style={{

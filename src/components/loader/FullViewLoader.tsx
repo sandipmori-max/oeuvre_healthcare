@@ -5,8 +5,10 @@ import FastImage from 'react-native-fast-image';
 import { ERP_GIF } from '../../assets';
 import { styles } from './loader_style';
 import { useAppSelector } from '../../store/hooks';
+import { useTranslation } from 'react-i18next';
 
 const FullViewLoader = () => {
+  const {t} = useTranslation()
   const theme = useAppSelector(state => state?.theme.mode);
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -71,7 +73,7 @@ const FullViewLoader = () => {
           },
         ]}
       >
-        Please wait
+        {t('test6')}
       </Animated.Text>
 
       <Animated.Text
@@ -83,7 +85,7 @@ const FullViewLoader = () => {
           },
         ]}
       >
-        Fetching the latest information securely...
+        {t('test7')}
       </Animated.Text>
     </View>
   );
