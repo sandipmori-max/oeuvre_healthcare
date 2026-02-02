@@ -54,6 +54,7 @@ import VideoRecorder from './components/VideoRecorder';
 import ScanScreen from './components/ScanScreen';
 import BarCodeScan from './components/BarCodeScan';
 import { styles } from './page_style';
+import { openSettings } from 'react-native-permissions';
 
 type PageRouteParams = { PageScreen: { item: any } };
 
@@ -159,199 +160,199 @@ const PageScreen = () => {
   const hasLocationField = controls.some(
     item => item?.defaultvalue && item?.defaultvalue === '#location' && item?.visible === "0",
   );
-  
+
   const customScriptRule = '';
-//   const customScriptRule = `{
-//     "onClickButtonSave":
-//      {
-//         "logic": "OR",
-//          "rules": [
-//             {
-//                "left": "amount",
-//                "operator": "equals",
-//                "right": ""
-//            }
-//        ],
-//        "validActions": [
-//             { "field": "buttonSave", "action": "disable" }
-//        ],
-//        "invalidActions": [
-//            { "field": "buttonSave", "action": "enable" }
-//        ],
-//        "message": ""
-//    },
-//    "onPageLoad":
-//    {
-//        "logic": "OR",
-//        "rules": [
-//            {
-//                "left": "amount",
-//                "operator": "equals",
-//                "right": ""
-//            }
-//        ],
-//        "validActions": [
-//            { "field": "amount", "action": "enable" }
-//            ],
-//        "invalidActions": [
-//             { "field": "amount", "action": "disable" }
-//            ]
-//    },
-//    "place_onInputChange":
-//    {
-//        "logic": "OR",
-//        "rules": [
-//            {
-//                "left": "place",
-//                "operator": "equals",
-//                "right": "test"
-//            }
-//        ],
-//        "validActions": [
-//             { "field": "exptype", "action": "disable" } 
-//            ],
-//        "invalidActions": [
-//             { "field": "exptype", "action": "enable" }
-//            ]
-//    },
-//    "projectid_onAjaxChange":
-//    {
-//        "logic": "OR",
-//        "rules": [
-//            {
-//                "left": "projectname",
-//                "operator": "equals",
-//                "right": "00"
-//            }
-//        ],
-//        "validActions": [
-//             { "field": "qty", "action": "setValue", "text" : "2580258"}
-//            ],
-//        "invalidActions": [
-//             { "field": "qty", "action": "disable" }
-//            ]
-//    },
-//    "entryby_onDropDownChange":
-//    {
-//        "logic": "OR",
-//        "rules": [
-//            {
-//                "left": "entryby",
-//                "operator": "equals",
-//                "right": "Sandip Mori"
-//            }
-//        ],
-//        "validActions": [
-//             { "field": "buttonSave", "action": "disable" }
-//            ],
-//        "invalidActions": [
-//             { "field": "buttonSave", "action": "enable" }
-//            ]
-//    },
-//    "status_onBoolChange":
-//    {
-//        "logic": "OR",
-//        "rules": [
-//            {
-//                "left": "propname",
-//                "operator": "equals",
-//                "right": "Active"
-//             }
-//        ],
-//        "validActions": [
-//             { "field": "propname", "action": "borderColor", "borderColor" :"red"}
-//            ],
-//        "invalidActions": [
-//             { "field": "buttonSave", "action": "enable" }
-//            ]
-//    },
-//     "onImageChange":
-//    {
-//        "logic": "OR",
-//        "rules": [
-//            {
-//                "left": "doctorlocation",
-//                "operator": "locationWithin",
-//                "right": "inlocation",
-//                "meters": 50
-//            }
-//        ],
-//        "validActions": [
-//             { "field": "buttonSave", "action": "enable" }
-//            ],
-//        "invalidActions": [
-//             { "field": "buttonSave", "action": "enable" }
-//            ]
-//    },
-//    "onFileChange":
-//    {
-//        "logic": "OR",
-//        "rules": [
-//            {
-//                "left": "doctorlocation",
-//                "operator": "locationWithin",
-//                "right": "inlocation",
-//                "meters": 50
-//            }
-//        ],
-//        "validActions": [
-//             { "field": "buttonSave", "action": "disable" }
-//            ],
-//        "invalidActions": [
-//             { "field": "buttonSave", "action": "enable" }
-//            ]
-//    },
-//     "onLocationChange":
-//    {
-//        "logic": "OR",
-//        "rules": [
-//            {
-//                "left": "doctorlocation",
-//                "operator": "locationWithin",
-//                "right": "inlocation",
-//                "meters": 50
-//            }
-//        ],
-//        "validActions": [
-//             { "field": "buttonSave", "action": "enable" }
-//            ],
-//        "invalidActions": [
-//             { "field": "buttonSave", "action": "enable" }
-//            ]
-//    },
-//    "onBarCodeChange":
-//    {
-//        "logic": "OR",
-//        "rules": [
-//            {
-//                "left": "doctorlocation",
-//                "operator": "locationWithin",
-//                "right": "inlocation",
-//                "meters": 50
-//            }
-//        ],
-//        "validActions": [
-//             { "field": "buttonSave", "action": "enable" }
-//            ],
-//        "invalidActions": [
-//             { "field": "buttonSave", "action": "enable" }
-//            ]
-//    }
-// }`
+  //   const customScriptRule = `{
+  //     "onClickButtonSave":
+  //      {
+  //         "logic": "OR",
+  //          "rules": [
+  //             {
+  //                "left": "amount",
+  //                "operator": "equals",
+  //                "right": ""
+  //            }
+  //        ],
+  //        "validActions": [
+  //             { "field": "buttonSave", "action": "disable" }
+  //        ],
+  //        "invalidActions": [
+  //            { "field": "buttonSave", "action": "enable" }
+  //        ],
+  //        "message": ""
+  //    },
+  //    "onPageLoad":
+  //    {
+  //        "logic": "OR",
+  //        "rules": [
+  //            {
+  //                "left": "amount",
+  //                "operator": "equals",
+  //                "right": ""
+  //            }
+  //        ],
+  //        "validActions": [
+  //            { "field": "amount", "action": "enable" }
+  //            ],
+  //        "invalidActions": [
+  //             { "field": "amount", "action": "disable" }
+  //            ]
+  //    },
+  //    "place_onInputChange":
+  //    {
+  //        "logic": "OR",
+  //        "rules": [
+  //            {
+  //                "left": "place",
+  //                "operator": "equals",
+  //                "right": "test"
+  //            }
+  //        ],
+  //        "validActions": [
+  //             { "field": "exptype", "action": "disable" } 
+  //            ],
+  //        "invalidActions": [
+  //             { "field": "exptype", "action": "enable" }
+  //            ]
+  //    },
+  //    "projectid_onAjaxChange":
+  //    {
+  //        "logic": "OR",
+  //        "rules": [
+  //            {
+  //                "left": "projectname",
+  //                "operator": "equals",
+  //                "right": "00"
+  //            }
+  //        ],
+  //        "validActions": [
+  //             { "field": "qty", "action": "setValue", "text" : "2580258"}
+  //            ],
+  //        "invalidActions": [
+  //             { "field": "qty", "action": "disable" }
+  //            ]
+  //    },
+  //    "entryby_onDropDownChange":
+  //    {
+  //        "logic": "OR",
+  //        "rules": [
+  //            {
+  //                "left": "entryby",
+  //                "operator": "equals",
+  //                "right": "Sandip Mori"
+  //            }
+  //        ],
+  //        "validActions": [
+  //             { "field": "buttonSave", "action": "disable" }
+  //            ],
+  //        "invalidActions": [
+  //             { "field": "buttonSave", "action": "enable" }
+  //            ]
+  //    },
+  //    "status_onBoolChange":
+  //    {
+  //        "logic": "OR",
+  //        "rules": [
+  //            {
+  //                "left": "propname",
+  //                "operator": "equals",
+  //                "right": "Active"
+  //             }
+  //        ],
+  //        "validActions": [
+  //             { "field": "propname", "action": "borderColor", "borderColor" :"red"}
+  //            ],
+  //        "invalidActions": [
+  //             { "field": "buttonSave", "action": "enable" }
+  //            ]
+  //    },
+  //     "onImageChange":
+  //    {
+  //        "logic": "OR",
+  //        "rules": [
+  //            {
+  //                "left": "doctorlocation",
+  //                "operator": "locationWithin",
+  //                "right": "inlocation",
+  //                "meters": 50
+  //            }
+  //        ],
+  //        "validActions": [
+  //             { "field": "buttonSave", "action": "enable" }
+  //            ],
+  //        "invalidActions": [
+  //             { "field": "buttonSave", "action": "enable" }
+  //            ]
+  //    },
+  //    "onFileChange":
+  //    {
+  //        "logic": "OR",
+  //        "rules": [
+  //            {
+  //                "left": "doctorlocation",
+  //                "operator": "locationWithin",
+  //                "right": "inlocation",
+  //                "meters": 50
+  //            }
+  //        ],
+  //        "validActions": [
+  //             { "field": "buttonSave", "action": "disable" }
+  //            ],
+  //        "invalidActions": [
+  //             { "field": "buttonSave", "action": "enable" }
+  //            ]
+  //    },
+  //     "onLocationChange":
+  //    {
+  //        "logic": "OR",
+  //        "rules": [
+  //            {
+  //                "left": "doctorlocation",
+  //                "operator": "locationWithin",
+  //                "right": "inlocation",
+  //                "meters": 50
+  //            }
+  //        ],
+  //        "validActions": [
+  //             { "field": "buttonSave", "action": "enable" }
+  //            ],
+  //        "invalidActions": [
+  //             { "field": "buttonSave", "action": "enable" }
+  //            ]
+  //    },
+  //    "onBarCodeChange":
+  //    {
+  //        "logic": "OR",
+  //        "rules": [
+  //            {
+  //                "left": "doctorlocation",
+  //                "operator": "locationWithin",
+  //                "right": "inlocation",
+  //                "meters": 50
+  //            }
+  //        ],
+  //        "validActions": [
+  //             { "field": "buttonSave", "action": "enable" }
+  //            ],
+  //        "invalidActions": [
+  //             { "field": "buttonSave", "action": "enable" }
+  //            ]
+  //    }
+  // }`
 
   const hasMediaField = controls.some(
     item => item?.ctltype === 'IMAGE' ||
       item?.ctltype === 'PHOTO',
   );
 
-    useFocusEffect(
-      useCallback(() => {
-         setTapLoader(false)
-        return () => {
-        };
-      }, [navigation])
-    );
-   
+  useFocusEffect(
+    useCallback(() => {
+      setTapLoader(false)
+      return () => {
+      };
+    }, [navigation])
+  );
+
 
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
@@ -508,7 +509,10 @@ const PageScreen = () => {
         backgroundColor: theme === 'dark' ? 'black' : ERP_COLOR_CODE.ERP_APP_COLOR,
         borderBottomWidth: 1,
         borderBottomColor: '#fff',
+        
       },
+        
+      
       headerTintColor: '#fff',
       headerTitle: () => (
         <View style={{ flexDirection: 'row', alignItems: 'center', maxWidth: 210 }}>
@@ -550,15 +554,7 @@ const PageScreen = () => {
               }}
             />
           )}
-          {/* {controls.length > 0 && (
-            <ERPIcon
-              name="save-as"
-              isLoading={actionSaveLoader || tapLoader}
-              onPress={async () => {
-              
-              }}
-            />
-          )} */}
+         
         </>
       ),
     });
@@ -701,25 +697,27 @@ const PageScreen = () => {
   // }, [formValues]);
 
   const applyActionsToFormValues = (formValues, actions) => {
-  let updatedValues = { ...formValues };
+    let updatedValues = { ...formValues };
 
-  actions.forEach(action => {
-    if (action?.action === 'setValue' && action?.field) {
-      updatedValues[action.field] = action.text ?? '';
-      console.log(
-        `✅ setValue applied → ${action.field} = ${action.text}`
-      );
-    }
-  });
+    actions.forEach(action => {
+      if (action?.action === 'setValue' && action?.field) {
+        updatedValues[action.field] = action.text ?? '';
+        console.log(
+          `✅ setValue applied → ${action.field} = ${action.text}`
+        );
+      }
+    });
 
-  return updatedValues;
-};
+    return updatedValues;
+  };
 
 
   const renderItem = useCallback(
     ({ item, index }: { item: any; index: number }) => {
 
-       const setValue = (val) => {
+      const setValue = (val) => {
+
+        if (myScript) {
           console.log('================ SET VALUE START ================');
 
           console.log('Incoming value:', val);
@@ -740,7 +738,7 @@ const PageScreen = () => {
           setFormValues(updatedValues);
 
           // 🔹 Clear field error
-           setErrors(prev => ({ ...prev, [item?.field]: '' }));
+          setErrors(prev => ({ ...prev, [item?.field]: '' }));
 
           // 🔥 RULE EXECUTION LOGS
           const eventName = getEventByControl(item);
@@ -760,7 +758,7 @@ const PageScreen = () => {
             return;
           }
 
-         console.log('✅ Rule Found → Evaluating...');
+          console.log('✅ Rule Found → Evaluating...');
 
           const { actions } = evaluateRulesWithActions(rule, updatedValues);
           console.log('Rule Actions:', actions);
@@ -799,25 +797,24 @@ const PageScreen = () => {
           setControls(updatedControls);
 
           console.log('================ SET VALUE END ==================');
+        }
+        else {
 
-        };
+          if (typeof val === 'object' && val !== null) {
+            setFormValues(prev => ({ ...prev, ...val }));
+          } else {
+            setFormValues(prev => ({ ...prev, [item?.field]: val }));
+          }
+          setErrors(prev => ({ ...prev, [item?.field]: '' }));
+        }
+
+      };
 
 
-
-      // const setValue = (val: any) => {
-      //   if (typeof val === 'object' && val !== null) {
-      //     setFormValues(prev => ({ ...prev, ...val }));
-      //   } else {
-      //     setFormValues(prev => ({ ...prev, [item?.field]: val }));
-      //   }
-      //   setErrors(prev => ({ ...prev, [item?.field]: '' }));
-      // };
-
-      
       const value = formValues[item?.field] || formValues[item?.text] || '';
 
-   
-  
+
+
       if (item?.visible === '1') return null;
 
       let content = null;
@@ -1022,33 +1019,33 @@ const PageScreen = () => {
     [formValues, errors, controls, locationEnabled],
   );
 
-const getEventByControl = (item) => {
-  if (item?.ctltype === 'BOOL') return 'onBoolChange';
-  if (item?.ctltype === 'IMAGE') return 'onImageChange';
-  if (item?.ctltype === 'FILE') return 'onFileChange';
-  if (item?.defaultvalue === '#location') return 'onLocationChange';
-  if (item?.ctltype === 'QRSCANNER') return 'onBarCodeChange';
+  const getEventByControl = (item) => {
+    if (item?.ctltype === 'BOOL') return 'onBoolChange';
+    if (item?.ctltype === 'IMAGE') return 'onImageChange';
+    if (item?.ctltype === 'FILE') return 'onFileChange';
+    if (item?.defaultvalue === '#location') return 'onLocationChange';
+    if (item?.ctltype === 'QRSCANNER') return 'onBarCodeChange';
 
-  if (item?.ajax === 1) return 'onAjaxChange';
-  if (item?.ddl && item?.ddl !== '') return 'onDropDownChange';
+    if (item?.ajax === 1) return 'onAjaxChange';
+    if (item?.ddl && item?.ddl !== '') return 'onDropDownChange';
 
-  return 'onInputChange'; // default
-};
+    return 'onInputChange'; // default
+  };
 
 
   const getRuleKey = (item) => {
-  const eventName = getEventByControl(item);
-  return `${item.field}_${eventName}`;
-};
+    const eventName = getEventByControl(item);
+    return `${item.field}_${eventName}`;
+  };
 
-const parsedRules = useMemo(() => {
-  try {
-    return JSON.parse(customScriptRule);
-  } catch (e) {
-    console.error('Invalid rules JSON');
-    return {};
-  }
-}, []);
+  const parsedRules = useMemo(() => {
+    try {
+      return JSON.parse(customScriptRule);
+    } catch (e) {
+      console.error('Invalid rules JSON');
+      return {};
+    }
+  }, []);
 
   const showDatePicker = (field: string, date: any) => {
     setActiveDateField(field);
@@ -1122,7 +1119,7 @@ const parsedRules = useMemo(() => {
             />
 
 {!authUser && controls.length > 0 && (
-              <TouchableOpacity
+             <TouchableOpacity
                 style={{
                   height: 46,
                   width: '100%',
@@ -1134,13 +1131,9 @@ const parsedRules = useMemo(() => {
                 }}
                 onPress={async () => {
                     try {
-                  // let sccc = 
-                  // { "onClick_buttonSave": { "logic": "OR", "rules": [ { "left": "doctorlocation", "operator": "locationWithin", "right": "inlocation", "meters": 50 } ], "validActions": [ { "field": "buttonSave", "action": "disable" } ], "invalidActions": [ { "field": "buttonSave", "action": "enable" } ] }, "onpage_load": { "logic": "OR", "rules": [ { "left": "doctorlocation", "operator": "locationWithin", "right": "inlocation", "meters": 50 } ], "validActions": [ { "field": "buttonSave", "action": "enable" } ], "invalidActions": [ { "field": "buttonSave", "action": "enable" } ] }, }
-                  setTapLoader(true)
                   if(myScript){
                     let rules;
-
-                  if (typeof myScript === "string") {
+                  if (myScript && typeof myScript === "string") {
                     try {
                       rules = JSON.parse(myScript);
                     } catch (e) {
@@ -1150,7 +1143,6 @@ const parsedRules = useMemo(() => {
                   } else {
                     rules = myScript;
                   }
-
                   const { actions } = evaluateRulesWithActions(rules, formValues);
                   const hasButtonSaveEnable = actions.some(
                     item => item?.field === "buttonSave"
@@ -1163,25 +1155,26 @@ const parsedRules = useMemo(() => {
                     setControls(updatedControls)
                     setButtonSave(hasButtonSaveEnable)
                     if (!hasButtonSaveEnable) {
-                      setTapLoader(false);
                       Alert.alert("Error", myScript?.message)
                       return;
                     }
                   }
                   const updatedControls = applyActionsToControls(controls, actions);
                   setControls(updatedControls)
-                  }
-                  console.log("hasButtonSaveEnable-------------------")
+                  }  
 
-
+                  // 1️⃣ Check if location services are enabled
                   const locationEnabled = hasLocationField ? await DeviceInfo.isLocationEnabled() : true;
 
+                  // 2️⃣ Request location permissions if needed
                   const permissionStatus = hasLocationField
                     ? await requestLocationPermissions()
                     : 'granted';
 
+                  // 3️⃣ Request camera/media permission if needed
                   const hasCameraPermission = hasMediaField ? await requestCameraPermission() : true;
 
+                  // 4️⃣ Handle permission errors
                   if (!hasCameraPermission && hasMediaField) {
                     setAlertConfig({
                       title: t('title.title16'),
@@ -1244,7 +1237,7 @@ const parsedRules = useMemo(() => {
                       setTimeout(() => {
                         setAlertVisible(false);
                         navigation.goBack();
-                      }, 1800);
+                      }, 1500);
                     } catch (err: any) {
                       setLoader(false);
                       setAlertConfig({
@@ -1258,10 +1251,8 @@ const parsedRules = useMemo(() => {
                   }
 
                   setActionSaveLoader(false);
-                  setTapLoader(false)
                 } catch (error) {
                   console.error("Save error:", error);
-                  setTapLoader(false)
                   setActionSaveLoader(false);
                 }
                 }}
@@ -1277,6 +1268,7 @@ const parsedRules = useMemo(() => {
                 </Text>
               </TouchableOpacity>
             )}
+
           </View>
           <CustomAlert
             visible={alertVisible}
@@ -1318,7 +1310,8 @@ const parsedRules = useMemo(() => {
         errors={errorsList}
         onClose={() => {
           setTapLoader(false)
-          setShowErrorModal(false)}}
+          setShowErrorModal(false)
+        }}
       />
 
       {dateTimePickerVisible && Platform.OS === 'ios' && (
@@ -1397,6 +1390,7 @@ const parsedRules = useMemo(() => {
         message={alertConfig.message}
         type={alertConfig.type}
         onClose={() => {
+           
           setTapLoader(false)
           setAlertVisible(false);
           if (goBack) {

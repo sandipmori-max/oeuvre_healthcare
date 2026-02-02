@@ -1,4 +1,4 @@
-import { StyleSheet } from 'react-native';
+import { Dimensions, StyleSheet } from 'react-native';
 import { ERP_COLOR_CODE } from '../../utils/constants';
 
 export const styles = StyleSheet.create({
@@ -33,10 +33,9 @@ export const styles = StyleSheet.create({
   },
   emailid:{
         color: '#FFF',
-
   },
   menuContainer: {
-    flex: 1,
+    height: Dimensions.get("screen").height * 0.55,
     paddingTop: 10,
     top: 30
   },

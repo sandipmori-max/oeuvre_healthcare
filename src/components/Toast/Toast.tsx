@@ -10,7 +10,7 @@ import { useAppSelector } from '../../store/hooks';
 
 const { width } = Dimensions.get('window');
 
-const Toast = ({ visible, message, onHide }: { visible: boolean; message: string; onHide: () => void }) => {
+const Toast = ({ visible, message, onHide , tbackgroundColor}: { visible: boolean; message: string; onHide: () => void , tbackgroundColor: any}) => {
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const theme = useAppSelector(state => state.theme.mode);
 
@@ -52,6 +52,9 @@ const Toast = ({ visible, message, onHide }: { visible: boolean; message: string
             },
           ],
         },
+        {
+          backgroundColor: tbackgroundColor ? tbackgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR
+        }
       ]}
     >
       <Text style={[
@@ -79,7 +82,7 @@ const styles = StyleSheet.create({
     width: width ,
   },
   toastText: {
-    color: ERP_COLOR_CODE.ERP_WHITE,
+    color: ERP_COLOR_CODE.ERP_BLACK,
     fontSize: 16,
     textAlign: 'center',
   },

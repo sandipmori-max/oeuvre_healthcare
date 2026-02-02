@@ -86,6 +86,7 @@ const AttendanceScreen = () => {
       setIsListVisible(false);
     }
   }, [navigation])
+ 
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -216,7 +217,6 @@ const AttendanceScreen = () => {
           alignContent: 'center',
           alignItems: 'center',
           height: Dimensions.get('screen').height * 0.85,
-
         }}
       >
         <FullViewLoader />
@@ -233,9 +233,8 @@ const AttendanceScreen = () => {
         style={[
           {
             height: Dimensions.get('screen').height,
-            width: Dimensions.get('screen').width,
             flex: 1,
-            backgroundColor:'white'
+            backgroundColor: 'white'
           },
           theme === 'dark' && { backgroundColor: 'black' }]}
       >
@@ -243,13 +242,13 @@ const AttendanceScreen = () => {
           <View style={[styles.dateContainer, theme === 'dark' && {
             backgroundColor: 'black'
           },
-          
+
           ]}>
             <View style={[styles.dateRow, theme === 'dark' && {
               backgroundColor: 'black'
             },
-            
-            
+
+
             ]}>
 
               <TouchableOpacity
@@ -350,10 +349,12 @@ const AttendanceScreen = () => {
         {
           isListVisible ? <>
 
-            <View style={{ flex: 1,
-              width:'100%',
-              backgroundColor:'white',
-              height: '100%' }}>
+            <View style={{
+              flex: 1,
+              width: '100%',
+              backgroundColor: 'white',
+              height: '100%'
+            }}>
               <List
                 selectedMonth={formattedMonth}
                 showFilter={showFilter}
@@ -376,20 +377,12 @@ const AttendanceScreen = () => {
               resizeMode='cover'
               style={{
                 height: Dimensions.get('screen').height * 0.85,
-                width: Dimensions.get('screen').width,
                 flex: 1
               }}
             >
               <ScrollView showsVerticalScrollIndicator={false} style={[styles.container, theme === 'dark' && { backgroundColor: 'black' }]}>
-
-
                 <>
-
-
-
                   <AttendanceForm setBlockAction={setBlockAction} resData={resData} />
-
-
                 </>
               </ScrollView>
             </ImageBackground>

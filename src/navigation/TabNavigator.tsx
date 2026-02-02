@@ -25,34 +25,34 @@ const TabNavigator = () => {
 
   const tabConfig = [
     {
-      name: "Home",
+      name: t("navigation.home"),
       component: HomeScreen,
       icon: "home",
       label: t("navigation.home"),
     },
     {
-      name: "Entry",
+      name: t("navigation.entry"),
       type: "E",
       icon: "entry",
       label: t("navigation.entry"),
       search: t("navigation.search_entry"),
     },
     {
-      name: "Report",
+      name: t("navigation.report"),
       type: "R",
       icon: "report",
       label: t("navigation.report"),
       search: t("navigation.search_report"),
     },
     {
-      name: "Auth",
+      name: t("navigation.auth"),
       type: "A",
       icon: "auth",
       label: t("navigation.auth"),
       search: t("navigation.search_auth"),
     },
     {
-      name: "Profile",
+      name: t("navigation.profile"),
       component: ProfileTab,
       icon: "profile",
       label: t("navigation.profile"),

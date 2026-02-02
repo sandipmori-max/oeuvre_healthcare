@@ -111,7 +111,9 @@ export const loginUserThunk = createAsyncThunk(
         companyLink: companyData?.response?.link || "",
         companyName: companyData?.response?.name || "",
         app_id: response?.app_id || "",
+        password: password|| ""
       };
+      console.log("erpUser---------------",erpUser)
       const db = await getDBConnection();
       await createAccountsTable(db);
       const currentAccounts = await getAccounts(db);
@@ -332,7 +334,7 @@ export const getERPDashboardThunk = createAsyncThunk(
         fd,
         td
       );
-      console.log("dashboard---------------------")
+      console.log("dashboard---------------------", dashboard)
       return dashboard;
     } catch (error: any) {
       console.log("dashboard-----------error----------", error)

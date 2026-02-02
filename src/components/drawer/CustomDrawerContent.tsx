@@ -6,6 +6,7 @@ import {
   ScrollView,
   Image,
   Animated,
+  FlatList,
 } from 'react-native';
 import {
   DrawerContentComponentProps,
@@ -112,13 +113,14 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
 
   return (
     <DrawerContentScrollView
+    showsVerticalScrollIndicator={false}
       {...props}
       contentContainerStyle={{
         flexGrow: 1,
         backgroundColor: theme === 'dark' ? DARK_COLOR : 'white',
       }}
     >
-      
+ 
       {/* ================= HEADER ================= */}
       <Animated.View
         style={{
@@ -178,7 +180,9 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
       </Animated.View>
 
       {/* ================= MENU ================= */}
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView 
+      
+      showsVerticalScrollIndicator={false}>
         <View style={styles.menuContainer}>
           {ERP_DRAWER_LIST.map((item, index) => {
             const isActive = currentRoute === item.route;

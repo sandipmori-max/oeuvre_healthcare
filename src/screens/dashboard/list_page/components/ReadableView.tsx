@@ -147,8 +147,17 @@ useEffect(() => {
       color: configItem?.colorcode || ERP_COLOR_CODE.ERP_APP_COLOR,
     };
   };
+const accentColors = ['#dbe0f5ff', '#c8f3edff', '#faf1e0ff', '#f0e1e1ff', '#f2e3f8ff', '#e0f3edff',
+  '#eaf1fbff', 
+  '#e9f7f1ff', 
+  '#fff4e6ff',
+  '#f5edf7ff',
+  '#eef6eaff', 
+
+];
 
   const RenderCard = ({ item, index }: any) => {
+    const bgColor = accentColors[index % accentColors.length];
 
     if (!item) return null;
     const name = item?.name?.toString() || `-`;
@@ -188,6 +197,7 @@ useEffect(() => {
           paddingHorizontal: 8,
           paddingBottom: 6,
           marginVertical: 2.5,
+          marginHorizontal: 8,
           paddingTop: 6,
           borderWidth: 1,
           borderColor: ERP_COLOR_CODE.ERP_ddd,
@@ -222,15 +232,15 @@ useEffect(() => {
         >
           <View
             style={{
-              width: 34,
-              height: 34,
+              width: 40,
+              height: 40,
               borderRadius: 34,
-              backgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR,
+              backgroundColor: bgColor,
               justifyContent: 'center',
               alignItems: 'center',
               marginRight: 12,
               borderWidth: 1,
-              borderColor: theme === 'dark' ? 'white' : 'black'
+              borderColor: ERP_COLOR_CODE.ERP_999
             }}
           >
             {
@@ -241,7 +251,7 @@ useEffect(() => {
               ) : (
                 <Text
                   style={{
-                    color: theme === 'dark' ? 'white' : ERP_COLOR_CODE.ERP_WHITE,
+                    color: 'black',
                     fontWeight: '400',
                     fontSize: 16,
                   }}
@@ -556,6 +566,7 @@ useEffect(() => {
             borderWidth: 1,
             borderColor: ERP_COLOR_CODE.ERP_ddd,
             marginBottom: 12,
+            marginHorizontal: 8
           }}
         >
           <View

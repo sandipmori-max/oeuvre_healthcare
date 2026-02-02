@@ -3,18 +3,16 @@ import React, { useCallback, useEffect, useState } from 'react';
 import {
   View,
   Text,
-  Image,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
   FlatList,
   Dimensions,
-  Alert,
   PanResponder,
 } from 'react-native';
 import NoData from '../../../../components/no_data/NoData';
 import { PieChart } from 'react-native-gifted-charts';
-import { DARK_COLOR, ERP_COLOR_CODE } from '../../../../utils/constants';
+import { ERP_COLOR_CODE } from '../../../../utils/constants';
 import { useAppDispatch, useAppSelector } from '../../../../store/hooks';
 import { getERPListDataThunk } from '../../../../store/slices/auth/thunk';
 import FullViewLoader from '../../../../components/loader/FullViewLoader';
@@ -283,7 +281,6 @@ const styles = StyleSheet.create({
         <FullViewLoader />
       </View>
     )
-
   }
 
   return (

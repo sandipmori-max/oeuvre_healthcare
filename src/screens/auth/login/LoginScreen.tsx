@@ -9,15 +9,13 @@ import {
   KeyboardAvoidingView,
   Platform,
   Animated,
-  Image,
   Dimensions,
   ImageBackground,
-  StatusBar,
 } from 'react-native';
 import DeviceInfo from 'react-native-device-info';
 
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
-import { getERPAppConfigMenuThunk, loginUserThunk } from '../../../store/slices/auth/thunk';
+import {  loginUserThunk } from '../../../store/slices/auth/thunk';
 import CustomAlert from '../../../components/alert/CustomAlert';
 import useTranslations from '../../../hooks/useTranslations';
 import { styles } from './login_style';
@@ -26,9 +24,7 @@ import LoginForm from './components/LoginForm';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ERP_COLOR_CODE } from '../../../utils/constants';
 import { setReloadApp } from '../../../store/slices/reloadApp/reloadAppSlice';
-import FastImage from 'react-native-fast-image';
 import { ERP_GIF } from '../../../assets';
-import { Directions } from 'react-native-gesture-handler';
 
 const LoginScreen = ({ navigation, route }: any) => {
   const { t } = useTranslations();
@@ -84,10 +80,9 @@ const LoginScreen = ({ navigation, route }: any) => {
         companyData,
       }),
     );
-       setTimeout(() => {  
-                          dispatch(setReloadApp())
-                        }, 1000);
-    // dispatch(getERPAppConfigMenuThunk())
+    setTimeout(() => {
+      dispatch(setReloadApp())
+    }, 1000);
   };
 
   const showAlert = (config: {
@@ -115,16 +110,13 @@ const LoginScreen = ({ navigation, route }: any) => {
     }).start();
   };
 
-
-
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <KeyboardAvoidingView
         style={{ flex: 1, backgroundColor: ERP_COLOR_CODE.ERP_WHITE }}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
-
-      <ImageBackground
+        <ImageBackground
           source={ERP_GIF.BACK_IMG}
           style={{
             height: Dimensions.get('screen').height,
@@ -132,62 +124,62 @@ const LoginScreen = ({ navigation, route }: any) => {
           }}
           resizeMode='cover'
         >
-        <FlatList
-          data={['']}
-          showsVerticalScrollIndicator={false}
-          keyboardShouldPersistTaps="handled"
-          contentContainerStyle={{
-            flexGrow: 1,
-            paddingBottom: keyboardHeight / 2 || 20,
-          }}
-          renderItem={() => (
-            <>
-              <View style={styles.formContainer}>
-                <LoginHeader isAddingAccount={isAddingAccount} t={t} />
-                <LoginForm
-                  deviceId={deviceId}
-                  isAddingAccount={isAddingAccount}
-                  isLoading={isLoading}
-                  onLoginSuccess={handlePersistAfterLogin}
-                  showAlert={showAlert}
-                />
-                {isAddingAccount && (
-                  <Animated.View
-                    style={{
-                      transform: [
+          <FlatList
+            data={['']}
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+            contentContainerStyle={{
+              flexGrow: 1,
+              paddingBottom: keyboardHeight / 2 || 20,
+            }}
+            renderItem={() => (
+              <>
+                <View style={styles.formContainer}>
+                  <LoginHeader isAddingAccount={isAddingAccount} t={t} />
+                  <LoginForm
+                    deviceId={deviceId}
+                    isAddingAccount={isAddingAccount}
+                    isLoading={isLoading}
+                    onLoginSuccess={handlePersistAfterLogin}
+                    showAlert={showAlert}
+                  />
+                  {isAddingAccount && (
+                    <Animated.View
+                      style={{
+                        transform: [
 
-                        { scale: pressAnim },
-                      ],
-                    }}
-                  >
-                    <TouchableOpacity
-                      style={styles.cancelButton}
-                      onPress={() => navigation.goBack()}
-                      activeOpacity={0.8}
-                      onPressIn={onPressIn}
-                      onPressOut={onPressOut}
+                          { scale: pressAnim },
+                        ],
+                      }}
                     >
-                      <Text style={styles.cancelButtonText}>{t('auth.cancel')}</Text>
-                    </TouchableOpacity>
-                  </Animated.View>
+                      <TouchableOpacity
+                        style={styles.cancelButton}
+                        onPress={() => navigation.goBack()}
+                        activeOpacity={0.8}
+                        onPressIn={onPressIn}
+                        onPressOut={onPressOut}
+                      >
+                        <Text style={styles.cancelButtonText}>{t('auth.cancel')}</Text>
+                      </TouchableOpacity>
+                    </Animated.View>
+                  )}
+                </View>
 
-                )}
-              </View>
-
-              <CustomAlert
-                visible={alertVisible}
-                title={alertConfig.title}
-                message={alertConfig.message}
-                type={alertConfig.type}
-                onClose={() => setAlertVisible(false)}
-                actionLoader={undefined}
-              />
-            </>
-          )}
-          keyExtractor={(item, index) => index.toString()}
-        />
+                <CustomAlert
+                  visible={alertVisible}
+                  title={alertConfig.title}
+                  message={alertConfig.message}
+                  type={alertConfig.type}
+                  onClose={() => setAlertVisible(false)}
+                  actionLoader={undefined} 
+                  closeHide={undefined}                
+                />
+              </>
+            )}
+            keyExtractor={(item, index) => index.toString()}
+          />
         </ImageBackground>
-       
+
       </KeyboardAvoidingView>
     </TouchableWithoutFeedback>
   );
