@@ -1271,17 +1271,16 @@ const PageScreen = () => {
 
           </View>
           <CustomAlert
-            visible={alertVisible}
-            title={alertConfig.title}
-            message={alertConfig.message}
-            type={alertConfig.type}
-            onClose={() => {
-              setTapLoader(false)
-              if (modalClose) setAlertVisible(false);
-            }}
-            actionLoader={undefined}
-            isSettingVisible={isSettingVisible}
-          />
+                visible={alertVisible}
+                title={alertConfig.title}
+                message={alertConfig.message}
+                type={alertConfig.type}
+                onClose={() => {
+                  setTapLoader(false);
+                  if (modalClose) setAlertVisible(false);
+                } }
+                actionLoader={undefined}
+                isSettingVisible={isSettingVisible} closeHide={undefined}          />
           {loader && (
             <View
               style={{
@@ -1390,15 +1389,15 @@ const PageScreen = () => {
         message={alertConfig.message}
         type={alertConfig.type}
         onClose={() => {
-           
-          setTapLoader(false)
+
+          setTapLoader(false);
           setAlertVisible(false);
           if (goBack) {
             navigation.goBack();
           }
-        }}
+        } }
         actionLoader={undefined}
-      />
+         closeHide={undefined}      />
     </View>
   );
 };

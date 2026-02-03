@@ -252,5 +252,14 @@ export default {
     text52: "Dashboard",
     text53: "Welcome to Oeuvre",
     text54: "Your business, simplified."
-  }
+  },
+   text1: "Location permission has been denied. Please allow it to continue using the app.",
+  text2: "Location services are disabled. Please enable location services to continue.",
+  test3: "Location service disabled (GPS OFF)",
+  test4: "Authentication failed",
+  test5: "Duplicate user",
+  test6: "Please wait...",
+  test7: "Fetching the latest information securely...",
+  test8: "No Data Found",
+  test9: "Oops! No data available. Please refresh or check again later."
 };

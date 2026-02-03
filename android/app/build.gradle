@@ -84,8 +84,8 @@ android {
         applicationId "com.oeuvre"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 19
-        versionName "1.1.9"
+        versionCode 22
+        versionName "1.2.2"
     }
     signingConfigs {
         debug {
@@ -108,7 +108,7 @@ android {
         }
        release {
             signingConfig signingConfigs.release
-            minifyEnabled false // can be true if using Proguard
+            minifyEnabled false  
             shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }

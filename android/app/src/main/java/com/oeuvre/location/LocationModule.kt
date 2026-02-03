@@ -1,4 +1,4 @@
-package com.deverp.location
+package com.oeuvre.location
 
 import android.content.Intent
 import androidx.core.content.ContextCompat
@@ -6,9 +6,9 @@ import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
 import android.util.Log
-import com.deverp.location.LocationService
+import com.oeuvre.location.LocationService
 import com.facebook.react.bridge.ReadableArray
-import com.deverp.location.UserData
+import com.oeuvre.location.UserData
 
 
 class LocationModule(private val reactContext: ReactApplicationContext) :
