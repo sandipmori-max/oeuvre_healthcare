@@ -3,12 +3,13 @@
 // Multiple build creation with different Name + icon + package name
 
 // --- android build ----
-// gradlew --stop
-// gradlew clean
-// gradlew generateCodegenArtifactsFromSchema 
-// gradlew app:assembleRelease 
-// cmd - gradlew assemble[BRAND_NAME]Release
+// ./gradlew --stop
+// ./gradlew clean
+// ./gradlew generateCodegenArtifactsFromSchema 
+// ./gradlew app:assembleRelease 
+// ./gradlew app:bundleRelease 
 
+// cmd - gradlew assemble[BRAND_NAME]Release
 // How to used - .env.clientA and .env.cientB ??
 
 // How to run - clientA and clientB app ??

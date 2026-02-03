@@ -21,8 +21,8 @@ import {
 } from './src/firebase/firebaseService';
 import { clearAllTempFiles } from './src/utils/helpers';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import TermsAndConsent from './src/screens/TermsConditions.tsx/TermsCondition';
-import FullViewLoader from './src/components/loader/FullViewLoader';
+ import FullViewLoader from './src/components/loader/FullViewLoader';
+import TermsAndConsent from './src/screens/TermsConditions/TermsCondition';
 
 const App = () => {
   const isConnected = useNetworkStatus();
@@ -39,7 +39,6 @@ const App = () => {
       }
       setIsLoading(false);
     };
-
     checkAcceptance();
   }, []);
 
@@ -57,7 +56,6 @@ const App = () => {
         clearAllTempFiles();
       }
     });
-
     return () => subscription.remove();
   }, []);
 

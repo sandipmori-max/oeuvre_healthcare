@@ -33,6 +33,7 @@ import {
   Platform,
 } from 'react-native';
 import { ERP_ICON } from '../../../../assets';
+import { Image } from 'react-native';
 
 const { width } = Dimensions.get('screen');
 
@@ -97,21 +98,21 @@ const HomeScreen = () => {
     }, 300);
 
     return () => {
-      
+
       if (searchTimeout.current) clearTimeout(searchTimeout.current);
     };
   }, [searchText, dashboard]);
 
   useFocusEffect(
-      useCallback(() => {
-          dispatch(setActiveDashboardBranchId(''))
-          dispatch(setActiveDashboardBranch(''))
-          dispatch(setActiveDashboardType(''))
-          dispatch(setActiveDashboardTypeId(''))
-          setIsFilterVisible(false)
-        return () => {};
-      }, [isAuthenticated,  navigation])
-    );
+    useCallback(() => {
+      dispatch(setActiveDashboardBranchId(''))
+      dispatch(setActiveDashboardBranch(''))
+      dispatch(setActiveDashboardType(''))
+      dispatch(setActiveDashboardTypeId(''))
+      setIsFilterVisible(false)
+      return () => { };
+    }, [isAuthenticated, navigation])
+  );
 
   useEffect(() => {
     Animated.loop(
@@ -215,7 +216,7 @@ const HomeScreen = () => {
 
   useFocusEffect(
     useCallback(() => {
-       
+
       let timer;
 
       if (isAuthenticated) {
@@ -533,7 +534,7 @@ const HomeScreen = () => {
     fetchPageData();
   }, []);
 
-   
+
 
   useEffect(() => {
     dispatch(getERPDashboardThunk({ branch: auth?.dashboardBranch.trim() || "", type: auth?.dashboardType.trim() || "", fd: auth?.dashboardFromDate.trim() || "", td: auth?.dashboardToDate.trim() || "" }));
@@ -940,7 +941,7 @@ const HomeScreen = () => {
                 <ErrorMessage message={error} />{' '}
               </View>
             ) : controls?.length === 0 && !isDashboardLoading ? (
-                <View
+              <View
                 style={{
                   height: Dimensions.get('screen').height * 0.75,
                   justifyContent: 'center',
@@ -1021,7 +1022,7 @@ const HomeScreen = () => {
                             showsVerticalScrollIndicator={false}
                           />
 
-<View style={{
+                          <View style={{
                             height: 350, width: '100%',
                             alignContent: 'center',
                             alignItems: 'center',
