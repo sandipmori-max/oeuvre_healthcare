@@ -2,7 +2,6 @@ const ERP_BASE_URL_ICONS = './icons';
 const ERP_BASE_URL_GIF = './gif';
 
 const APP_LOGO = require(`${ERP_BASE_URL_ICONS}/logo.png`);
-const DEV_LOGO = require(`${ERP_BASE_URL_ICONS}/dev_logo.png`);
 
 const HOME = require(`${ERP_BASE_URL_ICONS}/home.png`);
 const ACTIVE_HOME = require(`${ERP_BASE_URL_ICONS}/active_home.png`);
@@ -16,15 +15,18 @@ const PROFILE = require(`${ERP_BASE_URL_ICONS}/user.png`);
 const ACTIVE_PROFILE = require(`${ERP_BASE_URL_ICONS}/active_user.png`);
 const BACK = require(`${ERP_BASE_URL_ICONS}/back.png`);
 const ERROR_ICON = require(`${ERP_BASE_URL_ICONS}/error.png`);
-const MENU = require(`${ERP_BASE_URL_ICONS}/menu.png`);
-const BACK_IMG = require(`${ERP_BASE_URL_GIF}/back5.jpg`);
-
+const ALERT = require(`${ERP_BASE_URL_ICONS}/alert.png`);
+const EXITS = require(`${ERP_BASE_URL_ICONS}/exit.png`);
+const VALIDATON = require(`${ERP_BASE_URL_ICONS}/validation.png`);
+ 
 const ERROR = require(`${ERP_BASE_URL_GIF}/error.gif`);
+const LOCATION = require(`${ERP_BASE_URL_GIF}/location.gif`);
+
 const LOADING = require(`${ERP_BASE_URL_GIF}/loader.gif`);
-const SEARCH_LOADER = require(`${ERP_BASE_URL_GIF}/search.gif`);
-const NO_INTERNET = require(`${ERP_BASE_URL_GIF}/not_internet.png`);
+ const NO_INTERNET = require(`${ERP_BASE_URL_GIF}/not_internet.png`);
 const NO_DATA = require(`${ERP_BASE_URL_GIF}/no_data.png`);
 const SUCCESS = require(`${ERP_BASE_URL_GIF}/success.gif`);
+ const BACK_IMG = require(`${ERP_BASE_URL_GIF}/back5.jpg`);
 
 const Analytics = require(`${ERP_BASE_URL_GIF}/Analytics.gif`);
 const Dashboards = require(`${ERP_BASE_URL_GIF}/Dashboards.gif`);
@@ -32,11 +34,8 @@ const DataManagement = require(`${ERP_BASE_URL_GIF}/DataManagement.gif`);
 const money = require(`${ERP_BASE_URL_GIF}/money.gif`);
 const RemoteMonitoring = require(`${ERP_BASE_URL_GIF}/RemoteMonitoring.gif`);
 
- 
-
 export const ERP_ICON = {
   APP_LOGO,
-  DEV_LOGO,
   HOME,
   ACTIVE_HOME,
   ENTRY,
@@ -49,14 +48,15 @@ export const ERP_ICON = {
   ACTIVE_PROFILE,
   BACK,
   ERROR_ICON,
-  MENU,
-};
+  ALERT,
+  EXITS,
+  VALIDATON
+ };
 
 export const ERP_GIF = {
   ERROR,
   LOADING,
-  SEARCH_LOADER,
-  NO_DATA,
+   NO_DATA,
   NO_INTERNET,
   SUCCESS,
   Dashboards,
@@ -64,6 +64,7 @@ export const ERP_GIF = {
   money,
   DataManagement,
   RemoteMonitoring,
-  BACK_IMG
+  BACK_IMG,
+  LOCATION
 };
- 
+

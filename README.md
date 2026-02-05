@@ -476,6 +476,15 @@ login_style -
     fontFamily: "Handlee-Regular",
   },
 
+Splash screen 
+ title: {
+    color: ERP_COLOR_CODE.ERP_BLACK,
+    fontSize: 30, 
+    marginBottom: 8,
+    textAlign: 'center',
+    fontFamily: "Handlee-Regular",
+  },
+
 HomeTab
 Below flatlist - 1014
 

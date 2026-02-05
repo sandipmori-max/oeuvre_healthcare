@@ -49,7 +49,7 @@ const TermsAndConsent = ({ onAccept }: any) => {
 
       <Text style={styles.sectionTitle}>1. Introduction</Text>
       <Text style={styles.text}>
-        Welcome to DevERP. These Terms & Conditions govern your use of our mobile application
+        Welcome to Oeuvre. These Terms & Conditions govern your use of our mobile application
         (“Service”). By using the Service, you agree to comply with these terms.
       </Text>
 
@@ -61,7 +61,7 @@ const TermsAndConsent = ({ onAccept }: any) => {
 
       <Text style={styles.sectionTitle}>3. Permissions & Data Collection</Text>
       <Text style={styles.text}>
-        DevERP requests permissions to provide app functionality. Each permission is used only
+        Oeuvre requests permissions to provide app functionality. Each permission is used only
         with your explicit consent:
       </Text>
 
@@ -117,7 +117,7 @@ const TermsAndConsent = ({ onAccept }: any) => {
 
       <Text style={styles.sectionTitle}>7. Limitation of Liability</Text>
       <Text style={styles.text}>
-        DevERP is provided “as is.” We are not liable for any damages from use, inability to
+        Oeuvre is provided “as is.” We are not liable for any damages from use, inability to
         use, or reliance on the app.
       </Text>
 
@@ -135,7 +135,7 @@ const TermsAndConsent = ({ onAccept }: any) => {
       <Text style={styles.sectionTitle}>10. Contact Us</Text>
       <Text style={styles.text}>
         Questions? Contact us at{" "}
-        <Text style={{ color: 'blue' }}>http://deverp.com/index.aspx?q=aboutus</Text>.
+        <Text style={{ color: 'blue' }}>http://Oeuvre.com/index.aspx?q=aboutus</Text>.
       </Text>
 
         {/* TERMS CHECKBOX */}
@@ -175,7 +175,7 @@ const TermsAndConsent = ({ onAccept }: any) => {
             <Text style={styles.modalTitle}>Location Data Usage Disclosure</Text>
 
             <Text style={styles.modalText}>
-              DevERP collects and uses location data to enable real-time tracking,
+              Oeuvre collects and uses location data to enable real-time tracking,
               operational monitoring, and geofencing features.
             </Text>
 
