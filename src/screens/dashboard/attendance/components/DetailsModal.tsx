@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Modal,
   View,
@@ -15,20 +15,22 @@ import FastImage from 'react-native-fast-image';
 import { ERP_COLOR_CODE } from '../../../../utils/constants';
 import { useAppSelector } from '../../../../store/hooks';
 import useTranslations from '../../../../hooks/useTranslations';
+import ImageBottomSheetModal from '../../../../components/bottomsheet/ImageBottomSheetModal';
 
 const { height } = Dimensions.get('screen');
 
 const DetailsBottomSheet = ({ visible, onClose, item, baseLink }: any) => {
   const theme = useAppSelector(state => state?.theme.mode);
   const { t } = useTranslations();
-
+  const [showImgModal, setShowImgModal] = useState(false);
+  const [img, setImg] = useState('')
   const sheetTranslateY = useRef(new Animated.Value(height)).current;
   const backdropOpacity = useRef(new Animated.Value(0)).current;
   const contentOpacity = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     if (visible) {
-      Animated.sequence([ 
+      Animated.sequence([
         Animated.parallel([
           Animated.timing(backdropOpacity, {
             toValue: 1,
@@ -37,15 +39,15 @@ const DetailsBottomSheet = ({ visible, onClose, item, baseLink }: any) => {
           }),
           Animated.timing(sheetTranslateY, {
             toValue: 0,
-            duration: -950, 
-            easing: Easing.out(Easing.cubic), 
+            duration: -950,
+            easing: Easing.out(Easing.cubic),
             useNativeDriver: true,
           }),
         ]),
         Animated.timing(contentOpacity, {
           toValue: 1,
           duration: 350,
-          delay: 60, 
+          delay: 60,
           useNativeDriver: true,
         }),
       ]).start();
@@ -60,12 +62,12 @@ const DetailsBottomSheet = ({ visible, onClose, item, baseLink }: any) => {
     <Modal
       visible={visible}
       transparent
-       onRequestClose={onClose}
+      onRequestClose={onClose}
     >
       <Animated.View
         style={{
           flex: 1,
-          backgroundColor: 'rgba(0,0,0,0.6)', 
+          backgroundColor: 'rgba(0,0,0,0.6)',
           justifyContent: 'flex-end',
           opacity: backdropOpacity,
         }}
@@ -105,21 +107,37 @@ const DetailsBottomSheet = ({ visible, onClose, item, baseLink }: any) => {
               >
                 <View style={{ flexDirection: 'row', justifyContent: 'center', marginBottom: 16 }}>
                   {item?.image && (
-                    <FastImage
-                      source={{ uri: baseLink + '/' + item?.image }}
-                      style={{ width: 80, height: 80, borderRadius: 40 }}
-                    />
+                    <TouchableOpacity
+                      onPress={() => {
+                        setImg(`${baseLink}/${item?.image}`)
+                        setShowImgModal(true)
+                      }}
+                    >
+                      <FastImage
+                        source={{ uri: baseLink + '/' + item?.image }}
+                        style={{ width: 80, height: 80, borderRadius: 40 }}
+                      />
+                    </TouchableOpacity>
+
                   )}
                   {item?.image2 && (
-                    <FastImage
-                      source={{ uri: baseLink + '/' + item?.image2 }}
-                      style={{
-                        width: 80,
-                        height: 80,
-                        borderRadius: 40,
-                        marginLeft: -20,
+                    <TouchableOpacity
+                      onPress={() => {
+                        setImg(`${baseLink}/${item?.image2}`)
+                        setShowImgModal(true)
                       }}
-                    />
+                    >
+                      <FastImage
+                        source={{ uri: baseLink + '/' + item?.image2 }}
+                        style={{
+                          width: 80,
+                          height: 80,
+                          borderRadius: 40,
+                          marginLeft: -20,
+                        }}
+                      />
+                    </TouchableOpacity>
+
                   )}
                 </View>
               </Animated.View>
@@ -206,6 +224,12 @@ const DetailsBottomSheet = ({ visible, onClose, item, baseLink }: any) => {
             </Animated.Text>
           )}
         </Animated.View>
+
+        <ImageBottomSheetModal
+          visible={showImgModal}
+          onClose={() => setShowImgModal(false)}
+          imageUrl={img}
+        />
       </Animated.View>
     </Modal>
   );

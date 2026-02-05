@@ -19,6 +19,7 @@ import MaterialIcons from '@react-native-vector-icons/material-icons';
 import { ERP_COLOR_CODE } from '../../../utils/constants';
 import useTranslations from '../../../hooks/useTranslations';
 import { tags } from 'react-native-svg/lib/typescript/xmlTags';
+import { JumpingTransition } from 'react-native-reanimated';
 
 const ListScreen = () => {
   const navigation = useNavigation();
@@ -548,6 +549,15 @@ const ListScreen = () => {
                 <View style={styles.sheet}>
                   {/* Divider */}
                   <View style={styles.divider} />
+                 <View style={{flexDirection:'row', justifyContent:'space-between', paddingHorizontal: 12, alignContent:"center", alignItems:'center'}}>
+                   <Text>Select date</Text>
+                  <TouchableOpacity onPress={() =>{
+                       setShowDatePicker(null);
+                  }}>
+                    <MaterialIcons name='close' size={24}/>
+                  </TouchableOpacity>
+                 </View>
+                  <View style={styles.divider} />
 
                   {/* Date Picker */}
                   <DateTimePicker
@@ -584,7 +594,7 @@ const ListScreen = () => {
               display="spinner"
               is24Hour={false}
               onChange={handleDateChange}
-            />
+             />
 
           )}
         </View>
@@ -687,7 +697,7 @@ const ListScreen = () => {
         isBottomButtonVisible={true}
         doneText={alertConfig.title}
         color={alertConfig.color}
-        onDone={async remark => {
+        onDone={async (remark) => {
           try {
             const type = `page${alertConfig.title}`;
             await dispatch(
@@ -696,7 +706,7 @@ const ListScreen = () => {
                 id: alertConfig.id.toString(),
                 remarks: remark,
                 page: alertConfig?.actionValue,
-              }),
+              })
             ).unwrap();
 
             setAlertVisible(false);
@@ -713,9 +723,8 @@ const ListScreen = () => {
             });
             setApiError(true);
           }
-        }}
-        isFromButtonList={true}
-      />
+        } }
+        isFromButtonList={true} closeHide={undefined}      />
 
       <CustomAlert
         visible={apiError}
@@ -724,8 +733,7 @@ const ListScreen = () => {
         type={alertConfig.type}
         onClose={() => setApiError(false)}
         onCancel={() => setApiError(false)}
-        actionLoader={actionLoader}
-      />
+        actionLoader={actionLoader} closeHide={undefined}      />
     </View>
   );
 };

@@ -22,12 +22,14 @@ import { useAppStateListener } from '../../hooks/useAppStateListener';
 import { ICameraScannerProps } from '../../utils/helpers/types';
 import { getWindowHeight, getWindowWidth, isIos } from '../../utils/helpers';
 import MaterialIcons from '@react-native-vector-icons/material-icons';
+import { useTranslation } from 'react-i18next';
 
 
 export const CameraScanner = ({
   setIsCameraShown,
   onReadCode,
 }: ICameraScannerProps) => {
+  const {t} = useTranslation()
   const device = useCameraDevice('back');
   const camera = useRef<Camera>(null);
   const isFocused = useIsFocused();
@@ -86,7 +88,7 @@ export const CameraScanner = ({
         <Modal presentationStyle="fullScreen" animationType="slide">
           {/* ---------- Header ---------- */}
           <View style={uiStyles.header}>
-            <Text style={uiStyles.headerTitle}>Scan Code</Text>
+            <Text style={uiStyles.headerTitle}>{t('test19')}</Text>
             <TouchableOpacity style={uiStyles.closeBtn} onPress={onCrossClick}>
               <MaterialIcons name="close" size={26} color="#fff" />
             </TouchableOpacity>
@@ -95,7 +97,7 @@ export const CameraScanner = ({
           {/* ---------- Description ---------- */}
           <View style={uiStyles.descriptionContainer}>
             <Text style={uiStyles.descriptionText}>
-              Align the QR code inside the frame to scan automatically.
+              {t('test20')}
             </Text>
           </View>
 
@@ -133,7 +135,7 @@ export const CameraScanner = ({
 
           {/* ---------- Bottom Fade Panel ---------- */}
           <View style={uiStyles.bottomPanel}>
-            <Text style={uiStyles.bottomText}>Scanning...</Text>
+            <Text style={uiStyles.bottomText}>{t('test18')}</Text>
           </View>
         </Modal>
       </SafeAreaView>

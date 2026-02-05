@@ -351,14 +351,14 @@ const RootNavigator = () => {
           <Modal visible={backgroundDeniedModal} transparent>
             <View style={styles.overlay}>
               <View style={styles.modalContainer}>
-                <Text style={styles.title}>Allow Background Location</Text>
+                <Text style={styles.title}>{t('test21')}</Text>
                 <Text style={styles.message}>
-                  Set location access to "Always Allow" in settings for continuous tracking.
+                  {t('test22')}
                 </Text>
                 <TouchableOpacity
                   style={styles.btnPrimary}
                   onPress={() => Linking.openSettings()}>
-                  <Text style={styles.btnText}>Open Settings</Text>
+                  <Text style={styles.btnText}>{t('test23')}</Text>
                 </TouchableOpacity>
               </View>
             </View>

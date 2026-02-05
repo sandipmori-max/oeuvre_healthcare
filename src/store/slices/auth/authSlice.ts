@@ -166,7 +166,6 @@ const authSlice = createSlice({
         state.isAuthenticated = false;
         state.error = action.payload as string;
       })
-
       .addCase(switchAccountThunk.pending, state => {
         state.isLoading = true;
       })

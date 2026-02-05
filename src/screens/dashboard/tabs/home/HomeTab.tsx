@@ -16,6 +16,7 @@ import PieChartSection from './chartData';
 
 import { formatDateForAPI, parseCustomDate } from '../../../../utils/helpers';
 import DateTimePicker from '@react-native-community/datetimepicker';
+
 import CustomPicker from '../../page/components/CustomPicker';
 import { setActiveDashboardBranch, setActiveDashboardBranchId, setActiveDashboardFromDate, setActiveDashboardToDate, setActiveDashboardType, setActiveDashboardTypeId, setDashboardLoading } from '../../../../store/slices/auth/authSlice';
 import {
@@ -33,7 +34,7 @@ import {
   Platform,
 } from 'react-native';
 import { ERP_ICON } from '../../../../assets';
-import { Image } from 'react-native';
+import { NativeModules } from 'react-native';
 
 const { width } = Dimensions.get('screen');
 
@@ -92,7 +93,7 @@ const HomeScreen = () => {
 
     searchTimeout.current = setTimeout(() => {
       const filtered = dashboard.filter(item =>
-        (item.name || '').toLowerCase().includes(searchText.toLowerCase()),
+        (item?.name || '').toLowerCase().includes(searchText?.toLowerCase()),
       );
       setFilteredDashboard(filtered);
     }, 300);
@@ -105,12 +106,17 @@ const HomeScreen = () => {
 
   useFocusEffect(
     useCallback(() => {
+      NativeModules.OrientationModule.enableLandscape();
+      console.log("NativeModules+++++++++++++++++++++++++++++++++++++++++++", NativeModules)
       dispatch(setActiveDashboardBranchId(''))
       dispatch(setActiveDashboardBranch(''))
       dispatch(setActiveDashboardType(''))
       dispatch(setActiveDashboardTypeId(''))
       setIsFilterVisible(false)
-      return () => { };
+      setIsHorizontal(false)
+      return () => {
+        NativeModules.OrientationModule.disableLandscape();
+      };
     }, [isAuthenticated, navigation])
   );
 
@@ -708,6 +714,16 @@ const HomeScreen = () => {
             <View style={styles.overlay}>
               <View style={styles.sheet}>
                 {/* Divider */}
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 12, alignContent: "center", alignItems: 'center' }}>
+                  <Text>Select date</Text>
+                  <TouchableOpacity onPress={() => {
+                    setShowDatePicker(null);
+
+
+                  }}>
+                    <MaterialIcons name='close' size={24} />
+                  </TouchableOpacity>
+                </View>
                 <View style={styles.divider} />
 
                 {/* Date Picker */}
@@ -874,6 +890,15 @@ const HomeScreen = () => {
             <View style={styles.overlay}>
               <View style={styles.sheet}>
                 {/* Divider */}
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', padding: 12, alignContent: "center", alignItems: 'center' }}>
+                  <Text>Select date</Text>
+                  <TouchableOpacity onPress={() => {
+                    setShowDatePicker(null);
+
+                  }}>
+                    <MaterialIcons name='close' size={24} />
+                  </TouchableOpacity>
+                </View>
                 <View style={styles.divider} />
 
                 {/* Date Picker */}
@@ -941,7 +966,7 @@ const HomeScreen = () => {
                 <ErrorMessage message={error} />{' '}
               </View>
             ) : controls?.length === 0 && !isDashboardLoading ? (
-              <View
+                <View
                 style={{
                   height: Dimensions.get('screen').height * 0.75,
                   justifyContent: 'center',
@@ -1021,8 +1046,10 @@ const HomeScreen = () => {
                             }
                             showsVerticalScrollIndicator={false}
                           />
+                        </View>
 
-                          <View style={{
+
+<View style={{
                             height: 350, width: '100%',
                             alignContent: 'center',
                             alignItems: 'center',
@@ -1041,7 +1068,6 @@ const HomeScreen = () => {
                             }}>Welcome</Text>
                           </View>
 
-                        </View>
                         {/* <View>
                     <Animated.FlatList
                       showsVerticalScrollIndicator={false}

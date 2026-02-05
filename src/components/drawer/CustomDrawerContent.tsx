@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -21,21 +21,26 @@ import MaterialIcons from '@react-native-vector-icons/material-icons';
 import FastImage from 'react-native-fast-image';
 
 import { useAppSelector } from '../../store/hooks';
-import { firstLetterUpperCase } from '../../utils/helpers';
+import { firstLetterUpperCase, handleEmailPress, handlePhonePress } from '../../utils/helpers';
 import { ERP_DRAWER_LIST } from '../../constants';
 import { styles } from './drawer_style';
 import { useBaseLink } from '../../hooks/useBaseLink';
-import { DARK_COLOR } from '../../utils/constants';
+import { DARK_COLOR, ERP_COLOR_CODE } from '../../utils/constants';
 import ContactRow from './ContactRow';
 import { ERP_ICON } from '../../assets';
+import ImageBottomSheetModal from '../bottomsheet/ImageBottomSheetModal';
+import { NativeModules } from 'react-native';
 
 const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
   const navigation = useNavigation();
   const drawerStatus = useDrawerStatus();
+  const [showModal, setShowModal] = useState(false);
+  const [img, setImg] = useState('')
 
   const { user } = useAppSelector(state => state.auth);
   const theme = useAppSelector(state => state.theme.mode);
   const baseLink = useBaseLink();
+  console.log("baseLink", baseLink)
 
   /* ================= SAFE CURRENT ROUTE ================= */
   const currentRoute = useNavigationState(state => {
@@ -113,14 +118,14 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
 
   return (
     <DrawerContentScrollView
-    showsVerticalScrollIndicator={false}
+      showsVerticalScrollIndicator={false}
       {...props}
       contentContainerStyle={{
         flexGrow: 1,
         backgroundColor: theme === 'dark' ? DARK_COLOR : 'white',
       }}
     >
- 
+
       {/* ================= HEADER ================= */}
       <Animated.View
         style={{
@@ -130,19 +135,30 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
         }}
       >
         <View
-          style={[
+         style={[
             styles.header,
             theme === 'dark' && { backgroundColor: 'black' },
           ]}
         >
-          <FastImage
-            source={{
-              uri: `${baseLink}/FileUpload/1/UserMaster/${user?.id}/profileimage.jpeg?ts=${new Date().getTime()}`,
-              priority: FastImage.priority.normal,
-              cache: FastImage.cacheControl.web,
+          <View>
+            <TouchableOpacity
+            
+            onPress={() => {
+              setImg(`${baseLink}/FileUpload/1/UserMaster/${user?.id}/profileimage.jpeg?ts=${new Date().getTime()}`)
+              setShowModal(true)
             }}
-            style={styles.profileImage}
-          />
+          >
+            <FastImage
+              source={{
+                uri: `${baseLink}/FileUpload/1/UserMaster/${user?.id}/profileimage.jpeg?ts=${new Date().getTime()}`,
+                priority: FastImage.priority.normal,
+                cache: FastImage.cacheControl.web,
+              }}
+              style={styles.profileImage}
+            />
+          </TouchableOpacity>
+          </View>
+
 
           <View style={{ height: 28, width: 100 }} />
 
@@ -154,19 +170,27 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
 
           <View style={{ top: 4, width: '100%', marginVertical: 1 }}>
             {user?.mobileno && (
-              <View style={{ flexDirection: 'row', alignItems: 'center', padding: 6 }}>
+              <TouchableOpacity
+                onPress={() => {
+                  handlePhonePress(user.mobileno)
+                }}
+                style={{ flexDirection: 'row', alignItems: 'center', padding: 6 }}>
                 <MaterialIcons name="call" color="white" size={14} />
                 <Text style={styles.userPhone}>{user.mobileno}</Text>
-              </View>
+              </TouchableOpacity>
             )}
 
             {user?.emailid && (
-              <View style={{ flexDirection: 'row', alignItems: 'center', padding: 6 }}>
+              <TouchableOpacity
+                onPress={() => {
+                  handleEmailPress(user.emailid)
+                }}
+                style={{ flexDirection: 'row', alignItems: 'center', padding: 6 }}>
                 <MaterialIcons name="mail-outline" color="white" size={14} />
                 <Text numberOfLines={1} style={styles.userPhone}>
                   {user.emailid}
                 </Text>
-              </View>
+              </TouchableOpacity>
             )}
 
             {user?.rolename && (
@@ -180,9 +204,9 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
       </Animated.View>
 
       {/* ================= MENU ================= */}
-      <ScrollView 
-      
-      showsVerticalScrollIndicator={false}>
+      <ScrollView
+
+        showsVerticalScrollIndicator={false}>
         <View style={styles.menuContainer}>
           {ERP_DRAWER_LIST.map((item, index) => {
             const isActive = currentRoute === item.route;
@@ -226,12 +250,13 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
                       props?.navigation.closeDrawer();
                       return;
                     }
-                    if(item?.route === "Attendance"){
+                    if (item?.route === "Attendance") {
+                      NativeModules.OrientationModule.enableLandscape();
                       props?.navigation.closeDrawer();
                       navigation.navigate(item?.route, { isFor: 'Attendance' });
                       return;
                     }
-                    if(item?.route === "MyAttendance"){
+                    if (item?.route === "MyAttendance") {
                       props?.navigation.closeDrawer();
                       navigation.navigate(item?.route, { isFor: 'MyAttendance' });
                       return;
@@ -254,8 +279,8 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
                         theme === 'dark'
                           ? '#FFF'
                           : isActive
-                          ? '#FFF'
-                          : '#000'
+                            ? '#FFF'
+                            : '#000'
                       }
                     />
                     <Text
@@ -267,8 +292,8 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
                             theme === 'dark'
                               ? 'white'
                               : isActive
-                              ? '#FFF'
-                              : '#000',
+                                ? '#FFF'
+                                : '#000',
                         },
                       ]}
                     >
@@ -282,6 +307,11 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
         </View>
       </ScrollView>
 
+      <ImageBottomSheetModal
+        visible={showModal}
+        onClose={() => setShowModal(false)}
+        imageUrl={img}
+      />
       {/* ================= FOOTER ================= */}
       <Animated.View
         style={{
@@ -289,15 +319,29 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
           opacity: footerOpacity,
         }}
       >
-        <View style={{ alignItems: 'center', marginBottom: 10 }}>
+        <View style={{ alignItems: 'center', marginBottom: 0 }}>
           <Image
-            source={ERP_ICON.APP_LOGO}
-            style={{ height: 40, width: 40 }}
+            source={{
+              uri:  `${baseLink}fileupload/1/InvoiceByConfig/1/logo.jpg`
+            }}
+            style={{ height: 80, width: 80 }}
             resizeMode="contain"
           />
         </View>
 
         <View style={styles.logoutButton}>
+          <Text
+            style={[
+              styles.logoutText,
+              {
+                fontSize: 12,
+                color: ERP_COLOR_CODE.ERP_777
+              },
+              theme === 'dark' && { color: 'white' },
+            ]}
+          >
+            Developed by
+          </Text>
           <Text
             style={[
               styles.logoutText,

@@ -19,6 +19,13 @@ export const styles = StyleSheet.create({
     height: width * 0.3,
     borderRadius: 100,
   },
+  helloTitle: {
+    color: ERP_COLOR_CODE.ERP_555,
+    fontSize: 18,
+    fontWeight: '600',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
   title: {
     color: ERP_COLOR_CODE.ERP_BLACK,
     fontSize: 30,

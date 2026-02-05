@@ -16,7 +16,8 @@ export const styles = StyleSheet.create({
     marginBottom: 10,
     backgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR,
     borderWidth: 2,
-    top: -40,
+    top: -55,
+    left: -40,
     position:'absolute',
     borderColor: ERP_COLOR_CODE.ERP_WHITE
   },
@@ -35,7 +36,7 @@ export const styles = StyleSheet.create({
         color: '#FFF',
   },
   menuContainer: {
-    height: Dimensions.get("screen").height * 0.55,
+    height: Dimensions.get("screen").height * 0.52,
     paddingTop: 10,
     top: 30
   },

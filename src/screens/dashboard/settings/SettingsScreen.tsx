@@ -32,7 +32,7 @@ import {
 import { DevERPService } from '../../../services/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useApi } from '../../../hooks/useApi';
-import { isTokenValid } from '../../../utils/helpers';
+import { firstLetterUpperCase, isTokenValid } from '../../../utils/helpers';
 import DeviceInfo from 'react-native-device-info';
 import { setLang, setTheme } from '../../../store/slices/theme/themeSlice';
 import { clearAuthState, setDashboard, setEmptyMenu } from '../../../store/slices/auth/authSlice';
@@ -66,6 +66,7 @@ const SettingsScreen = () => {
 const translateY = useRef(new Animated.Value(HIDDEN_POSITION)).current;
   const overlayOpacity = useRef(new Animated.Value(0)).current;
   const [logoutVisible, setLogoutVisible] = useState(false);
+  const { user } = useAppSelector(state => state.auth);
 
   const [languageModalVisible, setLanguageModalVisible] = useState(false);
   const [currentLanguage, setCurrentLanguage] = useState(getCurrentLanguage());
@@ -267,7 +268,7 @@ const translateY = useRef(new Animated.Value(HIDDEN_POSITION)).current;
           setLogoutVisible(true);
           setAlertConfig({
             title: t('settings.logout'),
-            message: t('settings.logoutConfirm'),
+            message:`${firstLetterUpperCase(user?.name || '')}, ${t('settings.logoutConfirm')}`,
             type: 'exit',
           });
           setAlertVisible(true);
@@ -586,12 +587,12 @@ const translateY = useRef(new Animated.Value(HIDDEN_POSITION)).current;
         onClose={() => {
           setLogoutVisible(false);
           setAlertVisible(false);
-        }}
+        } }
         isBottomButtonVisible={logoutVisible}
         onCancel={() => {
           setLogoutVisible(false);
           setAlertVisible(false);
-        }}
+        } }
         onDone={async () => {
           if (logoutVisible) {
             const db = await getDBConnection();
@@ -608,11 +609,10 @@ const translateY = useRef(new Animated.Value(HIDDEN_POSITION)).current;
                   await AsyncStorage.setItem('auth_token', newActiveUser?.user?.token || '');
                   await AsyncStorage.setItem(
                     'erp_token_valid_till',
-                    newActiveUser?.user?.token || '',
+                    newActiveUser?.user?.token || ''
                   );
 
-                  const validation = await validateCompanyCode(() =>
-                    DevERPService.validateCompanyCode(newActiveUser?.user?.company_code),
+                  const validation = await validateCompanyCode(() => DevERPService.validateCompanyCode(newActiveUser?.user?.company_code)
                   );
                   if (!validation?.isValid) {
                     return;
@@ -620,8 +620,7 @@ const translateY = useRef(new Animated.Value(HIDDEN_POSITION)).current;
 
                   dispatch(switchAccountThunk(newActiveUser?.id));
                 } else {
-                  const validation = await validateCompanyCode(() =>
-                    DevERPService.validateCompanyCode(newActiveUser?.user?.company_code),
+                  const validation = await validateCompanyCode(() => DevERPService.validateCompanyCode(newActiveUser?.user?.company_code)
                   );
                   if (!validation?.isValid) {
                     return;
@@ -633,20 +632,19 @@ const translateY = useRef(new Animated.Value(HIDDEN_POSITION)).current;
                 dispatch(setDashboard([]));
                 dispatch(setEmptyMenu([]));
                 dispatch(resetAjaxState());
-                dispatch(resetAttendanceState())
-                dispatch(clearAuthState())
-                dispatch(resetDropdownState())
-                dispatch(resetSyncLocationState())
-                dispatch(resetAttendanceState())
+                dispatch(resetAttendanceState());
+                dispatch(clearAuthState());
+                dispatch(resetDropdownState());
+                dispatch(resetSyncLocationState());
+                dispatch(resetAttendanceState());
                 dispatch(logoutUserThunk());
               }
             }
           }
-        }}
+        } }
         doneText="Logout"
         color={ERP_COLOR_CODE.ERP_ERROR}
-        actionLoader={undefined}
-      />
+        actionLoader={undefined} closeHide={undefined}      />
     </View>
   );
 };

@@ -26,11 +26,11 @@ const ProfileTab = () => {
 
   const handleAddAccount = () => {
     setTapLoader(true)
-    setTimeout(()=>{
-setShowAccountSwitcher(false);
-    setIsSwitchAccountOpen(true)
-    setShowAddAccount(true);
-    },600)
+    setTimeout(() => {
+      setShowAccountSwitcher(false);
+      setIsSwitchAccountOpen(true)
+      setShowAddAccount(true);
+    }, 600)
   };
 
   const activeAccount = accounts?.find(acc => acc?.user?.id === user?.id);
@@ -41,14 +41,14 @@ setShowAccountSwitcher(false);
   const [tapLoader, setTapLoader] = useState(false);
 
   useFocusEffect(
-      useCallback(() => {
-         setTapLoader(false)
-        return () => {
-        };
-      }, [navigation])
+    useCallback(() => {
+      setTapLoader(false)
+      return () => {
+      };
+    }, [navigation])
   );
-   
-      
+
+
   useFocusEffect(
     useCallback(() => {
       // Reset animation values
@@ -75,7 +75,7 @@ setShowAccountSwitcher(false);
         // Optional cleanup
       };
     }, [showAccountSwitcher, showAddAccount])
-);
+  );
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -88,13 +88,13 @@ setShowAccountSwitcher(false);
       headerRight: () => (
         <>
           <ERPIcon
-          isLoading={tapLoader}
-          name="person-add-alt" onPress={()=>{
-            setTapLoader(true)
+            isLoading={tapLoader}
+            name="person-add-alt" onPress={() => {
+              setTapLoader(true)
               setShowAccountSwitcher(false);
               setIsSwitchAccountOpen(false)
               setShowAddAccount(true);
-          }} />
+            }} />
           <ERPIcon name="settings" onPress={() => navigation.navigate('Settings')} />
         </>
       ),
@@ -198,7 +198,7 @@ setShowAccountSwitcher(false);
             <TouchableOpacity style={styles.settingCard} onPress={() => {
               setIsSwitchAccountOpen(true)
               setShowAccountSwitcher(true)
-              }}>
+            }}>
               <View style={styles.settingHeader}>
                 <View style={styles.settingIcon}>
                   <MaterialIcons
@@ -262,22 +262,23 @@ setShowAccountSwitcher(false);
 
       <AccountSwitcher
         visible={showAccountSwitcher}
-        onClose={() =>{
+        onClose={() => {
           setTapLoader(false)
-          setShowAccountSwitcher(false)}}
+          setShowAccountSwitcher(false)
+        }}
         onAddAccount={handleAddAccount}
         tapLoader={tapLoader}
       />
 
-      <AddAccountScreen 
+      <AddAccountScreen
         visible={showAddAccount}
         onClose={() => {
           setTapLoader(false)
-          if(isSwitchAccountOpen){
+          if (isSwitchAccountOpen) {
             setShowAddAccount(false)
             setShowAccountSwitcher(true)
             setIsSwitchAccountOpen(false)
-          }else{
+          } else {
             setShowAddAccount(false)
           }
         }}

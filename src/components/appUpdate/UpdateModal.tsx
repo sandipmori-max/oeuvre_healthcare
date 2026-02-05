@@ -1,4 +1,5 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useTransition } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Modal,
   View,
@@ -10,6 +11,7 @@ import {
 } from 'react-native';
 
 const UpdateModal = ({ visible, forceUpdate, storeUrl, onSkip }) => {
+  const {t} = useTranslation()
   const scale = useRef(new Animated.Value(0.7)).current;
 
   useEffect(() => {
@@ -25,23 +27,22 @@ const UpdateModal = ({ visible, forceUpdate, storeUrl, onSkip }) => {
     <Modal transparent visible={visible} animationType="fade">
       <View style={styles.overlay}>
         <Animated.View style={[styles.container, { transform: [{ scale }] }]}>
-          <Text style={styles.title}>Update Available 🚀</Text>
+          <Text style={styles.title}>{t('test13')}</Text>
 
           <Text style={styles.desc}>
-            A new version of the app is available. Please update to continue
-            using the app with latest features.
+            {t('test14')}
           </Text>
 
           <TouchableOpacity
             style={styles.updateBtn}
             onPress={() => Linking.openURL(storeUrl)}
           >
-            <Text style={styles.updateText}>Update Now</Text>
+            <Text style={styles.updateText}>{t('test15')}</Text>
           </TouchableOpacity>
 
           {!forceUpdate && (
             <TouchableOpacity onPress={onSkip}>
-              <Text style={styles.skipText}>Skip for now</Text>
+              <Text style={styles.skipText}>{t('test16')}</Text>
             </TouchableOpacity>
           )}
         </Animated.View>

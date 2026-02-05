@@ -420,33 +420,33 @@ const Media = ({ isValidate, item, handleAttachment, infoData, baseLink, isFromN
           if (!modalClose) {
             setAlertVisible(false);
           }
-        }}
+        } }
         isSettingVisible={isSettingVisible}
-        actionLoader={undefined}
-      />
+        actionLoader={undefined} closeHide={undefined}      />
     </>
   );
 };
-
-const styles = StyleSheet.create({
+ const styles = StyleSheet.create({
   imageWrapper: {
     width: '100%',
-    alignContent: 'center',
     justifyContent: 'center',
     alignItems: 'center',
     marginVertical: 4,
   },
+
   label: {
     fontSize: 14,
     color: ERP_COLOR_CODE.ERP_333,
     marginBottom: 6,
     fontWeight: '600',
   },
+
   imageThumb: {
     borderWidth: 1,
     width: 100,
     height: 100,
   },
+
   editBtn: {
     height: 36,
     width: 36,
@@ -454,17 +454,20 @@ const styles = StyleSheet.create({
     backgroundColor: ERP_COLOR_CODE.ERP_WHITE,
     position: 'absolute',
     bottom: 28,
-    justifyContent: 'center',
-    alignContent: 'center',
-    alignItems: 'center',
     left: Dimensions.get('screen').width / 1.88,
+    justifyContent: 'center',
+    alignItems: 'center',
     borderWidth: 1,
   },
+
+  /* ---------- Bottom Sheet ---------- */
+
   modalOverlay: {
     flex: 1,
     justifyContent: 'flex-end',
     backgroundColor: 'rgba(0,0,0,0.5)',
   },
+
   modalContent: {
     backgroundColor: ERP_COLOR_CODE.ERP_WHITE,
     borderTopLeftRadius: 16,
@@ -474,22 +477,26 @@ const styles = StyleSheet.create({
     maxHeight: '60%',
     width: '100%',
   },
+
   modalHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '100%',
     marginBottom: 16,
   },
+
   modalTitle: {
     fontSize: 18,
     fontWeight: '600',
   },
+
   optionRow: {
     flexDirection: 'row',
     justifyContent: 'space-evenly',
     width: '100%',
     marginTop: 12,
   },
+
   optionCard: {
     width: 100,
     height: 100,
@@ -499,48 +506,81 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginHorizontal: 10,
   },
+
   optionLabel: {
     marginTop: 6,
     fontSize: 14,
     fontWeight: '500',
   },
+
+  /* ---------- FULLSCREEN IMAGE MODAL (IMPROVED) ---------- */
+
   fullscreenModalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.95)',
+    backgroundColor: 'rgba(0,0,0,0.92)',
     justifyContent: 'center',
     alignItems: 'center',
   },
+
   fullscreenModalContent: {
     flex: 1,
     width: '100%',
     justifyContent: 'center',
     alignItems: 'center',
   },
+
   fullscreenImage: {
     width: '100%',
     height: '100%',
   },
+
   closeBtn: {
     position: 'absolute',
-    top: 40,
+    top: 48,
     right: 20,
-    zIndex: 10,
+    zIndex: 20,
+
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    backgroundColor: 'rgba(0,0,0,0.45)',
+    justifyContent: 'center',
+    alignItems: 'center',
+
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 6,
   },
+
   zoomControls: {
     position: 'absolute',
     bottom: 40,
     flexDirection: 'row',
-    justifyContent: 'space-around',
-    width: '30%',
+    gap: 16,
+
+    backgroundColor: 'rgba(255,255,255,0.9)',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 30,
+
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 6,
+    elevation: 8,
   },
+
   zoomBtn: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    width: 46,
+    height: 46,
+    borderRadius: 23,
     backgroundColor: ERP_COLOR_CODE.ERP_WHITE,
     justifyContent: 'center',
     alignItems: 'center',
   },
 });
+
 
 export default Media;

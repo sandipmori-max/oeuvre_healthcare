@@ -26,9 +26,11 @@ import { resetDropdownState } from '../../../store/slices/dropdown/dropdownSlice
 import { resetSyncLocationState } from '../../../store/slices/location/syncLocationSlice';
 import { setReloadApp } from '../../../store/slices/reloadApp/reloadAppSlice';
 import { generateGUID } from '../../../utils/helpers';
+import { useBaseLink } from '../../../hooks/useBaseLink';
 
 const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose, isSwitchAccountOpen }) => {
   const { t } = useTranslation();
+  const baseLink = useBaseLink();
 
   const dispatch = useAppDispatch();
   const theme = useAppSelector(state => state?.theme.mode);
@@ -370,7 +372,13 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose, i
                     }}
                   >
                     <View style={styles.formContainer}>
-                      <Image source={ERP_ICON.APP_LOGO} style={styles.logo} resizeMode="contain" />
+                      <Image 
+            //            source={{
+            //   uri:  `${baseLink}fileupload/1/InvoiceByConfig/1/logo.jpg`
+            // }}
+                      source={ERP_ICON.APP_LOGO} 
+                      style={styles.logo} resizeMode="contain" />
+
                       <Text style={[styles.subtitle, theme === 'dark' && { color: 'white' }]}>{t('account.msg')}</Text>
 
                       <Formik
@@ -417,9 +425,7 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose, i
 
                           return (
                             <>
-                              {/* Company Code Input */}
-                              
-
+                             
                               {/* User Input */}
                               <View style={styles.inputContainer}>
                                 <Text style={[styles.inputLabel, theme === 'dark' && { color: 'white' }]}>{t('auth.user')}</Text>
