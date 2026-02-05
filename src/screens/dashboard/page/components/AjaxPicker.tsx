@@ -8,6 +8,7 @@ import MaterialIcons from '@react-native-vector-icons/material-icons';
 import FullViewLoader from '../../../../components/loader/FullViewLoader';
 import useTranslations from '../../../../hooks/useTranslations';
 import InputError from '../../../../components/error/InputError';
+import NoData from '../../../../components/no_data/NoData';
 
 const AjaxPicker = ({ isValidate, label, onValueChange, item, errors, dtext, formValues }: any) => {
   const dispatch = useAppDispatch();
@@ -254,17 +255,17 @@ const AjaxPicker = ({ isValidate, label, onValueChange, item, errors, dtext, for
                   })
                 ) : (
                   <View
-                    style={{
-                      marginVertical: 12,
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      height: 100,
-                    }}
-                  >
-                    <Text style={[styles.label, theme === 'dark' && {
-                      color: 'white'
-                    }]}>{t("title.title6")}</Text>
-                  </View>
+                  style={{
+                    marginVertical: 12,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    height: 100,
+                    alignContent:'center',
+                    marginTop: 200,
+                  }}
+                >
+                  <NoData />
+                </View>
                 )}
               </ScrollView>
             )}
