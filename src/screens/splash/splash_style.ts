@@ -28,10 +28,10 @@ export const styles = StyleSheet.create({
   },
   title: {
     color: ERP_COLOR_CODE.ERP_BLACK,
-    fontSize: 30,
-    fontWeight: '700',
+    fontSize: 30, 
     marginBottom: 8,
     textAlign: 'center',
+    fontFamily: "Handlee-Regular",
   },
   subtitle: {
     color: ERP_COLOR_CODE.ERP_BLACK,

@@ -12,11 +12,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var reactNativeDelegate: ReactNativeDelegate?
     var reactNativeFactory: RCTReactNativeFactory?
 
+    // MARK: - Orientation control
+    var allowRotation: Bool = false // default portrait
+
+    // MARK: - App Launch
     func application(
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
     ) -> Bool {
 
+        // React Native setup
         let delegate = ReactNativeDelegate()
         let factory = RCTReactNativeFactory(delegate: delegate)
         delegate.dependencyProvider = RCTAppDependencyProvider()
@@ -31,12 +36,23 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             launchOptions: launchOptions
         )
 
+        // Firebase setup
         FirebaseApp.configure()
 
         return true
     }
+
+    // MARK: - Dynamic Orientation
+    func application(
+        _ application: UIApplication,
+        supportedInterfaceOrientationsFor window: UIWindow?
+    ) -> UIInterfaceOrientationMask {
+        // If allowRotation true → support portrait + landscape, else portrait only
+        return allowRotation ? [.portrait, .landscapeLeft, .landscapeRight] : .portrait
+    }
 }
 
+// MARK: - React Native Delegate
 class ReactNativeDelegate: RCTDefaultReactNativeFactoryDelegate {
     override func sourceURL(for bridge: RCTBridge) -> URL? {
         self.bundleURL()

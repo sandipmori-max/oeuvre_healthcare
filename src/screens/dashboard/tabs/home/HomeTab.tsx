@@ -32,6 +32,7 @@ import {
   Modal,
   Pressable,
   Platform,
+  Image,
 } from 'react-native';
 import { ERP_ICON } from '../../../../assets';
 import { NativeModules } from 'react-native';

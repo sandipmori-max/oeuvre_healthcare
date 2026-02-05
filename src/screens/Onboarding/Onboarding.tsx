@@ -12,16 +12,16 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ERP_COLOR_CODE } from '../../utils/constants';
-import FullViewLoader from '../../components/loader/FullViewLoader';
-import MaterialIcons from '@react-native-vector-icons/material-icons';
+ import MaterialIcons from '@react-native-vector-icons/material-icons';
 import FastImage from 'react-native-fast-image';
 import { ERP_GIF } from '../../assets';
+import FullViewLoader from '../../components/loader/FullViewLoader';
 
 const { width, height } = Dimensions.get('window');
 const slides = [
   {
     id: '1',
-    title: 'Welcome to DevERP Connect',
+    title: 'Welcome to Oeuvre Connect',
     desc: 'Experience the power of integrated ERP software to manage entire business processes with real-time control and efficiency.',
     image: ERP_GIF.Dashboards,
     bgColor: ['#f8b6c1', '#FAD4D8'],
@@ -31,7 +31,7 @@ const slides = [
   {
     id: '2',
     title: 'End-to-End Business Control',
-    desc: 'From customer orders to invoicing, DevERP Connect unifies sales, finance, inventory, HR, and plant operations in one seamless platform.',
+    desc: 'From customer orders to invoicing, Oeuvre Connect unifies sales, finance, inventory, HR, and plant operations in one seamless platform.',
     image: ERP_GIF.Analytics,
     bgColor: ['#b2cffa', '#D4E6F1'],
     statusBar: '#b2cffa',
@@ -49,7 +49,7 @@ const slides = [
   {
     id: '4',
     title: 'Grow with Confidence',
-    desc: 'Use built-in reports and dashboards to reduce waste, optimize costs, and scale business operations efficiently with DevERP.',
+    desc: 'Use built-in reports and dashboards to reduce waste, optimize costs, and scale business operations efficiently with Oeuvre.',
     image: ERP_GIF.RemoteMonitoring,
     bgColor: ['#c6b6f8', '#E8DAEF'],
     statusBar: '#c6b6f8',
