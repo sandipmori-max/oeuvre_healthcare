@@ -1,63 +1,47 @@
 import Foundation
-import CoreLocation
-import React
 
 @objc(LocationModule)
-class LocationModule: NSObject, CLLocationManagerDelegate {
-
-    private let locationManager = CLLocationManager()
-    private var userDataList: [[String: String]] = []
-
-    override init() {
-        super.init()
-        locationManager.delegate = self
-        locationManager.allowsBackgroundLocationUpdates = true
-        locationManager.pausesLocationUpdatesAutomatically = false
-        locationManager.desiredAccuracy = kCLLocationAccuracyBest
-    }
+class LocationModule: NSObject {
 
     @objc
     func startService() {
-        DispatchQueue.main.async {
-            self.locationManager.requestAlwaysAuthorization()
-            self.locationManager.startUpdatingLocation()
-            print("🚀 Location service started")
-        }
+        print("📍 [LocationModule] startService() CALLED from JS")
+        LocationService.shared.start()
+        print("✅ [LocationModule] LocationService.start() executed")
     }
 
     @objc
     func stopService() {
-        locationManager.stopUpdatingLocation()
-        print("🛑 Location service stopped")
+        print("🛑 [LocationModule] stopService() CALLED from JS")
+        LocationService.shared.stop()
+        print("✅ [LocationModule] LocationService.stop() executed")
     }
 
     @objc
     func setUserTokens(_ data: [[String: String]]) {
-        self.userDataList = data
-        print("🔐 User tokens set: \(data.count) items")
-    }
+        print("📦 [LocationModule] setUserTokens() CALLED")
+        print("📦 [LocationModule] Raw data from JS: \(data)")
 
-    // MARK: - CLLocationManagerDelegate
-    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        guard let location = locations.last else { return }
-        print("📍 New Location: \(location.coordinate.latitude), \(location.coordinate.longitude)")
+        LocationService.shared.userDataList.removeAll()
+        print("🧹 [LocationModule] Cleared existing userDataList")
 
-        for user in userDataList {
-            let token = user["token"] ?? ""
-            let link = user["link"] ?? ""
-            sendLocation(token: token, link: link, location: "\(location.coordinate.latitude),\(location.coordinate.longitude)")
+        for (index, item) in data.enumerated() {
+            let token = item["token"]
+            let link = item["link"]
+
+            if let token = token, let link = link {
+                LocationService.shared.userDataList.append((token, link))
+                print("✅ [LocationModule] Added token-link pair: \(token) | \(link)")
+            } else {
+                print("❌ [LocationModule] Invalid token/link at index \(index)")
+            }
         }
-    }
 
-    private func sendLocation(token: String, link: String, location: String) {
-        guard let url = URL(string: "\(link)/msp_api.aspx/syncLocation") else { return }
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.httpBody = try? JSONSerialization.data(withJSONObject: ["token": token, "location": location])
-        URLSession.shared.dataTask(with: request).resume()
+        print("📊 [LocationModule] Final userDataList count: \(LocationService.shared.userDataList.count)")
     }
 
     @objc
-    static func requiresMainQueueSetup() -> Bool { true }
+    static func requiresMainQueueSetup() -> Bool {
+        return true
+    }
 }

@@ -30,11 +30,13 @@ import {
 } from "../../utils/helpers";
 
 import MaterialIcons from "@react-native-vector-icons/material-icons";
+import { useTranslation } from "react-i18next";
 
 export const BarCodeCameraScanner = ({
   setIsCameraShown,
   onReadCode,
 }: ICameraScannerProps) => {
+  const {t} = useTranslation()
   const device = useCameraDevice("back");
   const camera = useRef<Camera>(null);
   const isFocused = useIsFocused();
@@ -157,13 +159,13 @@ export const BarCodeCameraScanner = ({
           {/* DESCRIPTION */}
           <View style={ui.descriptionBox}>
             <Text style={ui.descriptionText}>
-              Align the barcode inside the frame to scan automatically.
+              {t('test17')}
             </Text>
           </View>
 
           {/* BOTTOM PANEL */}
           <View style={ui.bottomPanel}>
-            <Text style={ui.bottomText}>Scanning...</Text>
+            <Text style={ui.bottomText}>{t('test18')}</Text>
           </View>
 
         </View>

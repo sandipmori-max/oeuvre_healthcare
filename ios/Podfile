@@ -37,6 +37,7 @@ target 'Oeuvre' do
   use_react_native!(
     :path => config[:reactNativePath],
     :hermes_enabled => true,
+    :fabric_enabled => false,
   )
 
   # 👇 Add this line for MLKit integration

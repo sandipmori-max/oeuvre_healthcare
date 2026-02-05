@@ -20,6 +20,7 @@ import ERPTextInput from '../input/ERPTextInput';
 import { ERP_COLOR_CODE } from '../../utils/constants';
 import MaterialIcons from '@react-native-vector-icons/material-icons';
 import { useAppSelector } from '../../store/hooks';
+import { useTranslation } from 'react-i18next';
 
 const CustomAlert: React.FC<CustomAlertProps> = ({
   visible,
@@ -38,6 +39,7 @@ const CustomAlert: React.FC<CustomAlertProps> = ({
   isSettingVisible,
   closeHide = false
 }) => {
+  const {t} = useTranslation()
   const alertStyles = getAlertStyles(type);
   const gifSource = getGifSource(type);
   const theme = useAppSelector(state => state?.theme.mode);
@@ -211,8 +213,8 @@ const CustomAlert: React.FC<CustomAlertProps> = ({
                 </Text>
 
                 <ERPTextInput
-                  label="Remarks"
-                  placeholder="Enter remarks"
+                  label={t('test11')}
+                  placeholder={t('test12')}
                   placeholderTextColor={ERP_COLOR_CODE.ERP_999}
                   autoCapitalize="none"
                   onChangeText={handleChangedRemarks}
@@ -309,7 +311,7 @@ const CustomAlert: React.FC<CustomAlertProps> = ({
                       fontSize: 16,
                     }}
                   >
-                    Open Settings
+                    {t('test10')}
                   </Text>
                 </View>
               </TouchableOpacity>

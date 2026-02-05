@@ -13,7 +13,7 @@ import {
   ImageBackground,
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
+import { RouteProp, useFocusEffect, useNavigation, useRoute } from '@react-navigation/native';
 
 import { styles } from './attendance_style';
 import FullViewLoader from '../../../components/loader/FullViewLoader';
@@ -28,6 +28,7 @@ import { ERP_COLOR_CODE } from '../../../utils/constants';
 import useTranslations from '../../../hooks/useTranslations';
 import MaterialIcons from '@react-native-vector-icons/material-icons';
 import { ERP_GIF } from '../../../assets';
+import { NativeModules } from 'react-native';
 
 const AttendanceScreen = () => {
   const route = useRoute();
@@ -86,7 +87,7 @@ const AttendanceScreen = () => {
       setIsListVisible(false);
     }
   }, [navigation])
- 
+
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -143,6 +144,14 @@ const AttendanceScreen = () => {
     showDateFilter,
     theme,
   ]);
+
+  useFocusEffect(
+    useCallback(() => {
+      NativeModules.OrientationModule.disableLandscape();
+      return () => {
+      };
+    }, [navigation])
+  );
 
   const checkAttendance = () => {
     setIsLoading(true);
@@ -308,6 +317,16 @@ const AttendanceScreen = () => {
             <View style={styles.overlay}>
               <View style={styles.sheet}>
                 {/* Divider */}
+
+                {/* Divider */}
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', padding: 12, alignContent: "center", alignItems: 'center' }}>
+                  <Text>Select date</Text>
+                  <TouchableOpacity onPress={() => {
+                    setShowDatePicker(null);
+                  }}>
+                    <MaterialIcons name='close' size={24} />
+                  </TouchableOpacity>
+                </View>
                 <View style={styles.divider} />
 
                 {/* Date Picker */}

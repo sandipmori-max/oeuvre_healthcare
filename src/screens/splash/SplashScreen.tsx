@@ -7,6 +7,7 @@ import { SplashProps } from './types';
 import { useAppSelector } from '../../store/hooks';
 import { DARK_COLOR } from '../../utils/constants';
 import useTranslations from '../../hooks/useTranslations';
+import { firstLetterUpperCase } from '../../utils/helpers';
 
 const CustomSplashScreen: React.FC<SplashProps> = ({ onFinish }) => {
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -15,6 +16,7 @@ const CustomSplashScreen: React.FC<SplashProps> = ({ onFinish }) => {
   const subtitleOpacity = useRef(new Animated.Value(0)).current;
   const theme = useAppSelector(state => state?.theme.mode);
   const { t } = useTranslations();
+  const { user } = useAppSelector(state => state.auth);
 
   useEffect(() => {
     Animated.parallel([
@@ -75,6 +77,23 @@ const CustomSplashScreen: React.FC<SplashProps> = ({ onFinish }) => {
       >
         <Image source={ERP_ICON.APP_LOGO} style={styles.logo} resizeMode="contain" />
       </Animated.View>
+      {
+        user?.name &&  <Animated.Text
+        style={[
+          styles.helloTitle,
+          {
+            transform: [{ translateY: textTranslateY }],
+          },
+          theme === 'dark' && {
+            color: 'white'
+          }
+        ]}
+      >
+        Hello, {firstLetterUpperCase(user?.name || '')} 
+      </Animated.Text>
+      }
+     
+
       <Animated.Text
         style={[
           styles.title,

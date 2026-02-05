@@ -1,15 +1,21 @@
 import MaterialIcons from '@react-native-vector-icons/material-icons';
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { ERP_COLOR_CODE } from '../../../../utils/constants';
 import { useAppSelector } from '../../../../store/hooks';
+import { firstLetterUpperCase } from '../../../../utils/helpers';
+import ImageBottomSheetModal from '../../../../components/bottomsheet/ImageBottomSheetModal';
 
 const ProfileSection = ({ baseLink, user, onEditPress }: any) => {
   const theme = useAppSelector(state => state?.theme.mode);
 
+  const [showModal, setShowModal] = useState(false);
+  const [img, setImg] = useState('')
+
   if (!user) return null;
   return (
+   <>
     <TouchableOpacity
       onPress={onEditPress}
       style={[styles.profileContainer, theme === 'dark' && {
@@ -21,22 +27,31 @@ const ProfileSection = ({ baseLink, user, onEditPress }: any) => {
         backgroundColor: 'black'
       }]}>
         <View style={styles.profileHeader}>
-          <View style={styles.avatarContainer}>
-            <FastImage
-              source={{
-                uri: `${baseLink}/FileUpload/1/UserMaster/${user?.id
-                  }/d_profileimage.jpeg?ts=${new Date().getTime()}`,
-                priority: FastImage.priority.normal,
-                cache: FastImage.cacheControl.web,
-              }}
-              style={{ height: 56, width: 56, borderRadius: 46 }}
-            />
-          </View>
+          <TouchableOpacity
+            onPress={() => {
+              setImg(`${baseLink}/FileUpload/1/UserMaster/${user?.id
+                }/d_profileimage.jpeg?ts=${new Date().getTime()}`)
+              setShowModal(true)
+            }}
+          >
+            <View style={styles.avatarContainer}>
+              <FastImage
+                source={{
+                  uri: `${baseLink}/FileUpload/1/UserMaster/${user?.id
+                    }/profileimage.jpeg?ts=${new Date().getTime()}`,
+                  priority: FastImage.priority.normal,
+                  cache: FastImage.cacheControl.web,
+                }}
+                style={{ height: 56, width: 56, borderRadius: 46 }}
+              />
+            </View>
+
+          </TouchableOpacity>
 
           <View style={styles.profileInfo}>
             <Text style={[styles.profileName, theme === 'dark' && {
               color: 'white'
-            }]}>{user?.name || 'User Name'}</Text>
+            }]}>{firstLetterUpperCase(user?.name || '') || 'User Name'}</Text>
             <Text style={styles.profileEmail}>{user?.companyName || 'Company'}</Text>
             <View style={[styles.roleBadge, theme === 'dark' && {
               backgroundColor: 'white'
@@ -61,6 +76,14 @@ const ProfileSection = ({ baseLink, user, onEditPress }: any) => {
 
       </View>
     </TouchableOpacity>
+
+    <ImageBottomSheetModal
+        visible={showModal}
+        onClose={() => setShowModal(false)}
+        imageUrl={img}
+      />
+   
+   </>
   );
 };
 

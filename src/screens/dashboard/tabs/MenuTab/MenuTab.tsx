@@ -16,6 +16,7 @@ import ErrorMessage from '../../../../components/error/Error';
 import MaterialIcons from '@react-native-vector-icons/material-icons';
 import { DARK_COLOR, ERP_COLOR_CODE } from '../../../../utils/constants';
 import Toast from '../../../../components/Toast/Toast';
+import { NativeModules } from 'react-native';
 
 import { StyleSheet } from 'react-native';
 const accentColors = ['#dbe0f5ff', '#c8f3edff', '#faf1e0ff', '#f0e1e1ff', '#f2e3f8ff', '#e0f3edff',];
@@ -79,19 +80,27 @@ const MenuTab = ({ type, headerText, searchPlaceholder }: any) => {
     showToast(`${name} - Bookmark Updated!`, backgroundColor);
   };
 
+  console.log("allList", allList)
   // Search effect
   useEffect(() => {
-    if (searchTimeout.current) clearTimeout(searchTimeout.current);
+  if (searchTimeout.current) {
+    clearTimeout(searchTimeout.current);
+  }
 
-    searchTimeout.current = setTimeout(() => {
-      const filtered = allList.filter(
-        item =>
-          item.name.toLowerCase().includes(searchText.toLowerCase()) ||
-          item.title.toLowerCase().includes(searchText.toLowerCase())
-      );
-      setFilteredList(filtered);
-    }, 300);
-  }, [searchText, allList]);
+  searchTimeout.current = setTimeout(() => {
+    const text = (searchText ?? '').toLowerCase();
+
+    const filtered = allList.filter(item => {
+      const name = String(item?.name ?? '').toLowerCase();
+      const title = String(item?.title ?? '').toLowerCase();
+
+      return name.includes(text) || title.includes(text);
+    });
+
+    setFilteredList(filtered);
+  }, 300);
+}, [searchText, allList]);
+
   
   // Header setup
   useLayoutEffect(() => {
@@ -144,6 +153,7 @@ const MenuTab = ({ type, headerText, searchPlaceholder }: any) => {
 
   useFocusEffect(
     useCallback(() => {
+      NativeModules.OrientationModule.enableLandscape();
       setIsHorizontal(false)
       setShowSearch(false);
       setIsRefresh(false);
@@ -154,7 +164,9 @@ const MenuTab = ({ type, headerText, searchPlaceholder }: any) => {
         .unwrap()
         .finally(() => setEntryLoader(false));
     }
-      return () => {};
+      return () => {
+        NativeModules.OrientationModule.disableLandscape();
+      };
     }, [isAuthenticated, activeToken, isRefresh])
   );
 

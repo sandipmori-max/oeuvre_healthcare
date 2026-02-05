@@ -295,7 +295,7 @@ const CustomPicker = ({
                       {opt?.name}
                     </Text>
                     {
-                      selectedOption === opt?.name && <MaterialIcons name='done' size={24} color={ERP_COLOR_CODE.ERP_APP_COLOR} />
+                      selectedOption === opt?.name && <MaterialIcons name='done-all' size={24} color={ERP_COLOR_CODE.ERP_APP_COLOR} />
                     }
                   </TouchableOpacity>
                 ))

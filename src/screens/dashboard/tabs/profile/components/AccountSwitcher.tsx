@@ -9,7 +9,7 @@ import { DevERPService } from '../../../../../services/api';
 import CustomAlert from '../../../../../components/alert/CustomAlert';
 import { ERP_ICON } from '../../../../../assets';
 import { useApi } from '../../../../../hooks/useApi';
-import { formatDateHr, formatTimeTo12Hour, isTokenValid } from '../../../../../utils/helpers';
+import { firstLetterUpperCase, formatDateHr, formatTimeTo12Hour, isTokenValid } from '../../../../../utils/helpers';
 import MaterialIcons from '@react-native-vector-icons/material-icons';
 import FastImage from 'react-native-fast-image';
 import { ERP_COLOR_CODE } from '../../../../../utils/constants';
@@ -20,6 +20,7 @@ import { resetDropdownState } from '../../../../../store/slices/dropdown/dropdow
 import { resetSyncLocationState } from '../../../../../store/slices/location/syncLocationSlice';
 import { getLastPunchInThunk } from '../../../../../store/slices/attendance/thunk';
 import { setReloadApp } from '../../../../../store/slices/reloadApp/reloadAppSlice';
+import ImageBottomSheetModal from '../../../../../components/bottomsheet/ImageBottomSheetModal';
 
 interface AccountSwitcherProps {
   visible: boolean;
@@ -33,6 +34,9 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
   const { execute: validateCompanyCode } = useApi();
   const theme = useAppSelector(state => state?.theme.mode);
 
+
+  const [showModal, setShowModal] = useState(false);
+  const [img, setImg] = useState('')
   const { accounts, activeAccountId, user } = useAppSelector(state => state?.auth);
   const [alertVisible, setAlertVisible] = useState(false);
   const [selectedAccount, setSelectedAccount] = useState<any>(null);
@@ -152,7 +156,7 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
   const handleRemoveAccount = (account: Account) => {
     setAlertConfig({
       title: 'Remove account',
-      message: `Are you sure you want to remove ${account?.user?.company_code}?`,
+      message: `Are you sure you want to remove - ${firstLetterUpperCase(account?.user?.name)} ?`,
       type: 'confirmation',
     });
     setSelectedAccount(account?.id);
@@ -225,17 +229,25 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
           }}
         >
           <View style={styles.accountContent}>
-            <FastImage
-              style={styles.avatar}
-              source={{
-                uri: `${normalizedBase}/FileUpload/1/UserMaster/${item?.user?.id}/profileimage.jpeg?ts=${new Date().getTime()}`,
-                priority: FastImage.priority.normal,
-                cache: FastImage.cacheControl.web,
+            <TouchableOpacity
+              onPress={() => {
+                setImg(`${normalizedBase}/FileUpload/1/UserMaster/${item?.user?.id}/profileimage.jpeg?ts=${new Date().getTime()}`)
+                setShowModal(true)
               }}
-            />
+            >
+              <FastImage
+                style={styles.avatar}
+                source={{
+                  uri: `${normalizedBase}/FileUpload/1/UserMaster/${item?.user?.id}/profileimage.jpeg?ts=${new Date().getTime()}`,
+                  priority: FastImage.priority.normal,
+                  cache: FastImage.cacheControl.web,
+                }}
+              />
+            </TouchableOpacity>
+
             <View style={styles.accountInfo}>
               <Text style={[styles.accountName, isActive && styles.activeText, theme === 'dark' && { color: 'white' }]}>
-                {item?.user?.name.charAt(0).toUpperCase() + item?.user?.name.slice(1)}
+                {firstLetterUpperCase(item?.user?.name || '')}
               </Text>
               <Text numberOfLines={1} style={[styles.accountEmail, isActive && styles.activeText, theme === 'dark' && { color: 'white' }]}>
                 {item?.user?.companyName}
@@ -390,9 +402,15 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
           onDone={() => handleRemovedAccount(selectedAccount)}
           doneText="Remove"
           color={ERP_COLOR_CODE.ERP_ERROR}
-          actionLoader={undefined}
+          actionLoader={undefined} closeHide={undefined} />
+
+        <ImageBottomSheetModal
+          visible={showModal}
+          onClose={() => setShowModal(false)}
+          imageUrl={img}
         />
       </Animated.View>
+
     </Modal>
   );
 };

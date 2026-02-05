@@ -36,7 +36,7 @@ import Input from './components/Input';
 import CustomAlert from '../../../components/alert/CustomAlert';
 import AjaxPicker from './components/AjaxPicker';
 import DateTimePicker from 'react-native-modal-datetime-picker';
-import { applyActionsToControls, computeControlVisibility, evaluateRules, evaluateRulesWithActions, parseCustomDatePage, requestCameraPermission } from '../../../utils/helpers';
+import { applyActionsToControls, evaluateRulesWithActions, parseCustomDatePage, requestCameraPermission } from '../../../utils/helpers';
 import DateRow from './components/Date';
 import BoolInput from './components/BoolInput';
 import SignaturePad from './components/SignaturePad';
@@ -479,7 +479,6 @@ const PageScreen = () => {
 
   const route = useRoute<RouteProp<PageRouteParams, 'PageScreen'>>();
   const { item, title, id, isFromNew, url, pageTitle }: any = route?.params;
-  const authUser = item?.authuser;
   const isFromBusinessCard = route?.params?.isFromBusinessCard || false;
 
   const validateForm = useCallback(() => {
@@ -509,10 +508,7 @@ const PageScreen = () => {
         backgroundColor: theme === 'dark' ? 'black' : ERP_COLOR_CODE.ERP_APP_COLOR,
         borderBottomWidth: 1,
         borderBottomColor: '#fff',
-        
       },
-        
-      
       headerTintColor: '#fff',
       headerTitle: () => (
         <View style={{ flexDirection: 'row', alignItems: 'center', maxWidth: 210 }}>
@@ -554,7 +550,6 @@ const PageScreen = () => {
               }}
             />
           )}
-         
         </>
       ),
     });
@@ -573,21 +568,16 @@ const PageScreen = () => {
     actionSaveLoader,
     buttonSave,
     error
-
   ]);
 
   const fetchPageData = useCallback(async () => {
     try {
       setError(null);
       setLoadingPageId(isFromNew ? '0' : id);
-
       const parsed = await dispatch(
         getERPPageThunk({ page: url, id: isFromNew ? 0 : id }),
       ).unwrap();
-
-      console.log("parsed", parsed?.script);
       setMyScript(parsed?.script);
-
       if (!isFromNew) {
         setInfoData({
           id: id?.toString(),
@@ -1025,11 +1015,9 @@ const PageScreen = () => {
     if (item?.ctltype === 'FILE') return 'onFileChange';
     if (item?.defaultvalue === '#location') return 'onLocationChange';
     if (item?.ctltype === 'QRSCANNER') return 'onBarCodeChange';
-
     if (item?.ajax === 1) return 'onAjaxChange';
     if (item?.ddl && item?.ddl !== '') return 'onDropDownChange';
-
-    return 'onInputChange'; // default
+    return 'onInputChange'; 
   };
 
 
@@ -1117,9 +1105,8 @@ const PageScreen = () => {
               contentContainerStyle={{ paddingBottom: keyboardHeight }}
               keyboardShouldPersistTaps="handled"
             />
-
-{!authUser && controls.length > 0 && (
-             <TouchableOpacity
+            {controls.length > 0 && (
+<TouchableOpacity
                 style={{
                   height: 46,
                   width: '100%',
@@ -1268,7 +1255,6 @@ const PageScreen = () => {
                 </Text>
               </TouchableOpacity>
             )}
-
           </View>
           <CustomAlert
                 visible={alertVisible}
@@ -1280,7 +1266,8 @@ const PageScreen = () => {
                   if (modalClose) setAlertVisible(false);
                 } }
                 actionLoader={undefined}
-                isSettingVisible={isSettingVisible} closeHide={undefined}          />
+                isSettingVisible={isSettingVisible}
+                closeHide={undefined}          />
           {loader && (
             <View
               style={{
@@ -1314,14 +1301,7 @@ const PageScreen = () => {
       />
 
       {dateTimePickerVisible && Platform.OS === 'ios' && (
-        <Modal transparent animationType="slide" statusBarTranslucent>
-          <View style={styles.overlay}>
-            <View style={styles.sheet}>
-              {/* Divider */}
-              <View style={styles.divider} />
-
-              {/* Date Picker */}
-              <DateTimePicker
+        <DateTimePicker
                 isVisible={dateTimePickerVisible}
                 mode="datetime"
                 display='spinner'
@@ -1329,23 +1309,15 @@ const PageScreen = () => {
                 date={activeDateTime ? parseCustomDatePage(activeDateTime) : new Date()}
                 onConfirm={handleDateTimeConfirm}
                 onCancel={hideDateTimePicker}
+                cancelTextIOS="Cancel"
+  confirmTextIOS="Done"
               />
-            </View>
-          </View>
-        </Modal>
 
       )}
 
 
       {datePickerVisible && Platform.OS === 'ios' && (
-        <Modal transparent animationType="slide" statusBarTranslucent>
-          <View style={styles.overlay}>
-            <View style={styles.sheet}>
-              {/* Divider */}
-              <View style={styles.divider} />
-
-              {/* Date Picker */}
-              <DateTimePicker
+         <DateTimePicker
                 isVisible={datePickerVisible}
                 mode="date"
                 date={activeDate ? parseCustomDatePage(activeDate) : new Date()}
@@ -1353,10 +1325,9 @@ const PageScreen = () => {
                 onCancel={hideDatePicker}
                 display="spinner"
                 is24Hour={false}
+                cancelTextIOS="Cancel"
+  confirmTextIOS="Done"
               />
-            </View>
-          </View>
-        </Modal>
       )}
 
       {
@@ -1368,6 +1339,8 @@ const PageScreen = () => {
           date={activeDateTime ? parseCustomDatePage(activeDateTime) : new Date()}
           onConfirm={handleDateTimeConfirm}
           onCancel={hideDateTimePicker}
+          cancelTextIOS="Cancel"
+  confirmTextIOS="Done"
         />
       }
 
@@ -1380,6 +1353,8 @@ const PageScreen = () => {
           date={activeDate ? parseCustomDatePage(activeDate) : new Date()}
           onConfirm={handleConfirm}
           onCancel={hideDatePicker}
+          cancelTextIOS="Cancel"
+          confirmTextIOS="Done"
         />
       }
 
@@ -1396,8 +1371,8 @@ const PageScreen = () => {
             navigation.goBack();
           }
         } }
-        actionLoader={undefined}
-         closeHide={undefined}      />
+        actionLoader={undefined} 
+        closeHide={undefined}      />
     </View>
   );
 };

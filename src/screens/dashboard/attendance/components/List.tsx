@@ -31,6 +31,7 @@ import {
 } from '../../../../utils/helpers';
 import DetailsBottomSheet from './DetailsModal';
 import useTranslations from '../../../../hooks/useTranslations';
+import ImageBottomSheetModal from '../../../../components/bottomsheet/ImageBottomSheetModal';
 
 const styles = StyleSheet.create({
   recordCard: {
@@ -78,10 +79,13 @@ const styles = StyleSheet.create({
   },
 });
 
- const List = ({ selectedMonth, showFilter, fromDate, toDate }: any) => {
+const List = ({ selectedMonth, showFilter, fromDate, toDate }: any) => {
   const dispatch = useAppDispatch();
   const theme = useAppSelector(state => state?.theme.mode);
   const { t } = useTranslations();
+
+  const [showImgModal, setShowImgModal] = useState(false);
+  const [img, setImg] = useState('')
 
   const FILTERS = [
     { key: 'all', label: t("text.text9") },
@@ -105,16 +109,16 @@ const styles = StyleSheet.create({
   const baseLink = useBaseLink();
 
   useEffect(() => {
-      return(() =>{
-        setActiveFilter('all')
-        setIsLoading(false);
-        setListData([])
-        setParsedError(null)
-        setShowModal(false)
-        setSelectedItem(null);
-        setCurrentView('pie')
-      })
-  },[])
+    return (() => {
+      setActiveFilter('all')
+      setIsLoading(false);
+      setListData([])
+      setParsedError(null)
+      setShowModal(false)
+      setSelectedItem(null);
+      setCurrentView('pie')
+    })
+  }, [])
   const panResponder = PanResponder.create({
     onMoveShouldSetPanResponder: (_, gestureState) => {
       return (
@@ -154,7 +158,7 @@ const styles = StyleSheet.create({
           setIsLoading(false);
         }, 1400)
       } finally {
-        
+
       }
     },
     [dispatch, theme],
@@ -274,8 +278,8 @@ const styles = StyleSheet.create({
           height: Dimensions.get('screen').height * 0.75,
           justifyContent: 'center',
           alignItems: 'center',
-          alignContent:'center',
-          alignSelf:'center'
+          alignContent: 'center',
+          alignSelf: 'center'
         }}
       >
         <FullViewLoader />
@@ -413,7 +417,7 @@ const styles = StyleSheet.create({
                         const selectedData = listData?.find(
                           d => normalizeDate(d?.date) === day?.dateString,
                         );
-                       openDetails(selectedData)
+                        openDetails(selectedData)
                       }}
                       markingType={'custom'}
                       markedDates={markedDates}
@@ -567,31 +571,47 @@ const styles = StyleSheet.create({
                                     {/* Images */}
                                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                       {rec?.image && (
-                                        <FastImage
-                                          source={{
-                                            uri: baseLink + '/' + rec?.image,
-                                            priority: FastImage.priority.normal,
-                                            cache: FastImage.cacheControl.web,
+                                        <TouchableOpacity
+                                          onPress={() => {
+                                            setImg(`${baseLink}/${rec?.image}`)
+                                            setShowImgModal(true)
                                           }}
-                                          style={styles.recordAvatar}
-                                        />
+                                        >
+                                          <FastImage
+                                            source={{
+                                              uri: baseLink + '/' + rec?.image,
+                                              priority: FastImage.priority.normal,
+                                              cache: FastImage.cacheControl.web,
+                                            }}
+                                            style={styles.recordAvatar}
+                                          />
+                                        </TouchableOpacity>
+
                                       )}
                                       {rec?.image2 && (
-                                        <FastImage
-                                          source={{
-                                            uri: baseLink + '/' + rec?.image2,
-                                            priority: FastImage.priority.normal,
-                                            cache: FastImage.cacheControl.web,
+                                        <TouchableOpacity
+                                          onPress={() => {
+                                            setImg(`${baseLink}/${rec?.image2}`)
+                                            setShowImgModal(true)
                                           }}
-                                          style={[
-                                            styles.recordAvatar,
-                                            {
-                                              marginLeft: -28,
-                                              borderWidth: 2,
-                                              borderColor: ERP_COLOR_CODE.ERP_WHITE,
-                                            },
-                                          ]}
-                                        />
+                                        >
+                                          <FastImage
+                                            source={{
+                                              uri: baseLink + '/' + rec?.image2,
+                                              priority: FastImage.priority.normal,
+                                              cache: FastImage.cacheControl.web,
+                                            }}
+                                            style={[
+                                              styles.recordAvatar,
+                                              {
+                                                marginLeft: -28,
+                                                borderWidth: 2,
+                                                borderColor: ERP_COLOR_CODE.ERP_WHITE,
+                                              },
+                                            ]}
+                                          />
+                                        </TouchableOpacity>
+
                                       )}
                                     </View>
 
@@ -664,11 +684,11 @@ const styles = StyleSheet.create({
                                                     gap: 4,
                                                   }}
                                                 >
-                                                  <MaterialIcons
+                                                  {/* <MaterialIcons
                                                     color={ERP_COLOR_CODE.ERP_666}
                                                     size={14}
                                                     name="timeline"
-                                                  />
+                                                  /> */}
                                                   <Text
                                                     style={[
                                                       styles.recordPunchTime,
@@ -683,7 +703,8 @@ const styles = StyleSheet.create({
                                                       },
                                                     ]}
                                                   >
-                                                    {getWorkedHours2(rec?.intime, rec?.outtime)}
+                                                    -
+                                                    {/* {getWorkedHours2(rec?.intime, rec?.outtime)} */}
                                                   </Text>
                                                 </View>
                                               )}
@@ -726,7 +747,8 @@ const styles = StyleSheet.create({
                                           >
                                             <Text style={styles.statusBadgeGrey}>{t("text.text21")}</Text>
                                             <Text style={styles.statusBadgeGrey}>
-                                              ({workedHours.toFixed(2)} hrs)
+                                              {/* ({workedHours.toFixed(2)} hrs) */}
+                                              -
                                             </Text>
                                           </View>
                                         )}
@@ -761,7 +783,7 @@ const styles = StyleSheet.create({
               )}
             </>
           )}
-        /> : 
+        /> :
         <>
           <View style={{
             height: Dimensions.get('screen').height * 0.75,
@@ -772,6 +794,11 @@ const styles = StyleSheet.create({
         </>
       }
 
+      <ImageBottomSheetModal
+        visible={showImgModal}
+        onClose={() => setShowImgModal(false)}
+        imageUrl={img}
+      />
       <DetailsBottomSheet
         visible={showModal}
         onClose={closeDetails}
