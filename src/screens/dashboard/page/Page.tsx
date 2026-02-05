@@ -161,6 +161,7 @@ const PageScreen = () => {
     item => item?.defaultvalue && item?.defaultvalue === '#location' && item?.visible === "0",
   );
 
+  console.log("MY_____________________SCRIPT", myScript);
   const customScriptRule = '';
   //   const customScriptRule = `{
   //     "onClickButtonSave":
@@ -577,7 +578,12 @@ const PageScreen = () => {
       const parsed = await dispatch(
         getERPPageThunk({ page: url, id: isFromNew ? 0 : id }),
       ).unwrap();
-      setMyScript(parsed?.script);
+        if (
+          parsed?.script &&
+          !parsed.script.trim().toLowerCase().includes("<script")
+        ) {
+          setMyScript(parsed.script);
+        }
       if (!isFromNew) {
         setInfoData({
           id: id?.toString(),

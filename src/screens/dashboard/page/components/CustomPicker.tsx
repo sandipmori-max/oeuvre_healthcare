@@ -17,6 +17,7 @@ import MaterialIcons from '@react-native-vector-icons/material-icons';
 import FullViewLoader from '../../../../components/loader/FullViewLoader';
 import useTranslations from '../../../../hooks/useTranslations';
 import InputError from '../../../../components/error/InputError';
+import NoData from '../../../../components/no_data/NoData';
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 
@@ -306,11 +307,11 @@ const CustomPicker = ({
                     justifyContent: 'center',
                     alignItems: 'center',
                     height: 100,
+                    alignContent:'center',
+                    marginTop: 200,
                   }}
                 >
-                  <Text style={{ color: theme === 'dark' ? 'white' : 'black' }}>
-                    {t("text.text20")}
-                  </Text>
+                  <NoData />
                 </View>
               )}
             </ScrollView>

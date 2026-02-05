@@ -8,6 +8,7 @@ import MaterialIcons from '@react-native-vector-icons/material-icons';
 import FullViewLoader from '../../../../components/loader/FullViewLoader';
 import useTranslations from '../../../../hooks/useTranslations';
 import InputError from '../../../../components/error/InputError';
+import NoData from '../../../../components/no_data/NoData';
 
 const CustomMultiPicker = ({ isValidate,label, selectedValue, onValueChange, item, errors, dtext }: any) => {
   const [open, setOpen] = useState(false);
@@ -133,9 +134,18 @@ const CustomMultiPicker = ({ isValidate,label, selectedValue, onValueChange, ite
                 ))}
               </ScrollView>
             ) : (
-              <View style={{ marginVertical: 12, justifyContent: 'center', alignItems: 'center', height: 100 }}>
-                <Text>{t("text.text20")}</Text>
-              </View>
+               <View
+                  style={{
+                    marginVertical: 12,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    height: 100,
+                    alignContent:'center',
+                    marginTop: 200,
+                  }}
+                >
+                  <NoData />
+                </View>
             )
           )}
         </View>
