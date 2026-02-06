@@ -96,6 +96,7 @@ const AttendanceScreen = () => {
       headerTitleStyle: {
         color: '#FFFFFF',
       },
+      headerBackTitle: '',
       headerStyle: {
         backgroundColor: theme === 'dark' ? 'black' : ERP_COLOR_CODE.ERP_APP_COLOR,
         borderBottomWidth: 1,

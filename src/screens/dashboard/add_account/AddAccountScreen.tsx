@@ -321,7 +321,12 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose, i
           <TouchableOpacity onPress={() =>{
             handleClose()
           }} style={styles.closeButton}>
-            <Image source={ERP_ICON.BACK} style={styles.back} />
+            {
+              Platform.OS === 'ios' ? <>
+                            <MaterialIcons name="chevron-left" size={28} color="#000" />
+                        
+                            </> :  <Image source={ERP_ICON.BACK} style={styles.back} />
+            }
           </TouchableOpacity>
           <Text style={styles.title}>{t('account.addAccount')}</Text>
         </View>

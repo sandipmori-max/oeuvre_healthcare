@@ -241,7 +241,7 @@ const ReadableView = ({
             style={{
               width: 40,
               height: 40,
-              borderRadius: 34,
+              borderRadius: 10,
               backgroundColor: bgColor,
               justifyContent: 'center',
               alignItems: 'center',
@@ -306,7 +306,7 @@ const ReadableView = ({
                   fontSize: 12,
                   width: '100%',
                   textAlign: 'right',
-                  color: theme === 'dark' ? 'white' : ERP_COLOR_CODE.ERP_ERROR,
+                  color: theme === 'dark' ? 'white' : ERP_COLOR_CODE.ERP_COLOR,
                 }}
               >
                 {status}
@@ -318,7 +318,7 @@ const ReadableView = ({
                 style={{
                   fontWeight: '800',
                   fontSize: 12,
-                  color: theme === 'dark' ? 'white' : ERP_COLOR_CODE.ERP_BLACK,
+                  color: theme === 'dark' ? 'white' : ERP_COLOR_CODE.ERP_6C757D,
                   alignSelf: 'flex-end',
                   alignItems: 'flex-end',
                   textAlign: 'right'

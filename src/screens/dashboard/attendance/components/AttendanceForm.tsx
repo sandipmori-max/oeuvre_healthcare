@@ -405,7 +405,9 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
                 <View style={styles.formGroup}>
                   <Text style={[styles.label, theme === 'dark' && {
                     color: 'white'
-                  }]}>{t('attendance.remark')}</Text>
+                  }]}>{
+                  resData?.success === 1 || resData?.success === '1' ? t('attendance.outremark') : t('attendance.remark') }</Text>
+                  
                   <TextInput
                     style={[styles.input, { minHeight: 100, textAlignVertical: 'top' }, theme === 'dark' && {
                       borderWidth: 1,

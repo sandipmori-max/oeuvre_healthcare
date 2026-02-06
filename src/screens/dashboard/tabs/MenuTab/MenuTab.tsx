@@ -110,6 +110,7 @@ const MenuTab = ({ type, headerText, searchPlaceholder }: any) => {
         //  borderBottomWidth: 1,
         // borderBottomColor: '#fff',
       },
+      headerBackTitle: '',
       headerTintColor: 'white',
       headerTitle: () =>
         showSearch ? (

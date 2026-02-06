@@ -84,6 +84,7 @@ const ProfileTab = () => {
         borderBottomWidth: 1,
         borderBottomColor: '#fff',
       },
+      headerBackTitle: '',
       headerTintColor: '#fff',
       headerRight: () => (
         <>

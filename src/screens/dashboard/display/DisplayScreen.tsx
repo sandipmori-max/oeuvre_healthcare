@@ -77,6 +77,7 @@ const DisplayScreen = () => {
   useLayoutEffect(() => {
     navigation.setOptions({
       title: isListVisible ? 'Tasks' : 'Create Task',
+      headerBackTitle: '',
       headerRight: () => (
         <>
           <ERPIcon

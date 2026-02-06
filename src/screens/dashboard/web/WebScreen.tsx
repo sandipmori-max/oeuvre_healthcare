@@ -88,6 +88,7 @@ const WebScreen = () => {
           {isFromChart ? t("text.text52") : item?.title || t('webScreen.details')}
         </Text>
       ),
+      headerBackTitle: '',
       headerRight: () => (
         <>
           {isFromChart || item?.title === 'Attendance Code' ? (
