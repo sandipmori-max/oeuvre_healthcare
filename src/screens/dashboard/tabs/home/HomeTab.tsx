@@ -139,6 +139,7 @@ const HomeScreen = () => {
         borderBottomWidth: theme === 'dark' ? 1 : 0,
         borderBottomColor: theme === 'dark' ? '#fff' : ERP_COLOR_CODE.ERP_APP_COLOR,
       },
+      headerBackTitle: '',
       headerTintColor: '#fff',
       headerTitle: () =>
         showSearch ? (

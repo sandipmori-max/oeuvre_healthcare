@@ -510,6 +510,7 @@ const PageScreen = () => {
         borderBottomWidth: 1,
         borderBottomColor: '#fff',
       },
+      headerBackTitle: '',
       headerTintColor: '#fff',
       headerTitle: () => (
         <View style={{ flexDirection: 'row', alignItems: 'center', maxWidth: 210 }}>
@@ -807,7 +808,8 @@ const PageScreen = () => {
       };
 
 
-      const value = formValues[item?.field] || formValues[item?.text] || '';
+ const value =  formValues[item?.field] === '#location' ?  '': formValues[item?.field] || formValues[item?.text] || '';
+      console.log("value=================-------",  item?.field , '------', value)
 
 
 

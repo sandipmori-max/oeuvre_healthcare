@@ -166,6 +166,7 @@ const ListScreen = () => {
         // borderBottomWidth: 1,
         borderBottomColor: '#fff',
       },
+      headerBackTitle: '',
       headerTintColor: '#fff',
       headerTitle: () => (
         <Text

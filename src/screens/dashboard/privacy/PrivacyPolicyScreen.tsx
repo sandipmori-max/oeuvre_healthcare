@@ -37,6 +37,7 @@ const PrivacyPolicyScreen = () => {
       headerStyle: {
         backgroundColor: theme === 'dark' ? 'black' : ERP_COLOR_CODE.ERP_APP_COLOR,
       },
+      headerBackTitle: '',
       headerTintColor: '#fff',
       headerTitle: () => (
         <Text

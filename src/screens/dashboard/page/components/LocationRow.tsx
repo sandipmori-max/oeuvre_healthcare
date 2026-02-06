@@ -13,15 +13,25 @@ const LocationRow = ({ locationEnabled, locationVisible, isValidate, item, value
   const [address, setAddress] = useState<string>('');
     const { t } = useTranslations();
   const theme = useAppSelector(state => state?.theme.mode);
+  console.log("locationEnabled", locationEnabled)
 
   useEffect(() => {
-    if(!locationEnabled){
+    if(error){
       setValue({
         [item?.field]: ``,
       });
       setAddress('')
       return;
     }
+    if(!locationEnabled){
+      console.log("locationEnabled", locationEnabled)
+      setValue({
+        [item?.field]: ``,
+      });
+      setAddress('')
+      return;
+    }
+
     if (item?.text !== '' && item?.text !== '#location') {
       setAddress(item?.text);
       return;
@@ -33,7 +43,7 @@ const LocationRow = ({ locationEnabled, locationVisible, isValidate, item, value
       });
       setAddress(hookAddress || `${coords?.latitude},${coords?.longitude}`);
     }
-  }, [coords, loading, locationVisible, hookAddress, locationEnabled]);
+  }, [coords, loading, locationVisible, hookAddress, locationEnabled, error]);
 
   return (
     <View style={{ marginBottom: 16 }}>
@@ -47,7 +57,9 @@ const LocationRow = ({ locationEnabled, locationVisible, isValidate, item, value
         }]}> - ( {item?.tooltip} )</Text>}
         {item?.mandatory === '1' && <Text style={{ color: ERP_COLOR_CODE.ERP_ERROR }}>*</Text>}
         </View>
-        <ShortAction item={item} value={address}/>
+        {
+          !error &&  <ShortAction item={item} value={address}/>
+        }
       </View>
 
       {/* Address / Loading / Error */}
@@ -62,7 +74,7 @@ const LocationRow = ({ locationEnabled, locationVisible, isValidate, item, value
             </Text>
           </View>
         ) : address ? (
-          <Text style={{ marginTop: 4, color: theme === 'dark' ?'white' : ERP_COLOR_CODE.ERP_333 }}>{address}</Text>
+          <Text style={{ marginTop: 4, color: theme === 'dark' ?'white' : ERP_COLOR_CODE.ERP_333 }}>{address} </Text>
         ) : (
           <View
             style={{
@@ -75,7 +87,8 @@ const LocationRow = ({ locationEnabled, locationVisible, isValidate, item, value
             <Text style={{  color: theme === 'dark' ?'white' : '#999', width: '80%' }}>
               {error ? `${t("title.title1")}: ${error}` : t("text.text38")}
             </Text>
-            <TouchableOpacity
+            {
+               <TouchableOpacity
               style={{
                 paddingVertical: 4,
                 paddingHorizontal: 6,
@@ -85,8 +98,10 @@ const LocationRow = ({ locationEnabled, locationVisible, isValidate, item, value
               }}
               onPress={refetch}
             >
-              <MaterialIcons name="refresh" color={theme === 'dark' ?'black' : '#fff'} size={18} />
+              <MaterialIcons name={"refresh"} color={theme === 'dark' ?'black' : '#fff'} size={18} />
             </TouchableOpacity>
+            }
+           
           </View>
         )}
       </View>

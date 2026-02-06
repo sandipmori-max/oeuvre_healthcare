@@ -334,7 +334,12 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
       >
         <View style={[styles.header, theme === 'dark' && { backgroundColor: 'black' }]}>
           <TouchableOpacity onPress={handleClose} style={styles.closeButton}>
-            <Image source={ERP_ICON.BACK} style={styles.back} />
+          {
+              Platform.OS === 'ios' ? <>
+                            <MaterialIcons name="chevron-left" size={28} color="#000" />
+                        
+                            </> :  <Image source={ERP_ICON.BACK} style={styles.back} />
+            }
           </TouchableOpacity>
           <Text style={styles.title}>Switch Account</Text>
         </View>

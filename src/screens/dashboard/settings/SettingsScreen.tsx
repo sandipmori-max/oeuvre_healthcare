@@ -125,6 +125,7 @@ const translateY = useRef(new Animated.Value(HIDDEN_POSITION)).current;
       headerStyle: {
         backgroundColor: theme === 'dark' ? 'black' : ERP_COLOR_CODE.ERP_APP_COLOR,   // <-- BLACK HEADER
       },
+      headerBackTitle: '',
       headerTintColor: '#fff',
       headerTitle: () => (
         <Text

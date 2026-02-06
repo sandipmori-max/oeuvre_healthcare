@@ -87,6 +87,8 @@ const RootNavigator = () => {
 
   const [alertVisible, setAlertVisible] = useState(false);
   const [openSettings, setOpenSettings] = useState(false);
+  const [isLocationRequired, setIsLocationReuired] = useState(false);
+
   const [backgroundDeniedModal, setBackgroundDeniedModal] = useState(false);
   const [alertConfig, setAlertConfig] = useState({
     title: '',
@@ -135,7 +137,21 @@ const RootNavigator = () => {
 
     // Start checking every 1 second
     locationServiceIntervalRef.current = setInterval(() => {
-      checkLocationServiceOnly();
+        try {
+          dispatch(getLastPunchInThunk())
+            .unwrap()
+            .then(res => {
+              if (res?.success === 1 || res?.success === '1') {
+                      checkLocationServiceOnly();
+              } else { 
+              }
+            })
+            .catch(err => { 
+            });
+        } catch (error) {
+          console.log(error);
+        }
+        
     }, 1000);
 
     return () => {
@@ -145,7 +161,7 @@ const RootNavigator = () => {
         locationServiceIntervalRef.current = null;
       }
     };
-  }, [isAuthenticated]);
+  }, [isAuthenticated, reLoading]);
   const app_id = user?.app_id;
 
   useEffect(() => {
@@ -174,14 +190,28 @@ const RootNavigator = () => {
         appState.current.match(/inactive|background/) &&
         nextAppState === 'active'
       ) {
-        await checkLocation();
+         try {
+          dispatch(getLastPunchInThunk())
+            .unwrap()
+            .then(res => {
+              if (res?.success === 1 || res?.success === '1') {
+                  checkLocation();
+              } else { 
+              }
+            })
+            .catch(err => { 
+            });
+        } catch (error) {
+          console.log(error);
+        }
+
       }
       appState.current = nextAppState;
     };
 
     const sub = AppState.addEventListener('change', handleAppStateChange);
     return () => sub.remove();
-  }, [isAuthenticated]);
+  }, [isAuthenticated,reLoading]);
 
   // ------------------------- Language -------------------------
   useEffect(() => {
@@ -198,20 +228,16 @@ const RootNavigator = () => {
 
   // ------------------------- Check Location -------------------------
   const checkLocation = async () => {
-    console.log("isAuthenticated ---------------- ", isAuthenticated)
     if (!isAuthenticated) return;
 
     const enabled = await DeviceInfo.isLocationEnabled();
-    console.log("enabled ---------------- ", enabled)
 
     const permission = await requestLocationPermissions();
-    console.log("permission ---------------- ", permission)
 
     if (enabled && permission === 'granted') {
       locationModalShownRef.current = false;
       setAlertVisible(false);
       setBackgroundDeniedModal(false);
-      console.log("testtetseteeee------------------------------------accounts", accounts, user)
 
       if (accounts.length) {
         const data = accounts
@@ -226,12 +252,8 @@ const RootNavigator = () => {
           })
           .filter(Boolean);
 
-        console.log(data);
-
-        console.log("data------------------+++++++++++------------------", data)
         NativeModules.LocationModule.setUserTokens(data);
         NativeModules.LocationModule.startService();
-        console.log("testtetseteeee")
 
       }
       return;
@@ -296,7 +318,6 @@ const RootNavigator = () => {
             .unwrap()
             .then(res => {
               if (res?.success === 1 || res?.success === '1') {
-                console.log("res-----------------------+++++++++++++++++++++++++++++++++++++++------------------------------+++++++");
                 checkLocation();
               } else {
                 setAlertVisible(false);
@@ -336,7 +357,6 @@ const RootNavigator = () => {
             message={alertConfig.message}
             type={alertConfig.type}
             onClose={() => { 
-            console.log("data------------------+++++++++++------------------", 'data')
             // setAlertVisible(true)
 
             }}
