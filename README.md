@@ -689,3 +689,6 @@ Page save button - 795 below flatlist
 
 Login - Add account 
 company_code - oeuvre01
+
+Welcome 
+tr - DevERP to Oeuvre
