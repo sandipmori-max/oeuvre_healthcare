@@ -19,6 +19,7 @@ import Toast from '../../../../components/Toast/Toast';
 import { NativeModules } from 'react-native';
 
 import { StyleSheet } from 'react-native';
+import { useTranslation } from 'react-i18next';
 const accentColors = ['#dbe0f5ff', '#c8f3edff', '#faf1e0ff', '#f0e1e1ff', '#f2e3f8ff', '#e0f3edff',];
 const MenuTab = ({ type, headerText, searchPlaceholder }: any) => {
   const navigation = useNavigation();
@@ -27,6 +28,7 @@ const MenuTab = ({ type, headerText, searchPlaceholder }: any) => {
     state => state.auth
   );
   const theme = useAppSelector(state => state.theme.mode);
+  const {t} = useTranslation()
 
   const allList = menu?.filter(item => item?.isReport === type) ?? [];
   const [entryLoader, setEntryLoader] = useState(false);
@@ -77,10 +79,9 @@ const MenuTab = ({ type, headerText, searchPlaceholder }: any) => {
     const db = await getDBConnection();
     await insertOrUpdateBookmark(db, id, user?.id, updated);
 
-    showToast(`${name} - Bookmark Updated!`, backgroundColor);
+    showToast(`${name} - ${t('text90')}`, backgroundColor);
   };
 
-  console.log("allList", allList)
   // Search effect
   useEffect(() => {
   if (searchTimeout.current) {
@@ -188,7 +189,7 @@ const MenuTab = ({ type, headerText, searchPlaceholder }: any) => {
       <TouchableOpacity
         style={[
           styles.card,
-          theme === 'dark' && { borderColor: 'white', borderWidth: 1 },
+          theme === 'dark' && { borderColor: backgroundColor , borderWidth: 2 },
           {
             backgroundColor: theme === 'dark' ? 'black' : backgroundColor,
             flexDirection: isHorizontal ? 'row' : 'column',
@@ -212,13 +213,13 @@ const MenuTab = ({ type, headerText, searchPlaceholder }: any) => {
         <View 
           style={[
             styles.iconContainer,
-            theme === 'dark' && { borderColor: 'white' },
-            { backgroundColor: theme === 'dark' ? DARK_COLOR : ERP_COLOR_CODE.ERP_WHITE },
+            theme === 'dark' && { borderColor: 'white', },
+            { backgroundColor: theme === 'dark' ? backgroundColor : ERP_COLOR_CODE.ERP_WHITE },
           ]}
         >
           <Text style={[styles.iconText, 
             
-            theme === 'dark' && { color: 'white' }]}>
+            theme === 'dark' && { color: 'black' }]}>
             {item.icon ||
               getInitials(item?.name)
             }

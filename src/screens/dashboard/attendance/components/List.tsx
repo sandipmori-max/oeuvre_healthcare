@@ -104,10 +104,7 @@ const List = ({ selectedMonth, showFilter, fromDate, toDate }: any) => {
   const [showModal, setShowModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState<any>(null);
   const [currentView, setCurrentView] = useState<'pie' | 'calendar'>('pie');
-
-  console.log("listData", listData);
   const baseLink = useBaseLink();
-
   useEffect(() => {
     return (() => {
       setActiveFilter('all')

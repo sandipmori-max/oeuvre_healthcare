@@ -314,7 +314,6 @@ const authSlice = createSlice({
         state.isDashboardLoading = true;
       })
       .addCase(getERPDashboardThunk.fulfilled, (state, action) => {
-        console.log("action?.payload", action?.payload)
         try {
           let dashboardData;
           if (typeof action?.payload === 'string') {
@@ -343,7 +342,6 @@ const authSlice = createSlice({
             } catch (innerParseError) {
             }
           }
-          console.log("dashboardItems", dashboardItems)
           state.dashboard = dashboardItems.length > 0 ? dashboardItems?.map((item: any, index: number) => ({
             id: item?.Link || `dashboard_${index}`,
             name: item?.Name || '',

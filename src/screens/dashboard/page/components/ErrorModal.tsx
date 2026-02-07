@@ -95,6 +95,11 @@ const ErrorModal = ({ visible, errors, onClose }: any) => {
           style={[
             styles.bottomSheet,
             { transform: [{ translateY }] },
+            theme === 'dark' && {
+              backgroundColor: 'black',
+              borderWidth: 1,
+              borderColor: 'white'
+            }
           ]}
         >
           {/* 👇 ONLY THIS PART IS DRAGGABLE */}
@@ -117,7 +122,9 @@ const ErrorModal = ({ visible, errors, onClose }: any) => {
                 alignItems: 'center',
               }}
             >
-              <Text style={styles.title}>{t('text.text35')}</Text>
+              <Text style={[styles.title, theme === 'dark'  && {
+                color: 'white'
+              }]}>{t('text.text35')}</Text>
               <TouchableOpacity onPress={()=>{
                  Animated.parallel([
                     Animated.timing(translateY, {
@@ -135,7 +142,7 @@ const ErrorModal = ({ visible, errors, onClose }: any) => {
                     onClose();
                   });
               }}>
-                <MaterialIcons name="close" size={22} />
+                <MaterialIcons name="close" color={theme === 'dark'  ? 'white' : 'black'} size={22} />
               </TouchableOpacity>
             </View>
           </View>

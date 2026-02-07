@@ -466,7 +466,7 @@ Google Support
 
 Login screen
 -----------
-login_style - 
+login_style -  
  title: {
     fontSize: 28,
     // fontWeight: 'bold',

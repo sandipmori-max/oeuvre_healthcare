@@ -9,6 +9,7 @@ export const styles = StyleSheet.create({
   },
   webview: {
     flex: 1,
+    marginTop: 12,
     backgroundColor: ERP_COLOR_CODE.ERP_WHITE || ERP_COLOR_CODE.ERP_WHITE,
   },
   loadingContainer: {

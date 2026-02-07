@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import {
   Modal,
   View,
-  Text,
   StyleSheet,
   Dimensions,
   TouchableOpacity,
@@ -10,6 +9,7 @@ import {
   Image,
   ActivityIndicator,
 } from 'react-native';
+import { useAppSelector } from '../../store/hooks';
 
 const { height } = Dimensions.get('window');
 const MODAL_HEIGHT = height * 0.8;
@@ -22,6 +22,7 @@ const ImageBottomSheetModal = ({
   const translateY = useRef(new Animated.Value(MODAL_HEIGHT)).current;
   const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(true);
+  const theme = useAppSelector(state => state?.theme.mode);
 
   useEffect(() => {
     if (visible) {
@@ -56,18 +57,34 @@ const ImageBottomSheetModal = ({
           style={[
             styles.container,
             { transform: [{ translateY }] },
+            theme === 'dark' && {
+              backgroundColor: 'black',
+              borderWidth: 1,
+              borderColor: 'white'
+            }
           ]}
         >
           {/* Handle */}
-          <View style={styles.handle} />
+          <View style={[styles.handle, 
+           theme === 'dark' && {
+              backgroundColor: 'white'
+            }
+
+          ]} />
 
           {/* Header */}
          
 
           {/* Image */}
-          <View style={styles.imageWrapper}>
+          <View style={[styles.imageWrapper, 
+             theme === 'dark' && {
+              backgroundColor: 'black'
+            }
+          ]}>
             {loading && (
-              <View style={styles.loader}>
+              <View style={[styles.loader,  theme === 'dark' && {
+              backgroundColor: 'black'
+            }]}>
                 <ActivityIndicator size="large" color="#666" />
               </View>
             )}

@@ -21,6 +21,7 @@ import { resetSyncLocationState } from '../../../../../store/slices/location/syn
 import { getLastPunchInThunk } from '../../../../../store/slices/attendance/thunk';
 import { setReloadApp } from '../../../../../store/slices/reloadApp/reloadAppSlice';
 import ImageBottomSheetModal from '../../../../../components/bottomsheet/ImageBottomSheetModal';
+import { useTranslation } from 'react-i18next';
 
 interface AccountSwitcherProps {
   visible: boolean;
@@ -29,8 +30,8 @@ interface AccountSwitcherProps {
 }
 
 const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onAddAccount, tapLoader }: any) => {
-  console.log("tapLoader", tapLoader)
   const dispatch = useAppDispatch();
+  const {t} = useTranslation()
   const { execute: validateCompanyCode } = useApi();
   const theme = useAppSelector(state => state?.theme.mode);
 
@@ -136,8 +137,8 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
         dispatch(removeAccountThunk(accountId));
       }
       setAlertConfig({
-        title: 'Remove account success',
-        message: `Something went wrong!!`,
+        title: t('text91'),
+        message: t('text92'),
         type: 'success',
       });
       setTimeout(() => {
@@ -146,8 +147,8 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
 
     } catch (error) {
       setAlertConfig({
-        title: 'Remove account',
-        message: `Something went wrong!!`,
+        title: t('text93'),
+        message: t('text92'),
         type: 'error',
       });
     }
@@ -155,8 +156,8 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
 
   const handleRemoveAccount = (account: Account) => {
     setAlertConfig({
-      title: 'Remove account',
-      message: `Are you sure you want to remove - ${firstLetterUpperCase(account?.user?.name)} ?`,
+      title: t('text93'),
+      message: `${t('text94')} ${firstLetterUpperCase(account?.user?.name)} ?`,
       type: 'confirmation',
     });
     setSelectedAccount(account?.id);
@@ -167,7 +168,6 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
     const isActive = user?.id.toString() === item?.user?.id.toString();
     const lastLogin = formatDateHr(item?.lastLoginAt, false);
     const lastLoginHr = formatTimeTo12Hour(item?.lastLoginAt);
-    console.log("normalizedBase", item)
 
     let normalizedBase = (item?.user?.companyLink || '').replace(/\/+$/, '');
     normalizedBase = normalizedBase.replace(/\/devws\/?/, '/');
@@ -334,14 +334,14 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
       >
         <View style={[styles.header, theme === 'dark' && { backgroundColor: 'black' }]}>
           <TouchableOpacity onPress={handleClose} style={styles.closeButton}>
-          {
+            {
               Platform.OS === 'ios' ? <>
-                            <MaterialIcons name="chevron-left" size={28} color="#000" />
-                        
-                            </> :  <Image source={ERP_ICON.BACK} style={styles.back} />
+              <MaterialIcons name="chevron-left" size={28} color="#fff" />
+          
+              </> :   <Image source={ERP_ICON.BACK} style={styles.back} />
             }
           </TouchableOpacity>
-          <Text style={styles.title}>Switch Account</Text>
+          <Text style={styles.title}>{t('text95')}</Text>
         </View>
 
         <FlatList
@@ -389,7 +389,7 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
 
             <Text style={[styles.addAccountText, theme === 'dark' && { color: 'black' }]}>
               {
-                tapLoader ? 'Add account...' : 'Add account'
+                tapLoader ? t('text96') : t('text97')
               }
             </Text>
 
@@ -405,7 +405,7 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
           onClose={() => setAlertVisible(false)}
           onCancel={() => setAlertVisible(false)}
           onDone={() => handleRemovedAccount(selectedAccount)}
-          doneText="Remove"
+          doneText={t('text98')}
           color={ERP_COLOR_CODE.ERP_ERROR}
           actionLoader={undefined} closeHide={undefined} />
 

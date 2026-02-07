@@ -24,11 +24,9 @@ export const getLastPunchInThunk = createAsyncThunk<
 >('attendance/getLastPunchIn', async (_, { rejectWithValue }) => {
   try {
     const response = await DevERPService.getLastPunchIn();
-    console.log("response getLastPunchInThunk", response)
     return response;
   } catch (error: any) {
     console.log("error getLastPunchInThunk", error)
-
     return rejectWithValue(error?.message || 'Failed to fetch last punch-in');
   }
 });

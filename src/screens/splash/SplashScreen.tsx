@@ -60,7 +60,7 @@ const CustomSplashScreen: React.FC<SplashProps> = ({ onFinish }) => {
 
   return (
     <View style={[styles.container, theme === 'dark' && {
-      backgroundColor: DARK_COLOR
+      backgroundColor: '#000'
     }]}>
       <StatusBar hidden />
       <Animated.View
@@ -71,7 +71,7 @@ const CustomSplashScreen: React.FC<SplashProps> = ({ onFinish }) => {
             transform: [{ scale: scaleAnim }],
           },
           theme === 'dark' && {
-            backgroundColor: DARK_COLOR
+            backgroundColor: '#000'
           }
         ]}
       >
@@ -89,7 +89,7 @@ const CustomSplashScreen: React.FC<SplashProps> = ({ onFinish }) => {
           }
         ]}
       >
-        Hello, {firstLetterUpperCase(user?.name || '')} 
+        {t('text99')}, {firstLetterUpperCase(user?.name || '')} 
       </Animated.Text>
       }
      
@@ -105,7 +105,7 @@ const CustomSplashScreen: React.FC<SplashProps> = ({ onFinish }) => {
           }
         ]}
       >
-        {t("text.text53")} 
+        {t("text.text53")}
       </Animated.Text>
       <Animated.Text
         style={[

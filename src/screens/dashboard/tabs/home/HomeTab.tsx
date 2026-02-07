@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useRef,Image, useState } from 'react';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 
@@ -32,7 +32,6 @@ import {
   Modal,
   Pressable,
   Platform,
-  Image,
 } from 'react-native';
 import { ERP_ICON } from '../../../../assets';
 import { NativeModules } from 'react-native';
@@ -108,7 +107,6 @@ const HomeScreen = () => {
   useFocusEffect(
     useCallback(() => {
       NativeModules.OrientationModule.enableLandscape();
-      console.log("NativeModules+++++++++++++++++++++++++++++++++++++++++++", NativeModules)
       dispatch(setActiveDashboardBranchId(''))
       dispatch(setActiveDashboardBranch(''))
       dispatch(setActiveDashboardType(''))
@@ -136,8 +134,7 @@ const HomeScreen = () => {
     navigation.setOptions({
       headerStyle: {
         backgroundColor: theme === 'dark' ? 'black' : ERP_COLOR_CODE.ERP_APP_COLOR,
-        borderBottomWidth: theme === 'dark' ? 1 : 0,
-        borderBottomColor: theme === 'dark' ? '#fff' : ERP_COLOR_CODE.ERP_APP_COLOR,
+
       },
       headerBackTitle: '',
       headerTintColor: '#fff',
@@ -148,7 +145,7 @@ const HomeScreen = () => {
               value={searchText}
               onChangeText={setSearchText}
               autoFocus={true}
-              placeholder="Search dashboard here..."
+              placeholder={t('text83')}
               style={{
                 flex: 1,
                 backgroundColor: '#f0f0f0',
@@ -173,7 +170,7 @@ const HomeScreen = () => {
           </View>
         ) : (
           <Text style={{ color: '#fff', fontSize: 18, fontWeight: '600' }}>
-            Home
+            {t('text84')}
           </Text>
         ),
       headerRight: () => (
@@ -396,7 +393,7 @@ const HomeScreen = () => {
                 <View style={{ marginBottom: 8, flexDirection: 'row', alignItems: 'center' }}>
                   <ActivityIndicator size="small" color={ERP_COLOR_CODE.ERP_007AFF} />
                   <Text style={{ marginLeft: 8, color: ERP_COLOR_CODE.ERP_6C757D }}>
-                    Loading page...
+                    {t('text85')}
                   </Text>
                 </View>
               )}
@@ -491,8 +488,8 @@ const HomeScreen = () => {
       if (fromDate) {
         const fromDateObj = new Date(fromDate.split('-').reverse().join('-'));
         if (selectedDate < fromDateObj) {
-          Alert.alert('Invalid Date Range', 'To date cannot be before From date.', [
-            { text: 'OK' },
+          Alert.alert(t('text86'), t('text87'), [
+            { text: t('text88') },
           ]);
           setShowDatePicker(null);
           return;
@@ -714,16 +711,31 @@ const HomeScreen = () => {
         {showDatePicker?.show && Platform.OS === 'ios' && (
           <Modal transparent animationType="slide" statusBarTranslucent>
             <View style={styles.overlay}>
-              <View style={styles.sheet}>
+              <View style={[styles.sheet,
+              theme === 'dark' && {
+                borderWidth: 1,
+                borderColor: 'white'
+              }
+              ]}>
                 {/* Divider */}
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 12, alignContent: "center", alignItems: 'center' }}>
-                  <Text>Select date</Text>
+                <View style={[
+                  theme === 'dark' && {
+                    overflow: 'hidden',
+                    borderColor: 'white',
+                  },
+                  {
+
+                    flexDirection: 'row', justifyContent: 'space-between', padding: 12, alignContent: "center", alignItems: 'center'
+                  }]}>
+                  <Text style={{
+                    color: theme === 'dark' ? 'white' : 'black'
+                  }}>{t('text89')}</Text>
                   <TouchableOpacity onPress={() => {
                     setShowDatePicker(null);
 
 
                   }}>
-                    <MaterialIcons name='close' size={24} />
+                    <MaterialIcons name='close' color={ 'black'} size={24} />
                   </TouchableOpacity>
                 </View>
                 <View style={styles.divider} />
@@ -737,6 +749,7 @@ const HomeScreen = () => {
                         ? parseCustomDate(toDate)
                         : new Date()
                   }
+                  themeVariant="light"
                   mode="date"
                   display='spinner'
                   onChange={handleDateChange}
@@ -890,15 +903,31 @@ const HomeScreen = () => {
         {showDatePicker?.show && Platform.OS === 'ios' && (
           <Modal transparent animationType="slide" statusBarTranslucent>
             <View style={styles.overlay}>
-              <View style={styles.sheet}>
+              <View style={[styles.sheet,
+              theme === 'dark' && {
+                borderWidth: 1,
+                borderColor: 'white'
+              }
+              ]}>
                 {/* Divider */}
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', padding: 12, alignContent: "center", alignItems: 'center' }}>
-                  <Text>Select date</Text>
+                <View style={[
+                  theme === 'dark' && {
+                    overflow: 'hidden',
+                    borderColor: 'white',
+                  },
+                  {
+
+                    flexDirection: 'row', justifyContent: 'space-between', padding: 12, alignContent: "center", alignItems: 'center'
+                  }]}>
+                  <Text style={{
+                    color: theme === 'dark' ? 'white' : 'black'
+                  }}>{t('text89')}</Text>
                   <TouchableOpacity onPress={() => {
                     setShowDatePicker(null);
 
+
                   }}>
-                    <MaterialIcons name='close' size={24} />
+                    <MaterialIcons name='close' color={ 'black'} size={24} />
                   </TouchableOpacity>
                 </View>
                 <View style={styles.divider} />
@@ -916,7 +945,9 @@ const HomeScreen = () => {
                   display="spinner"
                   is24Hour={false}
                   onChange={handleDateChange}
-                  style={styles.picker}
+                  style={[styles.picker, {
+                    backgroundColor: 'white',
+                  }]}
                 />
               </View>
             </View>
@@ -968,7 +999,7 @@ const HomeScreen = () => {
                 <ErrorMessage message={error} />{' '}
               </View>
             ) : controls?.length === 0 && !isDashboardLoading ? (
-                <View
+              <View
                 style={{
                   height: Dimensions.get('screen').height * 0.75,
                   justifyContent: 'center',
@@ -993,6 +1024,7 @@ const HomeScreen = () => {
                   }}>Welcome</Text>
                 </View>
               </View>
+
             ) : (
               <View style={{
                 backgroundColor: theme === 'dark' ? 'black' : 'white',
@@ -1048,7 +1080,6 @@ const HomeScreen = () => {
                             }
                             showsVerticalScrollIndicator={false}
                           />
-                        </View>
 
 
 <View style={{
@@ -1070,6 +1101,7 @@ const HomeScreen = () => {
                             }}>Welcome</Text>
                           </View>
 
+                        </View>
                         {/* <View>
                     <Animated.FlatList
                       showsVerticalScrollIndicator={false}

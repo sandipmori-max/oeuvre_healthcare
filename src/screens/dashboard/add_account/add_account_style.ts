@@ -23,8 +23,7 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     padding: 12,
-     borderBottomWidth: 1,
-    borderBottomColor: ERP_COLOR_CODE.ERP_e0e0e0,
+     borderBottomWidth: 1, 
     marginTop: Platform?.OS === 'android' ? 25 : 45
   },
   title: {
@@ -52,7 +51,7 @@ export const styles = StyleSheet.create({
     color: ERP_COLOR_CODE.ERP_555,
   },
   inputContainer: {
-    marginBottom: 2,
+    marginBottom: 4,
   },
   inputLabel: {
     marginBottom: 6,

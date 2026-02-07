@@ -43,7 +43,6 @@ const apiClient: AxiosInstance = axios.create({
 });
 
 function unwrapString(value: any): any {
-  console.log("value------------------", value)
   if (typeof value !== 'string') return value;
 
   let current = value;
@@ -62,7 +61,6 @@ function unwrapString(value: any): any {
 }
 
 function deepClean(obj: any): any {
-  console.log("obj", obj);
   if (Array.isArray(obj)) {
     return obj.map(deepClean);
   } else if (obj !== null && typeof obj === 'object') {
@@ -107,9 +105,7 @@ apiClient.interceptors.response.use(
     try {
       if (response.data && response.data.d) {
         let raw = response?.data?.d;
-        console.log("raw------------------", raw)
         let parsedData: any;
-
         try {
           if (typeof raw === 'string') {
             let sanitized = raw.replace(/[\u0000-\u001F]+/g, '');

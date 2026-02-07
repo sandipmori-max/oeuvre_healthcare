@@ -24,7 +24,7 @@ const DateRow = ({ isValidate, item, errors, value, showDatePicker }: any) => {
       <TouchableOpacity
         style={[
           styles.dateBox,
-          errors[item.field] && { borderColor: ERP_COLOR_CODE.ERP_ERROR },
+          errors[item.field] && { borderColor:   ERP_COLOR_CODE.ERP_ERROR },
           isValidate &&
           item?.mandatory === '1' &&
           value && {
@@ -33,7 +33,10 @@ const DateRow = ({ isValidate, item, errors, value, showDatePicker }: any) => {
           },
           item?.borderColor && {
             borderColor: item?.borderColor
-          }
+          },
+           theme === 'dark' && {
+            backgroundColor: 'black'
+           }
         ]}
         onPress={() => showDatePicker(item?.field, value)}
       >

@@ -73,19 +73,25 @@ const DetailsBottomSheet = ({ visible, onClose, item, baseLink }: any) => {
         }}
       >
         <Animated.View
-          style={{
+          style={[{
             height: height * 0.45,
-            backgroundColor: ERP_COLOR_CODE.ERP_WHITE,
+            backgroundColor: theme === 'dark' ? 'black' : ERP_COLOR_CODE.ERP_WHITE,
             borderTopLeftRadius: 20,
             borderTopRightRadius: 20,
             padding: 16,
             transform: [{ translateY: sheetTranslateY }],
-          }}
+          },
+          theme === 'dark' && {
+            borderWidth: 1,
+            borderColor: 'white'
+          }
+        
+        ]}
         >
           {/* Close */}
           <Animated.View style={{ opacity: contentOpacity }}>
             <TouchableOpacity onPress={onClose} style={{ alignSelf: 'flex-end', padding: 6 }}>
-              <MaterialIcons name="close" size={28} color={ERP_COLOR_CODE.ERP_333} />
+              <MaterialIcons name="close" size={28} color={theme === 'dark' ?  'white' :ERP_COLOR_CODE.ERP_333} />
             </TouchableOpacity>
           </Animated.View>
 
@@ -195,23 +201,23 @@ const DetailsBottomSheet = ({ visible, onClose, item, baseLink }: any) => {
                 <View
                   style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 6 }}
                 >
-                  <Text style={{ color: ERP_COLOR_CODE.ERP_444 }}>{t("text.text4")}</Text>
+                  <Text style={{ color:   theme === 'dark' ? 'white' : ERP_COLOR_CODE.ERP_444 }}>{t("text.text4")}</Text>
                   <Text style={{ fontWeight: '600', color: theme === 'dark' ? 'white' : 'black' }}>{item?.date}</Text>
                 </View>
                 <View
                   style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 6 }}
                 >
-                  <Text style={{ color: ERP_COLOR_CODE.ERP_444 }}>{t("text.text5")}</Text>
+                  <Text style={{ color:  theme === 'dark' ? 'white' : ERP_COLOR_CODE.ERP_444 }}>{t("text.text5")}</Text>
                   <Text style={{ fontWeight: '600', color: theme === 'dark' ? 'white' : 'black' }}>{formatTo12Hour(item?.intime) || '--'}</Text>
                 </View>
                 <View
                   style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 6 }}
                 >
-                  <Text style={{ color: ERP_COLOR_CODE.ERP_444 }}>{t("text.text6")}</Text>
+                  <Text style={{ color:  theme === 'dark' ? 'white' : ERP_COLOR_CODE.ERP_444 }}>{t("text.text6")}</Text>
                   <Text style={{ fontWeight: '600', color: theme === 'dark' ? 'white' : 'black' }}>{formatTo12Hour(item?.outtime) || '--'}</Text>
                 </View>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                  <Text style={{ color: ERP_COLOR_CODE.ERP_444 }}>{t("text.text7")}</Text>
+                  <Text style={{ color:  theme === 'dark' ? 'white' : ERP_COLOR_CODE.ERP_444 }}>{t("text.text7")}</Text>
                   <Text style={{ fontWeight: '600', color: theme === 'dark' ? 'white' : 'black' }}>
                     {getWorkedHours2(item?.intime, item?.outtime)}
                   </Text>

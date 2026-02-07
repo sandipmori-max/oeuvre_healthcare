@@ -20,7 +20,7 @@ export const styles = StyleSheet.create({
   },
 
   sheet: {
-    backgroundColor: '#fff',
+    backgroundColor:  '#fff',
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
     paddingBottom: 20,

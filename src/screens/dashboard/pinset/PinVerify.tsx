@@ -19,10 +19,12 @@ import CustomAlert from '../../../components/alert/CustomAlert';
 import { useAppDispatch } from '../../../store/hooks';
 import { updatePinVerifyLoadedState } from '../../../store/slices/auth/authSlice';
 import { ERP_GIF } from '../../../assets';
+import { useTranslation } from 'react-i18next';
 
 const { width } = Dimensions.get('screen');
 
 const PinVerifyScreen = () => {
+  const {t} = useTranslation()
   const dispatch = useAppDispatch()
   const [pin, setPin] = useState<string>('');
   const [attempts, setAttempts] = useState(0);
@@ -112,8 +114,8 @@ const PinVerifyScreen = () => {
     if (pin.length < 4) {
       setAlertVisible(true);
       setAlertConfig({
-        title: 'PIN Validation Failed',
-        message: 'The PIN must be exactly 4 digits.',
+        title: t('text74'),
+        message: t('text75'),
         type: 'error',
       });
       return;
@@ -132,8 +134,8 @@ const PinVerifyScreen = () => {
 
         setAlertVisible(true);
         setAlertConfig({
-          title: 'Authentication Failed',
-          message: 'The PIN you entered is incorrect. Please try again.',
+          title: t('text76'),
+          message: t('text77'),
           type: 'error',
         });
         setPin('');
@@ -147,7 +149,7 @@ const PinVerifyScreen = () => {
     } catch (error) {
       setAlertVisible(true);
       setAlertConfig({
-        title: 'Error verifying PIN',
+        title: t('text78'),
         message: error?.toString() || '',
         type: 'error',
       });
@@ -303,7 +305,7 @@ const PinVerifyScreen = () => {
           },
         ]}
       >
-        Enter PIN
+       {t('text79')}
       </Animated.Text>
 
       <Animated.Text
@@ -322,7 +324,7 @@ const PinVerifyScreen = () => {
           },
         ]}
       >
-        Enter your 4-digit PIN to continue
+        {t('text80')}
       </Animated.Text>
 
       {/* Countdown if blocked */}
@@ -336,7 +338,7 @@ const PinVerifyScreen = () => {
             textAlign: 'center',
           }}
         >
-          Too many wrong attempts.{'\n'}Try again in <Text  style={{
+          {t('text81')}{'\n'}{t('text82')} <Text  style={{
             fontSize: 18,
             marginBottom: 20,
             paddingHorizontal: 30,
@@ -440,13 +442,12 @@ const PinVerifyScreen = () => {
       </View>
 
       <CustomAlert
-        visible={alertVisible}
-        title={alertConfig.title}
-        message={alertConfig.message}
-        type={alertConfig.type}
-        onClose={() => setAlertVisible(false)}
-        actionLoader={undefined}
-      />
+          visible={alertVisible}
+          title={alertConfig.title}
+          message={alertConfig.message}
+          type={alertConfig.type}
+          onClose={() => setAlertVisible(false)}
+          actionLoader={undefined} closeHide={undefined}      />
             </ImageBackground>
 
     </View>

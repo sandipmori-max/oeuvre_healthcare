@@ -24,6 +24,7 @@ export const styles = StyleSheet.create({
   },
 
   sheet: {
+    overflow:'hidden',
     backgroundColor: '#fff',
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
