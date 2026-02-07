@@ -32,6 +32,7 @@ const LoginScreen = ({ navigation, route }: any) => {
 
   const isAddingAccount = route?.params?.isAddingAccount || false;
   const { isLoading } = useAppSelector(state => state.auth);
+  const theme = useAppSelector(state => state?.theme.mode);
 
   const [deviceId, setDeviceId] = useState<string>('');
   const [alertVisible, setAlertVisible] = useState(false);
@@ -117,7 +118,7 @@ const LoginScreen = ({ navigation, route }: any) => {
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         <ImageBackground
-          source={ERP_GIF.BACK_IMG}
+          source={theme === 'dark'  ? "" :ERP_GIF.BACK_IMG}
           style={{
             height: Dimensions.get('screen').height,
             width: Dimensions.get('screen').width

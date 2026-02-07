@@ -300,6 +300,7 @@ const translateY = useRef(new Animated.Value(HIDDEN_POSITION)).current;
 
     setTimeout(() => {
       setAlertVisible(false);
+      navigation.goBack()
     }, 1800);
   };
 
@@ -374,6 +375,12 @@ const translateY = useRef(new Animated.Value(HIDDEN_POSITION)).current;
         style={[
           languageStyles.languageName,
           currentLanguage === item.code && languageStyles.selectedLanguageText,
+          theme === 'dark' && {
+            color: 'white'
+          },
+          currentLanguage === item.code && theme === 'dark' && {
+            color: 'black'
+          }
         ]}
       >
         {item.name}
@@ -559,7 +566,9 @@ const translateY = useRef(new Animated.Value(HIDDEN_POSITION)).current;
         >
           {/* Header */}
           <View style={languageStyles.modalHeader}>
-            <Text style={languageStyles.modalTitle}>
+            <Text style={[languageStyles.modalTitle, theme === 'dark' && {
+              color: 'white'
+            }]}>
               {t('language.selectLanguage')}
             </Text>
 

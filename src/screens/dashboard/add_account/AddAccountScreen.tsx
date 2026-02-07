@@ -58,7 +58,6 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose, i
   const formAnim = useRef(new Animated.Value(0)).current; // form container
   const buttonAnim = useRef(new Animated.Value(0)).current; // Add button
   const backdropAnim = useRef(new Animated.Value(0)).current;
-  console.log("user----88888888-------------------", user)
 
   useEffect(() => {
     setLoader(false);
@@ -164,7 +163,6 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose, i
           firebaseid: currentFcmToken,
         }),
       );
-      console.log("loginResult", loginResult)
       DevERPService.setToken(loginResult?.token);
       await AsyncStorage.setItem('erp_token', loginResult?.token || '');
       await AsyncStorage.setItem('auth_token', loginResult?.token || '');
@@ -172,7 +170,7 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose, i
       onClose();
     });
   };
- 
+
   const handleAddAccount = async (values: { company_code: string; user: string; password: string }) => {
     try {
       DevERPService.setDevice(deviceId);
@@ -210,7 +208,6 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose, i
       );
 
       if (loginResult?.success !== 1) {
-        console.log("user---------*******************--------------", user)
         DevERPService.setAppId(user?.app_id);
         DevERPService.setToken(user?.token);
         await AsyncStorage.setItem('erp_token', user?.token || '');
@@ -227,7 +224,6 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose, i
             firebaseid: currentFcmToken,
           }),
         );
-        console.log("loginResult", loginResult)
         DevERPService.setToken(loginResult?.token);
         await AsyncStorage.setItem('erp_token', loginResult?.token || '');
         await AsyncStorage.setItem('auth_token', loginResult?.token || '');
@@ -235,7 +231,7 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose, i
         setAlertVisible(true);
         setLoader(false);
         setAlertConfig({
-          title: 'Authentication failed',
+          title: t('test4'),
           message: loginResult?.message || t("msg.msg2"),
           type: 'error',
         });
@@ -249,7 +245,6 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose, i
       dispatch(clearAuthState());
       dispatch(resetDropdownState());
       dispatch(resetSyncLocationState());
-      console.log("loginResult", loginResult)
       DevERPService.setToken(loginResult?.token);
       await AsyncStorage.setItem('erp_token', loginResult?.token || '');
       await AsyncStorage.setItem('auth_token', loginResult?.token || '');
@@ -310,7 +305,7 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose, i
   return (
     <Modal visible={visible} transparent onRequestClose={handleClose}>
       <ImageBackground
-        source={ERP_GIF.BACK_IMG}
+        source={theme === 'dark' ? "" : ERP_GIF.BACK_IMG}
         style={{
           height: Dimensions.get('screen').height,
         }}
@@ -318,17 +313,22 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose, i
       >
         <View style={[styles.header, theme === 'dark' && { backgroundColor: 'black' }
         ]}>
-          <TouchableOpacity onPress={() =>{
+          <TouchableOpacity onPress={() => {
             handleClose()
           }} style={styles.closeButton}>
             {
               Platform.OS === 'ios' ? <>
-                            <MaterialIcons name="chevron-left" size={28} color="#000" />
-                        
-                            </> :  <Image source={ERP_ICON.BACK} style={styles.back} />
+                <MaterialIcons name="chevron-left" size={28} color={theme === 'dark' ? 'white' : "#000"} />
+
+              </> : <Image source={ERP_ICON.BACK} style={styles.back} />
             }
+
           </TouchableOpacity>
-          <Text style={styles.title}>{t('account.addAccount')}</Text>
+          <Text style={[styles.title,
+          {
+            color: theme === 'dark' ? 'white' : 'black'
+          }
+          ]}>{t('account.addAccount')}</Text>
         </View>
         <KeyboardAvoidingView
           style={{ flex: 1 }}
@@ -337,7 +337,6 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose, i
           <ScrollView
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ paddingBottom: 40 }}
           >
             <Animated.View
               style={[
@@ -354,6 +353,9 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose, i
                   ],
                   opacity: slideAnim,
                 },
+                theme === 'dark' && {
+                  marginTop: 0
+                }
               ]}
             >
               <FlatList
@@ -377,12 +379,12 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose, i
                     }}
                   >
                     <View style={styles.formContainer}>
-                      <Image 
-            //            source={{
-            //   uri:  `${baseLink}fileupload/1/InvoiceByConfig/1/logo.jpg`
-            // }}
-                      source={ERP_ICON.APP_LOGO} 
-                      style={styles.logo} resizeMode="contain" />
+                      <Image
+                        //            source={{
+                        //   uri:  `${baseLink}fileupload/1/InvoiceByConfig/1/logo.jpg`
+                        // }}
+                        source={ERP_ICON.APP_LOGO}
+                        style={styles.logo} resizeMode="contain" />
 
                       <Text style={[styles.subtitle, theme === 'dark' && { color: 'white' }]}>{t('account.msg')}</Text>
 
@@ -430,7 +432,7 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose, i
 
                           return (
                             <>
-                             
+                            
                               {/* User Input */}
                               <View style={styles.inputContainer}>
                                 <Text style={[styles.inputLabel, theme === 'dark' && { color: 'white' }]}>{t('auth.user')}</Text>
@@ -596,6 +598,7 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose, i
                         }}
                       </Formik>
                     </View>
+                    <View style={{ height: 150 }} />
                   </Animated.View>
                 )}
               />
@@ -627,8 +630,6 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose, i
                   })
                   );
 
-
-                  console.log("loginResult", loginResult);
                   DevERPService.setToken(loginResult?.token);
                   await AsyncStorage.setItem('erp_token', loginResult?.token || '');
                   await AsyncStorage.setItem('auth_token', loginResult?.token || '');
@@ -637,12 +638,12 @@ const AddAccountScreen: React.FC<AddAccountScreenProps> = ({ visible, onClose, i
                   setAlertVisible(false);
                   setLoader(false);
                   setAlertConfig({
-                    title: 'Authentication failed',
+                    title: t('test4'),
                     message: loginResult?.message || t("msg.msg2"),
                     type: 'error',
                   });
 
-                } }
+                }}
                 actionLoader={undefined}
                 closeHide={undefined}
               />

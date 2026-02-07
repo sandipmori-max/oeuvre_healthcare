@@ -12,16 +12,16 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ERP_COLOR_CODE } from '../../utils/constants';
- import MaterialIcons from '@react-native-vector-icons/material-icons';
+import FullViewLoader from '../../components/loader/FullViewLoader';
+import MaterialIcons from '@react-native-vector-icons/material-icons';
 import FastImage from 'react-native-fast-image';
 import { ERP_GIF } from '../../assets';
-import FullViewLoader from '../../components/loader/FullViewLoader';
 
 const { width, height } = Dimensions.get('window');
 const slides = [
   {
     id: '1',
-    title: 'Welcome to Oeuvre Connect',
+    title: 'Welcome to DevERP Connect',
     desc: 'Experience the power of integrated ERP software to manage entire business processes with real-time control and efficiency.',
     image: ERP_GIF.Dashboards,
     bgColor: ['#f8b6c1', '#FAD4D8'],
@@ -31,7 +31,7 @@ const slides = [
   {
     id: '2',
     title: 'End-to-End Business Control',
-    desc: 'From customer orders to invoicing, Oeuvre Connect unifies sales, finance, inventory, HR, and plant operations in one seamless platform.',
+    desc: 'From customer orders to invoicing, DevERP Connect unifies sales, finance, inventory, HR, and plant operations in one seamless platform.',
     image: ERP_GIF.Analytics,
     bgColor: ['#b2cffa', '#D4E6F1'],
     statusBar: '#b2cffa',
@@ -49,48 +49,13 @@ const slides = [
   {
     id: '4',
     title: 'Grow with Confidence',
-    desc: 'Use built-in reports and dashboards to reduce waste, optimize costs, and scale business operations efficiently with Oeuvre.',
+    desc: 'Use built-in reports and dashboards to reduce waste, optimize costs, and scale business operations efficiently with DevERP.',
     image: ERP_GIF.RemoteMonitoring,
     bgColor: ['#c6b6f8', '#E8DAEF'],
     statusBar: '#c6b6f8',
     layout: { titleY: -20, descY: 10, align: 'center' },
   },
 ];
-
-
-const DotIndicator = ({ slides, currentIndex }) => {
-  const animations = useRef(
-    slides.map(() => new Animated.Value(0))
-  ).current;
-
-  useEffect(() => {
-    animations.forEach((a, i) => {
-      Animated.timing(a, {
-        toValue: i === currentIndex ? 1 : 0,
-        duration: 300,
-        useNativeDriver: false,
-      }).start();
-    });
-  }, [currentIndex]);
-
-  return (
-    <View style={styles.dotsContainer}>
-      {slides.map((_, i) => {
-        const width = animations[i].interpolate({
-          inputRange: [0, 1],
-          outputRange: [10, 22],
-        });
-
-        return (
-          <Animated.View
-            key={i}
-            style={[styles.dot, { width }]}
-          />
-        );
-      })}
-    </View>
-  );
-};
 
 
 const Onboarding = ({ navigation }) => {

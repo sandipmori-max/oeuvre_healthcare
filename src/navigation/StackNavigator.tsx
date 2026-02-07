@@ -1,5 +1,5 @@
 import React from 'react';
-import { Image, Platform } from 'react-native';
+import { Image, Platform, View } from 'react-native';
 import { createStackNavigator, CardStyleInterpolators } from '@react-navigation/stack';
 
 import SettingsScreen from '../screens/dashboard/settings/SettingsScreen';
@@ -33,6 +33,40 @@ const StackNavigator = () => {
   };
  
 
+  const globalTransition = {
+  gestureEnabled: true,
+  gestureDirection: 'horizontal',
+  cardStyleInterpolator: ({ current, layouts }) => ({
+    cardStyle: {
+      opacity: current.progress,
+      transform: [
+        {
+          translateX: current.progress.interpolate({
+            inputRange: [0, 1],
+            outputRange: [layouts.screen.width * 0.08, 0],
+          }),
+        },
+        {
+          scale: current.progress.interpolate({
+            inputRange: [0, 1],
+            outputRange: [0.98, 1],
+          }),
+        },
+      ],
+    },
+  }),
+  transitionSpec: {
+    open: {
+      animation: 'timing',
+      config: { duration: 320 },
+    },
+    close: {
+      animation: 'timing',
+      config: { duration: 280 },
+    },
+  },
+};
+
   const screenOptions = {
     headerShown: true,
     headerBackImage: () => Platform.OS === 'ios' ? 
@@ -50,7 +84,7 @@ const StackNavigator = () => {
         style={{ width: 24, height: 24, marginLeft: 10, tintColor: 'white' }}
         resizeMode="contain"
       />
-    ),,
+    ),
     headerStyle: {
       backgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR,
     },

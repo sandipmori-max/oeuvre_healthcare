@@ -19,8 +19,10 @@ import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 import CustomAlert from '../../../../components/alert/CustomAlert';
 import { ERP_COLOR_CODE } from '../../../../utils/constants';
 import { useAppSelector } from '../../../../store/hooks';
+import { useTranslation } from 'react-i18next';
 
 const Media = ({ isValidate, item, handleAttachment, infoData, baseLink, isFromNew }: any) => {
+  const {t} = useTranslation()
   const [imageUri, setImageUri] = useState<string | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [pickerModalVisible, setPickerModalVisible] = useState(false);
@@ -88,8 +90,8 @@ const Media = ({ isValidate, item, handleAttachment, infoData, baseLink, isFromN
 
       if (result === RESULTS.BLOCKED || result === RESULTS.DENIED) {
         setAlertConfig({
-          title: `${type === 'camera' ? 'Camera' : 'Gallery'} Permission Required`,
-          message: `Please enable ${type === 'camera' ? 'camera' : 'gallery'} access from Settings to continue.`,
+          title: `${type === 'camera' ? 'Camera' : 'Gallery'} ${t('text28')}`,
+          message: `${t('text29')} ${type === 'camera' ? 'camera' : 'gallery'} ${t('text30')}`,
           type: 'error',
         });
         setModalClose(true);
@@ -295,7 +297,8 @@ const Media = ({ isValidate, item, handleAttachment, infoData, baseLink, isFromN
 
         <TouchableOpacity onPress={handleChooseImage} style={[styles.editBtn, theme === 'dark' && {
           borderWidth: 1,
-          borderColor: 'white'
+          borderColor: 'white',
+          backgroundColor: 'black'
         },]}>
           <MaterialIcons name={'edit'} color={theme === 'dark' ? 'white' : ERP_COLOR_CODE.ERP_BLACK} size={20} />
         </TouchableOpacity>
@@ -374,12 +377,13 @@ const Media = ({ isValidate, item, handleAttachment, infoData, baseLink, isFromN
         <View style={styles.modalOverlay}>
           <View style={[styles.modalContent, theme === 'dark' && {
             borderWidth: 1,
-            borderColor: 'white'
+            borderColor: 'white',
+            backgroundColor: 'black'
           }]}>
             <View style={styles.modalHeader}>
               <Text style={[styles.modalTitle, theme === 'dark' && {
                 color: 'white'
-              }]}>Select Image</Text>
+              }]}>{t('text31')}</Text>
               <TouchableOpacity onPress={() => setPickerModalVisible(false)}>
                 <MaterialIcons name="close" size={24} color={theme === 'dark' ? 'white' : 'black'} />
               </TouchableOpacity>

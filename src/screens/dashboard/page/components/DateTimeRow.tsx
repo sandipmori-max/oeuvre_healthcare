@@ -31,6 +31,9 @@ const DateTimeRow = ({ isValidate, item, errors, value, showDateTimePicker }: an
             borderColor: 'green',
             borderWidth: 0.8,
           },
+           theme === 'dark' && {
+            backgroundColor: 'black'
+           }
         ]}
         onPress={() => showDateTimePicker(item?.field, value)}
       >

@@ -160,6 +160,7 @@ const ListScreen = () => {
 
   useLayoutEffect(() => {
      
+    
     navigation.setOptions({
       headerStyle: {
         backgroundColor: theme === 'dark' ? 'black' : ERP_COLOR_CODE.ERP_APP_COLOR,
@@ -454,7 +455,7 @@ const ListScreen = () => {
 
   if (parsedError) {
     return (
-      <View style={{ flex: 1, backgroundColor: ERP_COLOR_CODE.ERP_WHITE }}>
+      <View style={{ flex: 1, backgroundColor: theme == 'dark' ? 'black' :  ERP_COLOR_CODE.ERP_WHITE }}>
         <ErrorMessage message={parsedError} />
       </View>
     );
@@ -464,7 +465,7 @@ const ListScreen = () => {
     <View style={[styles.container, theme === 'dark' && { backgroundColor: 'black' }]}>
       {isFilterVisible && (
         <View style={{
-          backgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR,
+          backgroundColor: theme === 'dark' ?  '#000': ERP_COLOR_CODE.ERP_APP_COLOR,
           borderWidth: 1,
           padding: 8,
           paddingBottom: 8,
@@ -547,18 +548,34 @@ const ListScreen = () => {
           {showDatePicker?.show && Platform.OS === 'ios' && (
             <Modal transparent animationType="slide" statusBarTranslucent>
               <View style={styles.overlay}>
-                <View style={styles.sheet}>
-                  {/* Divider */}
-                  <View style={styles.divider} />
-                 <View style={{flexDirection:'row', justifyContent:'space-between', paddingHorizontal: 12, alignContent:"center", alignItems:'center'}}>
-                   <Text>Select date</Text>
-                  <TouchableOpacity onPress={() =>{
-                       setShowDatePicker(null);
-                  }}>
-                    <MaterialIcons name='close' size={24}/>
-                  </TouchableOpacity>
-                 </View>
-                  <View style={styles.divider} />
+               <View style={[styles.sheet,
+                             theme === 'dark' && {
+                               borderWidth: 1,
+                               borderColor: 'white'
+                             }
+                             ]}>
+                               {/* Divider */}
+                               <View style={[
+                                 theme === 'dark' && {
+                                   overflow: 'hidden',
+                                   borderColor: 'white',
+                                 },
+                                 {
+               
+                                   flexDirection: 'row', justifyContent: 'space-between', padding: 12, alignContent: "center", alignItems: 'center'
+                                 }]}>
+                                 <Text style={{
+                                   color: theme === 'dark' ? 'white' : 'black'
+                                 }}>{t('test27')}</Text>
+                                 <TouchableOpacity onPress={() => {
+                                   setShowDatePicker(null);
+               
+               
+                                 }}>
+                                   <MaterialIcons name='close' color={ 'black'} size={24} />
+                                 </TouchableOpacity>
+                               </View>
+                               <View style={styles.divider} />
 
                   {/* Date Picker */}
                   <DateTimePicker
@@ -602,7 +619,9 @@ const ListScreen = () => {
       )}
 
       {!!error ? (
-        <ErrorMessage message={error} />
+       <View style={{flex: 1, backgroundColor:theme === 'dark' ? 'black' : 'white'}}>
+         <ErrorMessage message={error} />
+        </View>
       ) : (
         <>
           {loadingListId ? (
@@ -668,7 +687,9 @@ const ListScreen = () => {
                 bottom: filteredData.length === 0 ? 40 : totalAmount === 0 ? 64 : 78,
               },
               theme === 'dark' && {
-                backgroundColor: 'white'
+                backgroundColor: 'white',
+                borderWidth: 1,
+                borderColor: 'white'
               }
             ]}
             onPressIn={onPressIn}
@@ -679,8 +700,8 @@ const ListScreen = () => {
             }}
           >
             {
-
-              tapLoader ? <ActivityIndicator size={'large'} color={'#fff'} /> : <MaterialIcons size={32} name="add" color={theme === 'dark' ? 'black' : ERP_COLOR_CODE.ERP_WHITE} />
+              tapLoader ? <ActivityIndicator size={'large'} color={'#fff'} /> : 
+              <MaterialIcons size={32} name="add" color={theme === 'dark' ? 'black' : ERP_COLOR_CODE.ERP_WHITE} />
             }
           </TouchableOpacity>
         </Animated.View>

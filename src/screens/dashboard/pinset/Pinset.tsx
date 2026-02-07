@@ -16,6 +16,7 @@ import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import CustomAlert from '../../../components/alert/CustomAlert';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { setIsPinLoaded } from '../../../store/slices/auth/authSlice';
+import { useTranslation } from 'react-i18next';
 
 const { width } = Dimensions.get('screen');
 
@@ -26,6 +27,7 @@ const AS_KEYS = {
 };
 
 const PinSetupScreen = () => {
+  const {t} = useTranslation()
   const navigation = useNavigation();
   const dispatch = useAppDispatch();
   const theme = useAppSelector(state => state.theme.mode);
@@ -125,7 +127,7 @@ const PinSetupScreen = () => {
             color: theme === 'dark' ? "white" : ERP_COLOR_CODE.ERP_WHITE,
           }}
         >
-          {'Pinset'}
+          {t('text32')}
         </Text>
       ),
     });
@@ -227,11 +229,11 @@ const PinSetupScreen = () => {
       const until = Date.now() + 5 * 60 * 1000; // 5 minutes
       await persistBlockUntil(until);
       setScreen('blocked');
-      showAlert('Blocked', 'Too many wrong attempts. Try again after 5 minutes.', 'error');
+      showAlert(t('text37'), t('text73'), 'error');
     } else {
       showAlert(
-        'Incorrect PIN',
-        `The PIN you entered is incorrect. Attempt ${newAttempts} of 3.`,
+        t('text71'),
+        `${t("text72")}${newAttempts} of 3.`,
         'error',
         35000
       );
@@ -247,7 +249,7 @@ const PinSetupScreen = () => {
       await removePinCode(db);  // remove code if exists
       await resetAttemptsAndBlock();
 
-      showAlert('Success', 'Your PIN has been successfully removed.', 'success', 1800);
+      showAlert(t('text61'), t('text70'), 'success', 1800);
 
       // update store and navigate back (same as original remove flow)
       dispatch(setIsPinLoaded());
@@ -256,7 +258,7 @@ const PinSetupScreen = () => {
         navigation.goBack();
       }, 1800);
     } catch (err) {
-      showAlert('Error', 'Failed to remove your PIN. Please try again.', 'error');
+      showAlert(t('text66'), t('text69'), 'error');
     }
   };
 
@@ -268,7 +270,7 @@ const PinSetupScreen = () => {
       await setPinEnabled(db, true);
       await resetAttemptsAndBlock();
 
-      showAlert('Success', 'Your PIN has been successfully set up.', 'success', 1800);
+      showAlert(t('text61'), t('text68'), 'success', 1800);
       dispatch(setIsPinLoaded());
 
       // update local storedPin and maybe go back
@@ -285,7 +287,7 @@ const PinSetupScreen = () => {
         setScreen('menu');
       }
     } catch (error) {
-      showAlert('Error', 'There was an issue saving your PIN. Please try again.', 'error');
+      showAlert(t('text66'), t('text67'), 'error');
     }
   };
 
@@ -294,7 +296,7 @@ const PinSetupScreen = () => {
     // blocked check
     if (isBlocked()) {
       const leftSec = Math.ceil((blockUntil - Date.now()) / 1000);
-      showAlert('Blocked', `Try again after ${leftSec} seconds`, 'error');
+      showAlert(t('text64'), `${t('text65')} ${leftSec} seconds`, 'error');
       setPin('');
       return;
     }
@@ -305,7 +307,7 @@ const PinSetupScreen = () => {
     if (screen === 'verify') {
       if (pin === storedPin) {
         await resetAttemptsAndBlock();
-        showAlert('Success', 'Please enter your new PIN.', 'success', 1800);
+        showAlert(t('text60'), t('text63'), 'success', 1800);
         setPin('');
         setScreen('setup');
       } else {
@@ -327,7 +329,7 @@ const PinSetupScreen = () => {
       if (pin === tempPinRef.current) {
         await performSavePin(pin, true); // navigate back as original did
       } else {
-        showAlert('PIN Mismatch', 'The PINs you entered do not match. Please re-enter them.', 'error');
+        showAlert(t('text59'), t('text60'), 'error');
         tempPinRef.current = '';
         setPin('');
         setScreen('setup');
@@ -341,7 +343,7 @@ const PinSetupScreen = () => {
         await resetAttemptsAndBlock();
         setPin('');
         setScreen('change_setup');
-        showAlert('Success', 'Please enter your new PIN.', 'success', 1800);
+        showAlert(t('text61'), t('text63'), 'success', 1800);
       } else {
         await handleWrongPin();
         setPin('');
@@ -358,7 +360,7 @@ const PinSetupScreen = () => {
       if (pin === tempPinRef.current) {
         await performSavePin(pin, true); // save and go back
       } else {
-        showAlert('PIN Mismatch', 'The PINs you entered do not match. Please re-enter them.', 'error');
+        showAlert(t('text59'), t('text60'), 'error');
         tempPinRef.current = '';
         setPin('');
         setScreen('change_setup');
@@ -372,7 +374,7 @@ const PinSetupScreen = () => {
         await resetAttemptsAndBlock();
         setPin('');
         setScreen('remove_confirm');
-        showAlert('Success', 'Verified. Tap Remove to confirm', 'success', 1800);
+        showAlert(t('text61'), t('text62'), 'success', 1800);
       } else {
         await handleWrongPin();
         setPin('');
@@ -398,7 +400,7 @@ const PinSetupScreen = () => {
         // save new PIN
         await performSavePin(pin, true);
       } else {
-        showAlert('PIN Mismatch', 'The PINs you entered do not match. Please re-enter them.', 'error');
+        showAlert(t('text59'), t('text60'), 'error');
         tempPinRef.current = '';
         setPin('');
         setScreen('forgot_setup');
@@ -412,7 +414,7 @@ const PinSetupScreen = () => {
   // remove button pressed initially: we ask to verify before removal (preserve security)
   const onRemovePinPress = () => {
     if (!storedPin) {
-      showAlert('PIN Error', 'Please set your PIN first', 'error');
+      showAlert(t('text57'), t('text58'), 'error');
       return;
     }
     setScreen('remove_verify');
@@ -429,55 +431,20 @@ const PinSetupScreen = () => {
     setPin('');
   };
 
-  const onForgotPinPress = () => {
-    if (!storedPin) {
-      showAlert('Info', 'No PIN is set. Please use "Add PIN" to create one.', 'info');
-      return;
-    }
-    // we will show a confirmation dialog to avoid accidental resets
-    Alert.alert(
-      'Forgot PIN',
-      'Resetting PIN will remove the existing PIN and allow you to set a new one. Are you sure?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Yes, Reset',
-          style: 'destructive',
-          onPress: () => {
-            // go to forgot flow (no old PIN verification)
-            setScreen('forgot_setup');
-            setPin('');
-          }
-        }
-      ]
-    );
-  };
-
-  const onCancel = () => {
-    // behave like previous screen: if storedPin existed earlier, go to verify, else setup
-    if (storedPin) {
-      setScreen('verify');
-    } else {
-      setScreen('setup');
-    }
-    setPin('');
-    tempPinRef.current = '';
-  };
-
   // Small helper to show status text under title
   const renderSubtitle = () => {
-    if (screen === 'verify') return 'Enter your current PIN to proceed';
-    if (screen === 'setup') return 'Enter a 4-digit PIN to secure your account';
-    if (screen === 'confirm') return 'Confirm your new PIN';
-    if (screen === 'change_verify') return 'Enter your current PIN to change';
-    if (screen === 'change_setup') return 'Enter new PIN';
-    if (screen === 'change_confirm') return 'Confirm new PIN';
-    if (screen === 'remove_verify') return 'Enter your PIN to remove it';
-    if (screen === 'remove_confirm') return 'Tap OK to remove PIN';
-    if (screen === 'forgot_setup') return 'Enter new PIN';
-    if (screen === 'forgot_confirm') return 'Confirm new PIN';
+    if (screen === 'verify') return t('text56');
+    if (screen === 'setup') return t('text55');
+    if (screen === 'confirm') return t('text54');
+    if (screen === 'change_verify') return t('text53');
+    if (screen === 'change_setup') return t('text49');
+    if (screen === 'change_confirm') return t('text52');
+    if (screen === 'remove_verify') return t('text51');
+    if (screen === 'remove_confirm') return t('text50');
+    if (screen === 'forgot_setup') return t('text49');
+    if (screen === 'forgot_confirm') return t('text45');
     if (screen === 'blocked') {
-      return `Too many attempts. Try again in ${blockedLeft} sec`;
+      return `${t('text48')} ${blockedLeft} sec`;
     }
 
     return '';
@@ -681,18 +648,18 @@ const PinSetupScreen = () => {
         ]}
       >
         {(() => {
-          if (screen === 'verify') return 'Verify your old PIN';
-          if (screen === 'setup') return 'Set up new PIN';
-          if (screen === 'confirm') return 'Confirm new PIN';
-          if (screen === 'change_verify') return 'Change PIN - verify';
-          if (screen === 'change_setup') return 'Change PIN - new';
-          if (screen === 'change_confirm') return 'Change PIN - confirm';
-          if (screen === 'remove_verify') return 'Remove PIN - verify';
-          if (screen === 'remove_confirm') return 'Remove PIN - confirm';
-          if (screen === 'forgot_setup') return 'Forgot PIN - new';
-          if (screen === 'forgot_confirm') return 'Forgot PIN - confirm';
-          if (screen === 'blocked') return 'Blocked';
-          return storedPin ? 'PIN Settings' : 'Set up PIN';
+          if (screen === 'verify') return t('text47');
+          if (screen === 'setup') return t('text46');
+          if (screen === 'confirm') return t('text45');
+          if (screen === 'change_verify') return t('text44');
+          if (screen === 'change_setup') return t('text43');
+          if (screen === 'change_confirm') return t('text42');
+          if (screen === 'remove_verify') return t('text41');
+          if (screen === 'remove_confirm') return t('text40');
+          if (screen === 'forgot_setup') return t('text39');
+          if (screen === 'forgot_confirm') return t('text38');
+          if (screen === 'blocked') return t('text37');
+          return storedPin ? t('text35') : t('text36');
         })()}
       </Animated.Text>
 
@@ -807,7 +774,12 @@ const PinSetupScreen = () => {
                       }}
                     >
                       <TouchableOpacity
-                        style={styles.key}
+                        style={[styles.key, 
+                          theme === 'dark' && {
+                            borderWidth : 1,
+                            borderColor: 'white'
+                          }
+                        ]}
                         onPress={() => {
                           if (screen === 'blocked') return;
 
@@ -828,7 +800,9 @@ const PinSetupScreen = () => {
                             color={pin.length === 4 ? '#16a34a' : '#9ca3af'}
                           />
                         ) : (
-                          <Text style={styles.keyText}>{item}</Text>
+                          <Text style={[styles.keyText, theme === 'dark' && {
+                            color : 'white'
+                          }]}>{item}</Text>
                         )}
                       </TouchableOpacity>
                     </Animated.View>
@@ -848,8 +822,7 @@ const PinSetupScreen = () => {
         message={alertConfig.message}
         type={alertConfig.type}
         onClose={() => setAlertVisible(false)}
-        actionLoader={undefined}
-      />
+        actionLoader={undefined} closeHide={undefined}      />
 
       {/* Menu */}
       {menuVisible && (
@@ -886,8 +859,10 @@ const PinSetupScreen = () => {
               }}
               style={{ paddingVertical: 10, paddingHorizontal: 14 }}
             >
-              <Text style={{ color: ERP_COLOR_CODE.ERP_APP_COLOR, fontSize: 15 }}>
-                Change PIN
+              <Text style={[{ color: ERP_COLOR_CODE.ERP_APP_COLOR, fontSize: 15 }, theme == 'dark' && {
+                color:'white'
+              }]}>
+                {t('text34')}
               </Text>
             </TouchableOpacity>
 
@@ -899,7 +874,7 @@ const PinSetupScreen = () => {
               style={{ paddingVertical: 10, paddingHorizontal: 14 }}
             >
               <Text style={{ color: '#dc2626', fontSize: 15 }}>
-                Remove PIN
+                {t('text33')}
               </Text>
             </TouchableOpacity>
           </Animated.View>

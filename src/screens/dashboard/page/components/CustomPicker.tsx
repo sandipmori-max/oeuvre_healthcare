@@ -161,6 +161,10 @@ const CustomPicker = ({
           theme === 'dark' && {
             backgroundColor: 'black',
           },
+          
+                      item?.disabled == '1' &&  theme === 'dark' && {
+                      backgroundColor: DARK_COLOR,
+                    }
         ]}
         onPress={() => {
           if (item?.disabled !== '1') handleOpen();
@@ -263,6 +267,7 @@ const CustomPicker = ({
                       },
                       theme === 'dark' && {
                         backgroundColor: 'black',
+                        borderBottomColor : ERP_COLOR_CODE.ERP_F8F9FA
                       },
                     ]}
                     onPress={() => {
@@ -296,7 +301,7 @@ const CustomPicker = ({
                       {opt?.name}
                     </Text>
                     {
-                      selectedOption === opt?.name && <MaterialIcons name='done-all' size={24} color={ERP_COLOR_CODE.ERP_APP_COLOR} />
+                      selectedOption === opt?.name && <MaterialIcons name='done-all' size={24} color={theme === 'dark' ? 'white' : ERP_COLOR_CODE.ERP_APP_COLOR} />
                     }
                   </TouchableOpacity>
                 ))

@@ -109,18 +109,18 @@ const AjaxPicker = ({ isValidate, label, onValueChange, item, errors, dtext, for
           isValidate && item?.mandatory === '1' && selectedOption && {
             borderColor: 'green',
             borderWidth: 0.8
-          },
-          item?.disabled === '1' && theme === 'dark' && {
-            backgroundColor: DARK_COLOR,
-            borderWidth: 1,
-          },
+          }, 
           theme === 'dark' && {
             backgroundColor: 'black',
             borderWidth: 1,
           },
            item?.background && {
-              backgroundColor: item?.background
-            }
+              
+            backgroundColor: item?.background
+            },
+            item?.disabled == '1' &&  theme === 'dark' && {
+            backgroundColor: DARK_COLOR,
+          }
         ]}
         onPress={() => {
           if (item?.disabled !== '1') {
@@ -213,7 +213,11 @@ const AjaxPicker = ({ isValidate, label, onValueChange, item, errors, dtext, for
                     return (
                       <TouchableOpacity
                         key={i}
-                        style={[styles.option, { paddingVertical: 12 }]}
+                        style={[styles.option, { paddingVertical: 12 },
+                          theme === 'dark' && {
+                             borderBottomColor : ERP_COLOR_CODE.ERP_F8F9FA
+                          }
+                        ]}
                         onPress={() => handleSelect(opt)}
                       >
                         <View

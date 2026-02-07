@@ -76,6 +76,7 @@ const Input = ({ id, isValidate, item, errors, value, setValue, onFocus }: any) 
             setIsInputEdit(false);
           }
         }}
+        placeholderTextColor={theme === 'dark' ? 'white' : 'gray'}
       />
       {errors[item.field] && (
                <InputError error = {errors[item?.field]}/>

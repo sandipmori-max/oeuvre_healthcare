@@ -53,7 +53,6 @@ class DevERPService {
       await this.ensureAuthToken();
 
       const response = await apiClient.post<T>(`${this.link}${endpoint}`, payload);
-      console.log("response",response)
       if (
         (response as any).data?.success === 0 &&
         (response as any).data?.message?.includes('Token Expire')
@@ -205,7 +204,6 @@ class DevERPService {
     fd: string,
     td: string
   ): Promise<DashboardResponse> {
-    console.log("this.token", this.token,'branch', branch)
     return this.apiCall<DashboardResponse>(
       'msp_api.aspx/getDB',
       {
@@ -275,7 +273,6 @@ class DevERPService {
   }
 
   getLastPunchIn() {
-    console.log("this.token getLastPunchIn", this.token)
     return this.apiCall<any>('msp_api.aspx/getLastPunchIn', { token: this.token });
   }
 

@@ -6,7 +6,6 @@ import {
   ScrollView,
   Image,
   Animated,
-  FlatList,
 } from 'react-native';
 import {
   DrawerContentComponentProps,
@@ -27,12 +26,13 @@ import { styles } from './drawer_style';
 import { useBaseLink } from '../../hooks/useBaseLink';
 import { DARK_COLOR, ERP_COLOR_CODE } from '../../utils/constants';
 import ContactRow from './ContactRow';
-import { ERP_ICON } from '../../assets';
 import ImageBottomSheetModal from '../bottomsheet/ImageBottomSheetModal';
 import { NativeModules } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
   const navigation = useNavigation();
+  const {t} = useTranslation();
   const drawerStatus = useDrawerStatus();
   const [showModal, setShowModal] = useState(false);
   const [img, setImg] = useState('')
@@ -40,7 +40,6 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
   const { user } = useAppSelector(state => state.auth);
   const theme = useAppSelector(state => state.theme.mode);
   const baseLink = useBaseLink();
-  console.log("baseLink", baseLink)
 
   /* ================= SAFE CURRENT ROUTE ================= */
   const currentRoute = useNavigationState(state => {
@@ -142,7 +141,6 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
         >
           <View>
             <TouchableOpacity
-            
             onPress={() => {
               setImg(`${baseLink}/FileUpload/1/UserMaster/${user?.id}/profileimage.jpeg?ts=${new Date().getTime()}`)
               setShowModal(true)
@@ -340,7 +338,7 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
               theme === 'dark' && { color: 'white' },
             ]}
           >
-            Developed by
+            {t('test24')}
           </Text>
           <Text
             style={[

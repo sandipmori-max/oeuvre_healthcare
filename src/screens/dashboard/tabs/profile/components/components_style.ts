@@ -13,7 +13,7 @@ export const styles = StyleSheet.create({
     padding: 12,
     backgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR,
     borderBottomWidth: 1,
-    borderBottomColor: ERP_COLOR_CODE.ERP_BORDER,
+     
   },
   back: {
     width: 24,

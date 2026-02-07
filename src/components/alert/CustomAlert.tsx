@@ -47,9 +47,6 @@ const CustomAlert: React.FC<CustomAlertProps> = ({
   const [remarks, setRemarks] = useState('');
   const [error, setError] = useState('');
 
-  /* =======================
-     Animations
-  ======================= */
   const containerAnim = useRef(new Animated.Value(0)).current;
   const headerAnim = useRef(new Animated.Value(0)).current;
   const contentAnim = useRef(new Animated.Value(0)).current;
@@ -88,9 +85,6 @@ const CustomAlert: React.FC<CustomAlertProps> = ({
     }
   }, [visible]);
 
-  /* =======================
-     Back Handler
-  ======================= */
   useEffect(() => {
     const onBackPress = () => {
       if (visible) {
@@ -123,9 +117,6 @@ const CustomAlert: React.FC<CustomAlertProps> = ({
     onDone?.(remarks);
   };
 
-  /* =======================
-     Render
-  ======================= */
   return (
     <Modal visible={visible} transparent animationType="none" onRequestClose={()=>{
       onClose()
@@ -179,7 +170,7 @@ const CustomAlert: React.FC<CustomAlertProps> = ({
                 <Text style={styles.closeIconText}>✕</Text>
               </TouchableOpacity>
               }
-             
+    
             </View>
           </Animated.View>
 

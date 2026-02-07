@@ -16,8 +16,7 @@ import { ERP_COLOR_CODE } from '../../../../utils/constants';
 import { useBaseLink } from '../../../../hooks/useBaseLink';
 import { useAppSelector } from '../../../../store/hooks';
 import useTranslations from '../../../../hooks/useTranslations';
-import deverp from '../../../../services/api/deverp';
-
+ 
 const SignaturePad: React.FC = ({isValidate, item, handleSignatureAttachment, infoData }: any) => {
   const signatureRef = useRef<SignatureViewRef>(null);
   const [modalVisible, setModalVisible] = useState(false);

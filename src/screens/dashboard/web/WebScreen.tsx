@@ -80,6 +80,11 @@ const WebScreen = () => {
 
   useLayoutEffect(() => {
     navigation.setOptions({
+      headerBackTitle: '',
+       headerStyle: {
+              backgroundColor: theme === 'dark' ? 'black' : ERP_COLOR_CODE.ERP_APP_COLOR,
+              
+            },
       headerTitle: () => (
         <Text
           numberOfLines={1}
@@ -88,7 +93,6 @@ const WebScreen = () => {
           {isFromChart ? t("text.text52") : item?.title || t('webScreen.details')}
         </Text>
       ),
-      headerBackTitle: '',
       headerRight: () => (
         <>
           {isFromChart || item?.title === 'Attendance Code' ? (
@@ -122,7 +126,7 @@ const WebScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar backgroundColor={ERP_COLOR_CODE.ERP_APP_COLOR} translucent={false} />
+      <StatusBar backgroundColor={theme === 'dark' ? 'black' : ERP_COLOR_CODE.ERP_APP_COLOR} translucent={false} />
       {token ? (
         <>
           <WebView

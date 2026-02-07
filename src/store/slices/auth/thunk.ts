@@ -113,7 +113,6 @@ export const loginUserThunk = createAsyncThunk(
         app_id: response?.app_id || "",
         password: password|| ""
       };
-      console.log("erpUser---------------",erpUser)
       const db = await getDBConnection();
       await createAccountsTable(db);
       const currentAccounts = await getAccounts(db);
@@ -326,7 +325,6 @@ export const getERPDashboardThunk = createAsyncThunk(
     { branch, type, fd, td }: ERPDashboardParams,
     { rejectWithValue }
   ) => {
-    console.log("dashboard------branch, type, fd, td ---------------", branch, type, fd, td )
     try {
       const dashboard = await DevERPService.getDashboard(
         branch,
@@ -334,11 +332,9 @@ export const getERPDashboardThunk = createAsyncThunk(
         fd,
         td
       );
-      console.log("dashboard---------------------", dashboard)
       return dashboard;
     } catch (error: any) {
       console.log("dashboard-----------error----------", error)
-
       return rejectWithValue(
         error?.message || 'Failed to get ERP dashboard'
       );
@@ -354,7 +350,6 @@ export const getERPPageThunk = createAsyncThunk<
 >('auth/getERPPage', async ({ page, id }, { rejectWithValue }) => {
   try {
     const pageData = await DevERPService.getPage(page, id );
-    console.log("pageData", pageData)
     return pageData;
   } catch (error: any) {
     return rejectWithValue(error || 'Failed to get ERP page data');

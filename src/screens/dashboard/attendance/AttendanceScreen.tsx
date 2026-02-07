@@ -91,7 +91,7 @@ const AttendanceScreen = () => {
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      title: isFor === 'MyAttendance' ? "My attendance" : "Attendance",
+      title: isFor === 'MyAttendance' ? t('test25') : t('test26'),
       headerTitleAlign: 'left',
       headerTitleStyle: {
         color: '#FFFFFF',
@@ -99,8 +99,7 @@ const AttendanceScreen = () => {
       headerBackTitle: '',
       headerStyle: {
         backgroundColor: theme === 'dark' ? 'black' : ERP_COLOR_CODE.ERP_APP_COLOR,
-        borderBottomWidth: 1,
-        borderBottomColor: '#fff',
+        
       },
       headerTintColor: '#fff',
       headerRight: () => (
@@ -316,19 +315,34 @@ const AttendanceScreen = () => {
         {showDatePicker?.show && Platform.OS === 'ios' && (
           <Modal transparent animationType="slide" statusBarTranslucent>
             <View style={styles.overlay}>
-              <View style={styles.sheet}>
-                {/* Divider */}
-
-                {/* Divider */}
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', padding: 12, alignContent: "center", alignItems: 'center' }}>
-                  <Text>Select date</Text>
-                  <TouchableOpacity onPress={() => {
-                    setShowDatePicker(null);
-                  }}>
-                    <MaterialIcons name='close' size={24} />
-                  </TouchableOpacity>
-                </View>
-                <View style={styles.divider} />
+              <View style={[styles.sheet,
+                            theme === 'dark' && {
+                              borderWidth: 1,
+                              borderColor: 'white'
+                            }
+                            ]}>
+                              {/* Divider */}
+                              <View style={[
+                                theme === 'dark' && {
+                                  overflow: 'hidden',
+                                  borderColor: 'white',
+                                },
+                                {
+              
+                                  flexDirection: 'row', justifyContent: 'space-between', padding: 12, alignContent: "center", alignItems: 'center'
+                                }]}>
+                                <Text style={{
+                                  color: theme === 'dark' ? 'white' : 'black'
+                                }}>{t('text27')}</Text>
+                                <TouchableOpacity onPress={() => {
+                                  setShowDatePicker(null);
+              
+              
+                                }}>
+                                  <MaterialIcons name='close' color={ 'black'} size={24} />
+                                </TouchableOpacity>
+                              </View>
+                              <View style={styles.divider} />
 
                 {/* Date Picker */}
                 <DateTimePicker
@@ -372,7 +386,7 @@ const AttendanceScreen = () => {
             <View style={{
               flex: 1,
               width: '100%',
-              backgroundColor: 'white',
+              backgroundColor: theme === 'dark' ? 'black' :'white',
               height: '100%'
             }}>
               <List
@@ -393,7 +407,7 @@ const AttendanceScreen = () => {
             </View>
           </> : <>
             <ImageBackground
-              source={ERP_GIF.BACK_IMG}
+              source={ theme === 'dark' ? '' : ERP_GIF.BACK_IMG}
               resizeMode='cover'
               style={{
                 height: Dimensions.get('screen').height * 0.85,
