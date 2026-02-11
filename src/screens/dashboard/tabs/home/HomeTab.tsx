@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useLayoutEffect, useRef,Image, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 
@@ -34,7 +34,10 @@ import {
   Platform,
 } from 'react-native';
 import { ERP_ICON } from '../../../../assets';
-import { NativeModules } from 'react-native';
+import { translateSingle } from '../../../../services/api/utils';
+import TranslatedText from './TranslatedText';
+import { Image } from 'react-native';
+// import { NativeModules } from 'react-native';
 
 const { width } = Dimensions.get('screen');
 
@@ -88,6 +91,7 @@ const HomeScreen = () => {
 
   const textItems = filteredDashboard.filter(item => item.data && !hasHtmlContent(item.data));
 
+  console.log("filteredDashboard", filteredDashboard)
   useEffect(() => {
     if (searchTimeout.current) clearTimeout(searchTimeout.current);
 
@@ -106,7 +110,7 @@ const HomeScreen = () => {
 
   useFocusEffect(
     useCallback(() => {
-      NativeModules.OrientationModule.enableLandscape();
+      // NativeModules.OrientationModule.enableLandscape();
       dispatch(setActiveDashboardBranchId(''))
       dispatch(setActiveDashboardBranch(''))
       dispatch(setActiveDashboardType(''))
@@ -114,7 +118,7 @@ const HomeScreen = () => {
       setIsFilterVisible(false)
       setIsHorizontal(false)
       return () => {
-        NativeModules.OrientationModule.disableLandscape();
+        // NativeModules.OrientationModule.disableLandscape();
       };
     }, [isAuthenticated, navigation])
   );
@@ -160,7 +164,7 @@ const HomeScreen = () => {
                 setSearchText('');
               }}
             >
-              <MaterialIcons
+              <MaterialIcons  
                 name="clear"
                 size={24}
                 color={ERP_COLOR_CODE.ERP_WHITE}
@@ -183,6 +187,7 @@ const HomeScreen = () => {
                   setControlsLoader(true);
                   setActionLoader(true);
                   setIsRefresh(!isRefresh);
+                   dispatch(getERPAppConfigMenuThunk());
                   dispatch(getERPDashboardThunk({ branch: auth.dashboardBranch.trim(), type: auth.dashboardType.trim(), fd: auth.dashboardFromDate.trim(), td: auth.dashboardToDate.trim() }));
                   const timer = setTimeout(() => {
                     setActionLoader(false);
@@ -226,7 +231,7 @@ const HomeScreen = () => {
 
       if (isAuthenticated) {
         setLoadingPageId(true);
-        // dispatch(getERPAppConfigMenuThunk());
+        dispatch(getERPAppConfigMenuThunk());
         const params = { branch: '', type: '', fd: '', td: '' }
         dispatch(getERPDashboardThunk(params));
         dispatch(getERPMenuThunk());
@@ -364,7 +369,7 @@ const HomeScreen = () => {
                   {/* <Text style={styles.iconText}>{getInitials(item?.name)}</Text> */}
                 </View>
                 <View style={styles.headerTextWrap}>
-                  <Text
+                  {/* <Text
                     style={[
                       styles.dashboardItemText,
                       {
@@ -379,11 +384,24 @@ const HomeScreen = () => {
                     ellipsizeMode="tail"
                   >
                     {isFromMenu
-                      ? item?.title
+                      ?  translateSingle(item?.title) 
                       : !isHorizontal
                         ? item?.title.replace(' ', '\n')
-                        : item?.title}
-                  </Text>
+                        : translateSingle(item?.title)}
+                  </Text> */}
+                  <TranslatedText
+                    text={item?.title}
+                    style={[
+                      styles.dashboardItemText,
+                      {
+                        color: theme === 'dark' ? 'white' : ERP_COLOR_CODE.ERP_BLACK,
+                        flexShrink: 1,
+                        includeFontPadding: false,
+                        textAlignVertical: 'top',
+                      },
+                    ]}
+                    numberOfLines={2}
+                  />
                 </View>
               </View>
             </View>
@@ -578,7 +596,7 @@ const HomeScreen = () => {
     );
   }
 
-  if (isDashboardLoading) return <FullViewLoader />
+  if (isDashboardLoading) return <FullViewLoader isShowTop={theme === 'dark' ? false : true}/>
   if (!actionLoader && filteredDashboard?.length === 0) {
     return <View
       style={{
@@ -732,8 +750,6 @@ const HomeScreen = () => {
                   }}>{t('text89')}</Text>
                   <TouchableOpacity onPress={() => {
                     setShowDatePicker(null);
-
-
                   }}>
                     <MaterialIcons name='close' color={ 'black'} size={24} />
                   </TouchableOpacity>
@@ -777,7 +793,7 @@ const HomeScreen = () => {
         )}
       </View>
 
-      <NoData />
+      <NoData isShowTop = {false} />
 
     </View>
   };
@@ -810,7 +826,7 @@ const HomeScreen = () => {
           }}
         >
           <MaterialIcons name="business" size={24} color={"#FFF"} />
-          <Text
+          <TranslatedText
             numberOfLines={1}
             style={{
               color: "#FFF",
@@ -818,9 +834,9 @@ const HomeScreen = () => {
               fontSize: 16,
               maxWidth: 280,
             }}
-          >
-            {user?.companyName || ''}
-          </Text>
+            text={user?.companyName || ''}
+          > 
+          </TranslatedText>
 
         </Animated.View>
 
@@ -850,11 +866,14 @@ const HomeScreen = () => {
                           color="#fff"
                           style={{ marginRight: 8 }}
                         />
-                        <Text style={[styles.dateButtonText, { color: "#FFF" }]}>
-                          {item.field === "fromdate"
+                        <TranslatedText
+                        numberOfLines={1}
+                        text={item.field === "fromdate"
                             ? fromDate || "Select From Date"
                             : toDate || "Select To Date"}
-                        </Text>
+                        style={[styles.dateButtonText, { color: "#FFF" }]}>
+                          
+                        </TranslatedText>
                       </View>
                     </TouchableOpacity>
                     {index === 0 && <View style={{ height: 1, width: 8 }} />}
@@ -996,10 +1015,10 @@ const HomeScreen = () => {
                   backgroundColor: theme === 'dark' ? 'black' : 'white',
                 }}
               >
-                <ErrorMessage message={error} />{' '}
+                <ErrorMessage message={error} isShowTop ={false} />{' '}
               </View>
             ) : controls?.length === 0 && !isDashboardLoading ? (
-              <View
+               <View
                 style={{
                   height: Dimensions.get('screen').height * 0.75,
                   justifyContent: 'center',
@@ -1024,7 +1043,6 @@ const HomeScreen = () => {
                   }}>Welcome</Text>
                 </View>
               </View>
-
             ) : (
               <View style={{
                 backgroundColor: theme === 'dark' ? 'black' : 'white',
@@ -1080,9 +1098,9 @@ const HomeScreen = () => {
                             }
                             showsVerticalScrollIndicator={false}
                           />
+                        </View>
 
-
-<View style={{
+                        <View style={{
                             height: 350, width: '100%',
                             alignContent: 'center',
                             alignItems: 'center',
@@ -1100,8 +1118,6 @@ const HomeScreen = () => {
                               fontFamily: "Handlee-Regular",
                             }}>Welcome</Text>
                           </View>
-
-                        </View>
                         {/* <View>
                     <Animated.FlatList
                       showsVerticalScrollIndicator={false}

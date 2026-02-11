@@ -93,7 +93,6 @@ const CustomSplashScreen: React.FC<SplashProps> = ({ onFinish }) => {
       </Animated.Text>
       }
      
-
       <Animated.Text
         style={[
           styles.title,

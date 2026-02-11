@@ -28,6 +28,7 @@ export const styles = StyleSheet.create({
   },
    title: {
     fontSize: 28,
+    // fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 6,
     color: ERP_COLOR_CODE.ERP_333,

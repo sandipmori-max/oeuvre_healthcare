@@ -4,6 +4,7 @@ import { ERPButtonProps } from './type';
 import { styles } from './style';
 import { ERP_COLOR_CODE } from '../../utils/constants';
 import MaterialIcons from '@react-native-vector-icons/material-icons';
+import TranslatedText from '../../screens/dashboard/tabs/home/TranslatedText';
 
 const ERPButton: React.FC<ERPButtonProps> = ({
   text = '',
@@ -59,7 +60,9 @@ const ERPButton: React.FC<ERPButtonProps> = ({
           isLoading && <ActivityIndicator size={'large'} color={'#fff'} />
         }
         <MaterialIcons name={'lock-outline'} color={'white'} size={20} />
-        <Text style={[styles.buttonText, textStyle]}>{text}</Text>
+        <Text 
+        numberOfLines={1}
+        style={[styles.buttonText, textStyle]}>{text}</Text>
       </TouchableOpacity>
     </Animated.View>
 

@@ -221,6 +221,7 @@ class DevERPService {
   }
 
   getListData(page: string, fd: string, td: string, param: string) {
+    console.log("pagepagepagepage", page, fd, td, param)
     return this.apiCall<ListDataResponse>('msp_api.aspx/getListData', {
       token: this.token,
       page,

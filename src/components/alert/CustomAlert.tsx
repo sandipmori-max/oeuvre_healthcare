@@ -21,6 +21,7 @@ import { ERP_COLOR_CODE } from '../../utils/constants';
 import MaterialIcons from '@react-native-vector-icons/material-icons';
 import { useAppSelector } from '../../store/hooks';
 import { useTranslation } from 'react-i18next';
+import TranslatedText from '../../screens/dashboard/tabs/home/TranslatedText';
 
 const CustomAlert: React.FC<CustomAlertProps> = ({
   visible,
@@ -148,7 +149,10 @@ const CustomAlert: React.FC<CustomAlertProps> = ({
           {/* Header */}
           <Animated.View style={{ opacity: headerAnim }}>
             <View style={styles.header}>
-              <Text style={alertStyles.title}>{title || ''}</Text>
+              <TranslatedText
+              numberOfLines={1}
+              text={title || ''}
+              style={alertStyles.title}></TranslatedText>
               {
                 !closeHide &&  <TouchableOpacity onPress={() => {
                 Animated.parallel([
@@ -194,14 +198,16 @@ const CustomAlert: React.FC<CustomAlertProps> = ({
           <Animated.View style={{ opacity: contentAnim }}>
             {isFromButtonList ? (
               <View style={{ width: '100%' }}>
-                <Text
+                <TranslatedText
                   style={[
                     alertStyles.message,
                     { textAlign: 'left', fontSize: 14, fontWeight: '800' },
                   ]}
+                  numberOfLines={1}
+                  text={message || ''}
                 >
-                  {message || ''}
-                </Text>
+                  
+                </TranslatedText>
 
                 <ERPTextInput
                   label={t('test11')}
@@ -215,11 +221,17 @@ const CustomAlert: React.FC<CustomAlertProps> = ({
                 />
 
                 {error ? (
-                  <Text style={{ color: ERP_COLOR_CODE.ERP_ERROR }}>{error}</Text>
+                  <TranslatedText
+                  numberOfLines={1}
+                  text={error}
+                  style={{ color: ERP_COLOR_CODE.ERP_ERROR }}></TranslatedText>
                 ) : null}
               </View>
             ) : (
-              <Text style={alertStyles.message}>{message || ''}</Text>
+              <TranslatedText 
+              numberOfLines={1}
+              text={message || ''}
+              style={alertStyles.message}></TranslatedText>
             )}
           </Animated.View>
 

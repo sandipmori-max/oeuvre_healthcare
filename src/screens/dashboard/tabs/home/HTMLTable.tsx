@@ -1,5 +1,6 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
+import TranslatedText from "./TranslatedText";
 
 const HTMLTable = ({ html }) => {
   const rows = Array.from(html.matchAll(/<tr>(.*?)<\/tr>/g)).map(r =>
@@ -13,7 +14,10 @@ const HTMLTable = ({ html }) => {
         <View key={rowIndex} style={styles.row}>
           {row.map((cell, cellIndex) => (
             <View key={cellIndex} style={styles.cell}>
-              <Text style={styles.text}>{cell}</Text>
+              <TranslatedText 
+              numberOfLines={1}
+              text={cell}
+              style={styles.text}></TranslatedText>
             </View>
           ))}
         </View>

@@ -104,7 +104,7 @@ const CustomMultiPicker = ({ isValidate,label, selectedValue, onValueChange, ite
       {open && (
         <View style={styles.dropdownCard}>
           {loader ? (
-            <FullViewLoader />
+            <FullViewLoader isShowTop={false}/>
           ) : (
             options.length > 0 ? (
               <ScrollView style={{ maxHeight: 200 }}>
@@ -144,7 +144,7 @@ const CustomMultiPicker = ({ isValidate,label, selectedValue, onValueChange, ite
                     marginTop: 200,
                   }}
                 >
-                  <NoData />
+                  <NoData isShowTop = {false}/>
                 </View>
             )
           )}

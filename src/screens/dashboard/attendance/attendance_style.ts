@@ -10,7 +10,7 @@ export const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginHorizontal: 16,
     marginVertical: 8,
-    backgroundColor: ERP_COLOR_CODE.ERP_WHITE,
+    backgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR,
   },
   overlay: {
     flex: 1,

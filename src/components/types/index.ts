@@ -47,4 +47,5 @@ export interface ERPTextInputProps extends TextInputProps {
 export interface ErrorMessageProps {
   message: string;
   visible?: boolean;
+  isShowTop?: boolean;
 }

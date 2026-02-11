@@ -1,13 +1,14 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Text, Image, Animated } from 'react-native';
+import { Text, Image, Animated, View } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 
 import { ERP_GIF, ERP_ICON } from '../../assets';
 import { styles } from './error_style';
 import { ErrorMessageProps } from '../types';
 import { useAppSelector } from '../../store/hooks';
+import { ERP_COLOR_CODE } from '../../utils/constants';
 
-const ErrorMessage: React.FC<ErrorMessageProps> = ({ message, visible = true }) => {
+const ErrorMessage: React.FC<ErrorMessageProps> = ({ message, visible = true , isShowTop = true}) => {
   const theme = useAppSelector(state => state?.theme.mode);
 
   const opacity = useRef(new Animated.Value(0)).current;
@@ -15,7 +16,6 @@ const ErrorMessage: React.FC<ErrorMessageProps> = ({ message, visible = true }) 
   const textTranslateX = useRef(new Animated.Value(15)).current;
   const [shouldRender, setShouldRender] = useState(false);
 
-  // 🔁 Reset values on screen focus
   useFocusEffect(
     useCallback(() => {
       opacity.setValue(0);
@@ -76,6 +76,12 @@ const ErrorMessage: React.FC<ErrorMessageProps> = ({ message, visible = true }) 
   if (!shouldRender) return null;
 
   return (
+  <>
+  {
+    isShowTop && <View style={{height: 16, width: '100%', backgroundColor: theme === 'dark' ? 'black' : ERP_COLOR_CODE.ERP_APP_COLOR, borderBottomLeftRadius: 12, borderBottomRightRadius: 12}}></View>
+    
+  }
+  
     <Animated.View
       style={[
         styles.container,
@@ -99,6 +105,7 @@ const ErrorMessage: React.FC<ErrorMessageProps> = ({ message, visible = true }) 
         {message}
       </Animated.Text>
     </Animated.View>
+  </>
   );
 };
 

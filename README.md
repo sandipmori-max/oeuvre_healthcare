@@ -692,3 +692,6 @@ company_code - oeuvre01
 
 Welcome 
 tr - DevERP to Oeuvre
+
+and removed app name - wecome ke aage
+Tab name - DCR 

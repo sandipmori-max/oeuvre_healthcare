@@ -20,6 +20,7 @@ import { ERP_COLOR_CODE } from '../../../utils/constants';
 import useTranslations from '../../../hooks/useTranslations';
 import { tags } from 'react-native-svg/lib/typescript/xmlTags';
 import { JumpingTransition } from 'react-native-reanimated';
+import TranslatedText from '../tabs/home/TranslatedText';
 
 const ListScreen = () => {
   const navigation = useNavigation();
@@ -72,6 +73,7 @@ const ListScreen = () => {
 
   const route = useRoute<RouteProp<ListRouteParams, 'List'>>();
   const { item } = route?.params;
+  console.log("-----------------------------------")
   const theme = useAppSelector(state => state?.theme.mode);
 
   const pageTitle = item?.title || item?.name || 'List Data';
@@ -170,7 +172,7 @@ const ListScreen = () => {
       headerBackTitle: '',
       headerTintColor: '#fff',
       headerTitle: () => (
-        <Text
+        <TranslatedText
           numberOfLines={1}
           style={{
             maxWidth: 180,
@@ -178,9 +180,10 @@ const ListScreen = () => {
             fontWeight: '700',
             color: theme === 'dark' ? "white" : ERP_COLOR_CODE.ERP_WHITE,
           }}
+          text= {pageTitle || 'List Data'}
         >
-          {pageTitle || 'List Data'}
-        </Text>
+         
+        </TranslatedText>
       ),
       headerRight: () => (
         <>
@@ -279,6 +282,8 @@ const ListScreen = () => {
 
   const onRefresh = async () => {
     try {
+      setSearchQuery('');
+      getCurrentMonthRange();
       await fetchListData(fromDate, toDate);
     } catch (e) {
     }
@@ -412,6 +417,7 @@ const ListScreen = () => {
       url: pageName,
       pageTitle: pageTitle,
       isFromBusinessCard: isFromBusinessCard,
+      isFromProfile : false
     });
   };
 
@@ -427,6 +433,7 @@ const ListScreen = () => {
         url: left,
         pageTitle: pageTitle,
         isFromBusinessCard: false,
+        isFromProfile: false
       });
     } else {
       setAlertConfig({
@@ -456,13 +463,23 @@ const ListScreen = () => {
   if (parsedError) {
     return (
       <View style={{ flex: 1, backgroundColor: theme == 'dark' ? 'black' :  ERP_COLOR_CODE.ERP_WHITE }}>
-        <ErrorMessage message={parsedError} />
+        <ErrorMessage message={parsedError} isShowTop ={false} />
       </View>
     );
   }
 
+  if(loadingListId){
+    return <FullViewLoader isShowTop={theme === 'dark' ? false : true}/>
+  }
+
   return (
     <View style={[styles.container, theme === 'dark' && { backgroundColor: 'black' }]}>
+       
+       {
+       !isFilterVisible &&  <View style={{height: 16, width: '100%', backgroundColor: theme === 'dark' ? 'black' : ERP_COLOR_CODE.ERP_APP_COLOR, borderBottomLeftRadius: 12, borderBottomRightRadius: 12}}></View>
+       
+       }
+           
       {isFilterVisible && (
         <View style={{
           backgroundColor: theme === 'dark' ?  '#000': ERP_COLOR_CODE.ERP_APP_COLOR,
@@ -516,7 +533,10 @@ const ListScreen = () => {
                       color="#000"
                       style={{ marginRight: 8 }}
                     />
-                    <Text style={styles.dateButtonText}>{fromDate || t("msg.msg9")}</Text>
+                    <TranslatedText 
+                    numberOfLines={1}
+                    text={fromDate || t("msg.msg9")}
+                    style={styles.dateButtonText}></TranslatedText>
                   </View>
                 </TouchableOpacity>
               </View>
@@ -566,7 +586,7 @@ const ListScreen = () => {
                                  }]}>
                                  <Text style={{
                                    color: theme === 'dark' ? 'white' : 'black'
-                                 }}>{t('test27')}</Text>
+                                 }}>{t('text27')}</Text>
                                  <TouchableOpacity onPress={() => {
                                    setShowDatePicker(null);
                
@@ -620,7 +640,7 @@ const ListScreen = () => {
 
       {!!error ? (
        <View style={{flex: 1, backgroundColor:theme === 'dark' ? 'black' : 'white'}}>
-         <ErrorMessage message={error} />
+         <ErrorMessage message={error} isShowTop ={false} />
         </View>
       ) : (
         <>
@@ -746,7 +766,8 @@ const ListScreen = () => {
             setApiError(true);
           }
         } }
-        isFromButtonList={true} closeHide={undefined}      />
+        isFromButtonList={true} closeHide={undefined}      
+      />
 
       <CustomAlert
         visible={apiError}
@@ -755,7 +776,9 @@ const ListScreen = () => {
         type={alertConfig.type}
         onClose={() => setApiError(false)}
         onCancel={() => setApiError(false)}
-        actionLoader={actionLoader} closeHide={undefined}      />
+        actionLoader={actionLoader}
+        closeHide={undefined}      
+      />
     </View>
   );
 };

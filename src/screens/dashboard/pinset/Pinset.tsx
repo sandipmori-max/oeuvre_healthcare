@@ -110,28 +110,7 @@ const PinSetupScreen = () => {
   }, [screen, blockUntil]);
 
   // header style kept as your original
-  useLayoutEffect(() => {
-    navigation.setOptions({
-      headerStyle: {
-        backgroundColor: theme === 'dark' ? 'black' : ERP_COLOR_CODE.ERP_APP_COLOR,
-      },
-      headerBackTitle: '',
-      headerTintColor: '#fff',
-      headerTitle: () => (
-        <Text
-          numberOfLines={1}
-          style={{
-            maxWidth: 180,
-            fontSize: 18,
-            fontWeight: '700',
-            color: theme === 'dark' ? "white" : ERP_COLOR_CODE.ERP_WHITE,
-          }}
-        >
-          {t('text32')}
-        </Text>
-      ),
-    });
-  }, [navigation, theme]);
+  
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -150,7 +129,7 @@ const PinSetupScreen = () => {
             color: theme === 'dark' ? "white" : ERP_COLOR_CODE.ERP_WHITE,
           }}
         >
-          {'Pinset'}
+          {t('text32')}
         </Text>
       ),
 
@@ -612,6 +591,10 @@ const PinSetupScreen = () => {
   };
 
   return (
+
+    <>
+       <View style={{height: 16, width: '100%', backgroundColor: theme === 'dark' ? 'black' : ERP_COLOR_CODE.ERP_APP_COLOR, borderBottomLeftRadius: 12, borderBottomRightRadius: 12}}></View>
+    
     <Animated.View
       style={[
         styles.container,
@@ -629,6 +612,7 @@ const PinSetupScreen = () => {
         },
       ]}
     >
+            
       {/* Header */}
       <Animated.Text
         style={[
@@ -881,6 +865,8 @@ const PinSetupScreen = () => {
         </TouchableOpacity>
       )}
     </Animated.View>
+    </>
+    
   );
 };
 

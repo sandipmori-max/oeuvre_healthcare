@@ -119,13 +119,15 @@ const WebScreen = () => {
   if ((!isFromChart && !targetUrl) || (isFromChart && !url)) {
     return (
       <SafeAreaView style={styles.container}>
-        <FullViewLoader />
+        <FullViewLoader isShowTop={false}/>
       </SafeAreaView>
     );
   }
 
   return (
     <SafeAreaView style={styles.container}>
+             <View style={{height: 16, width: '100%', backgroundColor: theme === 'dark' ? 'black' : ERP_COLOR_CODE.ERP_APP_COLOR, borderBottomLeftRadius: 12, borderBottomRightRadius: 12}}></View>
+      
       <StatusBar backgroundColor={theme === 'dark' ? 'black' : ERP_COLOR_CODE.ERP_APP_COLOR} translucent={false} />
       {token ? (
         <>
@@ -151,7 +153,7 @@ const WebScreen = () => {
                 <View style={[styles.webviewLoadingContent, theme === 'dark' && {
                   backgroundColor: 'black'
                 }]}>
-                  <FullViewLoader />
+                  <FullViewLoader isShowTop={false}/>
                 </View>
               </View>
             )}

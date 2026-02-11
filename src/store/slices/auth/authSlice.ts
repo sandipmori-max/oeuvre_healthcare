@@ -269,14 +269,14 @@ const authSlice = createSlice({
             isReport: menu?.IsReport,
           }));
           state.error = null;
-          state.isMenuLoading = false;
+          // state.isMenuLoading = false;
         } catch (error) {
           state.menu = [];
-          state.isMenuLoading = false;
+          // state.isMenuLoading = false;
         }
       })
       .addCase(getERPMenuThunk.rejected, (state, action) => {
-        state.isMenuLoading = false;
+        // state.isMenuLoading = false;
         state.error = action.payload as string;
       })
 
@@ -305,7 +305,7 @@ const authSlice = createSlice({
         }
       })
       .addCase(getERPAppConfigMenuThunk.rejected, (state, action) => {
-        state.isMenuLoading = false;
+        // state.isMenuLoading = false;
         state.error = action.payload as string;
       })
 

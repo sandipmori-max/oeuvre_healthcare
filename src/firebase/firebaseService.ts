@@ -19,25 +19,21 @@ export async function requestUserPermission(): Promise<void> {
       case messaging.AuthorizationStatus.AUTHORIZED:
         await getFcmToken();
         break;
-
       case messaging.AuthorizationStatus.PROVISIONAL:
         await getFcmToken();
         break;
-
       case messaging.AuthorizationStatus.DENIED:
         Alert.alert(
           'Permission Denied',
           'You have denied notification permission. Please enable it in Settings to receive alerts.'
         );
         break;
-
       case messaging.AuthorizationStatus.NOT_DETERMINED:
         Alert.alert(
           'Permission Not Determined',
           'Please decide whether to allow notifications to stay updated.'
         );
         break;
-
       default:
     }
   } catch (error) {

@@ -96,7 +96,7 @@ const Onboarding = ({ navigation }) => {
   };
 
   if (loading) return <>
-    <FullViewLoader />
+    <FullViewLoader isShowTop={false}/>
   </>;
 
   const startWaveAnimation = () => {

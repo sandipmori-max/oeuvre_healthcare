@@ -7,6 +7,7 @@ import {
 } from 'react-native';
 import { ERP_COLOR_CODE } from '../../utils/constants';
 import { useAppSelector } from '../../store/hooks';
+import TranslatedText from '../../screens/dashboard/tabs/home/TranslatedText';
 
 const { width } = Dimensions.get('window');
 
@@ -57,12 +58,15 @@ const Toast = ({ visible, message, onHide , tbackgroundColor}: { visible: boolea
         }
       ]}
     >
-      <Text style={[
+      <TranslatedText
+      text={message}
+      numberOfLines={1}
+      style={[
         styles.toastText,
         theme === 'dark' && { color: 'black' }
       ]}>
-        {message}
-      </Text>
+        
+      </TranslatedText>
     </Animated.View>
   );
 };

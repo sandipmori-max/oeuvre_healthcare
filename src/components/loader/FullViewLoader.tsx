@@ -6,8 +6,9 @@ import { ERP_GIF } from '../../assets';
 import { styles } from './loader_style';
 import { useAppSelector } from '../../store/hooks';
 import { useTranslation } from 'react-i18next';
+import { ERP_COLOR_CODE } from '../../utils/constants';
 
-const FullViewLoader = () => {
+const FullViewLoader = ({isShowTop = true}) => {
   const {t} = useTranslation()
   const theme = useAppSelector(state => state?.theme.mode);
 
@@ -49,7 +50,12 @@ const FullViewLoader = () => {
   }, []);
 
   return (
-    <View
+
+    <>
+       {
+        isShowTop && <View style={{height: 16, width: '100%', backgroundColor: theme === 'dark' ? 'black' : ERP_COLOR_CODE.ERP_APP_COLOR, borderBottomLeftRadius: 12, borderBottomRightRadius: 12}}></View>
+       } 
+       <View
       style={[
         styles.loadingContainer,
         theme === 'dark' && { backgroundColor: 'black' },
@@ -88,6 +94,8 @@ const FullViewLoader = () => {
         {t('test7')}
       </Animated.Text>
     </View>
+    </>
+ 
   );
 };
 

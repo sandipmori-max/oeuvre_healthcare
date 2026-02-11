@@ -22,6 +22,7 @@ import { getLastPunchInThunk } from '../../../../../store/slices/attendance/thun
 import { setReloadApp } from '../../../../../store/slices/reloadApp/reloadAppSlice';
 import ImageBottomSheetModal from '../../../../../components/bottomsheet/ImageBottomSheetModal';
 import { useTranslation } from 'react-i18next';
+import TranslatedText from '../../home/TranslatedText';
 
 interface AccountSwitcherProps {
   visible: boolean;
@@ -246,21 +247,33 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
             </TouchableOpacity>
 
             <View style={styles.accountInfo}>
-              <Text style={[styles.accountName, isActive && styles.activeText, theme === 'dark' && { color: 'white' }]}>
-                {firstLetterUpperCase(item?.user?.name || '')}
-              </Text>
-              <Text numberOfLines={1} style={[styles.accountEmail, isActive && styles.activeText, theme === 'dark' && { color: 'white' }]}>
-                {item?.user?.companyName}
-              </Text>
+              <TranslatedText 
+              text={firstLetterUpperCase(item?.user?.name || '')}
+              numberOfLines={1}
+              style={[styles.accountName, isActive && styles.activeText, theme === 'dark' && { color: 'white' }]}>
+              
+              </TranslatedText>
+              <TranslatedText
+               numberOfLines={1}
+               text={item?.user?.companyName}
+                style={[styles.accountEmail, isActive && styles.activeText, theme === 'dark' && { color: 'white' }]}>
+                
+              </TranslatedText>
 
               <View style={{ width: isActive ? '100%' : '80%', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                 <View style={{ gap: 2, flexDirection: 'row', alignItems: 'center' }}>
                   <MaterialIcons name={'date-range'} color={theme === 'dark' ? 'white' : ERP_COLOR_CODE.ERP_BLACK} size={18} />
-                  <Text style={styles.lastLogin}>{lastLogin}</Text>
+                  <TranslatedText
+                  numberOfLines={1}
+                  text={lastLogin}
+                  style={styles.lastLogin}></TranslatedText>
                 </View>
                 <View style={{ gap: 2, flexDirection: 'row', alignItems: 'center' }}>
                   <MaterialIcons name={'access-alarm'} color={theme === 'dark' ? 'white' : ERP_COLOR_CODE.ERP_BLACK} size={18} />
-                  <Text style={styles.lastLogin}>{lastLoginHr}</Text>
+                  <TranslatedText
+                  numberOfLines={1}
+                  text={lastLoginHr}
+                  style={styles.lastLogin}></TranslatedText>
                 </View>
               </View>
             </View>
@@ -392,7 +405,6 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
                 tapLoader ? t('text96') : t('text97')
               }
             </Text>
-
           </TouchableOpacity>
         </Animated.View>
 
@@ -406,8 +418,10 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
           onCancel={() => setAlertVisible(false)}
           onDone={() => handleRemovedAccount(selectedAccount)}
           doneText={t('text98')}
+          cancelText={t('auth.cancel')}
           color={ERP_COLOR_CODE.ERP_ERROR}
-          actionLoader={undefined} closeHide={undefined} />
+          actionLoader={undefined} 
+          closeHide={undefined} />
 
         <ImageBottomSheetModal
           visible={showModal}

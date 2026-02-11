@@ -29,10 +29,12 @@ import useTranslations from '../../../hooks/useTranslations';
 import MaterialIcons from '@react-native-vector-icons/material-icons';
 import { ERP_GIF } from '../../../assets';
 import { NativeModules } from 'react-native';
+import TranslatedText from '../tabs/home/TranslatedText';
 
 const AttendanceScreen = () => {
   const route = useRoute();
   const { isFor } = route?.params || '';
+  console.log('route', route)
   const navigation = useNavigation<any>();
   const [isListVisible, setIsListVisible] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -147,7 +149,7 @@ const AttendanceScreen = () => {
 
   useFocusEffect(
     useCallback(() => {
-      NativeModules.OrientationModule.disableLandscape();
+      // NativeModules.OrientationModule.disableLandscape();
       return () => {
       };
     }, [navigation])
@@ -166,7 +168,6 @@ const AttendanceScreen = () => {
 
       })
       .catch(err => {
-
         setActionLoader(false);
         setError(err);
         setIsLoading(false);
@@ -180,7 +181,7 @@ const AttendanceScreen = () => {
   }, [refresh, theme]);
 
   if (error && error !== '') {
-    <ErrorMessage message={error} />;
+    <ErrorMessage message={error} isShowTop ={false}/>;
   }
 
   const handleDateChange = (event: any, selectedDate?: Date) => {
@@ -238,15 +239,21 @@ const AttendanceScreen = () => {
         Keyboard.dismiss();
       }}
     >
-      <View
+      <>
+      
+        <View
         style={[
           {
             height: Dimensions.get('screen').height,
             flex: 1,
             backgroundColor: 'white'
           },
+         isListVisible && showDateFilter && {
+            backgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR,
+          }, 
           theme === 'dark' && { backgroundColor: 'black' }]}
       >
+        
         {isListVisible && showDateFilter && (
           <View style={[styles.dateContainer, theme === 'dark' && {
             backgroundColor: 'black'
@@ -273,12 +280,15 @@ const AttendanceScreen = () => {
                     color={theme === 'dark' ? '#fff' : "#000"}
                     style={{ marginRight: 8 }}
                   />
-                  <Text style={[styles.dateButtonText,
+                  <TranslatedText 
+                  text={fromDate || t("text.text27")}
+                  numberOfLines={1}
+                  style={[styles.dateButtonText,
                   {
                     color: theme === 'dark' ? '#fff' : "#000"
 
                   }
-                  ]}>{fromDate || t("text.text27")}</Text>
+                  ]}></TranslatedText>
                 </View>
 
 
@@ -301,10 +311,13 @@ const AttendanceScreen = () => {
                     color={theme === 'dark' ? '#fff' : "#000"}
                     style={{ marginRight: 8 }}
                   />
-                  <Text style={[styles.dateButtonText, {
+                  <TranslatedText 
+                  numberOfLines={1}
+                  text={toDate || ''}
+                  style={[styles.dateButtonText, {
                     color: theme === 'dark' ? '#fff' : "#000"
 
-                  }]}>{toDate || ''}</Text>
+                  }]}></TranslatedText>
                 </View>
 
               </TouchableOpacity>
@@ -389,6 +402,7 @@ const AttendanceScreen = () => {
               backgroundColor: theme === 'dark' ? 'black' :'white',
               height: '100%'
             }}>
+                   <View style={{height: 16, width: '100%', backgroundColor: theme === 'dark' ? 'black' : ERP_COLOR_CODE.ERP_APP_COLOR, borderBottomLeftRadius: 12, borderBottomRightRadius: 12}}></View>
               <List
                 selectedMonth={formattedMonth}
                 showFilter={showFilter}
@@ -416,6 +430,7 @@ const AttendanceScreen = () => {
             >
               <ScrollView showsVerticalScrollIndicator={false} style={[styles.container, theme === 'dark' && { backgroundColor: 'black' }]}>
                 <>
+      <View style={{height: 16, width: '100%', backgroundColor: theme === 'dark' ? 'black' : ERP_COLOR_CODE.ERP_APP_COLOR, borderBottomLeftRadius: 12, borderBottomRightRadius: 12}}></View>
                   <AttendanceForm setBlockAction={setBlockAction} resData={resData} />
                 </>
               </ScrollView>
@@ -424,6 +439,8 @@ const AttendanceScreen = () => {
         }
 
       </View>
+      </>
+    
 
     </TouchableWithoutFeedback>
   );
