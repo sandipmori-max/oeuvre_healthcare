@@ -21,6 +21,7 @@ import DeviceInfo from 'react-native-device-info';
 import { setReloadApp } from '../../../../store/slices/reloadApp/reloadAppSlice';
 import { Easing } from 'react-native';
 import ImageBottomSheetModal from '../../../../components/bottomsheet/ImageBottomSheetModal';
+import TranslatedText from '../../tabs/home/TranslatedText';
 
 const AttendanceForm = ({ setBlockAction, resData }: any) => {
   const { t } = useTranslations();
@@ -364,11 +365,13 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
                         transform: [{ translateY: animName }],
                       }}
                     >
-                      <Text
+                      <TranslatedText
+                        text={firstLetterUpperCase(user?.name || '')}
+                        numberOfLines={1}
                         style={{ color: ERP_COLOR_CODE.ERP_WHITE, fontWeight: 'bold', fontSize: 26 }}
                       >
-                        {firstLetterUpperCase(user?.name || '')}
-                      </Text>
+                        
+                      </TranslatedText>
                     </Animated.View>
                   </View>
                 )}
@@ -399,7 +402,10 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
                     editable={false}
                   />
                   {touched?.name && errors?.name ? (
-                    <Text style={styles.errorText}>{errors?.name}</Text>
+                    <TranslatedText 
+                    numberOfLines={1}
+                    text={errors?.name}
+                    style={styles.errorText}></TranslatedText>
                   ) : null}
                 </View>
                 <View style={styles.formGroup}>

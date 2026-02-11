@@ -65,3 +65,19 @@ export const retryApiCall = async <T>(
 
   throw lastError;
 };
+
+export const translateSingle = async (text) => {
+  try {
+    const response = await fetch(
+      `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=en|gu`
+    );
+
+    const result = await response.json();
+    const translated = result.responseData.translatedText;
+console.log("translated", translated)
+     return translated;
+
+  } catch (error) {
+    console.log("Translation failed");
+  }
+};

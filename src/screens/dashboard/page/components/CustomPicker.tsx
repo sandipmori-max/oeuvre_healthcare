@@ -18,6 +18,7 @@ import FullViewLoader from '../../../../components/loader/FullViewLoader';
 import useTranslations from '../../../../hooks/useTranslations';
 import InputError from '../../../../components/error/InputError';
 import NoData from '../../../../components/no_data/NoData';
+import TranslatedText from '../../tabs/home/TranslatedText';
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 
@@ -106,24 +107,33 @@ const CustomPicker = ({
 
       {/* Label */}
       {!isForceOpen && (
-        <Text style={{ color: 'white', marginBottom: 4 }}>{label}</Text>
+        <TranslatedText
+        numberOfLines={1}
+        text={label}
+        style={{ color: 'white', marginBottom: 4 }}></TranslatedText>
       )}
 
       {isForceOpen && (
         <View style={{ flexDirection: 'row' }}>
-          <Text style={[
+          <TranslatedText 
+          numberOfLines={1}
+          text={label}
+          style={[
             styles.label,
             theme === 'dark' && { color: 'white' },
           ]}>
-            {label}
-          </Text>
+            
+          </TranslatedText>
           {item?.tooltip !== label && (
-            <Text style={[
+            <TranslatedText
+            numberOfLines={1}
+            text={`{' '} - ( ${item?.tooltip} )`}
+            style={[
               styles.label,
               theme === 'dark' && { color: 'white' },
             ]}>
-              {' '} - ( {item?.tooltip} )
-            </Text>
+              
+            </TranslatedText>
           )}
           {item?.mandatory === '1' && (
             <Text style={{ color: ERP_COLOR_CODE.ERP_ERROR }}>*</Text>
@@ -171,7 +181,7 @@ const CustomPicker = ({
         }}
         activeOpacity={0.7}
       >
-        <Text
+        <TranslatedText
           numberOfLines={1}
           style={{
             color:
@@ -182,9 +192,10 @@ const CustomPicker = ({
                   : ERP_COLOR_CODE.ERP_888,
             flex: 1,
           }}
+          text= {selectedOption || `Select ${label}`}
         >
-          {selectedOption || `Select ${label}`}
-        </Text>
+         
+        </TranslatedText>
 
         <MaterialIcons
           name={open ? 'arrow-drop-up' : 'arrow-drop-down'}
@@ -217,16 +228,18 @@ const CustomPicker = ({
           }}
         >
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', padding: 4 }}>
-            <Text
+            <TranslatedText
               style={{
                 color: theme === 'dark' ? 'white' : ERP_COLOR_CODE.ERP_BLACK,
                 fontSize: 16,
                 fontWeight: '800',
                 marginBottom: 2,
               }}
+              numberOfLines={1}
+              text={`${t("text.text34")} ${label}`}
             >
-              {t("text.text34")} {label}
-            </Text>
+              
+            </TranslatedText>
 
             <TouchableOpacity
               onPress={() => {
@@ -242,7 +255,7 @@ const CustomPicker = ({
           </View>
 
           {loader ? (
-            <FullViewLoader />
+            <FullViewLoader isShowTop={false}/>
           ) : (
             <ScrollView keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
               {options.length > 0 ? (
@@ -280,7 +293,7 @@ const CustomPicker = ({
                       closeBottomSheet();
                     }}
                   >
-                    <Text
+                    <TranslatedText
                       style={[
                         {
                           color:
@@ -296,10 +309,12 @@ const CustomPicker = ({
                           fontWeight: '600'
                         }
                       ]}
+                      numberOfLines={1}
+                      text={opt?.name}
 
                     >
-                      {opt?.name}
-                    </Text>
+                      
+                    </TranslatedText>
                     {
                       selectedOption === opt?.name && <MaterialIcons name='done-all' size={24} color={theme === 'dark' ? 'white' : ERP_COLOR_CODE.ERP_APP_COLOR} />
                     }
@@ -316,7 +331,7 @@ const CustomPicker = ({
                     marginTop: 200,
                   }}
                 >
-                  <NoData />
+                  <NoData isShowTop = {false}/>
                 </View>
               )}
             </ScrollView>

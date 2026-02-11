@@ -13,6 +13,8 @@ import ERPTextInput from '../../../../components/input/ERPTextInput';
 import ERPButton from '../../../../components/button/ERPButton';
 import useFcmToken from '../../../../hooks/useFcmToken';
 import { ERP_COLOR_CODE } from '../../../../utils/constants';
+import { erpAddAccountValidationSchema } from '../../../../utils/validations/add_accounts';
+import TranslatedText from '../../../dashboard/tabs/home/TranslatedText';
  
 const LoginForm: React.FC<LoginFormProps> = ({
   deviceId,
@@ -129,19 +131,25 @@ const LoginForm: React.FC<LoginFormProps> = ({
     <>
       {(validationError || erpLoginError) && (
         <View style={styles.errorContainer}>
-          {!!validationError && <Text style={styles.errorText}>{validationError}</Text>}
-          {!!erpLoginError && <Text style={styles.errorText}>{erpLoginError}</Text>}
+          {!!validationError && <TranslatedText
+          numberOfLines={1}
+          text={validationError}
+          style={styles.errorText}></TranslatedText>}
+          {!!erpLoginError && <TranslatedText 
+          numberOfLines={1}
+          text={erpLoginError}
+          style={styles.errorText}></TranslatedText>}
         </View>
       )}
 
       <Formik
         initialValues={initialFormValues}
-        validationSchema={erp_login_validation_schema}
+        validationSchema={erpAddAccountValidationSchema(t)}
         onSubmit={handleLoginSubmit}
       >
         {({ handleChange, handleBlur, values, errors, touched, handleSubmit }) => (
           <>
-            {[ 'user', 'password'].map((field, index) => (
+            {['user', 'password'].map((field, index) => (
               <Animated.View
                 key={field}
                 style={{

@@ -1,8 +1,7 @@
 package com.oeuvre
 import android.app.Application
 import com.oeuvre.location.LocationPackage
-import com.oeuvre.orientation.OrientationPackage
-import com.facebook.react.PackageList
+ import com.facebook.react.PackageList
 import com.facebook.react.ReactApplication
 import com.facebook.react.ReactHost
 import com.facebook.react.ReactNativeApplicationEntryPoint.loadReactNative
@@ -19,7 +18,6 @@ class MainApplication : Application(), ReactApplication {
       override fun getPackages(): List<ReactPackage> =
         PackageList(this).packages.apply {
           add(LocationPackage())
-          add(OrientationPackage())
         }
 
       override fun getJSMainModuleName(): String = "index"

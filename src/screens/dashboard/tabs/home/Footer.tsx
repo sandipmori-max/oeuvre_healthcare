@@ -1,6 +1,7 @@
 import React, { useRef, useEffect } from 'react';
 import { Animated, Text, View, Dimensions } from 'react-native';
 import AutoHeightWebView from '../../page/components/AutoHeightWebView';
+import TranslatedText from './TranslatedText';
 
 const { width } = Dimensions.get('screen');
 
@@ -53,15 +54,15 @@ const Footer = ({
     );
   } else {
     return (
-      <Text
+      <TranslatedText
         style={{
           color: accentColors[index % accentColors.length],
           fontSize: 16,
           fontWeight: '600',
         }}
-      >
-        {footer}
-      </Text>
+        text={footer}
+         numberOfLines={1}      > 
+      </TranslatedText>
     );
   }
 };

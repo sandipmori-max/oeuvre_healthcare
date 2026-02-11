@@ -12,52 +12,21 @@ const Tab = createBottomTabNavigator();
 
 const TabNavigator = () => {
   const theme = useAppSelector((state) => state.theme.mode);
-  const { t } = useTranslations();
   const { appBottomMenuList } = useAppSelector(state => state?.auth);
 
+  console.log("appBottomMenuList", appBottomMenuList)
   const navigationItems = (appBottomMenuList || []).map(item => ({
-      name:  item?.name,
-      type: item?.type,
-      icon: item?.icon,
-      label: item?.name,
-      search: item?.name,
+    name: item?.name,
+    type: item?.code,
+    icon: item?.iconname?.toLowerCase(), // icon name lowercase for safety
+    label: item?.name,
   }));
 
-  const tabConfig = [
-    {
-      name: t("navigation.home"),
-      component: HomeScreen,
-      icon: "home",
-      label: t("navigation.home"),
-    },
-    {
-      name: t("navigation.entry"),
-      type: "E",
-      icon: "entry",
-      label: t("navigation.entry"),
-      search: t("navigation.search_entry"),
-    },
-    {
-      name: t("navigation.report"),
-      type: "R",
-      icon: "report",
-      label: t("navigation.report"),
-      search: t("navigation.search_report"),
-    },
-    {
-      name: t("navigation.auth"),
-      type: "A",
-      icon: "auth",
-      label: t("navigation.auth"),
-      search: t("navigation.search_auth"),
-    },
-    {
-      name: t("navigation.profile"),
-      component: ProfileTab,
-      icon: "profile",
-      label: t("navigation.profile"),
-    },
-  ];
+  const getComponent = (item) => {
+    if (item.name === "Home") return HomeScreen;
+    if (item.name === "Profile") return ProfileTab;
+    return null; // बाकी MenuTab में जाएगा
+  };
 
   return (
     <Tab.Navigator
@@ -69,51 +38,57 @@ const TabNavigator = () => {
         tabBarInactiveTintColor:
           theme === "dark" ? "black" : ERP_COLOR_CODE.ERP_APP_COLOR,
         tabBarStyle: {
-          backgroundColor: theme === "dark" ? DARK_COLOR : ERP_COLOR_CODE.ERP_WHITE,
+          backgroundColor:
+            theme === "dark" ? DARK_COLOR : ERP_COLOR_CODE.ERP_WHITE,
           height: 80,
           paddingBottom: 5,
           paddingTop: 5,
         },
         headerStyle: {
-          backgroundColor: theme === "dark" ? DARK_COLOR : ERP_COLOR_CODE.ERP_APP_COLOR,
+          backgroundColor:
+            theme === "dark" ? DARK_COLOR : ERP_COLOR_CODE.ERP_APP_COLOR,
         },
         headerTintColor: "white",
       }}
     >
-      {tabConfig.map((tab, index) => (
-        <Tab.Screen
-          key={index}
-          name={tab.name}
-          children={
-            tab.component
-              ? () => <tab.component />
-              : () => (
-                  <MenuTab
-                    type={tab.type}
-                    headerText={tab.label}
-                    searchPlaceholder={tab.search}
-                  />
-                )
-          }
-          options={{
-            tabBarLabel: tab.label,
-            title: tab.label,
-            tabBarLabelStyle: {
-              fontSize: 12,
-              fontWeight: "500",
-              marginTop: 8,
-            },
-            tabBarIcon: ({ color, size, focused }) => (
-              <AnimatedTabIcon
-                name={tab.icon}
-                color={color}
-                size={size}
-                focused={focused}
-              />
-            ),
-          }}
-        />
-      ))}
+      {navigationItems.map((item, index) => {
+        const Component = getComponent(item);
+
+        return (
+          <Tab.Screen
+            key={index}
+            name={item.name}
+            children={
+              Component
+                ? () => <Component />
+                : () => (
+                    <MenuTab
+                      type={item.type}
+                      headerText={item.label}
+                      searchPlaceholder={`Search ${item.label}`}
+                    />
+                  )
+            }
+            options={{
+              tabBarLabel: item.label,
+              title: item.label,
+              tabBarLabelStyle: {
+                fontSize: 12,
+                fontWeight: "500",
+                marginTop: 8,
+              },
+              tabBarIcon: ({ color, size, focused }) => (
+                <AnimatedTabIcon
+                  name={item.icon}
+                  color={color}
+                  size={size}
+                  focused={focused}
+                />
+              ),
+            }}
+          />
+        );
+      })}
     </Tab.Navigator>
   );
 };

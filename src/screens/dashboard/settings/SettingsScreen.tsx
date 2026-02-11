@@ -436,6 +436,8 @@ const translateY = useRef(new Animated.Value(HIDDEN_POSITION)).current;
     } : {
       backgroundColor: 'white'
     }]}>
+             <View style={{height: 16, width: '100%', backgroundColor: theme === 'dark' ? 'black' : ERP_COLOR_CODE.ERP_APP_COLOR, borderBottomLeftRadius: 12, borderBottomRightRadius: 12}}></View>
+      
    <ScrollView
       style={styles.scrollContainer}
       keyboardShouldPersistTaps="handled"
@@ -652,7 +654,8 @@ const translateY = useRef(new Animated.Value(HIDDEN_POSITION)).current;
             }
           }
         } }
-        doneText="Logout"
+        cancelText={t('auth.cancel')}
+        doneText={t('auth.logout')}
         color={ERP_COLOR_CODE.ERP_ERROR}
         actionLoader={undefined} closeHide={undefined}      />
     </View>

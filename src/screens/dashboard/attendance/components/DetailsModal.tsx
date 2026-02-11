@@ -16,6 +16,7 @@ import { ERP_COLOR_CODE } from '../../../../utils/constants';
 import { useAppSelector } from '../../../../store/hooks';
 import useTranslations from '../../../../hooks/useTranslations';
 import ImageBottomSheetModal from '../../../../components/bottomsheet/ImageBottomSheetModal';
+import TranslatedText from '../../tabs/home/TranslatedText';
 
 const { height } = Dimensions.get('screen');
 
@@ -202,25 +203,37 @@ const DetailsBottomSheet = ({ visible, onClose, item, baseLink }: any) => {
                   style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 6 }}
                 >
                   <Text style={{ color:   theme === 'dark' ? 'white' : ERP_COLOR_CODE.ERP_444 }}>{t("text.text4")}</Text>
-                  <Text style={{ fontWeight: '600', color: theme === 'dark' ? 'white' : 'black' }}>{item?.date}</Text>
+                  <TranslatedText 
+                  numberOfLines={1}
+                  text={item?.date}
+                  style={{ fontWeight: '600', color: theme === 'dark' ? 'white' : 'black' }}></TranslatedText>
                 </View>
                 <View
                   style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 6 }}
                 >
                   <Text style={{ color:  theme === 'dark' ? 'white' : ERP_COLOR_CODE.ERP_444 }}>{t("text.text5")}</Text>
-                  <Text style={{ fontWeight: '600', color: theme === 'dark' ? 'white' : 'black' }}>{formatTo12Hour(item?.intime) || '--'}</Text>
+                  <TranslatedText
+                  numberOfLines={1}
+                  text={formatTo12Hour(item?.intime) || '--'}
+                  style={{ fontWeight: '600', color: theme === 'dark' ? 'white' : 'black' }}></TranslatedText>
                 </View>
                 <View
                   style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 6 }}
                 >
                   <Text style={{ color:  theme === 'dark' ? 'white' : ERP_COLOR_CODE.ERP_444 }}>{t("text.text6")}</Text>
-                  <Text style={{ fontWeight: '600', color: theme === 'dark' ? 'white' : 'black' }}>{formatTo12Hour(item?.outtime) || '--'}</Text>
+                  <TranslatedText 
+                  numberOfLines={1}
+                  text={formatTo12Hour(item?.outtime) || '--'}
+                  style={{ fontWeight: '600', color: theme === 'dark' ? 'white' : 'black' }}></TranslatedText>
                 </View>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                   <Text style={{ color:  theme === 'dark' ? 'white' : ERP_COLOR_CODE.ERP_444 }}>{t("text.text7")}</Text>
-                  <Text style={{ fontWeight: '600', color: theme === 'dark' ? 'white' : 'black' }}>
-                    {getWorkedHours2(item?.intime, item?.outtime)}
-                  </Text>
+                  <TranslatedText
+                  numberOfLines={1}
+                  text={getWorkedHours2(item?.intime, item?.outtime)}
+                  style={{ fontWeight: '600', color: theme === 'dark' ? 'white' : 'black' }}>
+                 
+                  </TranslatedText>
                 </View>
               </Animated.View>
             </ScrollView>

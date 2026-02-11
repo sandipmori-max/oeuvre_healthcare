@@ -2,6 +2,7 @@ import React, { memo, useState } from 'react';
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { ERP_COLOR_CODE } from '../../utils/constants';
+import TranslatedText from '../../screens/dashboard/tabs/home/TranslatedText';
 
 const ProfileImage = memo(({ userId, baseLink, userName }: any) => {
   const [loading, setLoading] = useState(true);
@@ -20,7 +21,10 @@ const ProfileImage = memo(({ userId, baseLink, userName }: any) => {
     alignItems:'center',
     alignSelf:'center',
     marginBottom: 18, borderWidth: 1, borderColor: 'black', borderRadius: 12 }}>
-      <Text style={styles.smLabel}>{initials.toUpperCase()}</Text>
+      <TranslatedText 
+      numberOfLines={1}
+      text={initials.toUpperCase()}
+      style={styles.smLabel}></TranslatedText>
 
       <FastImage
         source={{

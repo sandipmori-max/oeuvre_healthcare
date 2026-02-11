@@ -29,6 +29,7 @@ import ContactRow from './ContactRow';
 import ImageBottomSheetModal from '../bottomsheet/ImageBottomSheetModal';
 import { NativeModules } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import TranslatedText from '../../screens/dashboard/tabs/home/TranslatedText';
 
 const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
   const navigation = useNavigation();
@@ -160,9 +161,12 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
 
           <View style={{ height: 28, width: 100 }} />
 
-          <Text style={[styles.username, { top: 8, color: '#FFF' }]}>
-            {firstLetterUpperCase(user?.name || '')}
-          </Text>
+          <TranslatedText 
+          text={firstLetterUpperCase(user?.name || '')}
+          numberOfLines={1}
+          style={[styles.username, { top: 8, color: '#FFF' }]}>
+            
+          </TranslatedText>
 
           <View style={{ height: 8, width: 100 }} />
 
@@ -174,7 +178,10 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
                 }}
                 style={{ flexDirection: 'row', alignItems: 'center', padding: 6 }}>
                 <MaterialIcons name="call" color="white" size={14} />
-                <Text style={styles.userPhone}>{user.mobileno}</Text>
+                <TranslatedText 
+                text={user.mobileno}
+                numberOfLines={1}
+                style={styles.userPhone}></TranslatedText>
               </TouchableOpacity>
             )}
 
@@ -185,16 +192,20 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
                 }}
                 style={{ flexDirection: 'row', alignItems: 'center', padding: 6 }}>
                 <MaterialIcons name="mail-outline" color="white" size={14} />
-                <Text numberOfLines={1} style={styles.userPhone}>
-                  {user.emailid}
-                </Text>
+                <TranslatedText
+                text= {user.emailid}
+                numberOfLines={1} style={styles.userPhone}>
+                </TranslatedText>
               </TouchableOpacity>
             )}
 
             {user?.rolename && (
               <View style={{ flexDirection: 'row', alignItems: 'center', padding: 6 }}>
                 <MaterialIcons name="person" color="white" size={14} />
-                <Text style={styles.userPhone}>{user.rolename}</Text>
+                <TranslatedText 
+                numberOfLines={1}
+                text={user.rolename}
+                style={styles.userPhone}></TranslatedText>
               </View>
             )}
           </View>
@@ -249,7 +260,7 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
                       return;
                     }
                     if (item?.route === "Attendance") {
-                      NativeModules.OrientationModule.enableLandscape();
+                      // NativeModules.OrientationModule.enableLandscape();
                       props?.navigation.closeDrawer();
                       navigation.navigate(item?.route, { isFor: 'Attendance' });
                       return;
@@ -281,7 +292,7 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
                             : '#000'
                       }
                     />
-                    <Text
+                    <TranslatedText
                       style={[
                         styles.itemLabel,
                         isActive && styles.activeText,
@@ -294,9 +305,11 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
                                 : '#000',
                         },
                       ]}
+                      numberOfLines={1}
+                      text={item.label}
                     >
-                      {item.label}
-                    </Text>
+                      
+                    </TranslatedText>
                   </View>
                 </TouchableOpacity>
               </Animated.View>

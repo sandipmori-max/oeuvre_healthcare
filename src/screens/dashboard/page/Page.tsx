@@ -55,6 +55,7 @@ import ScanScreen from './components/ScanScreen';
 import BarCodeScan from './components/BarCodeScan';
 import { styles } from './page_style';
 import { openSettings } from 'react-native-permissions';
+import TranslatedText from '../tabs/home/TranslatedText';
 
 type PageRouteParams = { PageScreen: { item: any } };
 
@@ -478,7 +479,7 @@ const PageScreen = () => {
   );
 
   const route = useRoute<RouteProp<PageRouteParams, 'PageScreen'>>();
-  const { item, title, id, isFromNew, url, pageTitle }: any = route?.params;
+  const { item, title, id, isFromNew, url, pageTitle , isFromProfile}: any = route?.params;
   const isFromBusinessCard = route?.params?.isFromBusinessCard || false;
 
   const validateForm = useCallback(() => {
@@ -512,7 +513,7 @@ const PageScreen = () => {
       headerTintColor: '#fff',
       headerTitle: () => (
         <View style={{ flexDirection: 'row', alignItems: 'center', maxWidth: 210 }}>
-          <Text
+          <TranslatedText
             numberOfLines={1}
             style={{
               flexShrink: 1,
@@ -520,19 +521,25 @@ const PageScreen = () => {
               fontWeight: '700',
               color: theme === 'dark' ? "white" : ERP_COLOR_CODE.ERP_WHITE,
             }}
+            text={title || pageTitle || 'Details'}
           >
-            {title || pageTitle || 'Details'}
-          </Text>
-          <Text
+            
+          </TranslatedText>
+          {
+             isFromProfile === false &&  <TranslatedText
+             numberOfLines={1}
             style={{
               fontSize: 18,
               fontWeight: '700',
               color: ERP_COLOR_CODE.ERP_WHITE,
               marginLeft: 4,
             }}
+            text= {isFromNew ? `( ${t("text.text44")} )` : `( ${t('text.text45')} )`}
           >
-            {isFromNew ? `( ${t("text.text44")} )` : `( ${t('text.text45')} )`}
-          </Text>
+           
+          </TranslatedText>
+          }
+         
         </View>
       ),
       headerRight: () => (
@@ -1078,8 +1085,15 @@ const PageScreen = () => {
     };
   }, []);
 
+  if(loadingPageId){
+       return <FullViewLoader isShowTop={theme === 'dark' ? false : true}/>
+  }
   return (
-    <View style={{ flex: 1, padding: 16, backgroundColor: theme === 'dark' ? 'black' : ERP_COLOR_CODE.ERP_WHITE }}>
+    <>
+    {
+      theme !== 'dark' &&  <View style={{height: 16, width: '100%', backgroundColor: theme === 'dark' ? 'black' : ERP_COLOR_CODE.ERP_APP_COLOR, borderBottomLeftRadius: 12, borderBottomRightRadius: 12}}></View>
+    }
+           <View style={{ flex: 1, padding: 16, backgroundColor: theme === 'dark' ? 'black' : ERP_COLOR_CODE.ERP_WHITE }}>
       {loadingPageId ? (
         <FullViewLoader />
       ) : !!error ? (
@@ -1091,7 +1105,7 @@ const PageScreen = () => {
             backgroundColor: theme === 'dark' ? 'black' : ERP_COLOR_CODE.ERP_WHITE,
           }}
         >
-          <ErrorMessage message={error} />
+          <ErrorMessage message={error} isShowTop ={false} />
         </View>
       ) : controls?.length > 0 ? (
         <>
@@ -1113,7 +1127,7 @@ const PageScreen = () => {
               keyboardShouldPersistTaps="handled"
             />
 
-{!authUser && controls.length > 0 && (
+{controls.length > 0 && (
               <TouchableOpacity
                 style={{
                   height: 46,
@@ -1263,7 +1277,6 @@ const PageScreen = () => {
                 </Text>
               </TouchableOpacity>
             )}
-
           </View>
           <CustomAlert
                 visible={alertVisible}
@@ -1296,7 +1309,7 @@ const PageScreen = () => {
           backgroundColor: 'black',
           width: '100%'
         }]}>
-          <NoData />
+          <NoData isShowTop = {false} />
         </View>
       )}
 
@@ -1383,6 +1396,8 @@ const PageScreen = () => {
         actionLoader={undefined} 
         closeHide={undefined}      />
     </View>
+    </>
+  
   );
 };
 

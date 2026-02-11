@@ -5,6 +5,7 @@ import { styles } from './input_style';
 import MaterialIcons from '@react-native-vector-icons/material-icons';
 import { ERP_COLOR_CODE } from '../../utils/constants';
 import { Easing } from 'react-native';
+import TranslatedText from '../../screens/dashboard/tabs/home/TranslatedText';
 
 const ERPTextInput: React.FC<ERPTextInputProps> = ({
   label,
@@ -40,7 +41,10 @@ const ERPTextInput: React.FC<ERPTextInputProps> = ({
   }, [touched, error]);
   return (
     <View style={[styles.inputContainer, containerStyle, ,]}>
-      {label ? <Text style={[styles.inputLabel, labelStyle]}>{label}</Text> : null}
+      {label ? <Text 
+    
+      numberOfLines={1}
+      style={[styles.inputLabel, labelStyle]}>{label}</Text> : null}
 
       <View style={styles.inputWrapper}>
         <View
@@ -100,7 +104,13 @@ const ERPTextInput: React.FC<ERPTextInputProps> = ({
         {icon}
       </View>
 
-      {helperText && !error && <Text style={[styles.helperText, helperStyle]}>{helperText}</Text>}
+      
+
+      {helperText && !error && <TranslatedText 
+      text={helperText}
+      numberOfLines={1}
+    
+      style={[styles.helperText, helperStyle]}></TranslatedText>}
        {touched && !!error && (
         <Animated.Text
           style={[

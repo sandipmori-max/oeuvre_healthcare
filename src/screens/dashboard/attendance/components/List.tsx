@@ -32,6 +32,7 @@ import {
 import DetailsBottomSheet from './DetailsModal';
 import useTranslations from '../../../../hooks/useTranslations';
 import ImageBottomSheetModal from '../../../../components/bottomsheet/ImageBottomSheetModal';
+import TranslatedText from '../../tabs/home/TranslatedText';
 
 const styles = StyleSheet.create({
   recordCard: {
@@ -224,7 +225,7 @@ const List = ({ selectedMonth, showFilter, fromDate, toDate }: any) => {
           alignItems: 'center',
         }}
       >
-        <ErrorMessage message={JSON.stringify(parsedError)} />
+        <ErrorMessage message={JSON.stringify(parsedError)} isShowTop ={false} />
       </View>
     );
   }
@@ -311,7 +312,7 @@ const List = ({ selectedMonth, showFilter, fromDate, toDate }: any) => {
                   },
               ]}
             >
-              <Text
+              <TranslatedText
                 style={{
                   color:
                     activeFilter === filter.key ? theme === 'dark' ? '#fff' :
@@ -319,9 +320,11 @@ const List = ({ selectedMonth, showFilter, fromDate, toDate }: any) => {
                       : ERP_COLOR_CODE.ERP_BLACK,
                   fontWeight: '600',
                 }}
+                numberOfLines={1}
+                text={filter.label}
               >
-                {filter.label}
-              </Text>
+                
+              </TranslatedText>
             </TouchableOpacity>
           ))}
         </ScrollView>
@@ -386,9 +389,13 @@ const List = ({ selectedMonth, showFilter, fromDate, toDate }: any) => {
                               backgroundColor: c.color,
                             }}
                           />
-                          <Text style={{
+                          <TranslatedText
+                          numberOfLines={1}
+                          text={`${c?.text} (${c?.value})`}
+                          style={{
                             color: theme === 'dark' ? '#fff' : "#000"
-                          }}> {`${c?.text} (${c?.value})`}</Text>
+                          }}> 
+                          </TranslatedText>
                         </View>
                       ))}
                     </View>
@@ -490,7 +497,7 @@ const List = ({ selectedMonth, showFilter, fromDate, toDate }: any) => {
                     alignItems: 'center',
                   }}
                 >
-                  <NoData />
+                  <NoData isShowTop = {false}/>
                 </View>
               ) : (
                 <View style={{
@@ -621,12 +628,18 @@ const List = ({ selectedMonth, showFilter, fromDate, toDate }: any) => {
                                           marginBottom: 4,
                                         }}
                                       >
-                                        <Text style={[styles.recordName, theme === 'dark' && {
+                                        <TranslatedText
+                                        numberOfLines={1}
+                                        text={rec?.employee}
+                                        style={[styles.recordName, theme === 'dark' && {
                                           color: 'white'
-                                        }]}>{rec?.employee}</Text>
-                                        <Text style={[styles.recordDateTime, theme === 'dark' && {
+                                        }]}></TranslatedText>
+                                        <TranslatedText
+                                        numberOfLines={1}
+                                        text={rec?.date}
+                                        style={[styles.recordDateTime, theme === 'dark' && {
                                           color: 'white'
-                                        }]}>{rec?.date}</Text>
+                                        }]}></TranslatedText>
                                       </View>
 
                                       {
@@ -649,9 +662,12 @@ const List = ({ selectedMonth, showFilter, fromDate, toDate }: any) => {
                                               size={14}
                                               name="access-alarm"
                                             />
-                                            <Text style={[styles.recordPunchTime,]}>
-                                              {formatTo12Hour(rec?.intime) || '--'}
-                                            </Text>
+                                            <TranslatedText 
+                                            numberOfLines={1}
+                                            text= {formatTo12Hour(rec?.intime) || '--'}
+                                            style={[styles.recordPunchTime,]}>
+                                             
+                                            </TranslatedText>
                                           </View>
 
                                           {rec?.status?.toLowerCase() === 'working' ? (
@@ -667,9 +683,12 @@ const List = ({ selectedMonth, showFilter, fromDate, toDate }: any) => {
                                                 size={14}
                                                 name="history-toggle-off"
                                               />
-                                              <Text style={styles.recordPunchTime}>
-                                                {rec?.status}
-                                              </Text>
+                                              <TranslatedText 
+                                              numberOfLines={1}
+                                              text=  {rec?.status}
+                                              style={styles.recordPunchTime}>
+                                              
+                                              </TranslatedText>
                                             </View>
                                           ) : (
                                             <>
@@ -721,9 +740,12 @@ const List = ({ selectedMonth, showFilter, fromDate, toDate }: any) => {
                                                 size={14}
                                                 name="access-alarm"
                                               />
-                                              <Text style={styles.recordPunchTime}>
-                                                {formatTo12Hour(rec?.outtime) || '--'}
-                                              </Text>
+                                              <TranslatedText 
+                                              numberOfLines={1}
+                                              text= {formatTo12Hour(rec?.outtime) || '--'}
+                                              style={styles.recordPunchTime}>
+                                               
+                                              </TranslatedText>
                                             </View>
                                           )}
                                         </View>
@@ -786,7 +808,7 @@ const List = ({ selectedMonth, showFilter, fromDate, toDate }: any) => {
             height: Dimensions.get('screen').height * 0.75,
             flex: 1, justifyContent: 'center', alignContent: 'center', alignItems: 'center'
           }}>
-            <NoData />
+            <NoData isShowTop = {false}/>
           </View>
         </>
       }

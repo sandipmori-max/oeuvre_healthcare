@@ -22,7 +22,7 @@ const StartupScreen = ({ navigation }: any) => {
 
   return (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <FullViewLoader />
+      <FullViewLoader isShowTop={false}/>
     </View>
   );
 };

@@ -3,6 +3,7 @@ import { View, Text, FlatList, Dimensions, TouchableOpacity } from 'react-native
 import { PieChart } from 'react-native-gifted-charts';
 import { useAppSelector } from '../../../../store/hooks';
 import { DARK_COLOR } from '../../../../utils/constants';
+import TranslatedText from './TranslatedText';
 
 const MAX_ITEMS_PER_LIST = 5;
 
@@ -93,26 +94,29 @@ const PieChartSection = ({ pieChartData, navigation, t }: any) => {
                           gap: 4,
                         }}
                       />
-                      <Text
+                      <TranslatedText
                         numberOfLines={1}
                         style={{
                           fontWeight: '500',
                           maxWidth: 110,
                           color: theme === 'dark' ? '#fff' : "#000",
                         }}
+                        text={item.text}
                       >
-                        {item.text}
-                      </Text>
-                      <Text
+                        
+                      </TranslatedText>
+                      <TranslatedText
                         style={{
                           marginLeft: 8,
                           fontSize: 14,
                           color: item.color,
                           fontWeight: '800',
                         }}
+                        numberOfLines={1}
+                        text={`:- ${item.value}` }
                       >
-                        :- {item.value}
-                      </Text>
+                        
+                      </TranslatedText>
                     </View>
                   )}
                 />
@@ -149,14 +153,18 @@ const PieChartSection = ({ pieChartData, navigation, t }: any) => {
                         gap: 4,
                       }}
                     />
-                    <Text numberOfLines={1} style={{ maxWidth: 80 }}>
-                      {item.text}
-                    </Text>
-                    <Text
+                    <TranslatedText 
+                    text={item.text}
+                    numberOfLines={1} style={{ maxWidth: 80 }}>
+                      
+                    </TranslatedText>
+                    <TranslatedText
+                    numberOfLines={1}
+                    text={`:- ${item.value}`}
                       style={{ marginLeft: 8, fontSize: 14, color: item.color, fontWeight: '800' }}
                     >
-                      :- {item.value}
-                    </Text>
+                      
+                    </TranslatedText>
                   </View>
                 )}
               />

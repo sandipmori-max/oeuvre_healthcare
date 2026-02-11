@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Animated } from 'react-native';
+import { Animated, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { useFocusEffect } from '@react-navigation/native';
 
@@ -7,8 +7,9 @@ import { ERP_GIF } from '../../assets';
 import { styles } from './no_data_style';
 import { useAppSelector } from '../../store/hooks';
 import { useTranslation } from 'react-i18next';
+import { ERP_COLOR_CODE } from '../../utils/constants';
 
-const NoData = () => {
+const NoData = ({isShowTop = true}: any) => {
   const {t} = useTranslation()
   const theme = useAppSelector(state => state?.theme.mode);
 
@@ -63,7 +64,9 @@ const NoData = () => {
   if (!shouldRender) return null;
 
   return (
-    <Animated.View
+    <>
+    {isShowTop &&  <View style={{height: 16, width: '100%', backgroundColor: theme === 'dark' ? 'black' : ERP_COLOR_CODE.ERP_APP_COLOR, borderBottomLeftRadius: 12, borderBottomRightRadius: 12}}></View>}
+     <Animated.View
       style={[
         styles.container,
         theme === 'dark' && { backgroundColor: 'black' },
@@ -101,6 +104,8 @@ const NoData = () => {
         {t('test9')}
       </Animated.Text>
     </Animated.View>
+    </>
+   
   );
 };
 

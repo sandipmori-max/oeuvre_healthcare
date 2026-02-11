@@ -352,5 +352,8 @@ export default {
   text96: 'Add account...',
   text97: 'Add account',
   text98: 'Remove',
-  text99: 'Hello'
+  text99: 'Hello',
+  company_code_required: "Company code is required",
+  user_name_required: "User name is required",
+  password_required: "Password is required"
 };

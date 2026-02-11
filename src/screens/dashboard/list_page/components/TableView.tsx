@@ -123,6 +123,7 @@ const TableView = ({
               id: item?.id,
               url: pageName,
               isFromBusinessCard: isFromBusinessCard,
+              isFromProfile: false
             });
           }
         }}
@@ -216,7 +217,7 @@ const TableView = ({
             backgroundColor: ERP_COLOR_CODE.ERP_WHITE,
           }}
         >
-          <NoData />
+          <NoData isShowTop = {false}/>
         </View>
       </>
     );

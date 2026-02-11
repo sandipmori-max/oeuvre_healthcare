@@ -28,6 +28,7 @@ import { useAppSelector } from '../../../../store/hooks';
 import useTranslations from '../../../../hooks/useTranslations';
 import { Easing } from 'react-native';
 import ImageBottomSheetModal from '../../../../components/bottomsheet/ImageBottomSheetModal';
+import TranslatedText from '../../tabs/home/TranslatedText';
 
 // enable LayoutAnimation on Android
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -233,6 +234,7 @@ const ReadableView = ({
                 id: item?.id,
                 url: pageName,
                 isFromBusinessCard,
+                isFromProfile: false
               });
             }
           }}
@@ -263,26 +265,33 @@ const ReadableView = ({
                   <Image source={{ uri: baseUrl }} style={styles.profileImage} />
                 </TouchableOpacity>
               ) : (
-                <Text
+                <TranslatedText
                   style={{
                     color: 'black',
                     fontWeight: '400',
                     fontSize: 16,
                   }}
+                  numberOfLines={1}
+                  text={avatarLetter}
                 >
-                  {avatarLetter}
-                </Text>
+                  
+                </TranslatedText>
               )}</>
             }
           </View>
 
           <View style={{ flex: 1 }}>
-            <Text style={{ fontWeight: '700', color: theme === 'dark' ? 'white' : 'black' }} numberOfLines={1}>
-              {name}
-            </Text>
-            <Text style={{ fontSize: 12, color: theme === 'dark' ? 'white' : 'black' }} numberOfLines={1}>
-              {subName}
-            </Text>
+            <TranslatedText
+            text={name}
+            
+            style={{ fontWeight: '700', color: theme === 'dark' ? 'white' : 'black' }} numberOfLines={1}>
+              
+            </TranslatedText>
+            <TranslatedText 
+            text={subName}
+            style={{ fontSize: 12, color: theme === 'dark' ? 'white' : 'black' }} numberOfLines={1}>
+              
+            </TranslatedText>
           </View>
 
           <View
@@ -300,7 +309,7 @@ const ReadableView = ({
               }}> </View>
             }
             {
-              status && <Text
+              status && <TranslatedText
                 style={{
                   fontWeight: '600',
                   fontSize: 12,
@@ -308,13 +317,15 @@ const ReadableView = ({
                   textAlign: 'right',
                   color: theme === 'dark' ? 'white' : ERP_COLOR_CODE.ERP_COLOR,
                 }}
+                numberOfLines={1}
+                text= {status}
               >
-                {status}
-              </Text>
+               
+              </TranslatedText>
             }
 
             {!!date && (
-              <Text
+              <TranslatedText
                 style={{
                   fontWeight: '800',
                   fontSize: 12,
@@ -323,11 +334,13 @@ const ReadableView = ({
                   alignItems: 'flex-end',
                   textAlign: 'right'
                 }}
-              >
-                {
+                numberOfLines={1}
+                text={
                   formatDateList(date)
                 }
-              </Text>
+              >
+                
+              </TranslatedText>
             )}
           </View>
         </TouchableOpacity>
@@ -342,6 +355,7 @@ const ReadableView = ({
                 id: item?.id,
                 url: pageName,
                 isFromBusinessCard,
+                isFromProfile: false
               });
             }
           }}
@@ -361,7 +375,7 @@ const ReadableView = ({
                 </View>
                 <View style={{ width: '30%', alignItems: 'flex-end' }}>
                   {!qty && !!amount && (
-                    <Text
+                    <TranslatedText
                       numberOfLines={1}
                       style={{
                         textAlign: 'right',
@@ -369,9 +383,10 @@ const ReadableView = ({
                         fontWeight: '700',
                         color: '#28a745',
                       }}
+                      text={`₹ ${amount}`}
                     >
-                      ₹ {amount}
-                    </Text>
+                     
+                    </TranslatedText>
                   )}
                 </View>
               </View>
@@ -390,12 +405,14 @@ const ReadableView = ({
                     size={16}
                     color={theme === 'dark' ? 'white' : ERP_COLOR_CODE.ERP_APP_COLOR}
                   />
-                  <Text
+                  <TranslatedText
                     numberOfLines={2}
                     style={{
                       width: '96%',
                       color: theme === 'dark' ? 'white' : 'black'
-                    }}>{address}</Text>
+                    }}
+                    text={address}
+                    ></TranslatedText>
                 </View>
               )}
             </View>
@@ -421,7 +438,7 @@ const ReadableView = ({
                 >
                   {t("text.text28")}:
                 </Text>
-                <Text
+                <TranslatedText
                   numberOfLines={1}
                   style={{
                     textAlign: 'right',
@@ -429,8 +446,9 @@ const ReadableView = ({
                     fontWeight: '700',
                     color: '#07581dff',
                   }}
-                >  {qty}
-                </Text>
+                  text= {qty}
+                > 
+                </TranslatedText>
               </View>
             )}
             {!!amount && !!qty && (
@@ -450,7 +468,7 @@ const ReadableView = ({
                 >
                   {t("text.text29")}:
                 </Text>
-                <Text
+                <TranslatedText
                   numberOfLines={1}
                   style={{
                     textAlign: 'right',
@@ -458,10 +476,11 @@ const ReadableView = ({
                     fontWeight: '700',
                     color: 'green',
                   }}
-                >  {
+                  text={
                     amount
                   }
-                </Text>
+                >  
+                </TranslatedText>
               </View>
             )}
           </View>
@@ -494,15 +513,17 @@ const ReadableView = ({
                     handleActionButtonPressed(actionValue, label, color, item?.id, item);
                   }}
                 >
-                  <Text
+                  <TranslatedText
                     style={{
                       color: ERP_COLOR_CODE.ERP_WHITE,
                       fontWeight: '600',
                       fontSize: 12,
                     }}
+                    numberOfLines={1}
+                    text={label}
                   >
-                    {label}
-                  </Text>
+                    
+                  </TranslatedText>
                 </TouchableOpacity>
               );
             })}
@@ -545,7 +566,7 @@ const ReadableView = ({
           backgroundColor: theme === 'dark' ? 'black' : ERP_COLOR_CODE.ERP_WHITE,
         }}
       >
-        <NoData />
+        <NoData isShowTop = {false}/>
       </View>
     );
   }
@@ -608,16 +629,18 @@ const ReadableView = ({
                   >
                     {t("text.text28")} :-
                   </Text>
-                  <Text
+                  <TranslatedText
                     style={{
                       fontSize: 16,
                       fontWeight: 'bold',
                       color: theme === 'dark' ? 'white' : '#28a745',
                       marginLeft: 8,
                     }}
+                    numberOfLines={1}
+                    text=  {totalQty?.toFixed(2)}
                   >
-                    {totalQty?.toFixed(2)}
-                  </Text>
+                  
+                  </TranslatedText>
                 </View>
               )}
 
@@ -636,7 +659,7 @@ const ReadableView = ({
                   >
                     {t("text.text29")} :-
                   </Text>
-                  <Text
+                  <TranslatedText
                     style={{
                       fontSize: 16,
                       fontWeight: 'bold',
@@ -644,23 +667,27 @@ const ReadableView = ({
                       marginLeft: 8,
 
                     }}
+                    numberOfLines={1}
+                    text={`₹ ${totalAmount?.toFixed(2)}`}
                   >
-                    ₹ {totalAmount?.toFixed(2)}
-                  </Text>
+                    
+                  </TranslatedText>
                 </View>
               )}
             </View>
 
             <View style={{ justifyContent: 'space-between', flexDirection: 'row' }}>
-              <Text
+              <TranslatedText
                 style={{
                   fontSize: 14,
                   fontWeight: '700',
                   color: theme === 'dark' ? 'white' : ERP_COLOR_CODE.ERP_333,
                 }}
+                text={`${listData?.length} ${t("text.text31")}`}
+                numberOfLines={1}
               >
-                {listData?.length} {t("text.text31")}
-              </Text>
+                
+              </TranslatedText>
             </View>
           </View>
         </Animated.View>

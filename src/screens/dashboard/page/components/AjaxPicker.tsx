@@ -9,6 +9,7 @@ import FullViewLoader from '../../../../components/loader/FullViewLoader';
 import useTranslations from '../../../../hooks/useTranslations';
 import InputError from '../../../../components/error/InputError';
 import NoData from '../../../../components/no_data/NoData';
+import TranslatedText from '../../tabs/home/TranslatedText';
 
 const AjaxPicker = ({ isValidate, label, onValueChange, item, errors, dtext, formValues }: any) => {
   const dispatch = useAppDispatch();
@@ -90,9 +91,13 @@ const AjaxPicker = ({ isValidate, label, onValueChange, item, errors, dtext, for
   return (
     <View style={{ marginBottom: 16 }}>
       <View style={{ flexDirection: 'row' }}>
-        <Text style={[styles.label, theme === 'dark' && {
+        <TranslatedText 
+        numberOfLines={1}
+        style={[styles.label, theme === 'dark' && {
           color: 'white'
-        }]}>{label}</Text>
+        }]}
+        text={label}
+        ></TranslatedText>
         {item?.tooltip !== label && <Text style={[styles.label, theme === 'dark' && {
           color: 'white'
         }]}> - ( {item?.tooltip} ) </Text>}
@@ -129,9 +134,13 @@ const AjaxPicker = ({ isValidate, label, onValueChange, item, errors, dtext, for
         }}
         activeOpacity={0.7}
       >
-        <Text style={{ color: theme === 'dark' ? 'white' : selectedOption ? ERP_COLOR_CODE.ERP_BLACK : ERP_COLOR_CODE.ERP_888, flex: 1 }}>
-          {selectedOption || `${t("text.text34")} ${label}`}
-        </Text>
+        <TranslatedText 
+        numberOfLines={1}
+        text={selectedOption || `${t("text.text34")} ${label}`}
+
+        style={{ color: theme === 'dark' ? 'white' : selectedOption ? ERP_COLOR_CODE.ERP_BLACK : ERP_COLOR_CODE.ERP_888, flex: 1 }}>
+          
+        </TranslatedText>
         <MaterialIcons name={'arrow-drop-down'} size={24} color={ERP_COLOR_CODE.ERP_555} />
       </TouchableOpacity>
 
@@ -159,7 +168,10 @@ const AjaxPicker = ({ isValidate, label, onValueChange, item, errors, dtext, for
             ]}
           >
             <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-              <Text style={{ fontSize: 16, fontWeight: '600', color: theme === 'dark' ? 'white' : "#000" }}>{label}</Text>
+              <TranslatedText 
+              numberOfLines={1}
+              text={label}
+              style={{ fontSize: 16, fontWeight: '600', color: theme === 'dark' ? 'white' : "#000" }}></TranslatedText>
               <TouchableOpacity onPress={() => setOpen(false)}>
                 <MaterialIcons name="close" size={24} color={theme === 'dark' ? 'white' : "#000"} />
               </TouchableOpacity>
@@ -198,7 +210,7 @@ const AjaxPicker = ({ isValidate, label, onValueChange, item, errors, dtext, for
 
             {loader ? (
               <View style={{ flex: 1, justifyContent: 'center', alignContent: 'center', alignItems: 'center' }}>
-                <FullViewLoader />
+                <FullViewLoader isShowTop={false}/>
               </View>
             ) : (
               <ScrollView keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
@@ -235,7 +247,7 @@ const AjaxPicker = ({ isValidate, label, onValueChange, item, errors, dtext, for
                                 paddingHorizontal: 6,
                               }}
                             >
-                              <Text
+                              <TranslatedText
                                 style={[{
                                   color:
                                     key === label?.toLowerCase()
@@ -247,10 +259,10 @@ const AjaxPicker = ({ isValidate, label, onValueChange, item, errors, dtext, for
                                   color: theme === 'dark' ? 'white' : "#000"
                                 }]}
                                 numberOfLines={1}
-                                ellipsizeMode="tail"
+                                text= {String(value)}
                               >
-                                {String(value)}
-                              </Text>
+                               
+                              </TranslatedText>
                             </View>
                           ))}
                         </View>
@@ -268,7 +280,7 @@ const AjaxPicker = ({ isValidate, label, onValueChange, item, errors, dtext, for
                     marginTop: 200,
                   }}
                 >
-                  <NoData />
+                  <NoData isShowTop = {false}/>
                 </View>
                 )}
               </ScrollView>
