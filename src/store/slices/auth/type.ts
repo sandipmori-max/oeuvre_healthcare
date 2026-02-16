@@ -56,5 +56,7 @@ export interface AuthState {
   appDrawerMenuList: [],
   appBottomMenuList: [],
   appColorCode: string,
-  isPinVerifyLoaded: boolean
+  isPinVerifyLoaded: boolean,
+  attendanceDone: boolean,
+  locationLogs: []
 }

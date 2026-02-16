@@ -22,7 +22,8 @@ const authPersistConfig = {
   'appDrawerMenuList',
   'appBottomMenuList',
   'appColorCode',
-  'accounts'
+  'accounts',
+  'locationLogs'
   ],
 };
 

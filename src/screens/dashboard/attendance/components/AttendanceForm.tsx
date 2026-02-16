@@ -1,52 +1,75 @@
-import { View, Text, Image, TextInput, AppState, Dimensions, Animated, TouchableOpacity } from 'react-native';
-import React, { useState, useRef, useEffect } from 'react';
-import { Formik } from 'formik';
-import * as Yup from 'yup';
-import Geolocation from '@react-native-community/geolocation';
-import { launchCamera } from 'react-native-image-picker';
+import {
+  View,
+  Text,
+  Image,
+  TextInput,
+  AppState,
+  Dimensions,
+  Animated,
+  TouchableOpacity,
+} from "react-native";
+import React, { useState, useRef, useEffect } from "react";
+import { Formik } from "formik";
+import * as Yup from "yup";
+import Geolocation from "@react-native-community/geolocation";
+import { launchCamera } from "react-native-image-picker";
 
-import { AttendanceFormValues, UserLocation } from '../types';
-import { firstLetterUpperCase, requestCameraAndLocationPermission } from '../../../../utils/helpers';
-import useTranslations from '../../../../hooks/useTranslations';
-import { styles } from '../attendance_style';
-import CustomAlert from '../../../../components/alert/CustomAlert';
-import { useAppDispatch, useAppSelector } from '../../../../store/hooks';
-import { markAttendanceThunk } from '../../../../store/slices/attendance/thunk';
-import { ERP_COLOR_CODE } from '../../../../utils/constants';
-import { useNavigation } from '@react-navigation/native';
-import SlideButton from './SlideButton';
-import { useBaseLink } from '../../../../hooks/useBaseLink';
-import ProfileImage from '../../../../components/profile/ProfileImage';
-import DeviceInfo from 'react-native-device-info';
-import { setReloadApp } from '../../../../store/slices/reloadApp/reloadAppSlice';
-import { Easing } from 'react-native';
-import ImageBottomSheetModal from '../../../../components/bottomsheet/ImageBottomSheetModal';
-import TranslatedText from '../../tabs/home/TranslatedText';
+import { AttendanceFormValues, UserLocation } from "../types";
+import {
+  firstLetterUpperCase,
+  requestCameraAndLocationPermission,
+} from "../../../../utils/helpers";
+import useTranslations from "../../../../hooks/useTranslations";
+import { styles } from "../attendance_style";
+import CustomAlert from "../../../../components/alert/CustomAlert";
+import { useAppDispatch, useAppSelector } from "../../../../store/hooks";
+import { markAttendanceThunk } from "../../../../store/slices/attendance/thunk";
+import { ERP_COLOR_CODE } from "../../../../utils/constants";
+import { useNavigation } from "@react-navigation/native";
+import SlideButton from "./SlideButton";
+import { useBaseLink } from "../../../../hooks/useBaseLink";
+import ProfileImage from "../../../../components/profile/ProfileImage";
+import DeviceInfo from "react-native-device-info";
+import { setReloadApp } from "../../../../store/slices/reloadApp/reloadAppSlice";
+import { Easing } from "react-native";
+import ImageBottomSheetModal from "../../../../components/bottomsheet/ImageBottomSheetModal";
+import TranslatedText from "../../tabs/home/TranslatedText";
+import { updateAttendanceState } from "../../../../store/slices/auth/authSlice";
 
 const AttendanceForm = ({ setBlockAction, resData }: any) => {
   const { t } = useTranslations();
   const [showModal, setShowModal] = useState(false);
-  const [img, setImg] = useState('')
+  const [img, setImg] = useState("");
   const navigation = useNavigation();
   const dispatch = useAppDispatch();
-  const { user } = useAppSelector(state => state?.auth);
+  const { user, attendanceDone: isAttendanceDone } =
+  useAppSelector((state) => state?.auth);
+
   const baseLink = useBaseLink();
-  const theme = useAppSelector(state => state?.theme.mode);
+  const theme = useAppSelector((state) => state?.theme.mode);
   const [statusImage, setStatusImage] = useState<string | null>(null);
   const [userLocation, setUserLocation] = useState<UserLocation | null>(null);
   const [locationLoading, setLocationLoading] = useState(false);
   const [attendanceDone, setAttendanceDone] = useState(false);
+
   const [alertVisible, setAlertVisible] = useState(false);
   const [isSettingVisible, setIsSettingVisible] = useState(false);
   const [modalClose, setModalClose] = useState(false);
   const [alertLocationVisible, setLocationAlertVisible] = useState(false);
   const [blocked, setBlocked] = useState(false);
   const [alertConfig, setAlertConfig] = useState({
-    title: '',
-    message: '',
-    type: 'info' as 'error' | 'success' | 'info',
+    title: "",
+    message: "",
+    type: "info" as "error" | "success" | "info",
   });
+  const [alertMapVisible, setAlertMapVisible] = useState(false);
 
+ 
+  const [alertMapConfig, setAlertMapConfig] = useState({
+    title: "",
+    message: "",
+    type: "info" as "error" | "success" | "info" | 'location',
+  });
   // -------------------- Pending Camera Action --------------------
   const pendingCameraAction = useRef<{
     setFieldValue: (field: keyof AttendanceFormValues, value: any) => void;
@@ -55,18 +78,21 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
 
   // -------------------- AppState Listener --------------------
   useEffect(() => {
-    const subscription = AppState.addEventListener('change', async nextAppState => {
-      if (nextAppState === 'active' && pendingCameraAction.current) {
-        const hasPermission = await requestCameraAndLocationPermission();
-        if (hasPermission) {
-          setIsSettingVisible(false);
-          setAlertVisible(false);
-          const { setFieldValue, handleSubmit } = pendingCameraAction.current;
-          pendingCameraAction.current = null;
-          openCamera(setFieldValue, handleSubmit);
+    const subscription = AppState.addEventListener(
+      "change",
+      async (nextAppState) => {
+        if (nextAppState === "active" && pendingCameraAction.current) {
+          const hasPermission = await requestCameraAndLocationPermission();
+          if (hasPermission) {
+            setIsSettingVisible(false);
+            setAlertVisible(false);
+            const { setFieldValue, handleSubmit } = pendingCameraAction.current;
+            pendingCameraAction.current = null;
+            openCamera(setFieldValue, handleSubmit);
+          }
         }
-      }
-    });
+      },
+    );
     return () => subscription.remove();
   }, []);
 
@@ -76,12 +102,12 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
   ) => {
     launchCamera(
       {
-        mediaType: 'photo',
-        cameraType: 'back',
+        mediaType: "photo",
+        cameraType: "back",
         quality: 0.7,
         includeBase64: true,
       },
-      response => {
+      (response) => {
         if (response?.didCancel || response?.errorCode) {
           setLocationLoading(false);
           setBlockAction(false);
@@ -92,8 +118,11 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
         if (!photoUri) return;
         if (asset?.base64) {
           setFieldValue(
-            'imageBase64',
-            `${resData?.success === 1 || resData?.success === '1' ? 'punchOut.jpeg' : 'punchIn.jpeg'
+            "imageBase64",
+            `${
+              resData?.success === 1 || resData?.success === "1"
+                ? "punchOut.jpeg"
+                : "punchIn.jpeg"
             }; data:${asset?.type};base64,${asset?.base64}`,
           );
         }
@@ -126,9 +155,9 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
     if (!hasPermission) {
       pendingCameraAction.current = { setFieldValue, handleSubmit };
       setAlertConfig({
-        title: t('errors.permissionRequired'),
-        message: t('errors.cameraLocationPermission'),
-        type: 'error',
+        title: t("errors.permissionRequired"),
+        message: t("errors.cameraLocationPermission"),
+        type: "error",
       });
       setModalClose(false);
       setAlertVisible(true);
@@ -143,18 +172,18 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
 
     const getLocationWithRetry = () => {
       Geolocation.getCurrentPosition(
-        position => {
+        (position) => {
           const { latitude, longitude } = position?.coords;
           setUserLocation({ latitude, longitude });
-          setFieldValue('latitude', String(latitude));
-          setFieldValue('longitude', String(longitude));
+          setFieldValue("latitude", String(latitude));
+          setFieldValue("longitude", String(longitude));
           openCamera(setFieldValue, handleSubmit);
         },
-        error => {
+        (error) => {
           setAlertConfig({
-            title: t('errors.locationError'),
+            title: t("errors.locationError"),
             message: error?.message || t("msg.msg5"),
-            type: 'error',
+            type: "error",
           });
           setAlertVisible(true);
           setLocationLoading(false);
@@ -170,12 +199,12 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
     getLocationWithRetry();
   };
 
-  const formatName = (name = '') =>
+  const formatName = (name = "") =>
     name
       .toLowerCase()
-      .split(' ')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ');
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
 
   const animProfile = useRef(new Animated.Value(20)).current;
   const animName = useRef(new Animated.Value(20)).current;
@@ -260,60 +289,81 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
   }, []);
 
   return (
-    <View style={{
-      width: '100%',
-      padding: 16,
-      // backgroundColor: theme === 'dark' ? 'black' : 'white'
-    }}>
+    <View
+      style={{
+        width: "100%",
+        padding: 16,
+        // backgroundColor: theme === 'dark' ? 'black' : 'white'
+      }}
+    >
       <Formik
         initialValues={{
           name: user?.name,
-          latitude: userLocation ? String(userLocation?.latitude) : '',
-          longitude: userLocation ? String(userLocation?.longitude) : '',
-          remark: '',
+          latitude: userLocation ? String(userLocation?.latitude) : "",
+          longitude: userLocation ? String(userLocation?.longitude) : "",
+          remark: "",
           dateTime: new Date().toISOString(),
-          imageBase64: '',
+          imageBase64: "",
         }}
         validationSchema={Yup.object({
-          name: Yup.string().required(t('attendance.nameRequired')),
+          name: Yup.string().required(t("attendance.nameRequired")),
           longitude: Yup.string().optional(),
           remark: Yup.string().optional(),
           dateTime: Yup.string().optional(),
           imageBase64: Yup.string().required(t("msg.msg6")),
         })}
-        onSubmit={values => {
+        onSubmit={(values) => {
           dispatch(
             markAttendanceThunk({
               rawData: values,
-              type: resData?.success === 1 || resData?.success === '1' ? false : true,
+              type:
+                resData?.success === 1 || resData?.success === "1"
+                  ? false
+                  : true,
               user,
-              id: resData?.success === 1 || resData?.success === '1' ? resData?.id : '0',
+              id:
+                resData?.success === 1 || resData?.success === "1"
+                  ? resData?.id
+                  : "0",
             }),
           )
             .unwrap()
-            .then(res => {
+            .then((res) => {
+              if(resData?.success === 1 || resData?.success === "1"){
+                dispatch(updateAttendanceState(true));
+              }else{
+                dispatch(updateAttendanceState(false));
+              }
               setAttendanceDone(true);
               setAlertConfig({
                 title: t("title.title3"),
-                message: t('msg.msg7'),
-                type: 'success',
+                message: t("msg.msg7"),
+                type: "success",
               });
               setAlertVisible(true);
               setLocationLoading(false);
               setBlockAction(false);
 
               setTimeout(() => {
-                navigation?.goBack();
-                setAlertVisible(false);
-                dispatch(setReloadApp())
-              }, 1800);
+                 setAlertVisible(false);
+
+                setAlertMapConfig({
+                  title: "Location tracked status",
+                  message:
+                    !isAttendanceDone
+                      ? "You will be tracked until Punch Out"
+                      : "tracked stop",
+                  type: 'location',
+                });
+                setAlertMapVisible(true);
+              }, 1100);
             })
-            .catch(err => {
+            .catch((err) => {
               setAttendanceDone(false);
               setAlertConfig({
                 title: t("title.title1"),
-                message: err || t('msg.msg4'),
-                type: 'error',
+                message: err || t("msg.msg4"),
+                type: "error",
               });
               setAlertVisible(true);
               setLocationLoading(false);
@@ -322,18 +372,23 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
         }}
       >
         {({ values, errors, touched, setFieldValue, handleSubmit }) => (
-          <View style={[styles.profileCard,
-          {
-            backgroundColor: theme === 'dark' ? 'black' : 'transparent'
-          }
-          ]}>
+          <View
+            style={[
+              styles.profileCard,
+              {
+                backgroundColor: theme === "dark" ? "black" : "transparent",
+              },
+            ]}
+          >
             <View style={styles.profileRow}>
               <View style={styles.imageCol}>
                 {`${baseLink}/FileUpload/1/UserMaster/${user?.id}/profileimage.jpeg` ? (
                   <TouchableOpacity
                     onPress={() => {
-                      setImg(`${baseLink}/FileUpload/1/UserMaster/${user?.id}/profileimage.jpeg`)
-                      setShowModal(true)
+                      setImg(
+                        `${baseLink}/FileUpload/1/UserMaster/${user?.id}/profileimage.jpeg`,
+                      );
+                      setShowModal(true);
                     }}
                   >
                     <Animated.View
@@ -343,18 +398,21 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
                       }}
                     >
                       <View style={styles.profileRow}>
-                        <ProfileImage userId={user?.id} baseLink={baseLink} userName={firstLetterUpperCase(user?.name || '')} />
+                        <ProfileImage
+                          userId={user?.id}
+                          baseLink={baseLink}
+                          userName={firstLetterUpperCase(user?.name || "")}
+                        />
                       </View>
                     </Animated.View>
                   </TouchableOpacity>
-
                 ) : (
                   <View
                     style={[
                       styles.profileAvatar,
                       {
-                        justifyContent: 'center',
-                        alignItems: 'center',
+                        justifyContent: "center",
+                        alignItems: "center",
                         backgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR,
                       },
                     ]}
@@ -366,12 +424,14 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
                       }}
                     >
                       <TranslatedText
-                        text={firstLetterUpperCase(user?.name || '')}
+                        text={firstLetterUpperCase(user?.name || "")}
                         numberOfLines={1}
-                        style={{ color: ERP_COLOR_CODE.ERP_WHITE, fontWeight: 'bold', fontSize: 26 }}
-                      >
-                        
-                      </TranslatedText>
+                        style={{
+                          color: ERP_COLOR_CODE.ERP_WHITE,
+                          fontWeight: "bold",
+                          fontSize: 26,
+                        }}
+                      ></TranslatedText>
                     </Animated.View>
                   </View>
                 )}
@@ -386,45 +446,68 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
                 }}
               >
                 <View style={styles.formGroup}>
-                  <Text style={[styles.label, theme === 'dark' && {
-                    color: 'white'
-                  }]}>{t('attendance.employeeName')}</Text>
+                  <Text
+                    style={[
+                      styles.label,
+                      theme === "dark" && {
+                        color: "white",
+                      },
+                    ]}
+                  >
+                    {t("attendance.employeeName")}
+                  </Text>
                   <TextInput
-                    style={[styles.input, styles.inputReadonly, theme === 'dark' && {
-                      borderWidth: 1,
-                      borderColor: 'white',
-                      color: 'black',
-                      backgroundColor: 'black'
-                    },
-                    { backgroundColor: ERP_COLOR_CODE.ERP_BORDER_LINE }
+                    style={[
+                      styles.input,
+                      styles.inputReadonly,
+                      theme === "dark" && {
+                        borderWidth: 1,
+                        borderColor: "white",
+                        color: "black",
+                        backgroundColor: "black",
+                      },
+                      { backgroundColor: ERP_COLOR_CODE.ERP_BORDER_LINE },
                     ]}
                     value={formatName(values?.name)}
                     editable={false}
                   />
                   {touched?.name && errors?.name ? (
-                    <TranslatedText 
-                    numberOfLines={1}
-                    text={errors?.name}
-                    style={styles.errorText}></TranslatedText>
+                    <TranslatedText
+                      numberOfLines={1}
+                      text={errors?.name}
+                      style={styles.errorText}
+                    ></TranslatedText>
                   ) : null}
                 </View>
                 <View style={styles.formGroup}>
-                  <Text style={[styles.label, theme === 'dark' && {
-                    color: 'white'
-                  }]}>{
-                  resData?.success === 1 || resData?.success === '1' ? t('attendance.outremark') : t('attendance.remark') }</Text>
-                     
+                  <Text
+                    style={[
+                      styles.label,
+                      theme === "dark" && {
+                        color: "white",
+                      },
+                    ]}
+                  >
+                    {resData?.success === 1 || resData?.success === "1"
+                      ? t("attendance.outremark")
+                      : t("attendance.remark")}
+                  </Text>
+
                   <TextInput
-                    style={[styles.input, { minHeight: 100, textAlignVertical: 'top' }, theme === 'dark' && {
-                      borderWidth: 1,
-                      borderColor: 'white',
-                      color: 'white',
-                      backgroundColor: 'black'
-                    }]}
-                    placeholderTextColor={theme === 'dark' ? 'white' : 'black'}
+                    style={[
+                      styles.input,
+                      { minHeight: 100, textAlignVertical: "top" },
+                      theme === "dark" && {
+                        borderWidth: 1,
+                        borderColor: "white",
+                        color: "white",
+                        backgroundColor: "black",
+                      },
+                    ]}
+                    placeholderTextColor={theme === "dark" ? "white" : "black"}
                     value={values?.remark}
-                    onChangeText={text => setFieldValue('remark', text)}
-                    placeholder={t('attendance.enterRemark')}
+                    onChangeText={(text) => setFieldValue("remark", text)}
+                    placeholder={t("attendance.enterRemark")}
                     multiline
                     numberOfLines={3}
                   />
@@ -432,8 +515,13 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
               </Animated.View>
               {statusImage && (
                 <View>
-                  <Image source={{ uri: statusImage }} style={styles.selfyAvatar} />
-                  <Text style={styles.imageLabel}>{t('attendance.capturedPhoto')}</Text>
+                  <Image
+                    source={{ uri: statusImage }}
+                    style={styles.selfyAvatar}
+                  />
+                  <Text style={styles.imageLabel}>
+                    {t("attendance.capturedPhoto")}
+                  </Text>
                 </View>
               )}
               <Animated.View
@@ -445,19 +533,21 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
                 <View>
                   <SlideButton
                     label={
-                      resData?.success === 1 || resData?.success === '1'
-                        ? `${t("text.text3")} ${t('attendance.checkOut')}`
-                        : `${t("text.text3")} ${t('attendance.checkIn')}`
+                      resData?.success === 1 || resData?.success === "1"
+                        ? `${t("text.text3")} ${t("attendance.checkOut")}`
+                        : `${t("text.text3")} ${t("attendance.checkIn")}`
                     }
                     successColor={
-                      resData?.success === 1 || resData?.success === '1'
+                      resData?.success === 1 || resData?.success === "1"
                         ? ERP_COLOR_CODE.ERP_ERROR
                         : ERP_COLOR_CODE.ERP_APP_COLOR
                     }
                     loading={locationLoading}
                     completed={attendanceDone}
                     blocked={blocked}
-                    onSlideSuccess={() => handleStatusToggle(setFieldValue, handleSubmit)}
+                    onSlideSuccess={() =>
+                      handleStatusToggle(setFieldValue, handleSubmit)
+                    }
                   />
                 </View>
               </Animated.View>
@@ -466,17 +556,17 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
         )}
       </Formik>
 
-   <ImageBottomSheetModal
-          visible={showModal}
-          onClose={() => setShowModal(false)}
-          imageUrl={img}
-        />
+      <ImageBottomSheetModal
+        visible={showModal}
+        onClose={() => setShowModal(false)}
+        imageUrl={img}
+      />
 
       <CustomAlert
         visible={alertLocationVisible}
         title={t("title.title4")}
         message={t("msg.msg8")}
-        type={'error'}
+        type={"error"}
         onClose={() => {
           setBlocked(true);
           setAlertVisible(false);
@@ -486,6 +576,21 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
           setLocationLoading(false);
           setAttendanceDone(false);
           setLocationAlertVisible(false);
+        }}
+        actionLoader={undefined}
+        isSettingVisible={false}
+        closeHide={undefined}
+      />
+
+      <CustomAlert
+        visible={alertMapVisible}
+        title={alertMapConfig?.title}
+        message={alertMapConfig?.message}
+        type={alertMapConfig?.type}
+        onClose={() => {
+          navigation?.goBack();
+          setAlertMapVisible(false);
+          dispatch(setReloadApp());
         }}
         actionLoader={undefined}
         isSettingVisible={false}
