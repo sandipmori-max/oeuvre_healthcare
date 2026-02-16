@@ -33,7 +33,9 @@ const initialState: AuthState = {
   appDrawerMenuList: [],
   appBottomMenuList: [],
   appColorCode: '',
-  isPinVerifyLoaded: false
+  isPinVerifyLoaded: false,
+  attendanceDone: false,
+  locationLogs: [],
 };
 
 const authSlice = createSlice({
@@ -43,8 +45,14 @@ const authSlice = createSlice({
     clearError: state => {
       state.error = null;
     },
+     addLocation: (state, action) => {
+      state.locationLogs.unshift(action.payload);
+    },
     updatePinVerifyLoadedState: (state, action: PayloadAction<boolean>) => {
       state.isPinVerifyLoaded = action.payload;
+    },
+    updateAttendanceState: (state, action: PayloadAction<boolean>) => {
+      state.attendanceDone = action.payload;
     },
     setIsPinLoaded: state => {
       state.isPinLoaded = true;
@@ -383,6 +391,8 @@ export const {
   setActiveDashboardType,
   setActiveDashboardTypeId,
   clearAuthState,
-  updatePinVerifyLoadedState
+  updatePinVerifyLoadedState,
+  updateAttendanceState,
+  addLocation
 } = authSlice.actions;
 export default authSlice.reducer;

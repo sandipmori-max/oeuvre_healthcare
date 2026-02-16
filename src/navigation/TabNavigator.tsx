@@ -28,6 +28,11 @@ const TabNavigator = () => {
     return null; // बाकी MenuTab में जाएगा
   };
 
+if (!appBottomMenuList || appBottomMenuList.length === 0) {
+  return null; // ya loading spinner
+}
+
+
   return (
     <Tab.Navigator
       screenOptions={{

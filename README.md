@@ -504,6 +504,7 @@ Below flatlist - 1014
                             <Text style={{
                               fontSize: 30,
                               fontFamily: "Handlee-Regular",
+                               color : theme === 'dark' ? 'white' : 'black'
                             }}>Welcome</Text>
                           </View>
 
@@ -530,6 +531,7 @@ inside controls?.length === 0 && !isDashboardLoading - 934
                   <Text style={{
                     fontSize: 30,
                     fontFamily: "Handlee-Regular",
+                     color : theme === 'dark' ? 'white' : 'black'
                   }}>Welcome</Text>
                 </View>
               </View>

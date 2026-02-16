@@ -21,6 +21,8 @@ const AjaxPicker = ({ isValidate, label, onValueChange, item, errors, dtext, for
   const [search, setSearch] = useState('');
   const theme = useAppSelector(state => state?.theme.mode);
   const { t } = useTranslations();
+  const { user } = useAppSelector((state) => state?.auth);
+    console.log("user------user-------user------------", user)
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -37,10 +39,23 @@ const AjaxPicker = ({ isValidate, label, onValueChange, item, errors, dtext, for
 
   const fetchOptions = useCallback(async () => {
 
-    const resolvedWhere = item?.ddlwhere.replace(/\{(\w+)\}/g, (_, key) => {
-      const lowerKey = key.toLowerCase();
-       return formValues.hasOwnProperty(lowerKey) ? formValues[lowerKey] : `{${key}}`;
-    });
+   console.log("item-------------------------", item);
+
+let resolvedWhere = item?.ddlwhere;
+
+// 1️⃣ Replace {key} format
+resolvedWhere = resolvedWhere?.replace(/\{(\w+)\}/g, (_, key) => {
+  const lowerKey = key.toLowerCase();
+  return formValues.hasOwnProperty(lowerKey)
+    ? formValues[lowerKey]
+    : `{${key}}`;
+});
+
+// 2️⃣ Replace $UID with item.id
+resolvedWhere = resolvedWhere?.replace(/\$UID/g, user?.id);
+
+console.log("resolvedWhere-------------------------", resolvedWhere);
+
  
     try {
       setLoader(true);
@@ -65,6 +80,7 @@ const AjaxPicker = ({ isValidate, label, onValueChange, item, errors, dtext, for
   };
 
   const handleSelect = (opt: any) => {
+    console.log("item----", item)
     const afterDash = item?.ddl?.split('-')[1];
     const arr = afterDash?.split(',');
 

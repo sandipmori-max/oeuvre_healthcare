@@ -18,6 +18,7 @@ import PinSetupScreen from '../screens/dashboard/pinset/Pinset';
 import PinVerifyScreen from '../screens/dashboard/pinset/PinVerify';
 import { useAppSelector } from '../store/hooks';
 import MaterialIcons from '@react-native-vector-icons/material-icons';
+import LocationTrackScreen from '../screens/dashboard/tabs/home/LocationTrack';
 
 const Stack = createStackNavigator<any>();
 
@@ -136,7 +137,15 @@ const StackNavigator = () => {
         component={PinVerifyScreen}
       />
       <Stack.Screen name="Home" component={TabNavigator} />
-      <Stack.Screen options={screenOptions} name="Attendance" component={AttendanceScreen} />
+     <Stack.Screen
+        name="Attendance"
+        component={AttendanceScreen}
+        options={{
+          ...screenOptions,
+          gestureEnabled: false,  // Back button hide
+        }}
+      />
+
       <Stack.Screen options={screenOptions} name="MyAttendance" component={AttendanceScreen} />
       <Stack.Screen options={screenOptions} name="Business" component={DisplayScreen} />
       {/* <Stack.Screen options={screenOptions} name="File Manager" component={ScanScreen} /> */}
@@ -144,9 +153,13 @@ const StackNavigator = () => {
       <Stack.Screen options={screenOptions} name="Web" component={WebScreen} />
       <Stack.Screen options={screenOptions} name="Page" component={PageScreen} />
       <Stack.Screen options={screenOptions} name="List" component={ListScreen} />
+      <Stack.Screen options={screenOptions} name="LocationTrack" component={LocationTrackScreen} />
+
       <Stack.Screen name="Tasks" component={DisplayScreen} options={screenOptions} />
     </Stack.Navigator>
   );
 };
 
 export default StackNavigator;
+
+

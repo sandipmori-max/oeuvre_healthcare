@@ -4,7 +4,6 @@ import { styles } from '../page_style';
 import { DARK_COLOR, ERP_COLOR_CODE } from '../../../../utils/constants';
 import { formatDateHr, handleEmailPress, handlePhonePress } from '../../../../utils/helpers';
 import { useAppSelector } from '../../../../store/hooks';
-import MaterialIcons from '@react-native-vector-icons/material-icons';
 import ShortAction from './ShortAction';
 
 const Disabled = ({ item, value, type }: any) => {

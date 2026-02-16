@@ -10,12 +10,8 @@ import {
   Dimensions,
   Keyboard,
   Platform,
-  TextInput,
   PermissionsAndroid,
-  NativeModules,
   AppState,
-  Linking,
-  Modal,
   TouchableOpacity,
   Alert,
 } from 'react-native';
@@ -36,7 +32,12 @@ import Input from './components/Input';
 import CustomAlert from '../../../components/alert/CustomAlert';
 import AjaxPicker from './components/AjaxPicker';
 import DateTimePicker from 'react-native-modal-datetime-picker';
-import { applyActionsToControls, evaluateRulesWithActions, parseCustomDatePage, requestCameraPermission } from '../../../utils/helpers';
+import {
+  applyActionsToControls,
+  evaluateRulesWithActions,
+  parseCustomDatePage,
+  requestCameraPermission,
+} from '../../../utils/helpers';
 import DateRow from './components/Date';
 import BoolInput from './components/BoolInput';
 import SignaturePad from './components/SignaturePad';
@@ -53,8 +54,6 @@ import useTranslations from '../../../hooks/useTranslations';
 import VideoRecorder from './components/VideoRecorder';
 import ScanScreen from './components/ScanScreen';
 import BarCodeScan from './components/BarCodeScan';
-import { styles } from './page_style';
-import { openSettings } from 'react-native-permissions';
 import TranslatedText from '../tabs/home/TranslatedText';
 
 type PageRouteParams = { PageScreen: { item: any } };
@@ -112,14 +111,14 @@ const PageScreen = () => {
   const baseLink = useBaseLink();
   const theme = useAppSelector(state => state?.theme.mode);
   const { t } = useTranslations();
-  const [buttonSave, setButtonSave] = useState(true)
+  const [buttonSave, setButtonSave] = useState(true);
   const [loadingPageId, setLoadingPageId] = useState<string | null>(null);
   const [controls, setControls] = useState<any[]>([]);
   const [errorsList, setErrorsList] = useState<string[]>([]);
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [isValidate, setIsValidate] = useState(false);
 
-  const [tapLoader, setTapLoader] = useState(false)
+  const [tapLoader, setTapLoader] = useState(false);
 
   const [error, setError] = useState<string | null>(null);
   const [formValues, setFormValues] = useState<any>({});
@@ -150,7 +149,7 @@ const PageScreen = () => {
   const [locationEnabled, setLocationEnabled] = useState<boolean | null>(null);
   const [modalClose, setModalClose] = useState(false);
   const [isSettingVisible, setIsSettingVisible] = useState(false);
-  const [myScript, setMyScript] = useState("");
+  const [myScript, setMyScript] = useState('');
   const [backgroundDeniedModal, setBackgroundDeniedModal] = useState(false);
 
   const isCheckingPermission = useRef(false);
@@ -159,7 +158,7 @@ const PageScreen = () => {
   const appState = useRef(AppState.currentState);
 
   const hasLocationField = controls.some(
-    item => item?.defaultvalue && item?.defaultvalue === '#location' && item?.visible === "0",
+    item => item?.defaultvalue && item?.defaultvalue === '#location' && item?.visible === '0',
   );
 
   const customScriptRule = '';
@@ -210,7 +209,7 @@ const PageScreen = () => {
   //            }
   //        ],
   //        "validActions": [
-  //             { "field": "exptype", "action": "disable" } 
+  //             { "field": "exptype", "action": "disable" }
   //            ],
   //        "invalidActions": [
   //             { "field": "exptype", "action": "enable" }
@@ -342,18 +341,15 @@ const PageScreen = () => {
   // }`
 
   const hasMediaField = controls.some(
-    item => item?.ctltype === 'IMAGE' ||
-      item?.ctltype === 'PHOTO',
+    item => item?.ctltype === 'IMAGE' || item?.ctltype === 'PHOTO',
   );
 
   useFocusEffect(
     useCallback(() => {
-      setTapLoader(false)
-      return () => {
-      };
-    }, [navigation])
+      setTapLoader(false);
+      return () => {};
+    }, [navigation]),
   );
-
 
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
@@ -404,10 +400,8 @@ const PageScreen = () => {
 
       if (enabled !== locationEnabled) {
         setAlertConfig({
-          title: t("title.title13"),
-          message: enabled
-            ? t('title.title14')
-            : t('title.title15'),
+          title: t('title.title13'),
+          message: enabled ? t('title.title14') : t('title.title15'),
           type: enabled ? 'success' : 'error',
         });
         setAlertVisible(!enabled);
@@ -450,9 +444,8 @@ const PageScreen = () => {
           setBackgroundDeniedModal(true);
         } else {
           setAlertConfig({
-            title: t("title.title13"),
-            message:
-              t('title.title15'),
+            title: t('title.title13'),
+            message: t('title.title15'),
             type: 'error',
           });
           setModalClose(false);
@@ -479,18 +472,18 @@ const PageScreen = () => {
   );
 
   const route = useRoute<RouteProp<PageRouteParams, 'PageScreen'>>();
-  const { item, title, id, isFromNew, url, pageTitle , isFromProfile}: any = route?.params;
+  const { item, title, id, isFromNew, url, pageTitle, isFromProfile }: any = route?.params;
   const isFromBusinessCard = route?.params?.isFromBusinessCard || false;
 
   const validateForm = useCallback(() => {
-    setTapLoader(true)
+    setTapLoader(true);
     const validationErrors: Record<string, string> = {};
     const errorMessages: string[] = [];
 
     controls.forEach(ctrl => {
       if (ctrl?.mandatory === '1' && !formValues[ctrl?.field]) {
-        validationErrors[ctrl.field] = `${ctrl?.fieldtitle || ctrl?.field} ${t("text.text43")}`;
-        errorMessages.push(`${ctrl?.fieldtitle || ctrl?.field} ${t("text.text43")}`);
+        validationErrors[ctrl.field] = `${ctrl?.fieldtitle || ctrl?.field} ${t('text.text43')}`;
+        errorMessages.push(`${ctrl?.fieldtitle || ctrl?.field} ${t('text.text43')}`);
       }
     });
 
@@ -498,7 +491,7 @@ const PageScreen = () => {
     setErrorsList(errorMessages);
     setTimeout(() => {
       if (errorMessages?.length > 0) setShowErrorModal(true);
-    }, 780)
+    }, 780);
 
     return errorMessages?.length === 0;
   }, [controls, formValues]);
@@ -507,7 +500,6 @@ const PageScreen = () => {
     navigation.setOptions({
       headerStyle: {
         backgroundColor: theme === 'dark' ? 'black' : ERP_COLOR_CODE.ERP_APP_COLOR,
-        
       },
       headerBackTitle: '',
       headerTintColor: '#fff',
@@ -519,27 +511,22 @@ const PageScreen = () => {
               flexShrink: 1,
               fontSize: 18,
               fontWeight: '700',
-              color: theme === 'dark' ? "white" : ERP_COLOR_CODE.ERP_WHITE,
+              color: theme === 'dark' ? 'white' : ERP_COLOR_CODE.ERP_WHITE,
             }}
             text={title || pageTitle || 'Details'}
-          >
-            
-          </TranslatedText>
-          {
-             isFromProfile === false &&  <TranslatedText
-             numberOfLines={1}
-            style={{
-              fontSize: 18,
-              fontWeight: '700',
-              color: ERP_COLOR_CODE.ERP_WHITE,
-              marginLeft: 4,
-            }}
-            text= {isFromNew ? `( ${t("text.text44")} )` : `( ${t('text.text45')} )`}
-          >
-           
-          </TranslatedText>
-          }
-         
+          ></TranslatedText>
+          {isFromProfile === false && (
+            <TranslatedText
+              numberOfLines={1}
+              style={{
+                fontSize: 18,
+                fontWeight: '700',
+                color: ERP_COLOR_CODE.ERP_WHITE,
+                marginLeft: 4,
+              }}
+              text={isFromNew ? `( ${t('text.text44')} )` : `( ${t('text.text45')} )`}
+            ></TranslatedText>
+          )}
         </View>
       ),
       headerRight: () => (
@@ -549,7 +536,7 @@ const PageScreen = () => {
               name="refresh"
               isLoading={actionLoader}
               onPress={() => {
-                setButtonSave(true)
+                setButtonSave(true);
                 setActionLoader(true);
                 fetchPageData();
                 setErrors({});
@@ -557,7 +544,6 @@ const PageScreen = () => {
               }}
             />
           )}
-          
         </>
       ),
     });
@@ -575,7 +561,7 @@ const PageScreen = () => {
     actionLoader,
     actionSaveLoader,
     buttonSave,
-    error
+    error,
   ]);
 
   const fetchPageData = useCallback(async () => {
@@ -585,12 +571,13 @@ const PageScreen = () => {
       const parsed = await dispatch(
         getERPPageThunk({ page: url, id: isFromNew ? 0 : id }),
       ).unwrap();
-     if (
-          parsed?.script &&
-          !parsed.script.trim().toLowerCase().includes("<script")
-        ) {
-          setMyScript(parsed.script);
-        }
+     
+      if (parsed?.script && typeof parsed.script === "object" && !Array.isArray(parsed.script)) {
+
+        setMyScript(parsed.script);
+}
+
+     
       if (!isFromNew) {
         setInfoData({
           id: id?.toString(),
@@ -619,6 +606,7 @@ const PageScreen = () => {
         return merged;
       });
     } catch (e: any) {
+      console.log(e)
       setError(JSON.stringify(e?.data) || 'Failed to load page');
     } finally {
       setLoadingPageId(null);
@@ -668,7 +656,7 @@ const PageScreen = () => {
   //   if (typeof customScriptRule === 'string') {
   //     try {
   //       const json = JSON.parse(customScriptRule);
-  //       parsedRules = json.onPageLoad; 
+  //       parsedRules = json.onPageLoad;
   //     } catch (e) {
   //       console.error('Invalid JSON from backend', e);
   //       return;
@@ -705,25 +693,26 @@ const PageScreen = () => {
     actions.forEach(action => {
       if (action?.action === 'setValue' && action?.field) {
         updatedValues[action.field] = action.text ?? '';
-        console.log(
-          `✅ setValue applied → ${action.field} = ${action.text}`
-        );
+        console.log(`✅ setValue applied → ${action.field} = ${action.text}`);
       }
     });
 
     return updatedValues;
   };
 
-          console.log('================ SET VALUE START ================', formValues);
+  console.log('================ SET VALUE START ================', formValues);
 
   const renderItem = useCallback(
     ({ item, index }: { item: any; index: number }) => {
-
-      const setValue = (val) => {
-          console.log('================********* SET VALUE START ================', item?.field , '=====,' , val);
+      const setValue = val => {
+        console.log(
+          '================********* SET VALUE START ================',
+          item?.field,
+          '=====,',
+          val,
+        );
 
         if (myScript) {
-
           console.log('Incoming value:', val);
           console.log('Field:', item?.field);
           console.log('Item:', item);
@@ -782,9 +771,7 @@ const PageScreen = () => {
               newFormValues[action.field] = action.text ?? '';
               isFormValueChanged = true;
 
-              console.log(
-                `📝 setValue → ${action.field} = ${action.text}`
-              );
+              console.log(`📝 setValue → ${action.field} = ${action.text}`);
             }
           });
 
@@ -801,9 +788,7 @@ const PageScreen = () => {
           setControls(updatedControls);
 
           console.log('================ SET VALUE END ==================');
-        }
-        else {
-
+        } else {
           if (typeof val === 'object' && val !== null) {
             setFormValues(prev => ({ ...prev, ...val }));
           } else {
@@ -811,13 +796,13 @@ const PageScreen = () => {
           }
           setErrors(prev => ({ ...prev, [item?.field]: '' }));
         }
-
       };
 
-
-      const value =  formValues[item?.field] === '#location' ?  '': formValues[item?.field] || formValues[item?.text] || '';
-      console.log("value=================-------",  item?.field , '------', value)
-
+      const value =
+        formValues[item?.field] === '#location'
+          ? ''
+          : formValues[item?.field] || formValues[item?.text] || '';
+      console.log('value=================-------', item?.field, '------', value);
 
       if (item?.visible === '1') return null;
 
@@ -831,7 +816,7 @@ const PageScreen = () => {
             label={item?.fieldtitle}
             value={boolVal}
             onChange={val => {
-              setValue({ [item?.field]: val })
+              setValue({ [item?.field]: val });
             }}
           />
         );
@@ -865,15 +850,15 @@ const PageScreen = () => {
       }
       //VideoRecorder
       else if (item?.ctltype === 'VIDEO') {
-        content = <VideoRecorder item={item} />
+        content = <VideoRecorder item={item} />;
       }
       //ScanScreen
-      else if (item?.ctltype === 'QRSCANNER' && item?.title === "QR Scan") {
-        content = <ScanScreen item={item} />
+      else if (item?.ctltype === 'QRSCANNER' && item?.title === 'QR Scan') {
+        content = <ScanScreen item={item} />;
       }
       //BarCodeScan
-      else if (item?.ctltype === 'QRSCANNER' && item?.title === "Barcode Scan") {
-        content = <BarCodeScan item={item} />
+      else if (item?.ctltype === 'QRSCANNER' && item?.title === 'Barcode Scan') {
+        content = <BarCodeScan item={item} />;
       }
       //LocationRow
       else if (item?.defaultvalue === '#location') {
@@ -907,11 +892,7 @@ const PageScreen = () => {
         );
       }
       //Media - BusinessCardView
-      else if (
-        item?.ctltype === 'FILE' ||
-        item?.ctltype === 'IMAGE' ||
-        item?.ctltype === 'PHOTO'
-      ) {
+      else if (item?.ctltype === 'FILE' || item?.ctltype === 'IMAGE' || item?.ctltype === 'PHOTO') {
         content = (
           <>
             {isFromBusinessCard ? (
@@ -1005,7 +986,7 @@ const PageScreen = () => {
             onFocus={() => flatListRef.current?.scrollToIndex({ index, animated: true })}
             item={item}
             errors={errors}
-            value={ value}
+            value={value}
             setValue={setValue}
           />
         );
@@ -1023,7 +1004,7 @@ const PageScreen = () => {
     [formValues, errors, controls, locationEnabled],
   );
 
-  const getEventByControl = (item) => {
+  const getEventByControl = item => {
     if (item?.ctltype === 'BOOL') return 'onBoolChange';
     if (item?.ctltype === 'IMAGE') return 'onImageChange';
     if (item?.ctltype === 'FILE') return 'onFileChange';
@@ -1031,11 +1012,10 @@ const PageScreen = () => {
     if (item?.ctltype === 'QRSCANNER') return 'onBarCodeChange';
     if (item?.ajax === 1) return 'onAjaxChange';
     if (item?.ddl && item?.ddl !== '') return 'onDropDownChange';
-    return 'onInputChange'; 
+    return 'onInputChange';
   };
 
-
-  const getRuleKey = (item) => {
+  const getRuleKey = item => {
     const eventName = getEventByControl(item);
     return `${item.field}_${eventName}`;
   };
@@ -1085,319 +1065,344 @@ const PageScreen = () => {
     };
   }, []);
 
-  if(loadingPageId){
-       return <FullViewLoader isShowTop={theme === 'dark' ? false : true}/>
+  if (loadingPageId) {
+    return <FullViewLoader isShowTop={theme === 'dark' ? false : true} />;
   }
   return (
     <>
-    {
-      theme !== 'dark' &&  <View style={{height: 16, width: '100%', backgroundColor: theme === 'dark' ? 'black' : ERP_COLOR_CODE.ERP_APP_COLOR, borderBottomLeftRadius: 12, borderBottomRightRadius: 12}}></View>
-    }
-           <View style={{ flex: 1, padding: 16, backgroundColor: theme === 'dark' ? 'black' : ERP_COLOR_CODE.ERP_WHITE }}>
-      {loadingPageId ? (
-        <FullViewLoader />
-      ) : !!error ? (
+      {theme !== 'dark' && (
         <View
           style={{
-            flex: 1,
-            justifyContent: 'center',
-            alignContent: 'center',
-            backgroundColor: theme === 'dark' ? 'black' : ERP_COLOR_CODE.ERP_WHITE,
+            height: 16,
+            width: '100%',
+            backgroundColor: theme === 'dark' ? 'black' : ERP_COLOR_CODE.ERP_APP_COLOR,
+            borderBottomLeftRadius: 12,
+            borderBottomRightRadius: 12,
           }}
-        >
-          <ErrorMessage message={error} isShowTop ={false} />
-        </View>
-      ) : controls?.length > 0 ? (
-        <>
+        ></View>
+      )}
+      <View
+        style={{
+          flex: 1,
+          padding: 16,
+          backgroundColor: theme === 'dark' ? 'black' : ERP_COLOR_CODE.ERP_WHITE,
+        }}
+      >
+        {loadingPageId ? (
+          <FullViewLoader />
+        ) : !!error ? (
           <View
             style={{
               flex: 1,
-              height: Dimensions.get('screen').height,
+              justifyContent: 'center',
+              alignContent: 'center',
               backgroundColor: theme === 'dark' ? 'black' : ERP_COLOR_CODE.ERP_WHITE,
-
             }}
           >
-            <FlatList
-              showsVerticalScrollIndicator={false}
-              data={controls}
-              ref={flatListRef}
-              keyExtractor={(item, index) => index.toString()}
-              renderItem={renderItem}
-              contentContainerStyle={{ paddingBottom: keyboardHeight }}
-              keyboardShouldPersistTaps="handled"
-            />
-
-{controls.length > 0 && (
-              <TouchableOpacity
-                style={{
-                  height: 46,
-                  width: '100%',
-                  backgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR,
-                  justifyContent: 'center',
-                  alignContent: 'center',
-                  alignItems: 'center',
-                  borderRadius: 6,
-                }}
-                onPress={async () => {
-                    try {
-                  if(myScript){
-                    let rules;
-                  if (myScript && typeof myScript === "string") {
-                    try {
-                      rules = JSON.parse(myScript);
-                    } catch (e) {
-                      console.error("Invalid JSON from backend", e);
-                      return;
-                    }
-                  } else {
-                    rules = myScript;
-                  }
-                  const { actions } = evaluateRulesWithActions(rules, formValues);
-                  const hasButtonSaveEnable = actions.some(
-                    item => item?.field === "buttonSave"
-                  );
-                  if (hasButtonSaveEnable) {
-                    const hasButtonSaveEnable = actions.some(
-                      item => item?.field === "buttonSave" && item.action === "enable"
-                    );
-                    const updatedControls = applyActionsToControls(controls, actions);
-                    setControls(updatedControls)
-                    setButtonSave(hasButtonSaveEnable)
-                    if (!hasButtonSaveEnable) {
-                      Alert.alert("Error", myScript?.message)
-                      return;
-                    }
-                  }
-                  const updatedControls = applyActionsToControls(controls, actions);
-                  setControls(updatedControls)
-                  }  
-
-                  // 1️⃣ Check if location services are enabled
-                  const locationEnabled = hasLocationField ? await DeviceInfo.isLocationEnabled() : true;
-
-                  // 2️⃣ Request location permissions if needed
-                  const permissionStatus = hasLocationField
-                    ? await requestLocationPermissions()
-                    : 'granted';
-
-                  // 3️⃣ Request camera/media permission if needed
-                  const hasCameraPermission = hasMediaField ? await requestCameraPermission() : true;
-
-                  // 4️⃣ Handle permission errors
-                  if (!hasCameraPermission && hasMediaField) {
-                    setAlertConfig({
-                      title: t('title.title16'),
-                      message: t("msg.msg15"),
-                      type: 'error',
-                    });
-                    setAlertVisible(true);
-                    setModalClose(false);
-                    return;
-                  }
-
-                  if (hasLocationField && !locationEnabled) {
-                    setAlertConfig({
-                      title: t("title.title13"),
-                      message: t('title.title15'),
-                      type: 'error',
-                    });
-                    setAlertVisible(true);
-                    setModalClose(false);
-                    return;
-                  }
-
-                  if (hasLocationField && (permissionStatus === 'denied' || permissionStatus === 'blocked')) {
-                    setAlertConfig({
-                      title: t("title.title13"),
-                      message: t('title.title15'),
-                      type: 'error',
-                    });
-                    setAlertVisible(true);
-                    setModalClose(false);
-                    return;
-                  }
-
-                  // ✅ Permissions are granted, proceed
-                  setLocationVisible(true);
-                  setActionSaveLoader(true);
-                  setIsValidate(true);
-
-                  if (validateForm()) {
-                    const submitValues: Record<string, any> = {};
-                    controls?.forEach(f => {
-                      if (f.refcol !== '1') submitValues[f?.field] = formValues[f?.field];
-                    });
-
-                    try {
-                      setLoader(true);
-                      await dispatch(savePageThunk({ page: url, id, data: { ...submitValues } })).unwrap();
-                      setLoader(false);
-                      setIsValidate(false);
-
-                      fetchPageData();
-                      setAlertConfig({
-                        title: t('title.title17'),
-                        message: t("title.title18"),
-                        type: 'success',
-                      });
-                      setAlertVisible(true);
-                      setGoBack(true);
-
-                      setTimeout(() => {
-                        setAlertVisible(false);
-                        navigation.goBack();
-                      }, 1500);
-                    } catch (err: any) {
-                      setLoader(false);
-                      setAlertConfig({
-                        title: t('title.title17'),
-                        message: err,
-                        type: 'error',
-                      });
-                      setAlertVisible(true);
-                      setGoBack(false);
-                    }
-                  }
-
-                  setActionSaveLoader(false);
-                } catch (error) {
-                  console.error("Save error:", error);
-                  setActionSaveLoader(false);
-                }
-                }}
-              >
-                <Text
-                  style={{
-                    color: ERP_COLOR_CODE.ERP_WHITE,
-                    fontSize: 16,
-                    fontWeight: '800',
-                  }}
-                >
-                  {actionSaveLoader ? 'Loading' : 'Save'}
-                </Text>
-              </TouchableOpacity>
-            )}
+            <ErrorMessage message={error} isShowTop={false} />
           </View>
-          <CustomAlert
-                visible={alertVisible}
-                title={alertConfig.title}
-                message={alertConfig.message}
-                type={alertConfig.type}
-                onClose={() => {
-                  setTapLoader(false);
-                  if (modalClose) setAlertVisible(false);
-                } }
-                actionLoader={undefined}
-                isSettingVisible={isSettingVisible}
-                closeHide={undefined}          />
-          {loader && (
+        ) : controls?.length > 0 ? (
+          <>
             <View
               style={{
-                ...StyleSheet.absoluteFillObject,
-                backgroundColor: 'rgba(0,0,0,0.3)',
-                justifyContent: 'center',
-                alignItems: 'center',
-                zIndex: 999,
+                flex: 1,
+                height: Dimensions.get('screen').height,
+                backgroundColor: theme === 'dark' ? 'black' : ERP_COLOR_CODE.ERP_WHITE,
               }}
             >
-              <FullViewLoader />
+              <FlatList
+                showsVerticalScrollIndicator={false}
+                data={controls}
+                ref={flatListRef}
+                keyExtractor={(item, index) => index.toString()}
+                renderItem={renderItem}
+                contentContainerStyle={{ paddingBottom: keyboardHeight }}
+                keyboardShouldPersistTaps="handled"
+              />
+
+              {controls.length > 0 && (
+                <TouchableOpacity
+                  style={{
+                    height: 46,
+                    width: '100%',
+                    backgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR,
+                    justifyContent: 'center',
+                    alignContent: 'center',
+                    alignItems: 'center',
+                    borderRadius: 6,
+                  }}
+                  onPress={async () => {
+                    try {
+                      if (myScript) {
+                        let rules;
+                        if (myScript && typeof myScript === 'string') {
+                          try {
+                            rules = JSON.parse(myScript);
+                          } catch (e) {
+                            console.error('Invalid JSON from backend', e);
+                            return;
+                          }
+                        } else {
+                          rules = myScript;
+                        }
+                        const { actions } = evaluateRulesWithActions(rules, formValues);
+                        const hasButtonSaveEnable = actions.some(
+                          item => item?.field === 'buttonSave',
+                        );
+                        if (hasButtonSaveEnable) {
+                          const hasButtonSaveEnable = actions.some(
+                            item => item?.field === 'buttonSave' && item.action === 'enable',
+                          );
+                          const updatedControls = applyActionsToControls(controls, actions);
+                          setControls(updatedControls);
+                          setButtonSave(hasButtonSaveEnable);
+                          if (!hasButtonSaveEnable) {
+                            Alert.alert('Error', myScript?.message);
+                            return;
+                          }
+                        }
+                        const updatedControls = applyActionsToControls(controls, actions);
+                        setControls(updatedControls);
+                      }
+
+                      // 1️⃣ Check if location services are enabled
+                      const locationEnabled = hasLocationField
+                        ? await DeviceInfo.isLocationEnabled()
+                        : true;
+
+                      // 2️⃣ Request location permissions if needed
+                      const permissionStatus = hasLocationField
+                        ? await requestLocationPermissions()
+                        : 'granted';
+
+                      // 3️⃣ Request camera/media permission if needed
+                      const hasCameraPermission = hasMediaField
+                        ? await requestCameraPermission()
+                        : true;
+
+                      // 4️⃣ Handle permission errors
+                      if (!hasCameraPermission && hasMediaField) {
+                        setAlertConfig({
+                          title: t('title.title16'),
+                          message: t('msg.msg15'),
+                          type: 'error',
+                        });
+                        setAlertVisible(true);
+                        setModalClose(false);
+                        return;
+                      }
+
+                      if (hasLocationField && !locationEnabled) {
+                        setAlertConfig({
+                          title: t('title.title13'),
+                          message: t('title.title15'),
+                          type: 'error',
+                        });
+                        setAlertVisible(true);
+                        setModalClose(false);
+                        return;
+                      }
+
+                      if (
+                        hasLocationField &&
+                        (permissionStatus === 'denied' || permissionStatus === 'blocked')
+                      ) {
+                        setAlertConfig({
+                          title: t('title.title13'),
+                          message: t('title.title15'),
+                          type: 'error',
+                        });
+                        setAlertVisible(true);
+                        setModalClose(false);
+                        return;
+                      }
+
+                      // ✅ Permissions are granted, proceed
+                      setLocationVisible(true);
+                      setActionSaveLoader(true);
+                      setIsValidate(true);
+
+                      if (validateForm()) {
+                        const submitValues: Record<string, any> = {};
+                        controls?.forEach(f => {
+                          if (f.refcol !== '1') submitValues[f?.field] = formValues[f?.field];
+                        });
+
+                        try {
+                          setLoader(true);
+                          await dispatch(
+                            savePageThunk({ page: url, id, data: { ...submitValues } }),
+                          ).unwrap();
+                          setLoader(false);
+                          setIsValidate(false);
+
+                          fetchPageData();
+                          setAlertConfig({
+                            title: t('title.title17'),
+                            message: t('title.title18'),
+                            type: 'success',
+                          });
+                          setAlertVisible(true);
+                          setGoBack(true);
+
+                          setTimeout(() => {
+                            setAlertVisible(false);
+                            navigation.goBack();
+                          }, 1500);
+                        } catch (err: any) {
+                          setLoader(false);
+                          setAlertConfig({
+                            title: t('title.title17'),
+                            message: err,
+                            type: 'error',
+                          });
+                          setAlertVisible(true);
+                          setGoBack(false);
+                        }
+                      }
+
+                      setActionSaveLoader(false);
+                    } catch (error) {
+                      console.error('Save error:', error);
+                      setActionSaveLoader(false);
+                    }
+                  }}
+                >
+                  <Text
+                    style={{
+                      color: ERP_COLOR_CODE.ERP_WHITE,
+                      fontSize: 16,
+                      fontWeight: '800',
+                    }}
+                  >
+                    {actionSaveLoader ? 'Loading' : 'Save'}
+                  </Text>
+                </TouchableOpacity>
+              )}
             </View>
-          )}
-        </>
-      ) : (
-        <View style={[{ flex: 1, }, theme === 'dark' && {
-          backgroundColor: 'black',
-          width: '100%'
-        }]}>
-          <NoData isShowTop = {false} />
-        </View>
-      )}
+            <CustomAlert
+              visible={alertVisible}
+              title={alertConfig.title}
+              message={alertConfig.message}
+              type={alertConfig.type}
+              onClose={() => {
+                setTapLoader(false);
+                if (modalClose) setAlertVisible(false);
+              }}
+              actionLoader={undefined}
+              isSettingVisible={isSettingVisible}
+              closeHide={undefined}
+            />
+            {loader && (
+              <View
+                style={{
+                  ...StyleSheet.absoluteFillObject,
+                  backgroundColor: 'rgba(0,0,0,0.3)',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  zIndex: 999,
+                }}
+              >
+                <FullViewLoader />
+              </View>
+            )}
+          </>
+        ) : (
+          <View
+            style={[
+              { flex: 1 },
+              theme === 'dark' && {
+                backgroundColor: 'black',
+                width: '100%',
+              },
+            ]}
+          >
+            <NoData isShowTop={false} />
+          </View>
+        )}
 
-      <ErrorModal
-        visible={showErrorModal}
-        errors={errorsList}
-        onClose={() => {
-          setTapLoader(false)
-          setShowErrorModal(false)
-        }}
-      />
-
-      {dateTimePickerVisible && Platform.OS === 'ios' && (
-        <DateTimePicker
-                isVisible={dateTimePickerVisible}
-                mode="datetime"
-                display='spinner'
-                is24Hour={false}
-                date={activeDateTime ? parseCustomDatePage(activeDateTime) : new Date()}
-                onConfirm={handleDateTimeConfirm}
-                onCancel={hideDateTimePicker}
-                cancelTextIOS="Cancel"
-  confirmTextIOS="Done"
-              />
-
-      )}
-
-
-      {datePickerVisible && Platform.OS === 'ios' && (
-         <DateTimePicker
-                isVisible={datePickerVisible}
-                mode="date"
-                date={activeDate ? parseCustomDatePage(activeDate) : new Date()}
-                onConfirm={handleConfirm}
-                onCancel={hideDatePicker}
-                display="spinner"
-                is24Hour={false}
-                cancelTextIOS="Cancel"
-  confirmTextIOS="Done"
-              />
-      )}
-
-      {
-        Platform.OS !== 'ios' && <DateTimePicker
-          isVisible={dateTimePickerVisible}
-          mode="datetime"
-          display="spinner"
-          is24Hour={false}
-          date={activeDateTime ? parseCustomDatePage(activeDateTime) : new Date()}
-          onConfirm={handleDateTimeConfirm}
-          onCancel={hideDateTimePicker}
-          cancelTextIOS="Cancel"
-  confirmTextIOS="Done"
+        <ErrorModal
+          visible={showErrorModal}
+          errors={errorsList}
+          onClose={() => {
+            setTapLoader(false);
+            setShowErrorModal(false);
+          }}
         />
-      }
 
-      {
-        Platform.OS !== 'ios' && <DateTimePicker
-          isVisible={datePickerVisible}
-          mode="date"
-          display="spinner"
-          is24Hour={false}
-          date={activeDate ? parseCustomDatePage(activeDate) : new Date()}
-          onConfirm={handleConfirm}
-          onCancel={hideDatePicker}
-          cancelTextIOS="Cancel"
-          confirmTextIOS="Done"
+        {dateTimePickerVisible && Platform.OS === 'ios' && (
+          <DateTimePicker
+            isVisible={dateTimePickerVisible}
+            mode="datetime"
+            display="spinner"
+            is24Hour={false}
+            date={activeDateTime ? parseCustomDatePage(activeDateTime) : new Date()}
+            onConfirm={handleDateTimeConfirm}
+            onCancel={hideDateTimePicker}
+            cancelTextIOS="Cancel"
+            confirmTextIOS="Done"
+          />
+        )}
+
+        {datePickerVisible && Platform.OS === 'ios' && (
+          <DateTimePicker
+            isVisible={datePickerVisible}
+            mode="date"
+            date={activeDate ? parseCustomDatePage(activeDate) : new Date()}
+            onConfirm={handleConfirm}
+            onCancel={hideDatePicker}
+            display="spinner"
+            is24Hour={false}
+            cancelTextIOS="Cancel"
+            confirmTextIOS="Done"
+          />
+        )}
+
+        {Platform.OS !== 'ios' && (
+          <DateTimePicker
+            isVisible={dateTimePickerVisible}
+            mode="datetime"
+            display="spinner"
+            is24Hour={false}
+            date={activeDateTime ? parseCustomDatePage(activeDateTime) : new Date()}
+            onConfirm={handleDateTimeConfirm}
+            onCancel={hideDateTimePicker}
+            cancelTextIOS="Cancel"
+            confirmTextIOS="Done"
+          />
+        )}
+
+        {Platform.OS !== 'ios' && (
+          <DateTimePicker
+            isVisible={datePickerVisible}
+            mode="date"
+            display="spinner"
+            is24Hour={false}
+            date={activeDate ? parseCustomDatePage(activeDate) : new Date()}
+            onConfirm={handleConfirm}
+            onCancel={hideDatePicker}
+            cancelTextIOS="Cancel"
+            confirmTextIOS="Done"
+          />
+        )}
+
+        <CustomAlert
+          visible={alertVisible}
+          title={alertConfig.title}
+          message={alertConfig.message}
+          type={alertConfig.type}
+          onClose={() => {
+            setTapLoader(false);
+            setAlertVisible(false);
+            if (goBack) {
+              navigation.goBack();
+            }
+          }}
+          actionLoader={undefined}
+          closeHide={undefined}
         />
-      }
-
-      <CustomAlert
-        visible={alertVisible}
-        title={alertConfig.title}
-        message={alertConfig.message}
-        type={alertConfig.type}
-        onClose={() => {
-
-          setTapLoader(false);
-          setAlertVisible(false);
-          if (goBack) {
-            navigation.goBack();
-          }
-        } }
-        actionLoader={undefined} 
-        closeHide={undefined}      />
-    </View>
+      </View>
     </>
-  
   );
 };
 
