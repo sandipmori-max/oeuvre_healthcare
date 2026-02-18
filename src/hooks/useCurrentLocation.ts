@@ -5,6 +5,7 @@ import Geolocation from '@react-native-community/geolocation';
 type Coords = {
   latitude: number;
   longitude: number;
+  accuracy?: number;
 };
 
 export const useCurrentAddress = () => {
@@ -33,46 +34,74 @@ export const useCurrentAddress = () => {
     }
   };
 
-  // ---------- GET LOCATION ----------
-  const getLocation = useCallback(
-    async (highAccuracy = false) => {
-      setLoading(true);
-      setError(null);
+  // ---------- GET STABLE LOCATION ----------
+  const getLocation = useCallback(async () => {
+    setLoading(true);
+    setError(null);
 
-      const hasPermission = await requestLocationPermission();
-      if (!hasPermission) {
-        setError('Location permission denied');
-        setLoading(false);
-        return;
-      }
+    const hasPermission = await requestLocationPermission();
+    if (!hasPermission) {
+      setError('Location permission denied');
+      setLoading(false);
+      return;
+    }
 
-      Geolocation.getCurrentPosition(
-        (pos) => {
-          const { latitude, longitude } = pos.coords;
+    let bestLocation: any = null;
+    let readings = 0;
 
-          setCoords({ latitude, longitude });
-          setAddress(`${latitude},${longitude}`);
-          setLoading(false);
-        },
-        (err) => {
-          // If first attempt fails, retry with high accuracy
-          if (!highAccuracy) {
-            getLocation(true);
+    const watchId = Geolocation.watchPosition(
+      (pos) => {
+        const { latitude, longitude, accuracy } = pos.coords;
+
+        console.log('Lat:', latitude);
+        console.log('Lng:', longitude);
+        console.log('Accuracy:', accuracy);
+
+        readings++;
+
+        // Pick best accuracy
+        if (!bestLocation || accuracy < bestLocation.coords.accuracy) {
+          bestLocation = pos;
+        }
+
+        // Stop conditions:
+        // 1. Good accuracy achieved (<= 20m)
+        // 2. 3 readings taken
+        if (accuracy <= 20 || readings >= 3) {
+          Geolocation.clearWatch(watchId);
+
+          if (bestLocation.coords.accuracy > 50) {
+            setError('Weak GPS signal. Try open area.');
+            setLoading(false);
             return;
           }
 
-          setError(err.message || 'Unable to fetch location');
+          setCoords({
+            latitude: bestLocation.coords.latitude,
+            longitude: bestLocation.coords.longitude,
+            accuracy: bestLocation.coords.accuracy,
+          });
+
+          setAddress(
+            `${bestLocation.coords.latitude},${bestLocation.coords.longitude}`
+          );
+
           setLoading(false);
-        },
-        {
-          enableHighAccuracy: highAccuracy,
-          timeout: highAccuracy ? 25000 : 15000,
-          maximumAge: 30000,
         }
-      );
-    },
-    []
-  );
+      },
+      (err) => {
+        Geolocation.clearWatch(watchId);
+        setError(err.message || 'Unable to fetch location');
+        setLoading(false);
+      },
+      {
+        enableHighAccuracy: true,   // ✅ Always GPS
+        timeout: 25000,
+        maximumAge: 0,              // ✅ No cached location
+        distanceFilter: 0,
+      }
+    );
+  }, []);
 
   // ---------- INITIAL LOAD ----------
   useEffect(() => {
@@ -84,6 +113,6 @@ export const useCurrentAddress = () => {
     coords,
     loading,
     error,
-    refetch: () => getLocation(),
+    refetch: getLocation,
   };
 };

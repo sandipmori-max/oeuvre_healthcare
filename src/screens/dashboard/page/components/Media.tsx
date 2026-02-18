@@ -151,7 +151,7 @@ const Media = ({ isValidate, item, handleAttachment, infoData, baseLink, isFromN
             const granted = await requestPermission('camera');
             if (!granted) return;
 
-            launchCamera({ mediaType: 'photo', quality: 0.5, includeBase64: true ,cameraType: 'front'}, response => {
+            launchCamera({ mediaType: 'photo', quality: 0.5, includeBase64: true }, response => {
               if (response.assets && response.assets.length > 0) {
                 const asset: Asset = response.assets[0];
                 setImageUri(asset.uri || null);
@@ -174,7 +174,7 @@ const Media = ({ isValidate, item, handleAttachment, infoData, baseLink, isFromN
             const granted = await requestPermission('camera');
             if (!granted) return;
 
-            launchCamera({ mediaType: 'photo', quality: 0.5, includeBase64: true , cameraType: 'front'}, response => {
+            launchCamera({ mediaType: 'photo', quality: 0.5, includeBase64: true }, response => {
               if (response.assets && response.assets.length > 0) {
                 const asset: Asset = response.assets[0];
                 setImageUri(asset.uri || null);
