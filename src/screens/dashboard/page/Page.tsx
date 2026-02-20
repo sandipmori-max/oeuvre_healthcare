@@ -120,6 +120,9 @@ const PageScreen = () => {
 
   const [tapLoader, setTapLoader] = useState(false);
 
+   const [scriptErrorMessage, setScriptErrorMessage] = useState<any>()
+  const [isVisibleScriptError, setIsVisibleScriptError] = useState(false);
+
   const [error, setError] = useState<string | null>(null);
   const [formValues, setFormValues] = useState<any>({});
 
@@ -1132,140 +1135,149 @@ const PageScreen = () => {
                     borderRadius: 6,
                   }}
                   onPress={async () => {
-                    try {
-                      if (myScript) {
-                        let rules;
-                        if (myScript && typeof myScript === 'string') {
-                          try {
-                            rules = JSON.parse(myScript);
-                          } catch (e) {
-                            console.error('Invalid JSON from backend', e);
-                            return;
-                          }
-                        } else {
-                          rules = myScript;
-                        }
-                        const { actions } = evaluateRulesWithActions(rules, formValues);
-                        const hasButtonSaveEnable = actions.some(
-                          item => item?.field === 'buttonSave',
-                        );
-                        if (hasButtonSaveEnable) {
-                          const hasButtonSaveEnable = actions.some(
-                            item => item?.field === 'buttonSave' && item.action === 'enable',
-                          );
-                          const updatedControls = applyActionsToControls(controls, actions);
-                          setControls(updatedControls);
-                          setButtonSave(hasButtonSaveEnable);
-                          if (!hasButtonSaveEnable) {
-                            Alert.alert('Error', myScript?.message);
-                            return;
-                          }
-                        }
-                        const updatedControls = applyActionsToControls(controls, actions);
-                        setControls(updatedControls);
-                      }
+                      console.log("myScript", myScript)
+                try {
+                  setTapLoader(true)
+                  if (myScript) {
+                    let rules;
 
-                      // 1️⃣ Check if location services are enabled
-                      const locationEnabled = hasLocationField
-                        ? await DeviceInfo.isLocationEnabled()
-                        : true;
-
-                      // 2️⃣ Request location permissions if needed
-                      const permissionStatus = hasLocationField
-                        ? await requestLocationPermissions()
-                        : 'granted';
-
-                      // 3️⃣ Request camera/media permission if needed
-                      const hasCameraPermission = hasMediaField
-                        ? await requestCameraPermission()
-                        : true;
-
-                      // 4️⃣ Handle permission errors
-                      if (!hasCameraPermission && hasMediaField) {
-                        setAlertConfig({
-                          title: t('title.title16'),
-                          message: t('msg.msg15'),
-                          type: 'error',
-                        });
-                        setAlertVisible(true);
-                        setModalClose(false);
+                    if (typeof myScript === "string") {
+                      try {
+                        rules = JSON.parse(myScript);
+                      } catch (e) {
+                        console.error("Invalid JSON from backend", e);
+                        setTapLoader(false)
                         return;
                       }
-
-                      if (hasLocationField && !locationEnabled) {
-                        setAlertConfig({
-                          title: t('title.title13'),
-                          message: t('title.title15'),
-                          type: 'error',
-                        });
-                        setAlertVisible(true);
-                        setModalClose(false);
-                        return;
-                      }
-
-                      if (
-                        hasLocationField &&
-                        (permissionStatus === 'denied' || permissionStatus === 'blocked')
-                      ) {
-                        setAlertConfig({
-                          title: t('title.title13'),
-                          message: t('title.title15'),
-                          type: 'error',
-                        });
-                        setAlertVisible(true);
-                        setModalClose(false);
-                        return;
-                      }
-
-                      // ✅ Permissions are granted, proceed
-                      setLocationVisible(true);
-                      setActionSaveLoader(true);
-                      setIsValidate(true);
-
-                      if (validateForm()) {
-                        const submitValues: Record<string, any> = {};
-                        controls?.forEach(f => {
-                          if (f.refcol !== '1') submitValues[f?.field] = formValues[f?.field];
-                        });
-
-                        try {
-                          setLoader(true);
-                          await dispatch(
-                            savePageThunk({ page: url, id, data: { ...submitValues } }),
-                          ).unwrap();
-                          setLoader(false);
-                          setIsValidate(false);
-
-                          fetchPageData();
-                          setAlertConfig({
-                            title: t('title.title17'),
-                            message: t('title.title18'),
-                            type: 'success',
-                          });
-                          setAlertVisible(true);
-                          setGoBack(true);
-
-                          setTimeout(() => {
-                            setAlertVisible(false);
-                            navigation.goBack();
-                          }, 1500);
-                        } catch (err: any) {
-                          setLoader(false);
-                          setAlertConfig({
-                            title: t('title.title17'),
-                            message: err,
-                            type: 'error',
-                          });
-                          setAlertVisible(true);
-                          setGoBack(false);
-                        }
-                      }
-
-                      setActionSaveLoader(false);
-                    } catch (error) {
-                      console.error('Save error:', error);
-                      setActionSaveLoader(false);
+                    } else {
+                      rules = myScript;
                     }
+
+                    const { actions, messages } = evaluateRulesWithActions(rules, formValues);
+                    console.log("myScript-------------------------------------------", myScript)
+                    console.log("rules-------------------------------------------", rules)
+                    console.log("actions-------------------------------------------", actions)
+                    console.log("formValues-------------------------------------------", formValues)
+
+                    const hasButtonSaveEnable = actions.some(
+                      item => item?.field === "buttonSave"
+                    );
+                    if (hasButtonSaveEnable) {
+                      const hasButtonSaveEnable = actions.some(
+                        item => item?.field === "buttonSave" && item.action === "enable"
+                      );
+                      const updatedControls = applyActionsToControls(controls, actions);
+                      setControls(updatedControls)
+                      setButtonSave(hasButtonSaveEnable)
+                      if (!hasButtonSaveEnable) {
+                              setTapLoader(false);
+                              setScriptErrorMessage(messages)
+                              setIsVisibleScriptError(true)
+                        return;
+                      }
+                    }
+                    const updatedControls = applyActionsToControls(controls, actions);
+                    setControls(updatedControls)
+                  } 
+                  console.log("hasButtonSaveEnable-------------------")
+
+                  const locationEnabled = hasLocationField ? await DeviceInfo.isLocationEnabled() : true;
+
+                  const permissionStatus = hasLocationField
+                    ? await requestLocationPermissions()
+                    : 'granted';
+
+                  const hasCameraPermission = hasMediaField ? await requestCameraPermission() : true;
+
+                  if (!hasCameraPermission && hasMediaField) {
+                    setAlertVisible(true);
+                    setModalClose(true);
+                    setIsSettingVisible(true)
+                    setAlertConfig({
+                      title: t('title.title16'),
+                      message: t("msg.msg15"),
+                      type: 'error',
+                    });
+                    
+                    return;
+                  }
+
+                  if (hasLocationField && !locationEnabled) {
+                    setAlertConfig({
+                      title: t("title.title13"),
+                      message: t('title.title15'),
+                      type: 'error',
+                    });
+                    setAlertVisible(true);
+                    setModalClose(true);
+                     setIsSettingVisible(true)
+                    return;
+                  }
+
+                  if (hasLocationField && (permissionStatus === 'denied' || permissionStatus === 'blocked')) {
+                    setAlertConfig({
+                      title: t("title.title13"),
+                      message: t('title.title15'),
+                      type: 'error',
+                    });
+                    setAlertVisible(true);
+                    setModalClose(false);
+                    return;
+                  }
+
+                  // ✅ Permissions are granted, proceed
+                  setLocationVisible(true);
+                  setActionSaveLoader(true);
+                  setIsValidate(true);
+
+                  if (validateForm()) {
+                    const submitValues: Record<string, any> = {};
+                    controls?.forEach(f => {
+                      if (f.refcol !== '1') submitValues[f?.field] = formValues[f?.field];
+                    });
+
+                    try {
+                      setLoader(true);
+                      await dispatch(savePageThunk({ page: url, id, data: { ...submitValues } })).unwrap();
+                      setLoader(false);
+                      setIsValidate(false);
+
+                      fetchPageData();
+                      setAlertConfig({
+                        title: t('title.title17'),
+                        message: t("title.title18"),
+                        type: 'success',
+                      });
+                      setAlertVisible(true);
+                      setGoBack(true);
+
+                      setTimeout(() => {
+                        setAlertVisible(false);
+                        navigation.goBack();
+                      }, 1800);
+                    } catch (err: any) {
+                      setLoader(false);
+                      setAlertConfig({
+                        title: t('title.title17'),
+                        message: err,
+                        type: 'error',
+                      });
+                      setAlertVisible(true);
+                      setGoBack(false);
+                    }
+                  }
+
+                  setActionSaveLoader(false);
+                  setTimeout(() => {
+                    setTapLoader(false)
+                  }, 600)
+                } catch (error) {
+                  console.error("Save error:", error);
+                  setTimeout(() => {
+                    setTapLoader(false)
+                  }, 600)
+                  setActionSaveLoader(false);
+                }
                   }}
                 >
                   <Text
@@ -1327,6 +1339,15 @@ const PageScreen = () => {
           onClose={() => {
             setTapLoader(false);
             setShowErrorModal(false);
+          }}
+        />
+
+         <ErrorModal
+          visible={isVisibleScriptError}
+          errors={scriptErrorMessage}
+          onClose={() => {
+            setTapLoader(false);
+            setIsVisibleScriptError(false);
           }}
         />
 

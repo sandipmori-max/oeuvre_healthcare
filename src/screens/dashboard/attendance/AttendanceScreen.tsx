@@ -30,12 +30,12 @@ import MaterialIcons from '@react-native-vector-icons/material-icons';
 import { ERP_GIF } from '../../../assets';
 import { NativeModules } from 'react-native';
 import TranslatedText from '../tabs/home/TranslatedText';
+import { BackHandler } from 'react-native';
 
 const AttendanceScreen = () => {
   const route = useRoute();
   const { isFor } = route?.params || '';
-  console.log('route', route)
-  const navigation = useNavigation<any>();
+   const navigation = useNavigation<any>();
   const [isListVisible, setIsListVisible] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState(true);
   const dispatch = useAppDispatch();
@@ -238,9 +238,7 @@ const AttendanceScreen = () => {
       onPress={() => {
         Keyboard.dismiss();
       }}
-    >
-      <>
-      
+    > 
         <View
         style={[
           {
@@ -439,9 +437,6 @@ const AttendanceScreen = () => {
         }
 
       </View>
-      </>
-    
-
     </TouchableWithoutFeedback>
   );
 };
