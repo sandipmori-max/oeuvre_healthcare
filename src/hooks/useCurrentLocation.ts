@@ -46,61 +46,42 @@ export const useCurrentAddress = () => {
       return;
     }
 
-    let bestLocation: any = null;
-    let readings = 0;
+    Geolocation.getCurrentPosition(
+  (position) => {
+    const { latitude, longitude, accuracy } = position.coords;
+    setCoords({ latitude, longitude, accuracy });
+    setAddress(`${latitude},${longitude}`);
+    setLoading(false);
+  },
+  (err) => {
+    console.log("GPS failed → fallback network");
 
-    const watchId = Geolocation.watchPosition(
-      (pos) => {
-        const { latitude, longitude, accuracy } = pos.coords;
-
-        console.log('Lat:', latitude);
-        console.log('Lng:', longitude);
-        console.log('Accuracy:', accuracy);
-
-        readings++;
-
-        // Pick best accuracy
-        if (!bestLocation || accuracy < bestLocation.coords.accuracy) {
-          bestLocation = pos;
-        }
-
-        // Stop conditions:
-        // 1. Good accuracy achieved (<= 20m)
-        // 2. 3 readings taken
-        if (accuracy <= 20 || readings >= 3) {
-          Geolocation.clearWatch(watchId);
-
-          if (bestLocation.coords.accuracy > 50) {
-            setError('Weak GPS signal. Try open area.');
-            setLoading(false);
-            return;
-          }
-
-          setCoords({
-            latitude: bestLocation.coords.latitude,
-            longitude: bestLocation.coords.longitude,
-            accuracy: bestLocation.coords.accuracy,
-          });
-
-          setAddress(
-            `${bestLocation.coords.latitude},${bestLocation.coords.longitude}`
-          );
-
-          setLoading(false);
-        }
+    // ⭐ fallback network
+    Geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude, accuracy } = position.coords;
+        setCoords({ latitude, longitude, accuracy });
+        setAddress(`${latitude},${longitude}`);
+        setLoading(false);
       },
-      (err) => {
-        Geolocation.clearWatch(watchId);
-        setError(err.message || 'Unable to fetch location');
+      (error) => {
+        setError(error.message);
         setLoading(false);
       },
       {
-        enableHighAccuracy: true,   // ✅ Always GPS
-        timeout: 25000,
-        maximumAge: 0,              // ✅ No cached location
-        distanceFilter: 0,
+        enableHighAccuracy: false,
+        timeout: 10000,
+        maximumAge: 10000,
       }
     );
+  },
+  {
+    enableHighAccuracy: true,
+    timeout: 25000,
+    maximumAge: 0,
+  }
+);
+
   }, []);
 
   // ---------- INITIAL LOAD ----------

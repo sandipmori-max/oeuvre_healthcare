@@ -121,17 +121,25 @@ const Media = ({ isValidate, item, handleAttachment, infoData, baseLink, isFromN
           setIsSettingVisible(false);
           setAlertVisible(false);
           pendingCameraAction.current = false;
-          launchCamera({ mediaType: 'photo', quality: 0.5, includeBase64: true }, response => {
-            if (response.assets && response.assets.length > 0) {
-              const asset: Asset = response.assets[0];
-              setImageUri(asset.uri || null);
-              setCacheBuster(Date.now());
-              handleAttachment(
-                `${item?.field}.jpeg; data:${asset.type};base64,${asset.base64}`,
-                item.field,
-              );
-            }
-          });
+            launchCamera({ 
+              mediaType: 'photo', quality: 0.5, includeBase64: true , maxWidth: 1024, maxHeight: 1024}, response => {
+              try {
+                if (response?.didCancel || response?.errorCode) {
+                  return;
+                }
+                if (response.assets && response.assets.length > 0) {
+                  const asset = response.assets[0];
+                  setImageUri(asset.uri || null);
+                  setCacheBuster(Date.now());
+                  handleAttachment(
+                    `${item?.field}.jpeg; data:${asset.type};base64,${asset.base64}`,
+                    item.field,
+                  );
+                }
+              } catch (err) {
+                console.error('Failed to process image:', err);
+              }
+            });
         }
       }
       appState.current = nextAppState;
@@ -151,15 +159,23 @@ const Media = ({ isValidate, item, handleAttachment, infoData, baseLink, isFromN
             const granted = await requestPermission('camera');
             if (!granted) return;
 
-            launchCamera({ mediaType: 'photo', quality: 0.5, includeBase64: true }, response => {
-              if (response.assets && response.assets.length > 0) {
-                const asset: Asset = response.assets[0];
-                setImageUri(asset.uri || null);
-                setCacheBuster(Date.now());
-                handleAttachment(
-                  `${item?.field}.jpeg; data:${asset.type};base64,${asset.base64}`,
-                  item.field,
-                );
+             launchCamera({ 
+              mediaType: 'photo', quality: 0.5, includeBase64: true , maxWidth: 1024, maxHeight: 1024,}, response => {
+              try {
+                if (response?.didCancel || response?.errorCode) {
+                  return;
+                }
+                if (response.assets && response.assets.length > 0) {
+                  const asset = response.assets[0];
+                  setImageUri(asset.uri || null);
+                  setCacheBuster(Date.now());
+                  handleAttachment(
+                    `${item?.field}.jpeg; data:${asset.type};base64,${asset.base64}`,
+                    item.field,
+                  );
+                }
+              } catch (err) {
+                console.error('Failed to process image:', err);
               }
             });
           },
@@ -174,15 +190,23 @@ const Media = ({ isValidate, item, handleAttachment, infoData, baseLink, isFromN
             const granted = await requestPermission('camera');
             if (!granted) return;
 
-            launchCamera({ mediaType: 'photo', quality: 0.5, includeBase64: true }, response => {
-              if (response.assets && response.assets.length > 0) {
-                const asset: Asset = response.assets[0];
-                setImageUri(asset.uri || null);
-                setCacheBuster(Date.now());
-                handleAttachment(
-                  `${item?.field}.jpeg; data:${asset.type};base64,${asset.base64}`,
-                  item.field,
-                );
+           launchCamera({ 
+              mediaType: 'photo', quality: 0.5, includeBase64: true , maxWidth: 1024, maxHeight: 1024}, response => {
+              try {
+                if (response?.didCancel || response?.errorCode) {
+                  return;
+                }
+                if (response.assets && response.assets.length > 0) {
+                  const asset = response.assets[0];
+                  setImageUri(asset.uri || null);
+                  setCacheBuster(Date.now());
+                  handleAttachment(
+                    `${item?.field}.jpeg; data:${asset.type};base64,${asset.base64}`,
+                    item.field,
+                  );
+                }
+              } catch (err) {
+                console.error('Failed to process image:', err);
               }
             });
           },

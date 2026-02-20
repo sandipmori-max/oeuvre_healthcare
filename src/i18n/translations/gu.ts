@@ -202,6 +202,8 @@ export default {
     text1: 'પાસવર્ડ છુપાવો',
     text2: 'પાસવર્ડ બતાવો',
     text3: 'સ્લાઇડ કરો',
+        texti3: "Tap to",
+
     text4: 'તારીખ',
     text5: 'ઇન-ટાઇમ',
     text6: 'આઉટ-ટાઇમ',

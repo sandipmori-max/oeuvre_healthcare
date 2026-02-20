@@ -1,21 +1,26 @@
-import { ERP_GIF, ERP_ICON } from '../../assets';
-import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
-import moment from 'moment';
-import { Dimensions, Linking, PermissionsAndroid, Platform } from 'react-native';
-import RNFS from 'react-native-fs';
-import FastImage from 'react-native-fast-image';
+import { ERP_GIF, ERP_ICON } from "../../assets";
+import { check, request, PERMISSIONS, RESULTS } from "react-native-permissions";
+import moment from "moment";
+import {
+  Dimensions,
+  Linking,
+  PermissionsAndroid,
+  Platform,
+} from "react-native";
+import RNFS from "react-native-fs";
+import FastImage from "react-native-fast-image";
 
 export const getBottomTabIcon = (iconName: string, focused: boolean) => {
   switch (iconName) {
-    case 'home':
+    case "home":
       return focused ? ERP_ICON.ACTIVE_HOME : ERP_ICON.HOME;
-    case 'profile':
+    case "profile":
       return focused ? ERP_ICON.ACTIVE_PROFILE : ERP_ICON.PROFILE;
-    case 'report':
+    case "report":
       return focused ? ERP_ICON.ACTIVE_REPORT : ERP_ICON.REPORT;
-    case 'entry':
+    case "entry":
       return focused ? ERP_ICON.ACTIVE_ENTRY : ERP_ICON.ENTRY;
-    case 'auth':
+    case "auth":
       return focused ? ERP_ICON.ACTIVE_AUTH : ERP_ICON.AUTH;
     default:
       return ERP_ICON.HOME;
@@ -23,40 +28,42 @@ export const getBottomTabIcon = (iconName: string, focused: boolean) => {
 };
 
 export const formatDateMonthDateYear = (dateString: string) => {
-  return new Date(dateString).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
+  return new Date(dateString).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
   });
 };
 
 export function formatHeaderTitle(key: string): string {
-  let result = key.replace(/[_\.\-]+/g, ' ');
-  result = result.replace(/([a-z])([A-Z])/g, '$1 $2');
-  result = result.replace(/([a-zA-Z])([0-9]+)/g, '$1 $2');
-  result = result.toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
+  let result = key.replace(/[_\.\-]+/g, " ");
+  result = result.replace(/([a-z])([A-Z])/g, "$1 $2");
+  result = result.replace(/([a-zA-Z])([0-9]+)/g, "$1 $2");
+  result = result.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase());
   return result.trim();
 }
 
 export const firstLetterUpperCase = (str: string): string => {
-  if (!str) return '';
+  if (!str) return "";
   return str
-    .split(' ')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ');
+    .split(" ")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
 };
 
-export const getGifSource = (type: 'error' | 'success' | 'info' | 'location' | 'confirmation' | 'exit') => {
+export const getGifSource = (
+  type: "error" | "success" | "info" | "location" | "confirmation" | "exit",
+) => {
   switch (type) {
-    case 'error':
+    case "error":
       return ERP_GIF.ERROR;
-    case 'location':
+    case "location":
       return ERP_GIF.LOCATION;
-    case 'success':
+    case "success":
       return ERP_GIF.SUCCESS;
-     case 'confirmation':
+    case "confirmation":
       return ERP_ICON.ALERT;
-       case 'exit':
+    case "exit":
       return ERP_ICON.EXITS;
     default:
       return ERP_GIF.SUCCESS;
@@ -65,7 +72,10 @@ export const getGifSource = (type: 'error' | 'success' | 'info' | 'location' | '
 
 export const requestCameraPermission = async (): Promise<boolean> => {
   try {
-    const cameraPerm = Platform.OS === 'ios' ? PERMISSIONS.IOS.CAMERA : PERMISSIONS.ANDROID.CAMERA;
+    const cameraPerm =
+      Platform.OS === "ios"
+        ? PERMISSIONS.IOS.CAMERA
+        : PERMISSIONS.ANDROID.CAMERA;
     const cameraStatus = await check(cameraPerm);
     let cameraGranted = false;
     if (cameraStatus === RESULTS.GRANTED) {
@@ -85,73 +95,79 @@ export const requestCameraPermission = async (): Promise<boolean> => {
   }
 };
 
-export const requestCameraAndLocationPermission = async (): Promise<boolean> => {
-  try {
-    const cameraPerm = Platform.OS === 'ios' ? PERMISSIONS.IOS.CAMERA : PERMISSIONS.ANDROID.CAMERA;
+export const requestCameraAndLocationPermission =
+  async (): Promise<boolean> => {
+    try {
+      const cameraPerm =
+        Platform.OS === "ios"
+          ? PERMISSIONS.IOS.CAMERA
+          : PERMISSIONS.ANDROID.CAMERA;
 
-    const locationPerm =
-      Platform.OS === 'ios'
-        ? PERMISSIONS.IOS.LOCATION_WHEN_IN_USE
-        : PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION;
+      const locationPerm =
+        Platform.OS === "ios"
+          ? PERMISSIONS.IOS.LOCATION_WHEN_IN_USE
+          : PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION;
 
-    const cameraStatus = await check(cameraPerm);
-    const locationStatus = await check(locationPerm);
+      const cameraStatus = await check(cameraPerm);
+      const locationStatus = await check(locationPerm);
 
-    let cameraGranted = false;
-    if (cameraStatus === RESULTS.GRANTED) {
-      cameraGranted = true;
-    } else if (cameraStatus === RESULTS.DENIED) {
-      const res = await request(cameraPerm);
-      cameraGranted = res === RESULTS.GRANTED;
-      if (!cameraGranted) {
+      let cameraGranted = false;
+      if (cameraStatus === RESULTS.GRANTED) {
+        cameraGranted = true;
+      } else if (cameraStatus === RESULTS.DENIED) {
+        const res = await request(cameraPerm);
+        cameraGranted = res === RESULTS.GRANTED;
+        if (!cameraGranted) {
+          return false;
+        }
+      } else if (cameraStatus === RESULTS.BLOCKED) {
         return false;
       }
-    } else if (cameraStatus === RESULTS.BLOCKED) {
+
+      let locationGranted = false;
+      if (locationStatus === RESULTS.GRANTED) {
+        locationGranted = true;
+      } else if (locationStatus === RESULTS.DENIED) {
+        const res = await request(locationPerm);
+        locationGranted = res === RESULTS.GRANTED;
+        // if (!locationGranted) {
+        //   Alert.alert('Location Permission Denied', 'Location access is required for this feature.');
+        // }
+        return false;
+      } else if (locationStatus === RESULTS.BLOCKED) {
+        // Alert.alert(
+        //   'Location Permission Blocked',
+        //   'Location access has been permanently denied. Please enable it in Settings.',
+        //   [
+        //     { text: 'Cancel', style: 'cancel' },
+        //     { text: 'Open Settings', onPress: () => Linking.openSettings() },
+        //   ],
+        // );
+        return false;
+      }
+
+      return cameraGranted && locationGranted;
+    } catch (error) {
       return false;
     }
-
-    let locationGranted = false;
-    if (locationStatus === RESULTS.GRANTED) {
-      locationGranted = true;
-    } else if (locationStatus === RESULTS.DENIED) {
-      const res = await request(locationPerm);
-      locationGranted = res === RESULTS.GRANTED;
-      // if (!locationGranted) {
-      //   Alert.alert('Location Permission Denied', 'Location access is required for this feature.');
-      // }
-      return false;
-    } else if (locationStatus === RESULTS.BLOCKED) {
-      // Alert.alert(
-      //   'Location Permission Blocked',
-      //   'Location access has been permanently denied. Please enable it in Settings.',
-      //   [
-      //     { text: 'Cancel', style: 'cancel' },
-      //     { text: 'Open Settings', onPress: () => Linking.openSettings() },
-      //   ],
-      // );
-      return false;
-    }
-
-    return cameraGranted && locationGranted;
-  } catch (error) {
-    return false;
-  }
-};
+  };
 
 export const formatDateList = (input: string) => {
   const inputDate = input.split(" ")[0];
 
   const today = new Date();
   const formattedToday =
-    (today.getMonth() + 1).toString().padStart(2, "0") + "/" +
-    today.getDate().toString().padStart(2, "0") + "/" +
+    (today.getMonth() + 1).toString().padStart(2, "0") +
+    "/" +
+    today.getDate().toString().padStart(2, "0") +
+    "/" +
     today.getFullYear();
   if (inputDate === formattedToday) {
-    return "Today"
+    return "Today";
   } else {
     return input.replace(" ", input.length > 11 ? "\n" : " ");
   }
-}
+};
 
 export function formatDateToDDMMMYYYY(dateStr: string): string {
   const formatDate = (date: Date): string => {
@@ -161,22 +177,22 @@ export function formatDateToDDMMMYYYY(dateStr: string): string {
       date.getMonth() === today.getMonth() &&
       date.getFullYear() === today.getFullYear();
 
-    if (isToday) return 'Today';
+    if (isToday) return "Today";
 
-    const day = String(date.getDate()).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, "0");
     const monthNames = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
     ];
     const month = monthNames[date.getMonth()];
     const year = date.getFullYear();
@@ -190,20 +206,22 @@ export function formatDateToDDMMMYYYY(dateStr: string): string {
     const day = parseInt(dayStr, 10);
     const year = parseInt(yearStr, 10);
     const monthNames = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
     ];
-    const month = monthNames.findIndex(m => m.toLowerCase() === monthStr.toLowerCase());
+    const month = monthNames.findIndex(
+      (m) => m.toLowerCase() === monthStr.toLowerCase(),
+    );
     if (month >= 0) {
       const date = new Date(year, month, day);
       if (!isNaN(date.getTime())) {
@@ -212,16 +230,17 @@ export function formatDateToDDMMMYYYY(dateStr: string): string {
     }
   }
 
-  const mdYRegex = /^(\d{1,2})\/(\d{1,2})\/(\d{4}) (\d{1,2}):(\d{2}):(\d{2}) (\w{2})$/;
+  const mdYRegex =
+    /^(\d{1,2})\/(\d{1,2})\/(\d{4}) (\d{1,2}):(\d{2}):(\d{2}) (\w{2})$/;
   const mdYMatch = dateStr.match(mdYRegex);
   if (mdYMatch) {
     let [, month, day, year, hour, minute, second, ampm] = mdYMatch;
-    month = month.padStart(2, '0');
-    day = day.padStart(2, '0');
+    month = month.padStart(2, "0");
+    day = day.padStart(2, "0");
 
     let h = parseInt(hour, 10);
-    if (ampm.toUpperCase() === 'PM' && h < 12) h += 12;
-    if (ampm.toUpperCase() === 'AM' && h === 12) h = 0;
+    if (ampm.toUpperCase() === "PM" && h < 12) h += 12;
+    if (ampm.toUpperCase() === "AM" && h === 12) h = 0;
 
     const date = new Date(
       parseInt(year, 10),
@@ -241,16 +260,17 @@ export function formatDateToDDMMMYYYY(dateStr: string): string {
     return formatDate(fallbackDate);
   }
 
-  return '';
+  return "";
 }
 
 export function formatTimeTo12Hour(dateStr: string): string {
-  const mdYRegex = /^(\d{1,2})\/(\d{1,2})\/(\d{4}) (\d{1,2}):(\d{2}):(\d{2}) (\w{2})$/;
+  const mdYRegex =
+    /^(\d{1,2})\/(\d{1,2})\/(\d{4}) (\d{1,2}):(\d{2}):(\d{2}) (\w{2})$/;
   const match = dateStr.match(mdYRegex);
   if (match) {
     let [, month, day, year, hour, minute, , ampm] = match;
-    hour = hour.padStart(2, '0');
-    minute = minute.padStart(2, '0');
+    hour = hour.padStart(2, "0");
+    minute = minute.padStart(2, "0");
     return `${hour}:${minute} ${ampm.toUpperCase()}`;
   }
 
@@ -258,30 +278,30 @@ export function formatTimeTo12Hour(dateStr: string): string {
   if (!isNaN(fallbackDate.getTime())) {
     const hours = fallbackDate.getHours();
     const minutes = fallbackDate.getMinutes();
-    const ampm = hours >= 12 ? 'PM' : 'AM';
+    const ampm = hours >= 12 ? "PM" : "AM";
     const hour12 = hours % 12 || 12;
-    const paddedMinutes = minutes.toString().padStart(2, '0');
+    const paddedMinutes = minutes.toString().padStart(2, "0");
     return `${hour12}:${paddedMinutes} ${ampm}`;
   }
 
-  return '';
+  return "";
 }
 
 export const parseCustomDate = (dateStr: string): Date => {
-  const [day, monthStr, year] = dateStr.split('-');
+  const [day, monthStr, year] = dateStr.split("-");
   const month = [
-    'Jan',
-    'Feb',
-    'Mar',
-    'Apr',
-    'May',
-    'Jun',
-    'Jul',
-    'Aug',
-    'Sep',
-    'Oct',
-    'Nov',
-    'Dec',
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
   ].indexOf(monthStr);
   return new Date(Number(year), month, Number(day));
 };
@@ -292,16 +312,16 @@ export const parseCustomDatePage = (dateStr: string): Date => {
     return new Date(dateStr);
   }
 
-  const [datePart, timePart, ampm] = dateStr.split(' ');
-  const [month, day, year] = datePart.split('/').map(Number);
+  const [datePart, timePart, ampm] = dateStr.split(" ");
+  const [month, day, year] = datePart.split("/").map(Number);
 
   let hours = 0,
     minutes = 0,
     seconds = 0;
   if (timePart) {
-    const [h, m, s] = timePart.split(':').map(Number);
+    const [h, m, s] = timePart.split(":").map(Number);
     hours = h % 12;
-    if (ampm?.toUpperCase() === 'PM') hours += 12;
+    if (ampm?.toUpperCase() === "PM") hours += 12;
     minutes = m;
     seconds = s;
   }
@@ -310,23 +330,23 @@ export const parseCustomDatePage = (dateStr: string): Date => {
 };
 
 export const formatDatePage = (dateStr: string): string => {
-  if (!dateStr) return '';
+  if (!dateStr) return "";
 
   let date: Date;
 
   if (!isNaN(Date.parse(dateStr))) {
     date = new Date(dateStr);
   } else {
-    const [datePart, timePart, ampm] = dateStr.split(' ');
-    const [month, day, year] = datePart.split('/').map(Number);
+    const [datePart, timePart, ampm] = dateStr.split(" ");
+    const [month, day, year] = datePart.split("/").map(Number);
 
     let hours = 0,
       minutes = 0,
       seconds = 0;
     if (timePart) {
-      const [h, m, s] = timePart.split(':').map(Number);
+      const [h, m, s] = timePart.split(":").map(Number);
       hours = h % 12;
-      if (ampm?.toUpperCase() === 'PM') hours += 12;
+      if (ampm?.toUpperCase() === "PM") hours += 12;
       minutes = m;
       seconds = s;
     }
@@ -334,8 +354,8 @@ export const formatDatePage = (dateStr: string): string => {
     date = new Date(year, month - 1, day, hours, minutes, seconds);
   }
 
-  const dd = String(date.getDate()).padStart(2, '0');
-  const mm = String(date.getMonth() + 1).padStart(2, '0');
+  const dd = String(date.getDate()).padStart(2, "0");
+  const mm = String(date.getMonth() + 1).padStart(2, "0");
   const yyyy = date.getFullYear();
 
   return `${dd}-${mm}-${yyyy}`;
@@ -343,48 +363,48 @@ export const formatDatePage = (dateStr: string): string => {
 
 export const findKeyByKeywords = (obj: any, keywords: string[]) => {
   if (!obj) return null;
-  const lowerKeys = Object.keys(obj).map(k => k.toLowerCase());
+  const lowerKeys = Object.keys(obj).map((k) => k.toLowerCase());
   for (const keyword of keywords) {
-    const found = lowerKeys.find(k => k.includes(keyword.toLowerCase()));
+    const found = lowerKeys.find((k) => k.includes(keyword.toLowerCase()));
     if (found) return found;
   }
   return null;
 };
 
 export const formatDateForAPI = (date: Date): string => {
-  const day = String(date.getDate()).padStart(2, '0');
-  const month = date.toLocaleDateString('en-US', { month: 'short' });
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = date.toLocaleDateString("en-US", { month: "short" });
   const year = date.getFullYear();
   return `${day}-${month}-${year}`;
 };
 
 export const generateGUID = () => {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
     const r = (Math.random() * 16) | 0;
-    const v = c === 'x' ? r : (r & 0x3) | 0x8;
+    const v = c === "x" ? r : (r & 0x3) | 0x8;
     return v.toString(16);
   });
 };
 
-export const formatDate = dateStr => {
+export const formatDate = (dateStr) => {
   const date = moment(dateStr);
-  if (moment().isSame(date, 'day')) return 'Today';
-  if (moment().subtract(1, 'day').isSame(date, 'day')) return 'Yesterday';
-  return date.format('MMM DD, YYYY');
+  if (moment().isSame(date, "day")) return "Today";
+  if (moment().subtract(1, "day").isSame(date, "day")) return "Yesterday";
+  return date.format("MMM DD, YYYY");
 };
 export function formatDateHr(input, isFullDate) {
   if (!input) return input;
 
-  const normalized = input?.replace(' ', 'T');
+  const normalized = input?.replace(" ", "T");
   const date = new Date(normalized);
 
   if (isNaN(date.getTime())) {
-    const [mdy, time, ampm] = input?.split(' ');
-    const [m, d, y] = (mdy || '').split('/').map(Number);
-    let [hh, mm, ss] = (time || '').split(':').map(Number);
+    const [mdy, time, ampm] = input?.split(" ");
+    const [m, d, y] = (mdy || "").split("/").map(Number);
+    let [hh, mm, ss] = (time || "").split(":").map(Number);
 
-    if (ampm === 'PM' && hh < 12) hh += 12;
-    if (ampm === 'AM' && hh === 12) hh = 0;
+    if (ampm === "PM" && hh < 12) hh += 12;
+    if (ampm === "AM" && hh === 12) hh = 0;
 
     const parsed = new Date(y, m - 1, d, hh, mm, ss);
     if (isNaN(parsed.getTime())) {
@@ -399,26 +419,26 @@ export function formatDateHr(input, isFullDate) {
 function buildFormatted(date, isFullDate) {
   if (isNaN(date?.getTime?.())) return null;
   const months = [
-    'Jan',
-    'Feb',
-    'Mar',
-    'Apr',
-    'May',
-    'Jun',
-    'Jul',
-    'Aug',
-    'Sep',
-    'Oct',
-    'Nov',
-    'Dec',
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
   ];
-  const day = String(date.getDate()).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, "0");
   const month = months[date.getMonth()];
   const year = date.getFullYear();
 
   let hours = date.getHours() || 12;
-  const minutes = String(date.getMinutes()).padStart(2, '0');
-  const seconds = String(date.getSeconds()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  const seconds = String(date.getSeconds()).padStart(2, "0");
 
   if (isFullDate) {
     return `${day}-${month}-${year} ${hours}:${minutes}:${seconds}`;
@@ -431,9 +451,9 @@ export const isTokenValid = (tokenValidTill: string) => {
   return new Date(tokenValidTill).getTime() > Date.now();
 };
 export async function requestLocationPermissions(): Promise<
-  'granted' | 'foreground-only' | 'denied' | 'blocked'
+  "granted" | "foreground-only" | "denied" | "blocked"
 > {
-  if (Platform.OS === 'android') {
+  if (Platform.OS === "android") {
     try {
       const granted = await PermissionsAndroid.requestMultiple([
         PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
@@ -441,16 +461,17 @@ export async function requestLocationPermissions(): Promise<
         PermissionsAndroid.PERMISSIONS.ACCESS_BACKGROUND_LOCATION,
       ]);
 
-      const fine = granted['android.permission.ACCESS_FINE_LOCATION'];
-      const coarse = granted['android.permission.ACCESS_COARSE_LOCATION'];
-      const background = granted['android.permission.ACCESS_BACKGROUND_LOCATION'];
+      const fine = granted["android.permission.ACCESS_FINE_LOCATION"];
+      const coarse = granted["android.permission.ACCESS_COARSE_LOCATION"];
+      const background =
+        granted["android.permission.ACCESS_BACKGROUND_LOCATION"];
 
       const allGranted =
         fine === PermissionsAndroid.RESULTS.GRANTED &&
         coarse === PermissionsAndroid.RESULTS.GRANTED &&
         background === PermissionsAndroid.RESULTS.GRANTED;
 
-      if (allGranted) return 'granted';
+      if (allGranted) return "granted";
 
       const foregroundGranted =
         fine === PermissionsAndroid.RESULTS.GRANTED &&
@@ -458,7 +479,7 @@ export async function requestLocationPermissions(): Promise<
         background !== PermissionsAndroid.RESULTS.GRANTED;
 
       if (foregroundGranted) {
-        return 'foreground-only';
+        return "foreground-only";
       }
 
       const blocked =
@@ -467,97 +488,95 @@ export async function requestLocationPermissions(): Promise<
         background === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN;
 
       if (blocked) {
-        return 'blocked';
+        return "blocked";
       }
 
-      return 'denied';
+      return "denied";
     } catch (err) {
-      return 'denied';
+      return "denied";
     }
   }
-  return 'granted';
+  return "granted";
 }
 
-
-
 export const formatTo12Hour = (time: string) => {
-  if (!time) return '--';
-  const [hourStr, minute] = time.split(':');
+  if (!time) return "--";
+  const [hourStr, minute] = time.split(":");
   let hour = parseInt(hourStr, 10);
 
-  const suffix = hour >= 12 ? 'PM' : 'AM';
+  const suffix = hour >= 12 ? "PM" : "AM";
   hour = hour % 12 || 12;
 
-  return `${hour.toString().padStart(2, '0')}:${minute} ${suffix}`;
+  return `${hour.toString().padStart(2, "0")}:${minute} ${suffix}`;
 };
 
 export const isLatePunchIn = (punchIn: string) => {
   if (!punchIn) return false;
-  const [hours, minutes] = punchIn.split(':').map(Number);
+  const [hours, minutes] = punchIn.split(":").map(Number);
   return hours > 10 || (hours === 10 && minutes > 15);
 };
 
 export const isAfter830 = (punchIn: string) => {
   if (!punchIn) return false;
-  const [hours, minutes] = punchIn.split(':').map(Number);
+  const [hours, minutes] = punchIn.split(":").map(Number);
   return hours > 8 || (hours === 8 && minutes > 30);
 };
 
 export const isBefore830 = (punchIn: string) => {
   if (!punchIn) return false;
-  const [hours, minutes] = punchIn.split(':').map(Number);
+  const [hours, minutes] = punchIn.split(":").map(Number);
   return hours < 8 || (hours === 8 && minutes < 30);
 };
 
 export const normalizeDate = (dateStr: string) => {
-  const [day, monthStr, year] = dateStr && dateStr.split(' ');
+  const [day, monthStr, year] = dateStr && dateStr.split(" ");
   const monthMap: Record<string, string> = {
-    Jan: '01',
-    Feb: '02',
-    Mar: '03',
-    Apr: '04',
-    May: '05',
-    Jun: '06',
-    Jul: '07',
-    Aug: '08',
-    Sep: '09',
-    Oct: '10',
-    Nov: '11',
-    Dec: '12',
+    Jan: "01",
+    Feb: "02",
+    Mar: "03",
+    Apr: "04",
+    May: "05",
+    Jun: "06",
+    Jul: "07",
+    Aug: "08",
+    Sep: "09",
+    Oct: "10",
+    Nov: "11",
+    Dec: "12",
   };
-  return `${year}-${monthMap[monthStr]}-${day.padStart(2, '0')}`;
+  return `${year}-${monthMap[monthStr]}-${day.padStart(2, "0")}`;
 };
 
 export const getWorkedHours = (punchIn: string, punchOut: string): number => {
   if (!punchIn || !punchOut) return 0;
-  const [inH, inM] = punchIn.split(':').map(Number);
-  const [outH, outM] = punchOut.split(':').map(Number);
+  const [inH, inM] = punchIn.split(":").map(Number);
+  const [outH, outM] = punchOut.split(":").map(Number);
   const inDate = new Date(0, 0, 0, inH, inM);
   const outDate = new Date(0, 0, 0, outH, outM);
   return (outDate.getTime() - inDate.getTime()) / 1000 / 60 / 60;
 };
 export const getWorkedHours2 = (punchIn: string, punchOut: string) => {
-  if (!punchIn || !punchOut) return '0:00 hr';
+  if (!punchIn || !punchOut) return "0:00 hr";
 
-  const [inH, inM] = punchIn.split(':').map(Number);
-  const [outH, outM] = punchOut.split(':').map(Number);
+  const [inH, inM] = punchIn.split(":").map(Number);
+  const [outH, outM] = punchOut.split(":").map(Number);
 
   if (isNaN(inH) || isNaN(inM) || isNaN(outH) || isNaN(outM)) {
-    return '0:00 hr';
+    return "0:00 hr";
   }
 
   const inDate = new Date(0, 0, 0, inH, inM);
   const outDate = new Date(0, 0, 0, outH, outM);
 
   let diffMs = outDate.getTime() - inDate.getTime();
-  if (diffMs <= 0) return '0:00 hr';
+  if (diffMs <= 0) return "0:00 hr";
 
   const totalMinutes = Math.floor(diffMs / 60000);
 
   const hours = Math.floor(totalMinutes / 60);
   const mins = totalMinutes % 60;
 
-  return `${hours - 1}:${mins.toString().padStart(2, '0')} hr`;
+  return `${hours - 1}:${mins.toString().padStart(2, "0")} hr`;
 };
 
 export const clearAllTempFiles = async () => {
@@ -568,16 +587,14 @@ export const clearAllTempFiles = async () => {
     for (const file of files) {
       try {
         await RNFS.unlink(file.path);
-      } catch (err) {
-      }
+      } catch (err) {}
     }
     FastImage.clearMemoryCache();
     FastImage.clearDiskCache();
-    if (Platform.OS === 'android') {
+    if (Platform.OS === "android") {
       // WebView.clearCache(true);
     }
-  } catch (err) {
-  }
+  } catch (err) {}
 };
 
 export const getShadowProps = (
@@ -585,7 +602,7 @@ export const getShadowProps = (
   radius: number = 8,
   opacity: number = 0.2,
 ) => ({
-  shadowColor: '#000',
+  shadowColor: "#000",
   shadowOffset: {
     width: 0,
     height: offset,
@@ -595,15 +612,15 @@ export const getShadowProps = (
   elevation: radius,
 });
 
-export const isIos = Platform.OS === 'ios';
-export const isAndroid = Platform.OS === 'android';
+export const isIos = Platform.OS === "ios";
+export const isAndroid = Platform.OS === "android";
 
-export const getWindowWidth = () => Dimensions.get('window').width;
-export const getWindowHeight = () => Dimensions.get('window').height;
+export const getWindowWidth = () => Dimensions.get("window").width;
+export const getWindowHeight = () => Dimensions.get("window").height;
 
 export const goToSettings = () => {
   if (isIos) {
-    Linking.openURL('app-settings:');
+    Linking.openURL("app-settings:");
   } else {
     Linking.openSettings();
   }
@@ -620,23 +637,25 @@ export const handleLocationPress = (location: string) => {
   if (!location) return;
 
   // Split the string into latitude and longitude
-  const [lat, lng] = location.split(',').map(coord => coord.trim());
+  const [lat, lng] = location.split(",").map((coord) => coord.trim());
 
   // Construct URL for maps
   const url = Platform.select({
-    ios: `http://maps.apple.com/?ll=${lat},${lng}`,  // Apple Maps on iOS
-    android: `geo:${lat},${lng}?q=${lat},${lng}`,    // Google Maps on Android
+    ios: `http://maps.apple.com/?ll=${lat},${lng}`, // Apple Maps on iOS
+    android: `geo:${lat},${lng}?q=${lat},${lng}`, // Google Maps on Android
   });
 
   Linking.canOpenURL(url!)
-    .then(supported => {
+    .then((supported) => {
       if (supported) {
         Linking.openURL(url!);
       } else {
-        Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${lat},${lng}`);
+        Linking.openURL(
+          `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`,
+        );
       }
     })
-    .catch(err => console.error('Error opening map:', err));
+    .catch((err) => console.error("Error opening map:", err));
 };
 
 // =======================
@@ -644,19 +663,105 @@ export const handleLocationPress = (location: string) => {
 // =======================
 const operators = {
   // Equality
-  equals: (a, b) => a === b,
-  notEquals: (a, b) => a !== b,
+  equals: (a, b) => {
+  if (a === null || a === undefined) a = "";
+  if (b === null || b === undefined) b = "";
+
+  if (typeof a === "string") a = a.trim();
+  if (typeof b === "string") b = b.trim();
+
+  return a === b;
+},
+
+  notEquals: (a, b) => {
+  if (a === null || a === undefined) a = "";
+  if (b === null || b === undefined) b = "";
+
+  if (typeof a === "string") a = a.trim();
+  if (typeof b === "string") b = b.trim();
+
+  return a !== b;
+},
+
 
   // Numeric
-  greaterThan: (a, b) => Number(a) > Number(b),
-  greaterThanOrEqual: (a, b) => Number(a) >= Number(b),
-  lessThan: (a, b) => Number(a) < Number(b),
-  lessThanOrEqual: (a, b) => Number(a) <= Number(b),
+ greaterThan: (a, b) => {
+  if (
+    a === "" || a === null || a === undefined ||
+    b === "" || b === null || b === undefined
+  ) {
+    return false;
+  }
+
+  const numA = Number(a);
+  const numB = Number(b);
+
+  if (isNaN(numA) || isNaN(numB)) {
+    return false;
+  }
+
+  return numA > numB;
+},
+
+  greaterThanOrEqual: (a, b) => {
+    if (a === "" || a === null || a === undefined) return false;
+    if (b === "" || b === null || b === undefined) return false;
+
+    const numA = Number(a);
+    const numB = Number(b);
+
+    if (isNaN(numA) || isNaN(numB)) return false;
+
+    return numA >= numB;
+  },
+
+ lessThan: (a, b) => {
+  if (
+    a === "" || a === null || a === undefined ||
+    b === "" || b === null || b === undefined
+  ) {
+    return false;
+  }
+
+  const numA = Number(a);
+  const numB = Number(b);
+
+  if (isNaN(numA) || isNaN(numB)) {
+    return false;
+  }
+
+  return numA < numB;
+},
+
+  lessThanOrEqual: (a, b) => {
+    if (
+      a === "" ||
+      a === null ||
+      a === undefined ||
+      b === "" ||
+      b === null ||
+      b === undefined
+    ) {
+      return false;
+    }
+
+    const numA = Number(a);
+    const numB = Number(b);
+
+    if (isNaN(numA) || isNaN(numB)) {
+      return false;
+    }
+
+    return numA <= numB;
+  },
 
   // String
-  containsString: (a, b) => typeof a === "string" && typeof b === "string" && a.includes(b),
-  startsWithString: (a, b) => typeof a === "string" && typeof b === "string" && a.startsWith(b),
-  endsWithString: (a, b) => typeof a === "string" && typeof b === "string" && a.endsWith(b),
+  containsString: (a, b) =>
+    typeof a === "string" && typeof b === "string" && a.includes(b),
+  startsWithString: (a, b) =>
+    typeof a === "string" && typeof b === "string" && a.startsWith(b),
+  endsWithString: (a, b) =>
+    typeof a === "string" && typeof b === "string" && a.endsWith(b),
 
   // Array
   inArray: (a, b) => Array.isArray(b) && b.includes(a),
@@ -678,16 +783,16 @@ const operators = {
   isAfterDate: (a, b) => new Date(a) > new Date(b),
 
   locationWithin: (a, b, meters = 50) => {
-  if (!a || !b) return false;
+    if (!a || !b) return false;
 
-  const radius = Number(meters);
-  if (isNaN(radius)) return false;
+    const radius = Number(meters);
+    if (isNaN(radius)) return false;
 
-  const [lat1, lon1] = a.split(',').map(Number);
-  const [lat2, lon2] = b.split(',').map(Number);
+    const [lat1, lon1] = a.split(",").map(Number);
+    const [lat2, lon2] = b.split(",").map(Number);
 
-  return getDistanceInMeters(lat1, lon1, lat2, lon2) <= radius;
-},
+    return getDistanceInMeters(lat1, lon1, lat2, lon2) <= radius;
+  },
   between: (a, min, max) => {
     const num = Number(a);
     return num >= Number(min) && num <= Number(max);
@@ -698,22 +803,21 @@ const operators = {
     return num < Number(min) || num > Number(max);
   },
 
-  isNumber: (a) => !isNaN(a) && a !== null && a !== '',
+  isNumber: (a) => !isNaN(a) && a !== null && a !== "",
   equalsIgnoreCase: (a, b) =>
-    typeof a === 'string' && typeof b === 'string' &&
+    typeof a === "string" &&
+    typeof b === "string" &&
     a.toLowerCase() === b.toLowerCase(),
 
   notContainsString: (a, b) =>
-    typeof a === 'string' && typeof b === 'string' && !a.includes(b),
+    typeof a === "string" && typeof b === "string" && !a.includes(b),
 
-  stringLengthEquals: (a, b) =>
-    typeof a === 'string' && a.length === Number(b),
+  stringLengthEquals: (a, b) => typeof a === "string" && a.length === Number(b),
 
   stringLengthGreaterThan: (a, b) =>
-    typeof a === 'string' && a.length > Number(b),
+    typeof a === "string" && a.length > Number(b),
 
-  stringLengthLessThan: (a, b) =>
-    typeof a === 'string' && a.length < Number(b),
+  stringLengthLessThan: (a, b) => typeof a === "string" && a.length < Number(b),
   isToday: (a) => {
     const d = new Date(a);
     const t = new Date();
@@ -728,24 +832,22 @@ const operators = {
     const diff = Math.abs(new Date(a) - new Date());
     return diff / (1000 * 60 * 60 * 24) > Number(b);
   },
-
 };
 
 const getDistanceInMeters = (lat1, lon1, lat2, lon2) => {
   const R = 6371000;
-  const dLat = (lat2 - lat1) * Math.PI / 180;
-  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLon = ((lon2 - lon1) * Math.PI) / 180;
 
   const a =
     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(lat1 * Math.PI / 180) *
-    Math.cos(lat2 * Math.PI / 180) *
-    Math.sin(dLon / 2) *
-    Math.sin(dLon / 2);
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
 
   return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
 };
-
 
 // =======================
 // Evaluate Condition
@@ -768,15 +870,14 @@ const evaluateCondition = (rule, values) => {
   return operatorFn(leftValue, rightValue, rule.meters);
 };
 
-
-
-
 export const evaluateRules = (condition, values) => {
   if (!condition) return false;
 
   if (Array.isArray(condition.rules)) {
     const results = condition.rules.map((rule) => evaluateRules(rule, values));
-    return condition.logic === "OR" ? results.some(Boolean) : results.every(Boolean);
+    return condition.logic === "OR"
+      ? results.some(Boolean)
+      : results.every(Boolean);
   }
 
   return evaluateCondition(condition, values);
@@ -785,19 +886,16 @@ export const evaluateRules = (condition, values) => {
 export const computeControlVisibility = (
   rules: any[] | null,
   formValues: Record<string, any>,
-  logic: "AND" | "OR" = "AND"
+  logic: "AND" | "OR" = "AND",
 ): boolean => {
   if (!rules || !Array.isArray(rules) || rules.length === 0) {
     return true;
   }
 
-  const results = rules.map(rule => evaluateRules(rule, formValues));
+  const results = rules.map((rule) => evaluateRules(rule, formValues));
 
-  return logic === "OR"
-    ? results.some(Boolean)
-    : results.every(Boolean);
+  return logic === "OR" ? results.some(Boolean) : results.every(Boolean);
 };
-
 
 const evaluateCondition2 = (rule, values) => {
   if (!rule || !rule.operator) return false;
@@ -817,15 +915,12 @@ const evaluateCondition2 = (rule, values) => {
   return operatorFn(leftValue, rightValue, rule.meters);
 };
 
-
 export const evaluateRules2 = (condition, values) => {
   if (!condition) return false;
 
   // Nested rules
   if (condition.logic && Array.isArray(condition.rules)) {
-    const results = condition.rules.map(rule =>
-      evaluateRules2(rule, values)
-    );
+    const results = condition.rules.map((rule) => evaluateRules2(rule, values));
 
     return condition.logic === "OR"
       ? results.some(Boolean)
@@ -850,10 +945,10 @@ export const collectActionsFromRule2 = (rule, values) => {
   return [];
 };
 
-export const evaluateRulesWithActions = (
+export const evaluateRulesWithActionsv1 = (
   rules,
   formValues,
-  logic = "AND"
+  logic = "AND",
 ) => {
   if (!rules) return { isValid: true, actions: [] };
 
@@ -862,7 +957,7 @@ export const evaluateRulesWithActions = (
   const results = [];
   let actions = [];
 
-  ruleArray.forEach(rule => {
+  ruleArray.forEach((rule) => {
     const isValid = evaluateRules(rule, formValues);
     results.push(isValid);
 
@@ -870,17 +965,15 @@ export const evaluateRulesWithActions = (
   });
 
   const finalResult =
-    logic === "OR"
-      ? results.some(Boolean)
-      : results.every(Boolean);
+    logic === "OR" ? results.some(Boolean) : results.every(Boolean);
 
   return { isValid: finalResult, actions };
 };
 export const applyActionsToControls = (controls, actions) => {
   if (!actions || actions.length === 0) return controls;
 
-  return controls.map(ctrl => {
-    const fieldActions = actions.filter(a => a.field === ctrl.field);
+  return controls.map((ctrl) => {
+    const fieldActions = actions.filter((a) => a.field === ctrl.field);
     if (fieldActions.length === 0) return ctrl;
 
     return fieldActions.reduce((updatedCtrl, action) => {
@@ -898,7 +991,7 @@ export const applyActionsToControls = (controls, actions) => {
         case "enable":
           return { ...updatedCtrl, disabled: "0" };
         case "setValue":
-          return { ...updatedCtrl, text: action.value, dtext: action.value, };
+          return { ...updatedCtrl, text: action.value, dtext: action.value };
         case "setBoolValue":
           return { ...updatedCtrl, text: action.value, field: action.value };
         default:
@@ -906,4 +999,48 @@ export const applyActionsToControls = (controls, actions) => {
       }
     }, ctrl);
   });
+};
+
+const collectFailedMessages = (condition, values, messages = []) => {
+  if (!condition) return messages;
+
+  // Nested rules case
+  if (condition.logic && Array.isArray(condition.rules)) {
+    condition.rules.forEach((rule) => {
+      collectFailedMessages(rule, values, messages);
+    });
+    return messages;
+  }
+
+  // Leaf rule
+  const isValid = evaluateCondition(condition, values);
+
+  if (!isValid && condition.message) {
+    messages.push(condition.message);
+  }
+
+  return messages;
+};
+
+export const evaluateRulesWithActions = (rules, formValues, logic = "AND") => {
+  if (!rules) return { isValid: true, actions: [], messages: [] };
+
+  const ruleArray = Array.isArray(rules) ? rules : [rules];
+
+  const results = [];
+  let actions = [];
+  let messages = [];
+
+  ruleArray.forEach((rule) => {
+    const isValid = evaluateRules(rule, formValues);
+    results.push(isValid);
+
+    actions = actions.concat(collectActionsFromRule2(rule, formValues));
+    messages = messages.concat(collectFailedMessages(rule, formValues));
+  });
+
+  const finalResult =
+    logic === "OR" ? results.some(Boolean) : results.every(Boolean);
+
+  return { isValid: finalResult, actions, messages };
 };

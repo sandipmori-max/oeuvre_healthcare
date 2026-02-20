@@ -202,6 +202,8 @@ export default {
     text1: "Hide password",
     text2: "Show password",
     text3: "Slide to",
+        texti3: "Tap to",
+
     text4: "Date",
     text5: "In-Time",
     text6: "Out-Time",

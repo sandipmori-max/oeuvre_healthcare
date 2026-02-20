@@ -7,6 +7,7 @@ import {
   Dimensions,
   Animated,
   TouchableOpacity,
+  Platform,
 } from "react-native";
 import React, { useState, useRef, useEffect } from "react";
 import { Formik } from "formik";
@@ -35,6 +36,7 @@ import { Easing } from "react-native";
 import ImageBottomSheetModal from "../../../../components/bottomsheet/ImageBottomSheetModal";
 import TranslatedText from "../../tabs/home/TranslatedText";
 import { updateAttendanceState } from "../../../../store/slices/auth/authSlice";
+import SlideButtonIOS from "./SlideButtonIOS";
 
 const AttendanceForm = ({ setBlockAction, resData }: any) => {
   const { t } = useTranslations();
@@ -100,20 +102,29 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
     setFieldValue: (field: keyof AttendanceFormValues, value: any) => void,
     handleSubmit: () => void,
   ) => {
+    console.log("---------------------9")
+
     launchCamera(
       {
         mediaType: "photo",
         cameraType: "back",
-        quality: 0.7,
+        quality: 0.5,
         includeBase64: true,
       },
       (response) => {
-        if (response?.didCancel || response?.errorCode) {
+    console.log("---------------------10")
+
+        try {
+          if (response?.didCancel || response?.errorCode) {
+    console.log("---------------------11", response)
+
           setLocationLoading(false);
           setBlockAction(false);
           return;
         }
         const photoUri = response?.assets?.[0]?.uri;
+    console.log("---------------------12", photoUri)
+
         const asset = response?.assets?.[0];
         if (!photoUri) return;
         if (asset?.base64) {
@@ -130,6 +141,10 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
         setTimeout(() => {
           handleSubmit();
         }, 1000);
+        } catch (error) {
+    console.log("---------------------11", error)
+          
+        }
       },
     );
   };
@@ -138,6 +153,9 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
     setFieldValue: (field: keyof AttendanceFormValues, value: any) => void,
     handleSubmit: () => void,
   ) => {
+     
+     
+    console.log("---------------------1")
     const enabled = await DeviceInfo.isLocationEnabled();
     if (!enabled) {
       setBlocked(false);
@@ -149,10 +167,17 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
       setLocationAlertVisible(false);
     }
     setBlockAction(true);
+    console.log("---------------------2")
+    
     if (locationLoading) return;
+    console.log("---------------------3")
 
     const hasPermission = await requestCameraAndLocationPermission();
+    console.log("---------------------4")
+    
     if (!hasPermission) {
+    console.log("---------------------5")
+
       pendingCameraAction.current = { setFieldValue, handleSubmit };
       setAlertConfig({
         title: t("errors.permissionRequired"),
@@ -173,13 +198,19 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
     const getLocationWithRetry = () => {
       Geolocation.getCurrentPosition(
         (position) => {
+    console.log("---------------------6")
+
           const { latitude, longitude } = position?.coords;
+    console.log("---------------------7", position)
+
           setUserLocation({ latitude, longitude });
           setFieldValue("latitude", String(latitude));
           setFieldValue("longitude", String(longitude));
           openCamera(setFieldValue, handleSubmit);
         },
         (error) => {
+    console.log("-----------------------******")
+
           setAlertConfig({
             title: t("errors.locationError"),
             message: error?.message || t("msg.msg5"),
@@ -531,8 +562,29 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
                 }}
               >
                 <View>
-                  <SlideButton
+                  {
+                    Platform.OS === 'ios' ? <SlideButtonIOS
                     label={
+                      resData?.success === 1 || resData?.success === "1"
+                        ? `${t("text.texti3")} ${t("attendance.checkOut")}`
+                        : `${t("text.texti3")} ${t("attendance.checkIn")}`  
+                    }
+                    successColor={
+                      resData?.success === 1 || resData?.success === "1"
+                        ? ERP_COLOR_CODE.ERP_ERROR
+                        : ERP_COLOR_CODE.ERP_APP_COLOR
+                    }
+                    loading={locationLoading}
+                    completed={attendanceDone}
+                    onSlideSuccess={() =>
+                    {
+                      handleStatusToggle(setFieldValue, handleSubmit)
+                    }
+                    }
+                  /> : <SlideButton
+                    label={
+
+                      
                       resData?.success === 1 || resData?.success === "1"
                         ? `${t("text.text3")} ${t("attendance.checkOut")}`
                         : `${t("text.text3")} ${t("attendance.checkIn")}`
@@ -546,9 +598,13 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
                     completed={attendanceDone}
                     blocked={blocked}
                     onSlideSuccess={() =>
+                    {
                       handleStatusToggle(setFieldValue, handleSubmit)
                     }
+                    }
                   />
+                  }
+                  
                 </View>
               </Animated.View>
             </View>

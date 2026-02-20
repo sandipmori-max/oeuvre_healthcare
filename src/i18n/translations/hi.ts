@@ -215,6 +215,7 @@ export default {
     text1: "पासवर्ड छिपाएँ",
     text2: "पासवर्ड दिखाएँ",
     text3: "चल पटल करें",
+    texti3: "Tap to",
     text4: "तारीख",
     text5: "इन-टाइम",
     text6: "आउट-टाइम",
