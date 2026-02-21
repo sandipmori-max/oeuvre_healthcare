@@ -914,6 +914,7 @@ const PageScreen = () => {
                 item={item}
                 isFromNew={isFromNew}
                 handleAttachment={handleAttachment}
+                errors={errors}
               />
             )}
           </>
@@ -1102,7 +1103,7 @@ const PageScreen = () => {
               backgroundColor: theme === 'dark' ? 'black' : ERP_COLOR_CODE.ERP_WHITE,
             }}
           >
-            <ErrorMessage message={error} isShowTop={false} />
+            <ErrorMessage message={error} isShowTop={true} />
           </View>
         ) : controls?.length > 0 ? (
           <>

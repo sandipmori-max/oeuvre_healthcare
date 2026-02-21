@@ -14,3 +14,5 @@ export const ERP_DRAWER_LIST: DrawerItemConfig[] = [
 export enum EPermissionTypes {
   CAMERA = 'camera',
 }
+
+export const ERP_APP_VERSION = '1.2.2'

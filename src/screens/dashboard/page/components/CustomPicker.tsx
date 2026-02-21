@@ -127,7 +127,7 @@ const CustomPicker = ({
           {item?.tooltip !== label && (
             <TranslatedText
             numberOfLines={1}
-            text={`{' '} - ( ${item?.tooltip} )`}
+            text={` - ( ${item?.tooltip} )`}
             style={[
               styles.label,
               theme === 'dark' && { color: 'white' },
