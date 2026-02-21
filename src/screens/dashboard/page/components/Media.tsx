@@ -1,5 +1,5 @@
 import MaterialIcons from '@react-native-vector-icons/material-icons';
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, useLayoutEffect } from 'react';
 import {
   View,
   Image,
@@ -20,8 +20,9 @@ import CustomAlert from '../../../../components/alert/CustomAlert';
 import { ERP_COLOR_CODE } from '../../../../utils/constants';
 import { useAppSelector } from '../../../../store/hooks';
 import { useTranslation } from 'react-i18next';
+import InputError from '../../../../components/error/InputError';
 
-const Media = ({ isValidate, item, handleAttachment, infoData, baseLink, isFromNew }: any) => {
+const Media = ({ isValidate, item, handleAttachment, infoData, baseLink, isFromNew , errors}: any) => {
   const {t} = useTranslation()
   const [imageUri, setImageUri] = useState<string | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
@@ -54,9 +55,11 @@ const Media = ({ isValidate, item, handleAttachment, infoData, baseLink, isFromN
       imageUri ||
       `${baseLink}fileupload/1/${infoData?.tableName}/${infoData?.id}/${type === 'small' ? `d_${item?.text}` : item?.text
       }`;
+      console.log("--------=================", base)
      return `${base}?cb=${cacheBuster}`;
   };
 
+  
   // -------------------- Permissions --------------------
   const requestPermission = async (type: 'camera' | 'gallery'): Promise<boolean> => {
     try {
@@ -148,6 +151,9 @@ const Media = ({ isValidate, item, handleAttachment, infoData, baseLink, isFromN
     return () => subscription.remove();
   }, []);
 
+  useLayoutEffect(()=>{
+      setLoadingSmall(false)
+  },[])
   // -------------------- Render Media Options --------------------
   const renderMedia = () => {
     if (item?.ctltype === 'IMAGE') {
@@ -219,7 +225,7 @@ const Media = ({ isValidate, item, handleAttachment, infoData, baseLink, isFromN
             if (!granted) return;
 
             launchImageLibrary(
-              { mediaType: 'photo', quality: 0.8, includeBase64: true },
+              { mediaType: 'photo', quality: 0.5, includeBase64: true },
               response => {
                 if (response.assets && response.assets.length > 0) {
                   const asset: Asset = response.assets[0];
@@ -292,42 +298,99 @@ const Media = ({ isValidate, item, handleAttachment, infoData, baseLink, isFromN
         }]}> - ( {item?.tooltip} ) </Text>}
         {item?.mandatory === '1' && <Text style={{ color: ERP_COLOR_CODE.ERP_ERROR }}>*</Text>}
       </View>
-      <View style={styles.imageWrapper}>
+      <TouchableOpacity 
+      onPress={() =>{
+        if(loadingSmall){
+          handleChooseImage()
+        }
+      }}
+      
+      style={[styles.imageWrapper,
+      
+      loadingSmall && {
+        width:'100%',
+        borderWidth: 1,
+        borderRadius: 12,
+        borderColor: ERP_COLOR_CODE.ERP_BORDER,
+        marginBottom:12,
+      },
+      errors[item?.field] && {
+        borderColor: ERP_COLOR_CODE.ERP_ERROR,
+      },
+
+      ]}>
         <TouchableOpacity
           onPress={() => {
+             if(loadingSmall){
+          handleChooseImage()
+        }
             if (isFromNew) return;
             setModalVisible(true);
           }}
         >
           <View style={[
             theme === 'dark' && {
-              borderWidth: 1,
+              borderWidth: !loadingSmall ? 1 : 0,
               borderColor: 'white'
             },
-            { width: 100, height: 100, }]}>
+            
+            { width: loadingSmall ? 200 : 100, height: 100, }]}>
             {loadingSmall && (
-              <ActivityIndicator style={StyleSheet.absoluteFill} size="small" color={theme === 'dark' ? 'white' : 'black'} />
+              <ActivityIndicator 
+              
+              style={StyleSheet.absoluteFill} size="small" color={theme === 'dark' ? 'white' :  loadingSmall ? 'white' : 'black'} />
             )}
+            {
+              loadingSmall && <View style={{
+              marginTop: 18,
+              justifyContent:'center',
+              alignContent:'center',
+              alignItems:'center',
+              gap: 4
+            }}>
+                <MaterialIcons name={'add-photo-alternate'} color={theme === 'dark' ? 'white' : ERP_COLOR_CODE.ERP_999} size={38} />
+                <Text style={{
+                  color:  ERP_COLOR_CODE.ERP_999
+                }}>Please upload image</Text>
+                </View>
+            }
+            
             <Image
               key={item.field}
               source={imageUri ? { uri: imageUri } : { uri: getImageUri('small') }}
-              style={styles.imageThumb}
-              onLoadStart={() => !imageUri && setLoadingSmall(true)}
+              style={[styles.imageThumb, loadingSmall && {
+                height: 1,
+                width: 1,
+                borderWidth : 0,
+              }]}
+              onLoadStart={() => {
+                !imageUri && setLoadingSmall(true)
+              }}
               onLoadEnd={() => setLoadingSmall(false)}
               resizeMode="cover"
             />
           </View>
         </TouchableOpacity>
-
-        <TouchableOpacity onPress={handleChooseImage} style={[styles.editBtn, theme === 'dark' && {
+        {
+          !loadingSmall &&  <TouchableOpacity onPress={handleChooseImage} style={[styles.editBtn, theme === 'dark' && {
           borderWidth: 1,
           borderColor: 'white',
           backgroundColor: 'black'
-        },]}>
+        },
+        ]}>
           <MaterialIcons name={'edit'} color={theme === 'dark' ? 'white' : ERP_COLOR_CODE.ERP_BLACK} size={20} />
         </TouchableOpacity>
-      </View>
+        }
 
+       
+      </TouchableOpacity>
+
+      {errors[item?.field] && (
+        <>
+        <InputError error={errors[item?.field]} />
+        <View style={{height: 8}}/>
+        </>
+      )}
       {/* Fullscreen Image Modal */}
       <Modal
         animationType="slide"
@@ -343,7 +406,7 @@ const Media = ({ isValidate, item, handleAttachment, infoData, baseLink, isFromN
         }}
       >
         <View style={styles.fullscreenModalOverlay}>
-          <View style={styles.fullscreenModalContent}>
+          <View style={[styles.fullscreenModalContent]}>
             <TouchableOpacity
               style={styles.closeBtn}
               onPress={() => {
@@ -470,9 +533,9 @@ const Media = ({ isValidate, item, handleAttachment, infoData, baseLink, isFromN
   },
 
   imageThumb: {
-    borderWidth: 1,
     width: 100,
     height: 100,
+    borderWidth: 1
   },
 
   editBtn: {

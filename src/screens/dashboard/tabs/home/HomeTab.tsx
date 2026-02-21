@@ -233,7 +233,7 @@ const HomeScreen = () => {
         </TouchableOpacity>
       ),
     });
-  }, [actionLoader, navigation, isHorizontal, isRefresh, showSearch, dashboard, searchText, filteredDashboard, isFilterVisible]);
+  }, [actionLoader, navigation, attendanceDone ,isHorizontal, isRefresh, showSearch, dashboard, searchText, filteredDashboard, isFilterVisible]);
 
   useFocusEffect(
     useCallback(() => {

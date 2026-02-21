@@ -33,7 +33,6 @@ import { DevERPService } from '../../../services/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useApi } from '../../../hooks/useApi';
 import { firstLetterUpperCase, isTokenValid } from '../../../utils/helpers';
-import DeviceInfo from 'react-native-device-info';
 import { setLang, setTheme } from '../../../store/slices/theme/themeSlice';
 import { clearAuthState, setDashboard, setEmptyMenu } from '../../../store/slices/auth/authSlice';
 import { resetAjaxState } from '../../../store/slices/ajax/ajaxSlice';
@@ -41,6 +40,7 @@ import { resetAttendanceState } from '../../../store/slices/attendance/attendanc
 import { resetDropdownState } from '../../../store/slices/dropdown/dropdownSlice';
 import { resetSyncLocationState } from '../../../store/slices/location/syncLocationSlice';
 import { Easing } from 'react-native';
+import { ERP_APP_VERSION } from '../../../constants';
 
 interface SettingItem {
   id: string;
@@ -63,7 +63,7 @@ const SettingsScreen = () => {
   const { t, changeLanguage, getAvailableLanguages, getCurrentLanguage } = useTranslations();
   const [alertVisible, setAlertVisible] = useState(false);
   const theme = useAppSelector(state => state.theme.mode);
-const translateY = useRef(new Animated.Value(HIDDEN_POSITION)).current;
+  const translateY = useRef(new Animated.Value(HIDDEN_POSITION)).current;
   const overlayOpacity = useRef(new Animated.Value(0)).current;
   const [logoutVisible, setLogoutVisible] = useState(false);
   const { user } = useAppSelector(state => state.auth);
@@ -80,9 +80,9 @@ const translateY = useRef(new Animated.Value(HIDDEN_POSITION)).current;
     message: '',
     type: 'info' as 'error' | 'success' | 'info' | 'exit',
   });
-  const [settings, setSettings] = useState<SettingItem[]>([]);
-  const appVersion = DeviceInfo.getVersion();
-
+  const [settings, setSettings] = useState<SettingItem[]>([]); 
+  const appVersion = ERP_APP_VERSION;
+ 
  useEffect(() => {
     if (languageModalVisible) {
       Animated.parallel([

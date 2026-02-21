@@ -463,7 +463,7 @@ const ListScreen = () => {
   if (parsedError) {
     return (
       <View style={{ flex: 1, backgroundColor: theme == 'dark' ? 'black' :  ERP_COLOR_CODE.ERP_WHITE }}>
-        <ErrorMessage message={parsedError} isShowTop ={false} />
+        <ErrorMessage message={parsedError} isShowTop ={true} />
       </View>
     );
   }
