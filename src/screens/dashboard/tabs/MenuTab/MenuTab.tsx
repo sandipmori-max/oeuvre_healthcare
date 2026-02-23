@@ -124,6 +124,7 @@ const MenuTab = ({ type, headerText, searchPlaceholder }: any) => {
               placeholder={searchPlaceholder}
               autoFocus={true}
               style={{
+                
                 flex: 1,
                 backgroundColor: '#f0f0f0',
                 borderRadius: 8,
