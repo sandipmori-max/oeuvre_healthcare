@@ -225,7 +225,6 @@
 // };
 
 // export default WebScreen;
-
 import { SafeAreaView, StatusBar, Text, View } from 'react-native';
 import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -308,7 +307,6 @@ const WebScreen = () => {
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerBackTitle: '',
       headerTitle: () => (
         <Text
           numberOfLines={1}
@@ -317,6 +315,7 @@ const WebScreen = () => {
           {isFromChart ? t("text.text52") : item?.title || t('webScreen.details')}
         </Text>
       ),
+      headerBackTitle: '',
       headerRight: () => (
         <>
           {isFromChart || item?.title === 'Attendance Code' ? (
@@ -351,6 +350,8 @@ const WebScreen = () => {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar backgroundColor={ERP_COLOR_CODE.ERP_APP_COLOR} translucent={false} />
+      <View style={{height: 16, width: '100%', backgroundColor: theme === 'dark' ? 'black' : ERP_COLOR_CODE.ERP_APP_COLOR, borderBottomLeftRadius: 12, borderBottomRightRadius: 12}}></View>
+      
       {token ? (
         <>
           <WebView
@@ -375,7 +376,7 @@ const WebScreen = () => {
                 <View style={[styles.webviewLoadingContent, theme === 'dark' && {
                   backgroundColor: 'black'
                 }]}>
-                  <FullViewLoader isShowTop={false} />
+                  <FullViewLoader isShowTop={false}/>
                 </View>
               </View>
             )}
@@ -419,7 +420,7 @@ const WebScreen = () => {
           />
         </>
       ) : (
-        <FullViewLoader isShowTop={false}/>
+        <FullViewLoader />
       )}
     </SafeAreaView>
   );

@@ -20,23 +20,23 @@ const NoInternetScreen: React.FC<NoInterNetProps> = ({ onRetry }) => {
   const titleOpacity = useRef(new Animated.Value(0)).current;
   const subtitleOpacity = useRef(new Animated.Value(0)).current;
   const buttonOpacity = useRef(new Animated.Value(0)).current;
- const scaleAnim = useRef(new Animated.Value(1)).current;
+  const scaleAnim = useRef(new Animated.Value(1)).current;
 
-const onPressIn = () => {
-  Animated.spring(scaleAnim, {
-    toValue: 0.95,
-    useNativeDriver: true,
-  }).start();
-};
+  const onPressIn = () => {
+    Animated.spring(scaleAnim, {
+      toValue: 0.95,
+      useNativeDriver: true,
+    }).start();
+  };
 
-const onPressOut = () => {
-  Animated.spring(scaleAnim, {
-    toValue: 1,
-    friction: 4,
-    tension: 220,
-    useNativeDriver: true,
-  }).start();
-};
+  const onPressOut = () => {
+    Animated.spring(scaleAnim, {
+      toValue: 1,
+      friction: 4,
+      tension: 220,
+      useNativeDriver: true,
+    }).start();
+  };
   useEffect(() => {
     Animated.sequence([
       Animated.parallel([
@@ -102,11 +102,7 @@ const onPressOut = () => {
           transform: [{ scale: imageScale }],
         }}
       >
-        <FastImage
-          source={ERP_GIF.NO_INTERNET}
-          style={styles.gif}
-          resizeMode="contain"
-        />
+        <FastImage source={ERP_GIF.NO_INTERNET} style={styles.gif} resizeMode="contain" />
       </Animated.View>
 
       {/* Title */}
@@ -137,16 +133,16 @@ const onPressOut = () => {
 
       {/* Button */}
       <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
-  <TouchableOpacity
-    activeOpacity={0.85}
-    style={styles.button}
-    onPress={onRetry}
-    onPressIn={onPressIn}
-    onPressOut={onPressOut}
-  >
-    <Text style={styles.buttonText}>{t('errors.tryAgain')}</Text>
-  </TouchableOpacity>
-</Animated.View>
+        <TouchableOpacity
+          activeOpacity={0.85}
+          style={styles.button}
+          onPress={onRetry}
+          onPressIn={onPressIn}
+          onPressOut={onPressOut}
+        >
+          <Text style={styles.buttonText}>{t('errors.tryAgain')}</Text>
+        </TouchableOpacity>
+      </Animated.View>
     </View>
   );
 };

@@ -1,5 +1,5 @@
-import MaterialIcons from '@react-native-vector-icons/material-icons';
-import React, { useRef, useState, useEffect, useLayoutEffect } from 'react';
+import MaterialIcons from "@react-native-vector-icons/material-icons";
+import React, { useRef, useState, useEffect } from "react";
 import {
   View,
   Image,
@@ -13,17 +13,29 @@ import {
   Animated,
   PanResponder,
   AppState,
-} from 'react-native';
-import { launchCamera, launchImageLibrary, Asset } from 'react-native-image-picker';
-import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
-import CustomAlert from '../../../../components/alert/CustomAlert';
-import { ERP_COLOR_CODE } from '../../../../utils/constants';
-import { useAppSelector } from '../../../../store/hooks';
-import { useTranslation } from 'react-i18next';
-import InputError from '../../../../components/error/InputError';
+} from "react-native";
+import {
+  launchCamera,
+  launchImageLibrary,
+  Asset,
+} from "react-native-image-picker";
+import { check, request, PERMISSIONS, RESULTS } from "react-native-permissions";
+import CustomAlert from "../../../../components/alert/CustomAlert";
+import { ERP_COLOR_CODE } from "../../../../utils/constants";
+import { useAppSelector } from "../../../../store/hooks";
+import { useTranslation } from "react-i18next";
+import InputError from "../../../../components/error/InputError";
 
-const Media = ({ isValidate, item, handleAttachment, infoData, baseLink, isFromNew , errors}: any) => {
-  const {t} = useTranslation()
+const Media = ({
+  isValidate,
+  item,
+  handleAttachment,
+  infoData,
+  baseLink,
+  isFromNew,
+  errors,
+}: any) => {
+  const { t } = useTranslation();
   const [imageUri, setImageUri] = useState<string | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [pickerModalVisible, setPickerModalVisible] = useState(false);
@@ -35,9 +47,9 @@ const Media = ({ isValidate, item, handleAttachment, infoData, baseLink, isFromN
   const [alertVisible, setAlertVisible] = useState(false);
   const [isSettingVisible, setIsSettingVisible] = useState(false);
   const [alertConfig, setAlertConfig] = useState({
-    title: '',
-    message: '',
-    type: 'info' as 'error' | 'success' | 'info',
+    title: "",
+    message: "",
+    type: "info" as "error" | "success" | "info",
   });
 
   const scale = useRef(new Animated.Value(1)).current;
@@ -45,33 +57,38 @@ const Media = ({ isValidate, item, handleAttachment, infoData, baseLink, isFromN
   const translateY = useRef(new Animated.Value(0)).current;
   const lastScale = useRef(1);
   const lastTranslate = useRef({ x: 0, y: 0 });
-  const theme = useAppSelector(state => state?.theme.mode);
+  const theme = useAppSelector((state) => state?.theme.mode);
 
   const pendingCameraAction = useRef(false);
   const appState = useRef(AppState.currentState);
 
-  const getImageUri = (type: 'small' | 'large') => {
+  const getImageUri = (type: "small" | "large") => {
     const base =
       imageUri ||
-      `${baseLink}fileupload/1/${infoData?.tableName}/${infoData?.id}/${type === 'small' ? `d_${item?.text}` : item?.text
+      `${baseLink}fileupload/1/${infoData?.tableName}/${infoData?.id}/${
+        type === "small" ? `d_${item?.text}` : item?.text
       }`;
-      console.log("--------=================", base)
-     return `${base}?cb=${cacheBuster}`;
+    console.log("--------=================", base);
+    return `${base}?cb=${cacheBuster}`;
   };
 
-  
   // -------------------- Permissions --------------------
-  const requestPermission = async (type: 'camera' | 'gallery'): Promise<boolean> => {
+  const requestPermission = async (
+    type: "camera" | "gallery",
+  ): Promise<boolean> => {
     try {
       let permission;
 
-      if (type === 'camera') {
-        permission = Platform.OS === 'ios' ? PERMISSIONS.IOS.CAMERA : PERMISSIONS.ANDROID.CAMERA;
+      if (type === "camera") {
+        permission =
+          Platform.OS === "ios"
+            ? PERMISSIONS.IOS.CAMERA
+            : PERMISSIONS.ANDROID.CAMERA;
       } else {
         // Gallery / Photos
-        if (Platform.OS === 'ios') {
+        if (Platform.OS === "ios") {
           permission = PERMISSIONS.IOS.PHOTO_LIBRARY;
-        } 
+        }
         // else {
         //   // Android 13+
         //   if (Platform.Version >= 33) {
@@ -93,140 +110,175 @@ const Media = ({ isValidate, item, handleAttachment, infoData, baseLink, isFromN
 
       if (result === RESULTS.BLOCKED || result === RESULTS.DENIED) {
         setAlertConfig({
-          title: `${type === 'camera' ? 'Camera' : 'Gallery'} ${t('text28')}`,
-          message: `${t('text29')} ${type === 'camera' ? 'camera' : 'gallery'} ${t('text30')}`,
-          type: 'error',
+          title: `${type === "camera" ? "Camera" : "Gallery"} ${t("text28")}`,
+          message: `${t("text29")} ${
+            type === "camera" ? "camera" : "gallery"
+          } ${t("text30")}`,
+          type: "error",
         });
         setModalClose(true);
         setIsSettingVisible(true);
         setAlertVisible(true);
 
-        if (type === 'camera') pendingCameraAction.current = true; // Track if camera was pending
+        if (type === "camera") pendingCameraAction.current = true;
         return false;
       }
 
       return result === RESULTS.GRANTED;
     } catch (error) {
-       return false;
+      return false;
     }
   };
 
   // -------------------- AppState listener --------------------
   useEffect(() => {
-    const subscription = AppState.addEventListener('change', async nextAppState => {
-      if (
-        appState.current.match(/inactive|background/) &&
-        nextAppState === 'active' &&
-        pendingCameraAction.current
-      ) {
-        const granted = await requestPermission('camera');
-        if (granted) {
-          setIsSettingVisible(false);
-          setAlertVisible(false);
-          pendingCameraAction.current = false;
-            launchCamera({ 
-              mediaType: 'photo', quality: 0.5, includeBase64: true , maxWidth: 1024, maxHeight: 1024}, response => {
-              try {
-                if (response?.didCancel || response?.errorCode) {
-                  return;
+    const subscription = AppState.addEventListener(
+      "change",
+      async (nextAppState) => {
+        if (
+          appState.current.match(/inactive|background/) &&
+          nextAppState === "active" &&
+          pendingCameraAction.current
+        ) {
+          const granted = await requestPermission("camera");
+          if (granted) {
+            setIsSettingVisible(false);
+            setAlertVisible(false);
+            pendingCameraAction.current = false;
+            launchCamera(
+              {
+                mediaType: "photo",
+                quality: 0.5,
+                includeBase64: true,
+                maxWidth: 1024,
+                maxHeight: 1024,
+              },
+              (response) => {
+                try {
+                  if (response?.didCancel || response?.errorCode) {
+                    return;
+                  }
+                  if (response.assets && response.assets.length > 0) {
+                    const asset = response.assets[0];
+                    setImageUri(asset.uri || null);
+                    setImageExists(true);
+                    setCacheBuster(Date.now());
+                    handleAttachment(
+                      `${item?.field}.jpeg; data:${asset.type};base64,${asset.base64}`,
+                      item.field,
+                    );
+                  }
+                } catch (err) {
+                  setImageExists(false);
+                  console.error("Failed to process image:", err);
                 }
-                if (response.assets && response.assets.length > 0) {
-                  const asset = response.assets[0];
-                  setImageUri(asset.uri || null);
-                  setCacheBuster(Date.now());
-                  handleAttachment(
-                    `${item?.field}.jpeg; data:${asset.type};base64,${asset.base64}`,
-                    item.field,
-                  );
-                }
-              } catch (err) {
-                console.error('Failed to process image:', err);
-              }
-            });
+              },
+            );
+          }
         }
-      }
-      appState.current = nextAppState;
-    });
+        appState.current = nextAppState;
+      },
+    );
 
     return () => subscription.remove();
   }, []);
 
-  useLayoutEffect(()=>{
-      setLoadingSmall(false)
-  },[])
+  // useLayoutEffect(()=>{
+  //     setLoadingSmall(false)
+  // },[])
   // -------------------- Render Media Options --------------------
   const renderMedia = () => {
-    if (item?.ctltype === 'IMAGE') {
+    if (item?.ctltype === "IMAGE") {
       return [
         {
-          text: 'Camera',
-          icon: 'photo-camera',
+          text: "Camera",
+          icon: "photo-camera",
           onPress: async () => {
-            const granted = await requestPermission('camera');
+            const granted = await requestPermission("camera");
             if (!granted) return;
 
-             launchCamera({ 
-              mediaType: 'photo', quality: 0.5, includeBase64: true , maxWidth: 1024, maxHeight: 1024,}, response => {
-              try {
-                if (response?.didCancel || response?.errorCode) {
-                  return;
+            launchCamera(
+              {
+                mediaType: "photo",
+                quality: 0.5,
+                includeBase64: true,
+                maxWidth: 1024,
+                maxHeight: 1024,
+              },
+              (response) => {
+                try {
+                  if (response?.didCancel || response?.errorCode) {
+                    return;
+                  }
+                  if (response.assets && response.assets.length > 0) {
+                    const asset = response.assets[0];
+                    setImageUri(asset.uri || null);
+                    setImageExists(true);
+                    setCacheBuster(Date.now());
+                    handleAttachment(
+                      `${item?.field}.jpeg; data:${asset.type};base64,${asset.base64}`,
+                      item.field,
+                    );
+                  }
+                } catch (err) {
+                  setImageExists(false);
+                  console.error("Failed to process image:", err);
                 }
-                if (response.assets && response.assets.length > 0) {
-                  const asset = response.assets[0];
-                  setImageUri(asset.uri || null);
-                  setCacheBuster(Date.now());
-                  handleAttachment(
-                    `${item?.field}.jpeg; data:${asset.type};base64,${asset.base64}`,
-                    item.field,
-                  );
-                }
-              } catch (err) {
-                console.error('Failed to process image:', err);
-              }
-            });
+              },
+            );
           },
         },
       ];
-    } else if (item?.ctltype === 'PHOTO') {
+    } else if (item?.ctltype === "PHOTO") {
       return [
         {
-          text: 'Camera',
-          icon: 'photo-camera',
+          text: "Camera",
+          icon: "photo-camera",
           onPress: async () => {
-            const granted = await requestPermission('camera');
+            const granted = await requestPermission("camera");
             if (!granted) return;
 
-           launchCamera({ 
-              mediaType: 'photo', quality: 0.5, includeBase64: true , maxWidth: 1024, maxHeight: 1024}, response => {
-              try {
-                if (response?.didCancel || response?.errorCode) {
-                  return;
+            launchCamera(
+              {
+                mediaType: "photo",
+                quality: 0.5,
+                includeBase64: true,
+                maxWidth: 1024,
+                maxHeight: 1024,
+              },
+              (response) => {
+                try {
+                  if (response?.didCancel || response?.errorCode) {
+                    return;
+                  }
+                  if (response.assets && response.assets.length > 0) {
+                    const asset = response.assets[0];
+                    setImageUri(asset.uri || null);
+                    setImageExists(true);
+                    setCacheBuster(Date.now());
+                    handleAttachment(
+                      `${item?.field}.jpeg; data:${asset.type};base64,${asset.base64}`,
+                      item.field,
+                    );
+                  }
+                } catch (err) {
+                  setImageExists(false);
+                  console.error("Failed to process image:", err);
                 }
-                if (response.assets && response.assets.length > 0) {
-                  const asset = response.assets[0];
-                  setImageUri(asset.uri || null);
-                  setCacheBuster(Date.now());
-                  handleAttachment(
-                    `${item?.field}.jpeg; data:${asset.type};base64,${asset.base64}`,
-                    item.field,
-                  );
-                }
-              } catch (err) {
-                console.error('Failed to process image:', err);
-              }
-            });
+              },
+            );
           },
         },
         {
-          text: 'Gallery',
-          icon: 'photo-library',
+          text: "Gallery",
+          icon: "photo-library",
           onPress: async () => {
-            const granted = await requestPermission('gallery');
+            const granted = await requestPermission("gallery");
             if (!granted) return;
 
             launchImageLibrary(
-              { mediaType: 'photo', quality: 0.5, includeBase64: true },
-              response => {
+              { mediaType: "photo", quality: 0.5, includeBase64: true },
+              (response) => {
                 if (response.assets && response.assets.length > 0) {
                   const asset: Asset = response.assets[0];
                   setImageUri(asset.uri || null);
@@ -264,7 +316,9 @@ const Media = ({ isValidate, item, handleAttachment, infoData, baseLink, isFromN
           const distance = Math.sqrt(dx * dx + dy * dy);
           if (!lastScale.currentDistance) lastScale.currentDistance = distance;
           const scaleFactor = distance / lastScale.currentDistance;
-          scale.setValue(Math.max(1, Math.min(3, lastScale.current * scaleFactor)));
+          scale.setValue(
+            Math.max(1, Math.min(3, lastScale.current * scaleFactor)),
+          );
         }
       },
       onPanResponderRelease: (_, gesture) => {
@@ -285,110 +339,141 @@ const Media = ({ isValidate, item, handleAttachment, infoData, baseLink, isFromN
     scale.setValue(Math.max(1, scale.__getValue() - 0.2));
     lastScale.current = scale.__getValue();
   };
-
+  const [imageExists, setImageExists] = useState(true);
   // -------------------- JSX --------------------
   return (
     <>
-      <View style={{ flexDirection: 'row' }}>
-        <Text style={[styles.label, theme === 'dark' && {
-          color: 'white'
-        }]}>{item?.fieldtitle}</Text>
-        {item?.tooltip !== item?.fieldtitle && <Text style={[styles.label, theme === 'dark' && {
-          color: 'white'
-        }]}> - ( {item?.tooltip} ) </Text>}
-        {item?.mandatory === '1' && <Text style={{ color: ERP_COLOR_CODE.ERP_ERROR }}>*</Text>}
-      </View>
-      <TouchableOpacity 
-      onPress={() =>{
-        if(loadingSmall){
-          handleChooseImage()
-        }
-      }}
-      
-      style={[styles.imageWrapper,
-      
-      loadingSmall && {
-        width:'100%',
-        borderWidth: 1,
-        borderRadius: 12,
-        borderColor: ERP_COLOR_CODE.ERP_BORDER,
-        marginBottom:12,
-      },
-      errors[item?.field] && {
-        borderColor: ERP_COLOR_CODE.ERP_ERROR,
-      },
-
-      ]}>
-        <TouchableOpacity
-          onPress={() => {
-             if(loadingSmall){
-          handleChooseImage()
-        }
-            if (isFromNew) return;
-            setModalVisible(true);
-          }}
-        >
-          <View style={[
-            theme === 'dark' && {
-              borderWidth: !loadingSmall ? 1 : 0,
-              borderColor: 'white'
+      <View style={{ flexDirection: "row" }}>
+        <Text
+          style={[
+            styles.label,
+            theme === "dark" && {
+              color: "white",
             },
-            
-            { width: loadingSmall ? 200 : 100, height: 100, }]}>
-            {loadingSmall && (
-              <ActivityIndicator 
-              
-              style={StyleSheet.absoluteFill} size="small" color={theme === 'dark' ? 'white' :  loadingSmall ? 'white' : 'black'} />
-            )}
-            {
-              loadingSmall && <View style={{
-              marginTop: 18,
-              justifyContent:'center',
-              alignContent:'center',
-              alignItems:'center',
-              gap: 4
-            }}>
-                <MaterialIcons name={'add-photo-alternate'} color={theme === 'dark' ? 'white' : ERP_COLOR_CODE.ERP_999} size={38} />
-                <Text style={{
-                  color:  ERP_COLOR_CODE.ERP_999
-                }}>Please upload image</Text>
-                </View>
-            }
-            
-            <Image
-              key={item.field}
-              source={imageUri ? { uri: imageUri } : { uri: getImageUri('small') }}
-              style={[styles.imageThumb, loadingSmall && {
-                height: 1,
-                width: 1,
-                borderWidth : 0,
-              }]}
-              onLoadStart={() => {
-                !imageUri && setLoadingSmall(true)
-              }}
-              onLoadEnd={() => setLoadingSmall(false)}
-              resizeMode="cover"
-            />
-          </View>
-        </TouchableOpacity>
-        {
-          !loadingSmall &&  <TouchableOpacity onPress={handleChooseImage} style={[styles.editBtn, theme === 'dark' && {
-          borderWidth: 1,
-          borderColor: 'white',
-          backgroundColor: 'black'
-        },
-        ]}>
-          <MaterialIcons name={'edit'} color={theme === 'dark' ? 'white' : ERP_COLOR_CODE.ERP_BLACK} size={20} />
-        </TouchableOpacity>
-        }
+          ]}
+        >
+          {item?.fieldtitle}
+        </Text>
+        {item?.tooltip !== item?.fieldtitle && (
+          <Text
+            style={[
+              styles.label,
+              theme === "dark" && {
+                color: "white",
+              },
+            ]}
+          >
+            {" "}
+            - ( {item?.tooltip} ){" "}
+          </Text>
+        )}
+        {item?.mandatory === "1" && (
+          <Text style={{ color: ERP_COLOR_CODE.ERP_ERROR }}>*</Text>
+        )}
+      </View>
+      <TouchableOpacity
+        onPress={() => {
+          if (!imageExists) {
+            handleChooseImage();
+          } else if (!isFromNew) {
+            setModalVisible(true);
+          }
+        }}
+        style={[
+          styles.imageWrapper,
+          !imageExists && {
+            width: "100%",
+            borderWidth: 1,
+            borderRadius: 12,
+            borderColor: ERP_COLOR_CODE.ERP_BORDER,
+            marginBottom: 8,
+          },
+          errors[item?.field] && {
+            borderColor: ERP_COLOR_CODE.ERP_ERROR,
+          },
+        ]}
+      >
+        <View
+          style={[
+            theme === "dark" && {
+              borderWidth: imageExists ? 1 : 0,
+              borderColor: "white",
+            },
+            { width: imageExists ? 100 : 200, height: 100 },
+          ]}
+        >
+          {/* {loadingSmall && (
+      <ActivityIndicator
+        style={StyleSheet.absoluteFill}
+        size="small"
+        color={theme === 'dark' ? 'white' : 'black'}
+      />
+    )} */}
 
-       
+          {!imageExists && (
+            <View
+              style={{
+                marginTop: 18,
+                alignItems: "center",
+                gap: 4,
+              }}
+            >
+              <MaterialIcons
+                name="add-photo-alternate"
+                color={theme === "dark" ? "white" : ERP_COLOR_CODE.ERP_999}
+                size={38}
+              />
+              <Text style={{ color: ERP_COLOR_CODE.ERP_999 }}>
+                Please upload image
+              </Text>
+            </View>
+          )}
+
+          {imageExists && (
+            <Image
+              source={{
+                uri: imageUri ? imageUri : getImageUri("small"),
+              }}
+              style={styles.imageThumb}
+              resizeMode="cover"
+              onLoadStart={() => setLoadingSmall(true)}
+              onLoad={() => {
+                setImageExists(true);
+                setLoadingSmall(false);
+              }}
+              onError={() => {
+                setImageExists(false);
+                setLoadingSmall(false);
+              }}
+            />
+          )}
+        </View>
+
+        {imageExists && (
+          <TouchableOpacity
+            onPress={handleChooseImage}
+            style={[
+              styles.editBtn,
+              theme === "dark" && {
+                borderWidth: 1,
+                borderColor: "white",
+                backgroundColor: "black",
+              },
+            ]}
+          >
+            <MaterialIcons
+              name="edit"
+              color={theme === "dark" ? "white" : ERP_COLOR_CODE.ERP_BLACK}
+              size={20}
+            />
+          </TouchableOpacity>
+        )}
       </TouchableOpacity>
 
-      {errors[item?.field] && (
+      {!imageExists && errors[item?.field] && (
         <>
-        <InputError error={errors[item?.field]} />
-        <View style={{height: 8}}/>
+          <InputError error={errors[item?.field]} />
+          <View style={{ height: 8 }} />
         </>
       )}
       {/* Fullscreen Image Modal */}
@@ -418,23 +503,31 @@ const Media = ({ isValidate, item, handleAttachment, infoData, baseLink, isFromN
                 setModalVisible(false);
               }}
             >
-              <MaterialIcons name="close" size={30} color={ERP_COLOR_CODE.ERP_WHITE} />
+              <MaterialIcons
+                name="close"
+                size={30}
+                color={ERP_COLOR_CODE.ERP_WHITE}
+              />
             </TouchableOpacity>
 
             {loadingLarge && (
-              <ActivityIndicator style={StyleSheet.absoluteFill} size="large" color={ERP_COLOR_CODE.ERP_WHITE} />
+              <ActivityIndicator
+                style={StyleSheet.absoluteFill}
+                size="large"
+                color={ERP_COLOR_CODE.ERP_WHITE}
+              />
             )}
 
             <Animated.View
               style={{
-                width: '100%',
-                height: '100%',
+                width: "100%",
+                height: "100%",
                 transform: [{ scale }, { translateX }, { translateY }],
               }}
               {...panResponder.panHandlers}
             >
               <Image
-                source={{ uri: getImageUri('large') }}
+                source={{ uri: getImageUri("large") }}
                 style={styles.fullscreenImage}
                 resizeMode="contain"
                 onLoadStart={() => setLoadingLarge(true)}
@@ -462,17 +555,33 @@ const Media = ({ isValidate, item, handleAttachment, infoData, baseLink, isFromN
         onRequestClose={() => setPickerModalVisible(false)}
       >
         <View style={styles.modalOverlay}>
-          <View style={[styles.modalContent, theme === 'dark' && {
-            borderWidth: 1,
-            borderColor: 'white',
-            backgroundColor: 'black'
-          }]}>
+          <View
+            style={[
+              styles.modalContent,
+              theme === "dark" && {
+                borderWidth: 1,
+                borderColor: "white",
+                backgroundColor: "black",
+              },
+            ]}
+          >
             <View style={styles.modalHeader}>
-              <Text style={[styles.modalTitle, theme === 'dark' && {
-                color: 'white'
-              }]}>{t('text31')}</Text>
+              <Text
+                style={[
+                  styles.modalTitle,
+                  theme === "dark" && {
+                    color: "white",
+                  },
+                ]}
+              >
+                {t("text31")}
+              </Text>
               <TouchableOpacity onPress={() => setPickerModalVisible(false)}>
-                <MaterialIcons name="close" size={24} color={theme === 'dark' ? 'white' : 'black'} />
+                <MaterialIcons
+                  name="close"
+                  size={24}
+                  color={theme === "dark" ? "white" : "black"}
+                />
               </TouchableOpacity>
             </View>
 
@@ -480,20 +589,34 @@ const Media = ({ isValidate, item, handleAttachment, infoData, baseLink, isFromN
               {renderMedia().map((option, idx) => (
                 <TouchableOpacity
                   key={idx}
-                  style={[styles.optionCard, theme === 'dark' && {
-                    backgroundColor: 'black',
-                    borderWidth: 1,
-                    borderColor: 'white'
-                  }]}
+                  style={[
+                    styles.optionCard,
+                    theme === "dark" && {
+                      backgroundColor: "black",
+                      borderWidth: 1,
+                      borderColor: "white",
+                    },
+                  ]}
                   onPress={async () => {
                     setPickerModalVisible(false);
                     await option.onPress();
                   }}
                 >
-                  <MaterialIcons name={option?.icon} size={36} color={theme === 'dark' ? 'white' : 'black'} />
-                  <Text style={[styles.optionLabel, {
-                    color: theme === 'dark' ? 'white' : 'black'
-                  }]}>{option?.text}</Text>
+                  <MaterialIcons
+                    name={option?.icon}
+                    size={36}
+                    color={theme === "dark" ? "white" : "black"}
+                  />
+                  <Text
+                    style={[
+                      styles.optionLabel,
+                      {
+                        color: theme === "dark" ? "white" : "black",
+                      },
+                    ]}
+                  >
+                    {option?.text}
+                  </Text>
                 </TouchableOpacity>
               ))}
             </View>
@@ -511,17 +634,19 @@ const Media = ({ isValidate, item, handleAttachment, infoData, baseLink, isFromN
           if (!modalClose) {
             setAlertVisible(false);
           }
-        } }
+        }}
         isSettingVisible={isSettingVisible}
-        actionLoader={undefined} closeHide={undefined}      />
+        actionLoader={undefined}
+        closeHide={undefined}
+      />
     </>
   );
 };
- const styles = StyleSheet.create({
+const styles = StyleSheet.create({
   imageWrapper: {
-    width: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
+    width: "100%",
+    justifyContent: "center",
+    alignItems: "center",
     marginVertical: 4,
   },
 
@@ -529,13 +654,13 @@ const Media = ({ isValidate, item, handleAttachment, infoData, baseLink, isFromN
     fontSize: 14,
     color: ERP_COLOR_CODE.ERP_333,
     marginBottom: 6,
-    fontWeight: '600',
+    fontWeight: "600",
   },
 
   imageThumb: {
     width: 100,
     height: 100,
-    borderWidth: 1
+    borderWidth: 1,
   },
 
   editBtn: {
@@ -543,11 +668,11 @@ const Media = ({ isValidate, item, handleAttachment, infoData, baseLink, isFromN
     width: 36,
     borderRadius: 36,
     backgroundColor: ERP_COLOR_CODE.ERP_WHITE,
-    position: 'absolute',
+    position: "absolute",
     bottom: 28,
-    left: Dimensions.get('screen').width / 1.88,
-    justifyContent: 'center',
-    alignItems: 'center',
+    left: Dimensions.get("screen").width / 1.88,
+    justifyContent: "center",
+    alignItems: "center",
     borderWidth: 1,
   },
 
@@ -555,8 +680,8 @@ const Media = ({ isValidate, item, handleAttachment, infoData, baseLink, isFromN
 
   modalOverlay: {
     flex: 1,
-    justifyContent: 'flex-end',
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: "flex-end",
+    backgroundColor: "rgba(0,0,0,0.5)",
   },
 
   modalContent: {
@@ -564,69 +689,69 @@ const Media = ({ isValidate, item, handleAttachment, infoData, baseLink, isFromN
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
     padding: 20,
-    alignItems: 'center',
-    maxHeight: '60%',
-    width: '100%',
+    alignItems: "center",
+    maxHeight: "60%",
+    width: "100%",
   },
 
   modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '100%',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
     marginBottom: 16,
   },
 
   modalTitle: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: "600",
   },
 
   optionRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-evenly',
-    width: '100%',
+    flexDirection: "row",
+    justifyContent: "space-evenly",
+    width: "100%",
     marginTop: 12,
   },
 
   optionCard: {
     width: 100,
     height: 100,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: "#f5f5f5",
     borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     marginHorizontal: 10,
   },
 
   optionLabel: {
     marginTop: 6,
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: "500",
   },
 
   /* ---------- FULLSCREEN IMAGE MODAL (IMPROVED) ---------- */
 
   fullscreenModalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.92)',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "rgba(0,0,0,0.92)",
+    justifyContent: "center",
+    alignItems: "center",
   },
 
   fullscreenModalContent: {
     flex: 1,
-    width: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
+    width: "100%",
+    justifyContent: "center",
+    alignItems: "center",
   },
 
   fullscreenImage: {
-    width: '100%',
-    height: '100%',
+    width: "100%",
+    height: "100%",
   },
 
   closeBtn: {
-    position: 'absolute',
+    position: "absolute",
     top: 48,
     right: 20,
     zIndex: 20,
@@ -634,11 +759,11 @@ const Media = ({ isValidate, item, handleAttachment, infoData, baseLink, isFromN
     width: 42,
     height: 42,
     borderRadius: 21,
-    backgroundColor: 'rgba(0,0,0,0.45)',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "rgba(0,0,0,0.45)",
+    justifyContent: "center",
+    alignItems: "center",
 
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
@@ -646,17 +771,17 @@ const Media = ({ isValidate, item, handleAttachment, infoData, baseLink, isFromN
   },
 
   zoomControls: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 40,
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 16,
 
-    backgroundColor: 'rgba(255,255,255,0.9)',
+    backgroundColor: "rgba(255,255,255,0.9)",
     paddingHorizontal: 16,
     paddingVertical: 10,
     borderRadius: 30,
 
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.25,
     shadowRadius: 6,
@@ -668,10 +793,9 @@ const Media = ({ isValidate, item, handleAttachment, infoData, baseLink, isFromN
     height: 46,
     borderRadius: 23,
     backgroundColor: ERP_COLOR_CODE.ERP_WHITE,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
-
 
 export default Media;
