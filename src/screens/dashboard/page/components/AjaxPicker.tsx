@@ -207,6 +207,7 @@ console.log("resolvedWhere-------------------------", resolvedWhere);
                 placeholderTextColor={ERP_COLOR_CODE.ERP_888}
                 value={search}
                 onChangeText={setSearch}
+                autoFocus={true}
               />
 
               {search?.length > 0 && (

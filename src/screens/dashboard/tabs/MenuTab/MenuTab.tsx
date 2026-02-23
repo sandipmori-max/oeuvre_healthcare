@@ -117,7 +117,7 @@ const MenuTab = ({ type, headerText, searchPlaceholder }: any) => {
       headerTintColor: 'white',
       headerTitle: () =>
         showSearch ? (
-          <View style={{ width: Dimensions.get('screen').width - 70, flexDirection: 'row', alignItems: 'center' }}>
+          <View style={{ width: Dimensions.get('screen').width - 60, flexDirection: 'row', alignItems: 'center' }}>
             <TextInput
               value={searchText}
               onChangeText={setSearchText}
@@ -131,7 +131,7 @@ const MenuTab = ({ type, headerText, searchPlaceholder }: any) => {
                 height: 36,
               }}
             />
-            <TouchableOpacity onPress={() => { setShowSearch(false); setSearchText(''); }}>
+            <TouchableOpacity style={{marginLeft: 12}} onPress={() => { setShowSearch(false); setSearchText(''); }}>
               <MaterialIcons name="clear" size={24} color="white" />
             </TouchableOpacity>
           </View>

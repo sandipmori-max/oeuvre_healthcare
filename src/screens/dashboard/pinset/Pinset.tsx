@@ -17,6 +17,7 @@ import CustomAlert from '../../../components/alert/CustomAlert';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { setIsPinLoaded } from '../../../store/slices/auth/authSlice';
 import { useTranslation } from 'react-i18next';
+import ERPIcon from '../../../components/icon/ERPIcon';
 
 const { width } = Dimensions.get('screen');
 
@@ -137,12 +138,13 @@ const PinSetupScreen = () => {
       headerRight: () => (
         <>
           {
-            screen !== 'blocked' && <TouchableOpacity
-              style={{ paddingHorizontal: 12 }}
-              onPress={() => setMenuVisible(!menuVisible)}
-            >
-              <MaterialIcons name={menuVisible ? 'close' : "more-vert"} size={28} color="white" />
-            </TouchableOpacity>
+            screen !== 'blocked' && 
+            <ERPIcon
+             name={menuVisible ? 'close' : "more-vert"}
+              onPress={() => {
+                setMenuVisible(!menuVisible)
+              }}
+            />
           }
 
         </>
