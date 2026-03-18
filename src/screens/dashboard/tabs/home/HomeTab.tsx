@@ -30,14 +30,11 @@ import {
   TextInput,
   Alert,
   Modal,
-  Pressable,
   Platform,
 } from 'react-native';
 import { ERP_ICON } from '../../../../assets';
-import { translateSingle } from '../../../../services/api/utils';
 import TranslatedText from './TranslatedText';
 import { Image } from 'react-native';
-// import { NativeModules } from 'react-native';
 
 const { width } = Dimensions.get('screen');
 
@@ -57,7 +54,6 @@ const HomeScreen = () => {
     state => state.auth,
   );
 
-
   const [loadingPageId, setLoadingPageId] = useState<any>(null);
   const [isRefresh, setIsRefresh] = useState<boolean>(false);
   const [fromDate, setFromDate] = useState<string>('');
@@ -71,7 +67,6 @@ const HomeScreen = () => {
   }>(null);
 
   const [visible, setVisible] = useState(false);
-  const [selectedItem, setSelectedItem] = useState<string | null>(null);
   const slideAnim = useRef(new Animated.Value(0)).current;
 
   const theme = useAppSelector(state => state?.theme.mode);
@@ -91,7 +86,6 @@ const HomeScreen = () => {
 
   const textItems = filteredDashboard.filter(item => item.data && !hasHtmlContent(item.data));
 
-  console.log("filteredDashboard", filteredDashboard)
   useEffect(() => {
     if (searchTimeout.current) clearTimeout(searchTimeout.current);
 
@@ -258,42 +252,8 @@ const HomeScreen = () => {
       };
     }, [isAuthenticated, dispatch])
   );
-
-  const dummyUpcomingEvents = [];
-
-  const dummyUpcomingBirthdays = [
-    { id: 'b1', name: 'Amit Sharma', date: '28 sep 2025', type: 'Up-coming-Birthday' },
-  ];
-
-  const dummyUpcomingAnniversaries = [
-    { id: 'w1', name: 'Rohit & Neha', date: '03 sep 2025', type: 'Up-coming-work-anniversary' },
-  ];
-
-  const todayEvents = [{ id: 't2', date: 'Today', title: 'UX Review', type: 'Event' }];
-  const [selectedTask, setSelectedTask] = useState(null);
-  const [modalVisible, setModalVisible] = useState(false);
-
-  const todayBirthdays = [];
-
-  const todayAnniversaries = [];
-
-  const dummyTasks = [
-    {
-      id: '1',
-      title: 'Fix login bug',
-      description: 'Check the API response and fix login issue',
-      assignedTo: 'jr1',
-      createdBy: 'senior1',
-      status: 'pending',
-      updatedAt: '2025-09-10T10:00:00Z',
-    },
-  ];
-  const getInitials = (text?: string) => {
-    if (!text) return '?';
-    const trimmed = text?.trim();
-    if (trimmed?.length === 0) return '?';
-    return trimmed.slice(0, 2).toUpperCase();
-  };
+ 
+ 
 
   const accentColors = ['#4C6FFF', '#00C2A8', '#FFB020', '#FF6B6B', '#9B59B6', '#20C997'];
 
@@ -308,17 +268,7 @@ const HomeScreen = () => {
       text: item?.title,
     }));
 
-  const openSheet = () => {
-    setVisible(true);
-  };
-
-  const closeSheet = () => {
-    Animated.timing(slideAnim, {
-      toValue: 0,
-      duration: 250,
-      useNativeDriver: true,
-    }).start(() => setVisible(false));
-  };
+ 
 
   useEffect(() => {
     if (visible) {
@@ -489,18 +439,6 @@ const HomeScreen = () => {
     return { fromDate: fromDateStr, toDate: toDateStr };
   }, []);
 
-  useEffect(() => {
-    const { fromDate: initialFromDate, toDate: initialToDate } = getCurrentMonthRange();
-
-  }, [getCurrentMonthRange]);
-
-  // useFocusEffect(
-  //   useCallback(() => {
-  //     const { fromDate: initialFromDate, toDate: initialToDate } = getCurrentMonthRange();
-  //     // fetchListData(initialFromDate, initialToDate);
-  //     return () => { };
-  //   }, [getCurrentMonthRange,]),
-  // );
 
   const handleDateChange = (event: any, selectedDate?: Date) => {
     if (event?.type === 'dismissed' || !selectedDate) {
@@ -568,8 +506,6 @@ const HomeScreen = () => {
     fetchPageData();
   }, []);
 
-
-
   useEffect(() => {
     dispatch(getERPDashboardThunk({ branch: auth?.dashboardBranch.trim() || "", type: auth?.dashboardType.trim() || "", fd: auth?.dashboardFromDate.trim() || "", td: auth?.dashboardToDate.trim() || "" }));
     const timer = setTimeout(() => {
@@ -578,34 +514,6 @@ const HomeScreen = () => {
     return () => clearTimeout(timer);
 
   }, [auth.dashboardBranch, auth.dashboardType, auth.dashboardFromDate, auth.dashboardToDate])
-
-  function SmallItem({ left, primary, secondary, type }) {
-    return (
-      <TouchableOpacity style={[styles.itemRow, theme === 'dark' && {
-        backgroundColor: 'black'
-      }]} activeOpacity={0.8}>
-        <View style={[styles.avatar, {
-          borderWidth: 1,
-          borderColor: 'white'
-        }]}>{left}</View>
-        <View style={styles.itemText}>
-          <Text numberOfLines={1} style={[styles.itemPrimary, theme === 'dark' && {
-            color: 'white'
-          }]}>
-            {primary}
-          </Text>
-          <Text style={[styles.itemType, theme === 'dark' && {
-            color: 'white'
-          }]}>{type}</Text>
-        </View>
-        <View>
-          <Text style={[styles.itemSecondary, theme === 'dark' && {
-            color: 'white'
-          }]}>{secondary}</Text>
-        </View>
-      </TouchableOpacity>
-    );
-  }
 
   if (isDashboardLoading) return <FullViewLoader isShowTop={theme === 'dark' ? false : true}/>
   if (!actionLoader && filteredDashboard?.length === 0) {
@@ -656,8 +564,6 @@ const HomeScreen = () => {
 
         </Animated.View>
 
-
-        {/* Branch + Type Buttons */}
         {
           isFilterVisible && <>
             <View style={[styles.dateContainer, {
@@ -1132,224 +1038,9 @@ const HomeScreen = () => {
                               color : theme === 'dark' ? 'white' : 'black'
                             }}>Welcome</Text>
                           </View>
-                        {/* <View>
-                    <Animated.FlatList
-                      showsVerticalScrollIndicator={false}
-                      data={['']}
-                      keyExtractor={(_, i) => i.toString()}
-                      onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], {
-                        useNativeDriver: true,
-                      })}
-                      scrollEventThrottle={16}
-                      renderItem={() => (
-                        <View>
-
-                          <View style={[styles.grid,
-
-                          ]}>
-                            <View style={[styles.card, {
-
-                              backgroundColor: theme === 'dark' ? 'black' : 'white'
-
-                            }]}>
-                              <View style={{ flexDirection: 'row', marginVertical: 8, gap: 6 }}>
-                                <MaterialIcons
-                                  size={18}
-                                  color={theme === 'dark' ? 'white' : 'black'}
-                                  name="emoji-events"
-                                />
-                                <Text style={[styles.cardTitle, {
-                                  color: theme === 'dark' ? 'white' : 'black'
-                                }]}>Events</Text>
-                              </View>
-                              <FlatList
-                                data={todayEvents}
-                                keyExtractor={i => i.id}
-                                scrollEnabled={false}
-                                renderItem={({ item }) => (
-                                  <SmallItem
-                                    left={<Text style={[styles.avatarText, {
-                                      color: 'white'
-                                    }]}>T</Text>}
-                                    primary={item.title}
-                                    secondary={item.date}
-                                    type={item?.type}
-                                  />
-                                )}
-                              />
-
-                              <FlatList
-                                key={`${isHorizontal}`}
-                                data={dummyUpcomingEvents}
-                                keyExtractor={i => i.id}
-                                scrollEnabled={false}
-                                renderItem={({ item }) => (
-                                  <SmallItem
-                                    left={<Text style={[styles.avatarText, {
-                                      color: 'white'
-                                    }]}>E</Text>}
-                                    primary={item.title}
-                                    secondary={item.date}
-                                    type={item?.type}
-                                  />
-                                )}
-                              />
-                            </View>
-
-                            <View style={[styles.card, {
-                              backgroundColor: theme === 'dark' ? 'black' : 'white'
-
-                            }]}>
-                              <View style={{ flexDirection: 'row', marginVertical: 8, gap: 6 }}>
-                                <MaterialIcons
-                                  size={18}
-                                  color={theme === 'dark' ? 'white' : 'black'}
-                                  name="celebration"
-                                />
-                                <Text style={[styles.cardTitle,
-
-                                {
-                                  color: theme === 'dark' ? 'white' : 'black'
-                                }
-                                ]}>Birthday & Work-anniversary</Text>
-                              </View>
-                              <FlatList
-                                data={todayBirthdays}
-                                keyExtractor={i => i.id}
-                                scrollEnabled={false}
-                                renderItem={({ item }) => (
-                                  <SmallItem
-                                    left={
-                                      <Text style={[styles.avatarText, {
-                                        color: 'white'
-                                      }]}>
-                                        {item.name
-                                          .split(' ')
-                                          .map(n => n[0])
-                                          .slice(0, 2)
-                                          .join('')}
-                                      </Text>
-                                    }
-                                    primary={item.name}
-                                    secondary={item.date}
-                                    type={item?.type}
-                                  />
-                                )}
-                              />
-
-                              <FlatList
-                                data={dummyUpcomingBirthdays}
-                                keyExtractor={i => i.id}
-                                scrollEnabled={false}
-                                renderItem={({ item }) => (
-                                  <SmallItem
-                                    left={
-                                      <Text style={[styles.avatarText, {
-                                        color: 'white'
-                                      }]}>
-                                        {item.name
-                                          .split(' ')
-                                          .map(n => n[0])
-                                          .slice(0, 2)
-                                          .join('')}
-                                      </Text>
-                                    }
-                                    primary={item.name}
-                                    secondary={item.date}
-                                    type={item?.type}
-                                  />
-                                )}
-                              />
-                              <FlatList
-                                data={todayAnniversaries}
-                                keyExtractor={i => i.id}
-                                scrollEnabled={false}
-                                renderItem={({ item }) => (
-                                  <SmallItem
-                                    left={<Text style={[styles.avatarText, {
-                                      color: 'white'
-                                    }]}>A</Text>}
-                                    primary={item.name}
-                                    secondary={item.date}
-                                    type={item?.type}
-                                  />
-                                )}
-                              />
-
-                              <FlatList
-                                data={dummyUpcomingAnniversaries}
-                                keyExtractor={i => i.id}
-                                scrollEnabled={false}
-                                renderItem={({ item }) => (
-                                  <SmallItem
-                                    left={<Text style={[styles.avatarText, {
-                                      color: 'white',
-                                    }]}>W</Text>}
-                                    primary={item.name}
-                                    secondary={item.date}
-                                    type={item?.type}
-                                  />
-                                )}
-                              />
-                            </View>
-                          </View>
-                          <View>
-                            <View
-                              style={{
-                                flexDirection: 'row',
-                                justifyContent: 'space-between',
-                                marginHorizontal: 12,
-                                marginVertical: 8,
-                              }}
-                            >
-                              <View style={{ flexDirection: 'row', gap: 6 }}>
-                                <MaterialIcons
-                                  size={18}
-                                  color={ERP_COLOR_CODE.ERP_APP_COLOR}
-                                  name="pending-actions"
-                                />
-                                <Text style={{ fontSize: 16, fontWeight: '700' }}>My Pending Tasks</Text>
-                              </View>
-
-                              <TouchableOpacity
-                                onPress={() => {
-                                  navigation.navigate('Tasks', { isFromViewAll: true });
-                                }}
-                              >
-                                <Text style={{ color: ERP_COLOR_CODE.ERP_BORDER_LINE, fontSize: 12 }}>
-                                  View all
-                                </Text>
-                              </TouchableOpacity>
-                            </View>
-                            <TaskListScreen
-                              tasks={dummyTasks}
-                              onSelectTask={task => {
-                                setSelectedTask(task);
-                                setModalVisible(true);
-                              }}
-                              showPicker={undefined}
-                              showFilter={undefined}
-                            />
-                          </View>
-
-                          {selectedTask && (
-                            <TaskDetailsBottomSheet
-                              visible={modalVisible}
-                              task={selectedTask}
-                              role="junior"
-                              onClose={() => setModalVisible(false)}
-                              onUpdate={updatedTask => {
-                                setModalVisible(false);
-                              }}
-                            />
-                          )}
-                          <View style={{ height: 100, width: 100 }} />
-                        </View>
-                      )}
-                    />
-                  </View> */}
                       </View>
-                    )}
+                    )
+                  }
                   />
                 </>
               </View>
