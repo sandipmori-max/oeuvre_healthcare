@@ -698,4 +698,3 @@ tr - DevERP to Oeuvre
 and removed app name - wecome ke aage
 Tab name - DCR 
 dd
-https://github.com/sandipmori-max/oeuvre_healthcare.git

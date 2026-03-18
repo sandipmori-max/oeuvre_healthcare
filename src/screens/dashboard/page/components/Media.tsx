@@ -146,13 +146,15 @@ const Media = ({
             setAlertVisible(false);
             pendingCameraAction.current = false;
             launchCamera(
-              {
-                mediaType: "photo",
-                quality: 0.5,
-                includeBase64: true,
-                maxWidth: 1024,
-                maxHeight: 1024,
-              },
+               {
+        mediaType: "photo",
+        cameraType: "back",
+        quality: 0.5,
+        maxWidth: 1024,
+        maxHeight: 1024,
+        includeBase64: true,
+        saveToPhotos: false,
+      },
               (response) => {
                 try {
                   if (response?.didCancel || response?.errorCode) {
@@ -199,12 +201,14 @@ const Media = ({
 
             launchCamera(
               {
-                mediaType: "photo",
-                quality: 0.5,
-                includeBase64: true,
-                maxWidth: 1024,
-                maxHeight: 1024,
-              },
+        mediaType: "photo",
+        cameraType: "back",
+        quality: 0.5,
+        maxWidth: 1024,
+        maxHeight: 1024,
+        includeBase64: true,
+        saveToPhotos: false,
+      },
               (response) => {
                 try {
                   if (response?.didCancel || response?.errorCode) {
@@ -240,12 +244,14 @@ const Media = ({
 
             launchCamera(
               {
-                mediaType: "photo",
-                quality: 0.5,
-                includeBase64: true,
-                maxWidth: 1024,
-                maxHeight: 1024,
-              },
+        mediaType: "photo",
+        cameraType: "back",
+        quality: 0.5,
+        maxWidth: 1024,
+        maxHeight: 1024,
+        includeBase64: true,
+        saveToPhotos: false,
+      },
               (response) => {
                 try {
                   if (response?.didCancel || response?.errorCode) {

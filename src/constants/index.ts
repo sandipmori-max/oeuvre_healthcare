@@ -15,4 +15,5 @@ export enum EPermissionTypes {
   CAMERA = 'camera',
 }
 
-export const ERP_APP_VERSION = '1.2.2'
+export const ERP_ANDROID_APP_VERSION = '1.2.5'
+export const ERP_IOS_APP_VERSION = '1.0.1'
