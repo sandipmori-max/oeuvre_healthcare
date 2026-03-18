@@ -40,7 +40,7 @@ import { resetAttendanceState } from '../../../store/slices/attendance/attendanc
 import { resetDropdownState } from '../../../store/slices/dropdown/dropdownSlice';
 import { resetSyncLocationState } from '../../../store/slices/location/syncLocationSlice';
 import { Easing } from 'react-native';
-import { ERP_APP_VERSION } from '../../../constants';
+import { ERP_ANDROID_APP_VERSION, ERP_IOS_APP_VERSION } from '../../../constants';
 
 interface SettingItem {
   id: string;
@@ -81,7 +81,7 @@ const SettingsScreen = () => {
     type: 'info' as 'error' | 'success' | 'info' | 'exit',
   });
   const [settings, setSettings] = useState<SettingItem[]>([]); 
-  const appVersion = ERP_APP_VERSION;
+  const appVersion = Platform.OS === 'ios' ? ERP_IOS_APP_VERSION : ERP_ANDROID_APP_VERSION;
  
  useEffect(() => {
     if (languageModalVisible) {

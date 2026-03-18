@@ -117,7 +117,15 @@ const BusinessCardView = ({ setValue, controls, item, baseLink, infoData }: any)
 
 
     setShowPicker(false);
-    const res = await launchCamera({ mediaType: 'photo', quality: 0.5, includeBase64: true });
+    const res = await launchCamera( {
+        mediaType: "photo",
+        cameraType: "back",
+        quality: 0.5,
+        maxWidth: 1024,
+        maxHeight: 1024,
+        includeBase64: true,
+        saveToPhotos: false,
+      },);
     if (res.didCancel) return;
 
 
