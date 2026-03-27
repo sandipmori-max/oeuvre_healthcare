@@ -96,8 +96,9 @@ const TabNavigator = () => {
                 marginTop: 8,
               },
               tabBarIcon: ({ color, size, focused }) => (
-                <AnimatedTabIcon
+                <AnimatedTabIcon 
                   name={item.icon}
+                  
                   color={color}
                   size={size}
                   focused={focused}
