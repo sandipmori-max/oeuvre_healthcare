@@ -538,71 +538,82 @@ inside controls?.length === 0 && !isDashboardLoading - 934
 
 Page save button - 795 below flatlist
 
-{!authUser && controls.length > 0 && (
-              <TouchableOpacity
-                style={{
-                  height: 46,
-                  width: '100%',
-                  backgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR,
-                  justifyContent: 'center',
-                  alignContent: 'center',
-                  alignItems: 'center',
-                  borderRadius: 6,
-                }}
-                onPress={async () => {
-                    try {
-                  if(myScript){
+ {controls.length > 0 && (
+                <TouchableOpacity
+                  style={{
+                    height: 46,
+                    width: '100%',
+                    backgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR,
+                    justifyContent: 'center',
+                    alignContent: 'center',
+                    alignItems: 'center',
+                    borderRadius: 6,
+                  }}
+                  onPress={async () => {
+                      console.log("myScript", myScript)
+                try {
+                  setTapLoader(true)
+                  if (myScript) {
                     let rules;
-                  if (myScript && typeof myScript === "string") {
-                    try {
-                      rules = JSON.parse(myScript);
-                    } catch (e) {
-                      console.error("Invalid JSON from backend", e);
-                      return;
+
+                    if (typeof myScript === "string") {
+                      try {
+                        rules = JSON.parse(myScript);
+                      } catch (e) {
+                        console.error("Invalid JSON from backend", e);
+                        setTapLoader(false)
+                        return;
+                      }
+                    } else {
+                      rules = myScript;
                     }
-                  } else {
-                    rules = myScript;
-                  }
-                  const { actions } = evaluateRulesWithActions(rules, formValues);
-                  const hasButtonSaveEnable = actions.some(
-                    item => item?.field === "buttonSave"
-                  );
-                  if (hasButtonSaveEnable) {
+
+                    const { actions, messages } = evaluateRulesWithActions(rules, formValues);
+                    console.log("myScript-------------------------------------------", myScript)
+                    console.log("rules-------------------------------------------", rules)
+                    console.log("actions-------------------------------------------", actions)
+                    console.log("formValues-------------------------------------------", formValues)
+
                     const hasButtonSaveEnable = actions.some(
-                      item => item?.field === "buttonSave" && item.action === "enable"
+                      item => item?.field === "buttonSave"
                     );
+                    if (hasButtonSaveEnable) {
+                      const hasButtonSaveEnable = actions.some(
+                        item => item?.field === "buttonSave" && item.action === "enable"
+                      );
+                      const updatedControls = applyActionsToControls(controls, actions);
+                      setControls(updatedControls)
+                      setButtonSave(hasButtonSaveEnable)
+                      if (!hasButtonSaveEnable) {
+                              setTapLoader(false);
+                              setScriptErrorMessage(messages)
+                              setIsVisibleScriptError(true)
+                        return;
+                      }
+                    }
                     const updatedControls = applyActionsToControls(controls, actions);
                     setControls(updatedControls)
-                    setButtonSave(hasButtonSaveEnable)
-                    if (!hasButtonSaveEnable) {
-                      Alert.alert("Error", myScript?.message)
-                      return;
-                    }
-                  }
-                  const updatedControls = applyActionsToControls(controls, actions);
-                  setControls(updatedControls)
-                  }  
+                  } 
+                  console.log("hasButtonSaveEnable-------------------")
 
-                  // 1️⃣ Check if location services are enabled
                   const locationEnabled = hasLocationField ? await DeviceInfo.isLocationEnabled() : true;
 
-                  // 2️⃣ Request location permissions if needed
                   const permissionStatus = hasLocationField
                     ? await requestLocationPermissions()
                     : 'granted';
 
-                  // 3️⃣ Request camera/media permission if needed
                   const hasCameraPermission = hasMediaField ? await requestCameraPermission() : true;
 
-                  // 4️⃣ Handle permission errors
                   if (!hasCameraPermission && hasMediaField) {
+                    setAlertVisible(true);
+                    setModalClose(true);
+                    setIsSettingVisible(true)
                     setAlertConfig({
                       title: t('title.title16'),
                       message: t("msg.msg15"),
                       type: 'error',
                     });
-                    setAlertVisible(true);
-                    setModalClose(false);
+                    
                     return;
                   }
 
@@ -613,7 +624,8 @@ Page save button - 795 below flatlist
                       type: 'error',
                     });
                     setAlertVisible(true);
-                    setModalClose(false);
+                    setModalClose(true);
+                     setIsSettingVisible(true)
                     return;
                   }
 
@@ -657,7 +669,7 @@ Page save button - 795 below flatlist
                       setTimeout(() => {
                         setAlertVisible(false);
                         navigation.goBack();
-                      }, 1500);
+                      }, 1800);
                     } catch (err: any) {
                       setLoader(false);
                       setAlertConfig({
@@ -671,23 +683,30 @@ Page save button - 795 below flatlist
                   }
 
                   setActionSaveLoader(false);
+                  setTimeout(() => {
+                    setTapLoader(false)
+                  }, 600)
                 } catch (error) {
                   console.error("Save error:", error);
+                  setTimeout(() => {
+                    setTapLoader(false)
+                  }, 600)
                   setActionSaveLoader(false);
                 }
-                }}
-              >
-                <Text
-                  style={{
-                    color: ERP_COLOR_CODE.ERP_WHITE,
-                    fontSize: 16,
-                    fontWeight: '800',
                   }}
                 >
-                  {actionSaveLoader ? 'Loading' : 'Save'}
-                </Text>
-              </TouchableOpacity>
-            )}
+                  <Text
+                    style={{
+                      color: ERP_COLOR_CODE.ERP_WHITE,
+                      fontSize: 16,
+                      fontWeight: '800',
+                    }}
+                  >
+                    {actionSaveLoader ? 'Loading' : 'Save'}
+                  </Text>
+                </TouchableOpacity>
+              )}
+              
 
 Login - Add account 
 company_code - oeuvre01
@@ -698,3 +717,176 @@ tr - DevERP to Oeuvre
 and removed app name - wecome ke aage
 Tab name - DCR 
 dd
+
+
+TabNavigation
+
+import React from "react";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { DARK_COLOR, ERP_COLOR_CODE } from "../utils/constants";
+import MenuTab from "../screens/dashboard/tabs/MenuTab/MenuTab";
+import HomeScreen from "../screens/dashboard/tabs/home/HomeTab";
+import ProfileTab from "../screens/dashboard/tabs/profile/ProfileTab";
+import useTranslations from "../hooks/useTranslations";
+import { useAppSelector } from "../store/hooks";
+import AnimatedTabIcon from "../components/tab_icon/AnimatedTabIcon";
+
+const Tab = createBottomTabNavigator();
+
+const TabNavigator = () => {
+  const theme = useAppSelector((state) => state.theme.mode);
+  const { appBottomMenuList } = useAppSelector(state => state?.auth);
+
+  console.log("appBottomMenuList", appBottomMenuList)
+  const navigationItems = (appBottomMenuList || []).map(item => ({
+    name: item?.name,
+    type: item?.code,
+    icon: item?.iconname?.toLowerCase(), // icon name lowercase for safety
+    label: item?.name,
+  }));
+
+  const getComponent = (item) => {
+    if (item.name === "Home") return HomeScreen;
+    if (item.name === "Profile") return ProfileTab;
+    return null; // बाकी MenuTab में जाएगा
+  };
+
+if (!appBottomMenuList || appBottomMenuList.length === 0) {
+  return null; // ya loading spinner
+}
+
+
+  return (
+    <Tab.Navigator
+      screenOptions={{
+        headerShown: true,
+        headerTitleAlign: "left",
+        tabBarActiveTintColor:
+          theme === "dark" ? "white" : ERP_COLOR_CODE.ERP_APP_COLOR,
+        tabBarInactiveTintColor:
+          theme === "dark" ? "black" : ERP_COLOR_CODE.ERP_APP_COLOR,
+        tabBarStyle: {
+          backgroundColor:
+            theme === "dark" ? DARK_COLOR : ERP_COLOR_CODE.ERP_WHITE,
+          height: 80,
+          paddingBottom: 5,
+          paddingTop: 5,
+        },
+        headerStyle: {
+          backgroundColor:
+            theme === "dark" ? DARK_COLOR : ERP_COLOR_CODE.ERP_APP_COLOR,
+        },
+        headerTintColor: "white",
+      }}
+    >
+      {navigationItems.map((item, index) => {
+        const Component = getComponent(item);
+
+        return (
+          <Tab.Screen
+            key={index}
+            name={item.name}
+            children={
+              Component
+                ? () => <Component />
+                : () => (
+                    <MenuTab
+                      type={item.type}
+                      headerText={item.label}
+                      searchPlaceholder={`Search ${item.label}`}
+                    />
+                  )
+            }
+            options={{
+              tabBarLabel: item.label,
+              title: item.label,
+              tabBarLabelStyle: {
+                fontSize: 12,
+                fontWeight: "500",
+                marginTop: 8,
+              },
+              tabBarIcon: ({ color, size, focused }) => (
+                <AnimatedTabIcon
+                  name={item.icon}
+                  color={color}
+                  size={size}
+                  focused={focused}
+                />
+              ),
+            }}
+          />
+        );
+      })}
+    </Tab.Navigator>
+  );
+};
+
+export default TabNavigator;
+
+
+Login screen
+
+  const handlePersistAfterLogin = async (
+    company_code: string,
+    password: string,
+    user_credentials: { user: string; name?: string },
+    response: any,
+    companyData: any,
+  ) => {
+    dispatch(
+      loginUserThunk({
+        company_code,
+        password,
+        isAddingAccount,
+        user_credentials,
+        response,
+        companyData,
+      }),
+    );
+    dispatch(getERPAppConfigMenuThunk());
+    setTimeout(() => {
+      dispatch(setReloadApp())
+    }, 1000);
+  };
+
+  RootNavigator 
+
+   useEffect(() => {
+    if(isAuthenticated){
+      dispatch(getERPAppConfigMenuThunk());
+    }
+  }, [isAuthenticated])
+
+
+HomeTab - onRefresh
+
+  dispatch(getERPAppConfigMenuThunk());
+
+  useCallback - timer
+
+   dispatch(getERPAppConfigMenuThunk());
+        const params = { branch: '', type: '', fd: '', td: '' }
+        dispatch(getERPDashboardThunk(params));
+
+Auth thunk
+
+export const getERPAppConfigMenuThunk = createAsyncThunk(
+  'auth/getERPAppConfigMenu',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await DevERPService.getAppMenu();
+      console.log("response------------------", response)
+      if (response && typeof response === 'string') {
+        return response;
+      } else if (response && typeof response === 'object') {
+        return response;
+      }
+
+      return rejectWithValue('Invalid menu response format');
+    } catch (error: any) {
+       console.log("response---error---------------", error)
+      return rejectWithValue(error?.message || 'Failed to get ERP menu');
+    }
+  },
+);
+
