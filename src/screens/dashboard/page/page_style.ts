@@ -1,5 +1,5 @@
-import { StyleSheet } from 'react-native';
-import { ERP_COLOR_CODE } from '../../../utils/constants';
+import { StyleSheet } from "react-native";
+import { ERP_COLOR_CODE } from "../../../utils/constants";
 
 export const styles = StyleSheet.create({
   input: {
@@ -8,14 +8,14 @@ export const styles = StyleSheet.create({
     borderRadius: 6,
     padding: 10,
   },
-overlay: {
+  overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.35)',
-    justifyContent: 'flex-end',
+    backgroundColor: "rgba(0,0,0,0.35)",
+    justifyContent: "flex-end",
   },
 
   sheet: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
     paddingBottom: 20,
@@ -24,37 +24,37 @@ overlay: {
   header: {
     height: 50,
     paddingHorizontal: 16,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
 
   headerTitle: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#111827',
+    fontWeight: "600",
+    color: "#111827",
   },
 
   doneText: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#2563eb', // iOS blue
+    fontWeight: "600",
+    color: "#2563eb", // iOS blue
   },
 
   divider: {
     height: 1,
-    backgroundColor: '#e5e7eb',
+    backgroundColor: "#e5e7eb",
   },
 
   picker: {
     height: 220,
   },
-  center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  center: { flex: 1, justifyContent: "center", alignItems: "center" },
 
   label: {
     fontSize: 14,
-     marginBottom: 6,
-    fontWeight: '600',
+    marginBottom: 6,
+    fontWeight: "600",
   },
   textInput: {
     borderWidth: 1,
@@ -62,7 +62,7 @@ overlay: {
     borderRadius: 10,
     padding: 10,
     backgroundColor: ERP_COLOR_CODE.ERP_WHITE,
-    color:'black'
+    color: "black",
   },
   pickerBox: {
     borderWidth: 1,
@@ -70,10 +70,10 @@ overlay: {
     borderRadius: 10,
     padding: 12,
     backgroundColor: ERP_COLOR_CODE.ERP_WHITE,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignContent: 'center',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignContent: "center",
+    alignItems: "center",
   },
   dropdownCard: {
     marginTop: 4,
@@ -81,24 +81,24 @@ overlay: {
     borderWidth: 1,
     borderColor: ERP_COLOR_CODE.ERP_BORDER_LINE,
     backgroundColor: ERP_COLOR_CODE.ERP_WHITE,
-    overflow: 'hidden',
+    overflow: "hidden",
     elevation: 3,
   },
   option: {
     padding: 12,
     borderBottomWidth: 1,
     borderBottomColor: ERP_COLOR_CODE.ERP_eee,
-    flexDirection:'row',
-    justifyContent:'space-between',
-    alignContent:'center',
-    alignItems:'center'
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignContent: "center",
+    alignItems: "center",
   },
   disabledBox: {
     borderWidth: 1,
     borderColor: ERP_COLOR_CODE.ERP_BORDER_LINE,
     borderRadius: 10,
     padding: 12,
-    backgroundColor: '#f1f1f1',
+    backgroundColor: "#f1f1f1",
   },
   dateBox: {
     borderWidth: 1,
@@ -106,27 +106,27 @@ overlay: {
     borderRadius: 10,
     padding: 12,
     backgroundColor: ERP_COLOR_CODE.ERP_WHITE,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignContent: 'center',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignContent: "center",
+    alignItems: "center",
   },
   overlay: {
     flex: 1,
-    justifyContent: 'flex-end',
-    backgroundColor: 'rgba(0,0,0,0.4)',
+    justifyContent: "flex-end",
+    backgroundColor: "rgba(0,0,0,0.4)",
   },
   bottomSheet: {
-    backgroundColor: 'white',
+    backgroundColor: "white",
     padding: 16,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-    maxHeight: '50%',
+    maxHeight: "50%",
     marginVertical: 4,
   },
   title: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   errorText: {
     color: ERP_COLOR_CODE.ERP_ERROR,
@@ -134,9 +134,9 @@ overlay: {
   },
   closeBtn: {
     marginTop: 16,
-    backgroundColor: 'black',
+    backgroundColor: "black",
     padding: 12,
     borderRadius: 8,
-    alignItems: 'center',
+    alignItems: "center",
   },
 });

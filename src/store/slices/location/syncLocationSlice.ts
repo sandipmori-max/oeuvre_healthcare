@@ -1,6 +1,6 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { syncLocationThunk } from './thunk';
-import { SyncLocationResponse, SyncLocationState } from './type';
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { syncLocationThunk } from "./thunk";
+import { SyncLocationResponse, SyncLocationState } from "./type";
 
 const initialState: SyncLocationState = {
   loading: false,
@@ -9,18 +9,18 @@ const initialState: SyncLocationState = {
 };
 
 const syncLocationSlice = createSlice({
-  name: 'syncLocation',
+  name: "syncLocation",
   initialState,
   reducers: {
-    resetSyncLocationState: state => {
+    resetSyncLocationState: (state) => {
       state.loading = false;
       state.error = null;
       state.response = null;
     },
   },
-  extraReducers: builder => {
+  extraReducers: (builder) => {
     builder
-      .addCase(syncLocationThunk.pending, state => {
+      .addCase(syncLocationThunk.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
@@ -29,7 +29,7 @@ const syncLocationSlice = createSlice({
         (state, action: PayloadAction<SyncLocationResponse>) => {
           state.loading = false;
           state.response = action.payload;
-        }
+        },
       )
       .addCase(syncLocationThunk.rejected, (state, action) => {
         state.loading = false;

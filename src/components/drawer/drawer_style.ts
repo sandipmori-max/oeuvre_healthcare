@@ -61,7 +61,9 @@ export const styles = StyleSheet.create({
   drawerItem: {
     borderRadius: 8,
     marginHorizontal: 8,
-    marginVertical: 6,
+    marginVertical: 2,
+    borderWidth: 0.5,
+    borderColor: ERP_COLOR_CODE.ERP_BORDER_LINE
   },
   activeItemBackground: {
     backgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR,

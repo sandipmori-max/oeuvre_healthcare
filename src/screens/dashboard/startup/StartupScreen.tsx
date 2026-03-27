@@ -5,7 +5,7 @@ import FullViewLoader from "../../../components/loader/FullViewLoader";
 import { useAppSelector } from "../../../store/hooks";
 
 const StartupScreen = ({ navigation }: any) => {
-  const { isPinVerifyLoaded } = useAppSelector(state => state.auth);
+  const { isPinVerifyLoaded } = useAppSelector((state) => state.auth);
 
   useEffect(() => {
     const checkPin = async () => {
@@ -22,7 +22,7 @@ const StartupScreen = ({ navigation }: any) => {
 
   return (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <FullViewLoader isShowTop={false}/>
+      <FullViewLoader isShowTop={false} />
     </View>
   );
 };

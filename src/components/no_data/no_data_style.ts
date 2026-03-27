@@ -1,7 +1,7 @@
 import { StyleSheet, Dimensions } from 'react-native';
 import { ERP_COLOR_CODE } from '../../utils/constants';
 
-const { width } = Dimensions.get('window');
+const { width } = Dimensions.get('screen');
 
 export const styles = StyleSheet.create({
   container: {

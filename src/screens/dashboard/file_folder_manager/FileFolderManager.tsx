@@ -9,6 +9,7 @@ import {
   Modal,
   TextInput,
   Alert,
+  useWindowDimensions,
 } from "react-native";
 import FilePickerRow from "../page/components/FilePicker";
 
@@ -19,7 +20,8 @@ import FilePickerRow from "../page/components/FilePicker";
 const FileFolderManager = () => {
   const [items, setItems] = useState([]);
   const [currentFolder, setCurrentFolder] = useState(null);
-
+const { height, width } = useWindowDimensions();  
+  const isLandscape = width > height;
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showMoveModal, setShowMoveModal] = useState(false);
@@ -315,7 +317,7 @@ const [actionTarget, setActionTarget] = useState(null);
       </View>
 
 {/* ACTION MENU MODAL */}
-<Modal transparent visible={showActionMenu} animationType="fade">
+<Modal transparent visible={showActionMenu} animationType="fade" supportedOrientations={["portrait", "landscape"]}>
   <TouchableOpacity
     style={{
       flex: 1,
@@ -378,7 +380,7 @@ const [actionTarget, setActionTarget] = useState(null);
 
 
       {/* ADD MODAL */}
-      <Modal transparent visible={showAddModal} animationType="slide">
+      <Modal transparent visible={showAddModal} animationType="slide" supportedOrientations={["portrait", "landscape"]}>
         <View style={styles.modalBody}>
           <View style={styles.modalCard}>
             <Text style={styles.modalTitle}>Add</Text>
@@ -409,7 +411,7 @@ const [actionTarget, setActionTarget] = useState(null);
       </Modal>
 
       {/* EDIT MODAL */}
-      <Modal transparent visible={showEditModal} animationType="slide">
+      <Modal transparent visible={showEditModal} animationType="slide" supportedOrientations={["portrait", "landscape"]}>
         <View style={styles.modalBody}>
           <View style={styles.modalCard}>
             <Text style={styles.modalTitle}>Rename</Text>
@@ -428,7 +430,7 @@ const [actionTarget, setActionTarget] = useState(null);
       </Modal>
 
       {/* MOVE MODAL */}
-      <Modal transparent visible={showMoveModal} animationType="slide">
+      <Modal transparent visible={showMoveModal} animationType="slide" supportedOrientations={["portrait", "landscape"]}>
         <View style={styles.modalBody}>
           <View style={styles.modalCardLarge}>
             <Text style={styles.modalTitle}>Move To</Text>

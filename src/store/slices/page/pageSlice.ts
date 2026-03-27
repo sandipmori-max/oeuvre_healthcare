@@ -1,6 +1,6 @@
 // slice.ts
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { savePageThunk, handlePageActionThunk } from './thunk';
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { savePageThunk, handlePageActionThunk } from "./thunk";
 
 interface PageState {
   loading: boolean;
@@ -15,18 +15,18 @@ const initialState: PageState = {
 };
 
 const pageSlice = createSlice({
-  name: 'page',
+  name: "page",
   initialState,
   reducers: {
-    resetSavePageState: state => {
+    resetSavePageState: (state) => {
       state.loading = false;
       state.error = null;
       state.response = null;
     },
   },
-  extraReducers: builder => {
+  extraReducers: (builder) => {
     builder
-      .addCase(savePageThunk.pending, state => {
+      .addCase(savePageThunk.pending, (state) => {
         state.loading = true;
         state.error = null;
         state.response = null;
@@ -40,15 +40,18 @@ const pageSlice = createSlice({
         state.error = action.payload as string;
       })
 
-      .addCase(handlePageActionThunk.pending, state => {
+      .addCase(handlePageActionThunk.pending, (state) => {
         state.loading = true;
         state.error = null;
         state.response = null;
       })
-      .addCase(handlePageActionThunk.fulfilled, (state, action: PayloadAction<any>) => {
-        state.loading = false;
-        state.response = action.payload;
-      })
+      .addCase(
+        handlePageActionThunk.fulfilled,
+        (state, action: PayloadAction<any>) => {
+          state.loading = false;
+          state.response = action.payload;
+        },
+      )
       .addCase(handlePageActionThunk.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;

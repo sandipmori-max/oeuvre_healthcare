@@ -2,9 +2,9 @@ export const isNetworkError = (error: any): boolean => {
   return (
     !error.response &&
     error.message &&
-    (error.message.includes('Network Error') ||
-      error.message.includes('No internet connection') ||
-      error.message.includes('timeout'))
+    (error.message.includes("Network Error") ||
+      error.message.includes("No internet connection") ||
+      error.message.includes("timeout"))
   );
 };
 
@@ -18,15 +18,15 @@ export const isServerError = (error: any): boolean => {
 
 export const getErrorMessage = (error: any): string => {
   if (isNetworkError(error)) {
-    return 'No internet connection. Please check your network and try again.';
+    return "No internet connection. Please check your network and try again.";
   }
 
   if (isAuthError(error)) {
-    return 'Your session has expired. Please login again.';
+    return "Your session has expired. Please login again.";
   }
 
   if (isServerError(error)) {
-    return 'Server error. Please try again later.';
+    return "Server error. Please try again later.";
   }
 
   if (error.response?.data?.message) {
@@ -37,7 +37,7 @@ export const getErrorMessage = (error: any): string => {
     return error.message;
   }
 
-  return 'Something went wrong. Please try again.';
+  return "Something went wrong. Please try again.";
 };
 
 export const retryApiCall = async <T>(
@@ -52,12 +52,15 @@ export const retryApiCall = async <T>(
       return await apiCall();
     } catch (error) {
       lastError = error;
-      if (isAuthError(error) || (error.response?.status >= 400 && error.response?.status < 500)) {
+      if (
+        isAuthError(error) ||
+        (error.response?.status >= 400 && error.response?.status < 500)
+      ) {
         throw error;
       }
 
       if (attempt < maxRetries) {
-        await new Promise(resolve => setTimeout(resolve, delay));
+        await new Promise((resolve) => setTimeout(resolve, delay));
         delay *= 2;
       }
     }
@@ -69,14 +72,14 @@ export const retryApiCall = async <T>(
 export const translateSingle = async (text) => {
   try {
     const response = await fetch(
-      `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=en|gu`
+      `https://api.mymemory.translated.net/get?q=${encodeURIComponent(
+        text,
+      )}&langpair=en|gu`,
     );
 
     const result = await response.json();
     const translated = result.responseData.translatedText;
-console.log("translated", translated)
-     return translated;
-
+    return translated;
   } catch (error) {
     console.log("Translation failed");
   }

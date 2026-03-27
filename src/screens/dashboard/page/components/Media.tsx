@@ -13,6 +13,7 @@ import {
   Animated,
   PanResponder,
   AppState,
+  useWindowDimensions,
 } from "react-native";
 import {
   launchCamera,
@@ -43,7 +44,8 @@ const Media = ({
   const [loadingSmall, setLoadingSmall] = useState(false);
   const [loadingLarge, setLoadingLarge] = useState(false);
   const [cacheBuster, setCacheBuster] = useState(Date.now());
-
+const { height, width } = useWindowDimensions();  
+  const isLandscape = width > height;
   const [alertVisible, setAlertVisible] = useState(false);
   const [isSettingVisible, setIsSettingVisible] = useState(false);
   const [alertConfig, setAlertConfig] = useState({
@@ -68,7 +70,6 @@ const Media = ({
       `${baseLink}fileupload/1/${infoData?.tableName}/${infoData?.id}/${
         type === "small" ? `d_${item?.text}` : item?.text
       }`;
-    console.log("--------=================", base);
     return `${base}?cb=${cacheBuster}`;
   };
 
@@ -146,15 +147,14 @@ const Media = ({
             setAlertVisible(false);
             pendingCameraAction.current = false;
             launchCamera(
-               {
-        mediaType: "photo",
-        cameraType: "back",
-        quality: 0.5,
-        maxWidth: 1024,
-        maxHeight: 1024,
-        includeBase64: true,
-        saveToPhotos: false,
-      },
+              {
+                mediaType: "photo",
+                quality: 0.5,
+                includeBase64: true,
+                maxWidth: 1024,
+                maxHeight: 1024,
+                saveToPhotos: false,
+              },
               (response) => {
                 try {
                   if (response?.didCancel || response?.errorCode) {
@@ -201,14 +201,13 @@ const Media = ({
 
             launchCamera(
               {
-        mediaType: "photo",
-        cameraType: "back",
-        quality: 0.5,
-        maxWidth: 1024,
-        maxHeight: 1024,
-        includeBase64: true,
-        saveToPhotos: false,
-      },
+                mediaType: "photo",
+                quality: 0.5,
+                includeBase64: true,
+                maxWidth: 1024,
+                maxHeight: 1024,
+                saveToPhotos: false,
+              },
               (response) => {
                 try {
                   if (response?.didCancel || response?.errorCode) {
@@ -244,14 +243,13 @@ const Media = ({
 
             launchCamera(
               {
-        mediaType: "photo",
-        cameraType: "back",
-        quality: 0.5,
-        maxWidth: 1024,
-        maxHeight: 1024,
-        includeBase64: true,
-        saveToPhotos: false,
-      },
+                mediaType: "photo",
+                quality: 0.5,
+                includeBase64: true,
+                maxWidth: 1024,
+                maxHeight: 1024,
+                saveToPhotos: false,
+              },
               (response) => {
                 try {
                   if (response?.didCancel || response?.errorCode) {
@@ -484,6 +482,7 @@ const Media = ({
       )}
       {/* Fullscreen Image Modal */}
       <Modal
+      supportedOrientations={["portrait", "landscape"]}
         animationType="slide"
         transparent={true}
         visible={modalVisible}
@@ -496,8 +495,13 @@ const Media = ({
           setModalVisible(false);
         }}
       >
-        <View style={styles.fullscreenModalOverlay}>
-          <View style={[styles.fullscreenModalContent]}>
+        <View style={[styles.fullscreenModalOverlay,isLandscape && {
+                        alignContent:'center',
+                        alignItems:'center'
+                      }]}>
+          <View style={[styles.fullscreenModalContent, {
+          width: isLandscape ? '50%' : '100%'
+        }]}>
             <TouchableOpacity
               style={styles.closeBtn}
               onPress={() => {
@@ -557,10 +561,14 @@ const Media = ({
       <Modal
         animationType="slide"
         transparent={true}
+        supportedOrientations={["portrait", "landscape"]}
         visible={pickerModalVisible}
         onRequestClose={() => setPickerModalVisible(false)}
       >
-        <View style={styles.modalOverlay}>
+        <View style={[styles.modalOverlay,isLandscape && {
+                        alignContent:'center',
+                        alignItems:'center'
+                      }]}>
           <View
             style={[
               styles.modalContent,
@@ -568,7 +576,9 @@ const Media = ({
                 borderWidth: 1,
                 borderColor: "white",
                 backgroundColor: "black",
-              },
+              }, {
+          width: isLandscape ? '50%' : '100%'
+        }
             ]}
           >
             <View style={styles.modalHeader}>

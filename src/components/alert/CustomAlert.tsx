@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef } from "react";
 import {
   View,
   Text,
@@ -9,44 +9,46 @@ import {
   BackHandler,
   Animated,
   Easing,
-} from 'react-native';
-import FastImage from 'react-native-fast-image';
+  useWindowDimensions,
+} from "react-native";
+import FastImage from "react-native-fast-image";
 
-import { CustomAlertProps } from '../types';
-import { getGifSource } from '../../utils/helpers';
-import { styles } from './custom_alert_style';
-import { getAlertStyles } from './helper';
-import ERPTextInput from '../input/ERPTextInput';
-import { ERP_COLOR_CODE } from '../../utils/constants';
-import MaterialIcons from '@react-native-vector-icons/material-icons';
-import { useAppSelector } from '../../store/hooks';
-import { useTranslation } from 'react-i18next';
-import TranslatedText from '../../screens/dashboard/tabs/home/TranslatedText';
+import { CustomAlertProps } from "../types";
+import { getGifSource } from "../../utils/helpers";
+import { styles } from "./custom_alert_style";
+import { getAlertStyles } from "./helper";
+import ERPTextInput from "../input/ERPTextInput";
+import { ERP_COLOR_CODE } from "../../utils/constants";
+import MaterialIcons from "@react-native-vector-icons/material-icons";
+import { useAppSelector } from "../../store/hooks";
+import { useTranslation } from "react-i18next";
+import TranslatedText from "../../screens/dashboard/tabs/home/TranslatedText";
 
 const CustomAlert: React.FC<CustomAlertProps> = ({
   visible,
   title,
   message,
-  type = 'info',
+  type = "info",
   onClose,
   onDone,
   onCancel,
-  doneText = 'Done',
-  cancelText = 'Cancel',
+  doneText = "Done",
+  cancelText = "Cancel",
   isFromButtonList = false,
   actionLoader,
   color = ERP_COLOR_CODE.ERP_BLACK,
   isBottomButtonVisible,
   isSettingVisible,
-  closeHide = false
+  closeHide = false,
 }) => {
-  const {t} = useTranslation()
+  const { t } = useTranslation();
   const alertStyles = getAlertStyles(type);
   const gifSource = getGifSource(type);
-  const theme = useAppSelector(state => state?.theme.mode);
-
-  const [remarks, setRemarks] = useState('');
-  const [error, setError] = useState('');
+  const theme = useAppSelector((state) => state?.theme.mode);
+const { height, width } = useWindowDimensions();  
+  const isLandscape = width > height;
+  const [remarks, setRemarks] = useState("");
+  const [error, setError] = useState("");
 
   const containerAnim = useRef(new Animated.Value(0)).current;
   const headerAnim = useRef(new Animated.Value(0)).current;
@@ -94,43 +96,58 @@ const CustomAlert: React.FC<CustomAlertProps> = ({
       }
       return false;
     };
-    const backHandler = BackHandler.addEventListener('hardwareBackPress', onBackPress);
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      onBackPress,
+    );
     return () => backHandler.remove();
   }, [visible]);
 
   useEffect(() => {
     if (visible) {
-      setRemarks('');
-      setError('');
+      setRemarks("");
+      setError("");
     }
   }, [visible]);
 
   const handleChangedRemarks = (val: string) => {
     setRemarks(val);
-    if (val.trim()) setError('');
+    if (val.trim()) setError("");
   };
 
   const handleDonePress = () => {
     if (isFromButtonList && !remarks.trim()) {
-      setError('Please enter remarks before proceeding.');
+      setError("Please enter remarks before proceeding.");
       return;
     }
     onDone?.(remarks);
   };
 
   return (
-    <Modal visible={visible} transparent animationType="none" onRequestClose={()=>{
-      onClose()
-    }}>
-      <View style={styles.overlay}>
+    <Modal
+      visible={visible}
+      transparent
+      animationType="none"
+      onRequestClose={() => {
+        onClose();
+      }}
+      supportedOrientations={["portrait", "landscape"]}
+    >
+      <View style={[styles.overlay,isLandscape && {
+        alignContent:'center',
+        alignItems:'center'
+      }]}>
         <Animated.View
           style={[
             styles.bottomSheet,
+            {
+          width: isLandscape ? '50%' : '100%'
+        },
             alertStyles.container,
-            theme === 'dark' && {
-              backgroundColor: 'black',
+            theme === "dark" && {
+              backgroundColor: "black",
               borderWidth: 1,
-              borderColor: 'white',
+              borderColor: "white",
             },
             {
               opacity: containerAnim,
@@ -145,36 +162,38 @@ const CustomAlert: React.FC<CustomAlertProps> = ({
             },
           ]}
         >
-          
           {/* Header */}
           <Animated.View style={{ opacity: headerAnim }}>
             <View style={styles.header}>
               <TranslatedText
-              numberOfLines={1}
-              text={title || ''}
-              style={alertStyles.title}></TranslatedText>
-              {
-                !closeHide &&  <TouchableOpacity onPress={() => {
-                Animated.parallel([
-                  Animated.timing(containerAnim, {
-                    toValue: 0,
-                    duration: 260,
-                    easing: Easing.in(Easing.ease),
-                    useNativeDriver: true,
-                  }),
-                  Animated.timing(headerAnim, {
-                    toValue: 0,
-                    duration: 260,
-                    useNativeDriver: true,
-                  }),
-                ]).start(() => {
-                  onClose();
-                });
-              }} style={styles.closeIcon}>
-                <Text style={styles.closeIconText}>✕</Text>
-              </TouchableOpacity>
-              }
-    
+                numberOfLines={1}
+                text={title || ""}
+                style={alertStyles.title}
+              ></TranslatedText>
+              {!closeHide && (
+                <TouchableOpacity
+                  onPress={() => {
+                    Animated.parallel([
+                      Animated.timing(containerAnim, {
+                        toValue: 0,
+                        duration: 260,
+                        easing: Easing.in(Easing.ease),
+                        useNativeDriver: true,
+                      }),
+                      Animated.timing(headerAnim, {
+                        toValue: 0,
+                        duration: 260,
+                        useNativeDriver: true,
+                      }),
+                    ]).start(() => {
+                      onClose();
+                    });
+                  }}
+                  style={styles.closeIcon}
+                >
+                  <Text style={styles.closeIconText}>✕</Text>
+                </TouchableOpacity>
+              )}
             </View>
           </Animated.View>
 
@@ -197,41 +216,44 @@ const CustomAlert: React.FC<CustomAlertProps> = ({
           {/* Message / Input */}
           <Animated.View style={{ opacity: contentAnim }}>
             {isFromButtonList ? (
-              <View style={{ width: '100%' }}>
+              <View style={{ width: "100%" }}>
                 <TranslatedText
                   style={[
                     alertStyles.message,
-                    { textAlign: 'left', fontSize: 14, fontWeight: '800' },
+                    { textAlign: "left", fontSize: 14, fontWeight: "800" },
                   ]}
                   numberOfLines={1}
-                  text={message || ''}
-                >
-                  
-                </TranslatedText>
+                  text={message || ""}
+                ></TranslatedText>
 
                 <ERPTextInput
-                  label={t('test11')}
-                  placeholder={t('test12')}
+                  label={t("test11")}
+                  placeholder={t("test12")}
                   placeholderTextColor={ERP_COLOR_CODE.ERP_999}
                   autoCapitalize="none"
                   onChangeText={handleChangedRemarks}
                   value={remarks}
-                  labelStyle={[styles.inputLabel, { fontWeight: '400', fontSize: 12 }]}
+                  labelStyle={[
+                    styles.inputLabel,
+                    { fontWeight: "400", fontSize: 12 },
+                  ]}
                   inputStyle={[styles.input]}
                 />
 
                 {error ? (
                   <TranslatedText
-                  numberOfLines={1}
-                  text={error}
-                  style={{ color: ERP_COLOR_CODE.ERP_ERROR }}></TranslatedText>
+                    numberOfLines={1}
+                    text={error}
+                    style={{ color: ERP_COLOR_CODE.ERP_ERROR }}
+                  ></TranslatedText>
                 ) : null}
               </View>
             ) : (
-              <TranslatedText 
-              numberOfLines={1}
-              text={message || ''}
-              style={alertStyles.message}></TranslatedText>
+              <TranslatedText
+                numberOfLines={1}
+                text={message || ""}
+                style={alertStyles.message}
+              ></TranslatedText>
             )}
           </Animated.View>
 
@@ -268,35 +290,36 @@ const CustomAlert: React.FC<CustomAlertProps> = ({
                           useNativeDriver: true,
                         }),
                       ]).start(() => {
-                        setRemarks('');
-                        setError('');
+                        setRemarks("");
+                        setError("");
                         onCancel();
                       });
-
                     }}
                   >
                     <Text style={styles.cancelButtonText}>{cancelText}</Text>
                   </TouchableOpacity>
                 )}
 
-                {onDone && (
-                  actionLoader ? (
+                {onDone &&
+                  (actionLoader ? (
                     <TouchableOpacity style={styles.buttonCancel}>
-                      <ActivityIndicator size="small" color={ERP_COLOR_CODE.ERP_BLACK} />
+                      <ActivityIndicator
+                        size="small"
+                        color={ERP_COLOR_CODE.ERP_BLACK}
+                      />
                     </TouchableOpacity>
                   ) : (
                     <TouchableOpacity
                       style={[styles.button, { backgroundColor: color }]}
                       onPress={() => {
-                        setRemarks('');
-                        setError('');
+                        setRemarks("");
+                        setError("");
                         handleDonePress();
                       }}
                     >
                       <Text style={styles.buttonText}>{doneText}</Text>
                     </TouchableOpacity>
-                  )
-                )}
+                  ))}
               </View>
             </Animated.View>
           )}
@@ -305,16 +328,18 @@ const CustomAlert: React.FC<CustomAlertProps> = ({
           {isSettingVisible && (
             <Animated.View style={{ opacity: buttonAnim }}>
               <TouchableOpacity onPress={() => Linking.openSettings()}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                <View
+                  style={{ flexDirection: "row", alignItems: "center", gap: 8 }}
+                >
                   <MaterialIcons name="settings" size={20} color="#000" />
                   <Text
                     style={{
                       color: ERP_COLOR_CODE.ERP_BLACK,
-                      fontWeight: '600',
+                      fontWeight: "600",
                       fontSize: 16,
                     }}
                   >
-                    {t('test10')}
+                    {t("test10")}
                   </Text>
                 </View>
               </TouchableOpacity>

@@ -60,12 +60,12 @@ const ERPButton: React.FC<ERPButtonProps> = ({
           isLoading && <ActivityIndicator size={'large'} color={'#fff'} />
         }
         <MaterialIcons name={'lock-outline'} color={'white'} size={20} />
-        <Text 
+        <TranslatedText
+        text={text}
         numberOfLines={1}
-        style={[styles.buttonText, textStyle]}>{text}</Text>
+        style={[styles.buttonText, textStyle]}></TranslatedText>
       </TouchableOpacity>
     </Animated.View>
-
   )
 };
 

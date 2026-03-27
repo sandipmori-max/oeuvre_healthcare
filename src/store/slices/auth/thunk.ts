@@ -1,5 +1,5 @@
-import { createAsyncThunk } from '@reduxjs/toolkit';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { createAsyncThunk } from "@reduxjs/toolkit";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   getDBConnection,
   createAccountsTable,
@@ -8,12 +8,12 @@ import {
   getAccounts,
   getActiveAccount,
   removeAccount as sqliteRemoveAccount,
-} from '../../../utils/sqlite';
-import { Account, User } from './type';
-import { DevERPService } from '../../../services/api';
+} from "../../../utils/sqlite";
+import { Account, User } from "./type";
+import { DevERPService } from "../../../services/api";
 
 export const checkAuthStateThunk = createAsyncThunk(
-  'auth/checkAuthState',
+  "auth/checkAuthState",
   async (_, { rejectWithValue }) => {
     try {
       const db = await getDBConnection();
@@ -23,7 +23,7 @@ export const checkAuthStateThunk = createAsyncThunk(
 
       if (activeAccount?.user?.token && activeAccount?.user?.tokenValidTill) {
         const validTill =
-          typeof activeAccount.user.tokenValidTill === 'number'
+          typeof activeAccount.user.tokenValidTill === "number"
             ? new Date(activeAccount.user.tokenValidTill * 1000)
             : new Date(activeAccount.user.tokenValidTill);
 
@@ -48,13 +48,13 @@ export const checkAuthStateThunk = createAsyncThunk(
         user: updatedActiveAccount?.user || null,
       };
     } catch (error) {
-      return rejectWithValue('Failed to check authentication state');
+      return rejectWithValue("Failed to check authentication state");
     }
   },
 );
 
 export const loginUserThunk = createAsyncThunk(
-  'auth/loginUser',
+  "auth/loginUser",
   async (
     {
       newToken,
@@ -78,31 +78,40 @@ export const loginUserThunk = createAsyncThunk(
     { rejectWithValue },
   ) => {
     try {
-      const token = isAddingAccount ? newToken : await AsyncStorage.getItem('erp_token');
-      
+      const token = isAddingAccount
+        ? newToken
+        : await AsyncStorage.getItem("erp_token");
+
       const tokenValidTill = isAddingAccount
         ? newvalidTill
-        : await AsyncStorage.getItem('erp_token_valid_till');
+        : await AsyncStorage.getItem("erp_token_valid_till");
 
       if (!token) {
-        return rejectWithValue('No authentication token found. Please login again.');
+        return rejectWithValue(
+          "No authentication token found. Please login again.",
+        );
       }
 
-      await AsyncStorage.setItem('auth_token', token);
+      await AsyncStorage.setItem("auth_token", token);
 
       const erpUser: User = {
         id: response?.userid || "",
-        name: user_credentials?.name || user_credentials?.user || company_code.toUpperCase() || "",
-        company_code: company_code || "",
-        avatar: `https://ui-avatars.com/api/?name=${(
+        name:
           user_credentials?.name ||
           user_credentials?.user ||
-          company_code
-        ).toUpperCase()}&background=007AFF&color=fff` || "",
-        accountType: 'erp',
+          company_code.toUpperCase() ||
+          "",
+        company_code: company_code || "",
+        avatar:
+          `https://ui-avatars.com/api/?name=${(
+            user_credentials?.name ||
+            user_credentials?.user ||
+            company_code
+          ).toUpperCase()}&background=007AFF&color=fff` || "",
+        accountType: "",
         token: token || "",
         tokenValidTill: tokenValidTill || "",
-        emailid: response?.emailid || '',
+        emailid: response?.emailid || "",
         fullname: response?.fullname || "",
         mobileno: response?.mobileno || "",
         roleid: response?.roleid || "",
@@ -111,7 +120,7 @@ export const loginUserThunk = createAsyncThunk(
         companyLink: companyData?.response?.link || "",
         companyName: companyData?.response?.name || "",
         app_id: response?.app_id || "",
-        password: password|| ""
+        password: password || "",
       };
       const db = await getDBConnection();
       await createAccountsTable(db);
@@ -143,7 +152,7 @@ export const loginUserThunk = createAsyncThunk(
       await insertAccount(db, newAccount);
       await updateAccountActive(db, newAccount?.id);
       const updatedAccounts = await getAccounts(db);
-      
+
       return {
         user: erpUser,
         accountId: erpUser?.id,
@@ -151,24 +160,28 @@ export const loginUserThunk = createAsyncThunk(
         accounts: updatedAccounts,
       };
     } catch (error: any) {
-      return rejectWithValue(error?.message || 'Login failed. Please try again.');
+      return rejectWithValue(
+        error?.message || "Login failed. Please try again.",
+      );
     }
   },
 );
 
 export const switchAccountThunk = createAsyncThunk(
-  'auth/switchAccount',
+  "auth/switchAccount",
   async (accountId: string, { rejectWithValue }) => {
     try {
       const db = await getDBConnection();
       await createAccountsTable(db);
- 
+
       await updateAccountActive(db, accountId);
       const accounts = await getAccounts(db);
-       const targetAccount = accounts?.find((acc: Account) => acc?.id === accountId);
- 
+      const targetAccount = accounts?.find(
+        (acc: Account) => acc?.id === accountId,
+      );
+
       if (!targetAccount) {
-        return rejectWithValue('Account not found');
+        return rejectWithValue("Account not found");
       }
 
       if (targetAccount?.user?.token) {
@@ -176,10 +189,16 @@ export const switchAccountThunk = createAsyncThunk(
         if (tokenValidTill) {
           const validTill = new Date(tokenValidTill);
           if (validTill > new Date()) {
-            await AsyncStorage.setItem('erp_token', targetAccount?.user?.token || '');
-            await AsyncStorage.setItem('auth_token', targetAccount?.user?.token || '');
+            await AsyncStorage.setItem(
+              "erp_token",
+              targetAccount?.user?.token || "",
+            );
+            await AsyncStorage.setItem(
+              "auth_token",
+              targetAccount?.user?.token || "",
+            );
             DevERPService.setToken(targetAccount?.user?.token);
-             return {
+            return {
               user: targetAccount.user,
               accountId,
               accounts,
@@ -197,13 +216,13 @@ export const switchAccountThunk = createAsyncThunk(
         user: updatedActiveAccount?.user || null,
       };
     } catch (error) {
-      return rejectWithValue('Failed to switch account');
+      return rejectWithValue("Failed to switch account");
     }
   },
 );
 
 export const removeAccountThunk = createAsyncThunk(
-  'auth/removeAccount',
+  "auth/removeAccount",
   async (accountId: string, { rejectWithValue }) => {
     try {
       const db = await getDBConnection();
@@ -213,7 +232,7 @@ export const removeAccountThunk = createAsyncThunk(
       let newActiveAccountId = null;
       let newActiveAccount = null;
       if (updatedAccounts && updatedAccounts?.length > 0) {
-        const wasActive = !updatedAccounts.some(acc => acc.isActive);
+        const wasActive = !updatedAccounts.some((acc) => acc.isActive);
         if (wasActive) {
           await updateAccountActive(db, updatedAccounts[0].id);
         }
@@ -227,35 +246,35 @@ export const removeAccountThunk = createAsyncThunk(
         activeAccountId: newActiveAccountId,
       };
     } catch (error) {
-      return rejectWithValue('Failed to remove account');
+      return rejectWithValue("Failed to remove account");
     }
   },
 );
 
 export const logoutUserThunk = createAsyncThunk(
-  'auth/logoutUser',
+  "auth/logoutUser",
   async (_, { rejectWithValue }) => {
     try {
       await DevERPService.clearData();
       await AsyncStorage.multiRemove([
-        'auth_token',
-        'refresh_token',
-        'token_expires_at',
-        'erp_link',
-        'erp_token',
-        'erp_token_valid_till',
-        'erp_appid',
+        "auth_token",
+        "refresh_token",
+        "token_expires_at",
+        "erp_link",
+        "erp_token",
+        "erp_token_valid_till",
+        "erp_appid",
       ]);
       return { success: true };
     } catch (error) {
       await AsyncStorage.multiRemove([
-        'auth_token',
-        'refresh_token',
-        'token_expires_at',
-        'erp_link',
-        'erp_token',
-        'erp_token_valid_till',
-        'erp_appid',
+        "auth_token",
+        "refresh_token",
+        "token_expires_at",
+        "erp_link",
+        "erp_token",
+        "erp_token_valid_till",
+        "erp_appid",
       ]);
       return { success: true };
     }
@@ -263,32 +282,37 @@ export const logoutUserThunk = createAsyncThunk(
 );
 
 export const validateCompanyCodeThunk = createAsyncThunk(
-  'auth/validateCompanyCode',
-  async ({ companyCode, user }: { companyCode: string; user: string }, { rejectWithValue }) => {
+  "auth/validateCompanyCode",
+  async (
+    { companyCode, user }: { companyCode: string; user: string },
+    { rejectWithValue },
+  ) => {
     try {
       const result = await DevERPService.validateCompanyCode(companyCode, user);
       return result;
     } catch (error: any) {
-      return rejectWithValue(error?.message || 'Failed to validate company code');
+      return rejectWithValue(
+        error?.message || "Failed to validate company code",
+      );
     }
   },
 );
 
 export const getERPMenuThunk = createAsyncThunk(
-  'auth/getERPMenu',
+  "auth/getERPMenu",
   async (_, { rejectWithValue }) => {
     try {
       const response = await DevERPService.getMenu();
 
-      if (response && typeof response === 'string') {
+      if (response && typeof response === "string") {
         return response;
-      } else if (response && typeof response === 'object') {
+      } else if (response && typeof response === "object") {
         return response;
       }
 
-      return rejectWithValue('Invalid menu response format');
+      return rejectWithValue("Invalid menu response format");
     } catch (error: any) {
-      return rejectWithValue(error?.message || 'Failed to get ERP menu');
+      return rejectWithValue(error?.message || "Failed to get ERP menu");
     }
   },
 );
@@ -313,6 +337,7 @@ export const getERPAppConfigMenuThunk = createAsyncThunk(
   },
 );
 
+
 type ERPDashboardParams = {
   branch: string;
   type: string;
@@ -321,44 +346,33 @@ type ERPDashboardParams = {
 };
 
 export const getERPDashboardThunk = createAsyncThunk(
-  'auth/getERPDashboard',
-  async (
-    { branch, type, fd, td }: ERPDashboardParams,
-    { rejectWithValue }
-  ) => {
+  "auth/getERPDashboard",
+  async ({ branch, type, fd, td }: ERPDashboardParams, { rejectWithValue }) => {
     try {
-      const dashboard = await DevERPService.getDashboard(
-        branch,
-        type,
-        fd,
-        td
-      );
+      const dashboard = await DevERPService.getDashboard(branch, type, fd, td);
       return dashboard;
     } catch (error: any) {
-      console.log("dashboard-----------error----------", error)
-      return rejectWithValue(
-        error?.message || 'Failed to get ERP dashboard'
-      );
+      console.log("dashboard-----------error----------", error);
+      return rejectWithValue(error?.message || "Failed to get ERP dashboard");
     }
-  }
+  },
 );
-
 
 export const getERPPageThunk = createAsyncThunk<
   any,
   { page: string; id: string },
   { rejectValue: string }
->('auth/getERPPage', async ({ page, id }, { rejectWithValue }) => {
+>("auth/getERPPage", async ({ page, id }, { rejectWithValue }) => {
   try {
-    const pageData = await DevERPService.getPage(page, id );
+    const pageData = await DevERPService.getPage(page, id);
     return pageData;
   } catch (error: any) {
-    return rejectWithValue(error || 'Failed to get ERP page data');
+    return rejectWithValue(error || "Failed to get ERP page data");
   }
 });
 
 export const getERPListDataThunk = createAsyncThunk(
-  'auth/getERPListData',
+  "auth/getERPListData",
   async (
     {
       page,
@@ -369,10 +383,15 @@ export const getERPListDataThunk = createAsyncThunk(
     { rejectWithValue },
   ) => {
     try {
-      const listData = await DevERPService.getListData(page, fromDate, toDate, param);
+      const listData = await DevERPService.getListData(
+        page,
+        fromDate,
+        toDate,
+        param,
+      );
       return listData;
     } catch (error: any) {
-      return rejectWithValue(error?.message || 'Failed to get ERP list data');
+      return rejectWithValue(error?.message || "Failed to get ERP list data");
     }
   },
 );

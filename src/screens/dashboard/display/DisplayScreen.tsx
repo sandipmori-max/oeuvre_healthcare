@@ -4,7 +4,6 @@ import { styles } from './display_style';
 import ERPIcon from '../../../components/icon/ERPIcon';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import CreateTaskScreen from '../../task_module/create_task/CreateTaskScreen';
-import TaskListScreen from '../../task_module/task_list/TaskListScreen';
 import TaskDetailsBottomSheet from '../../task_module/task_details/TaskDetailsScreen';
 
 export const dummyTasks = [
@@ -119,31 +118,7 @@ const DisplayScreen = () => {
 
   return (
     <View style={styles.container}>
-      {!isListVisible ? (
-        <CreateTaskScreen onCreate={() => {}} />
-      ) : (
-        <TaskListScreen
-          onSelectTask={task => {
-            setSelectedTask(task);
-            setModalVisible(true);
-          }}
-          tasks={dummyTasks}
-          showFilter={showFilter}
-          showPicker={showPicker}
-        />
-      )}
-
-      {selectedTask && (
-        <TaskDetailsBottomSheet
-          visible={modalVisible}
-          task={selectedTask}
-          role="junior"
-          onClose={() => setModalVisible(false)}
-          onUpdate={updatedTask => {
-            setModalVisible(false);
-          }}
-        />
-      )}
+      
     </View>
   );
 };

@@ -1,17 +1,14 @@
 import React, { useRef, useEffect } from 'react';
-import {
-  Text,
-  Animated,
-  StyleSheet,
-  Dimensions,
+import { 
+  Animated, 
 } from 'react-native';
 import { ERP_COLOR_CODE } from '../../utils/constants';
 import { useAppSelector } from '../../store/hooks';
 import TranslatedText from '../../screens/dashboard/tabs/home/TranslatedText';
+import { styles } from './style';
 
-const { width } = Dimensions.get('window');
 
-const Toast = ({ visible, message, onHide , tbackgroundColor}: { visible: boolean; message: string; onHide: () => void , tbackgroundColor: any}) => {
+const Toast = ({ visible, message, onHide , tbackgroundColor, textColor}: any) => {
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const theme = useAppSelector(state => state.theme.mode);
 
@@ -63,7 +60,11 @@ const Toast = ({ visible, message, onHide , tbackgroundColor}: { visible: boolea
       numberOfLines={1}
       style={[
         styles.toastText,
-        theme === 'dark' && { color: 'black' }
+         
+        theme === 'dark' && { color: 'black' },
+        {
+          color: textColor
+        }
       ]}>
         
       </TranslatedText>
@@ -72,22 +73,3 @@ const Toast = ({ visible, message, onHide , tbackgroundColor}: { visible: boolea
 };
 
 export default Toast;
-
-const styles = StyleSheet.create({
-  toastContainer: {
-    position: 'absolute',
-    top: 0,
-    alignSelf: 'center',
-    backgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR,
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderBottomLeftRadius: 18,
-    borderBottomRightRadius: 18,
-    width: width ,
-  },
-  toastText: {
-    color: ERP_COLOR_CODE.ERP_BLACK,
-    fontSize: 16,
-    textAlign: 'center',
-  },
-});

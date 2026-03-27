@@ -1,36 +1,36 @@
-import { configureStore } from '@reduxjs/toolkit';
-import { persistReducer, persistStore } from 'redux-persist';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import authReducer from './slices/auth/authSlice';
-import themeReducer from './slices/theme/themeSlice';
-import attendanceReducer from './slices/attendance/attendanceSlice';
-import dropdownReducer from './slices/dropdown/dropdownSlice';
-import ajaxReducer from './slices/ajax/ajaxSlice';
-import pageReducer from './slices/page/pageSlice';
-import reloadAppReducer from './slices/reloadApp/reloadAppSlice';
+import { configureStore } from "@reduxjs/toolkit";
+import { persistReducer, persistStore } from "redux-persist";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import authReducer from "./slices/auth/authSlice";
+import themeReducer from "./slices/theme/themeSlice";
+import attendanceReducer from "./slices/attendance/attendanceSlice";
+import dropdownReducer from "./slices/dropdown/dropdownSlice";
+import ajaxReducer from "./slices/ajax/ajaxSlice";
+import pageReducer from "./slices/page/pageSlice";
+import reloadAppReducer from "./slices/reloadApp/reloadAppSlice";
 
-import syncLocationReducer from './slices/location/syncLocationSlice';
+import syncLocationReducer from "./slices/location/syncLocationSlice";
 
 const authPersistConfig = {
-  key: 'auth',
+  key: "auth",
   storage: AsyncStorage,
   whitelist: [
-  'token',
-  'isPinLoaded',
-  'isAuthenticated',
-  'user', 
-  'appDrawerMenuList',
-  'appBottomMenuList',
-  'appColorCode',
-  'accounts',
-  'locationLogs'
+    "token",
+    "isPinLoaded",
+    "isAuthenticated",
+    "user",
+    "appDrawerMenuList",
+    "appBottomMenuList",
+    "appColorCode",
+    "accounts",
+    "locationLogs",
   ],
 };
 
 const themePersistConfig = {
-  key: 'theme',
+  key: "theme",
   storage: AsyncStorage,
-  whitelist: ['mode', 'langcode'],
+  whitelist: ["mode", "langcode"],
 };
 
 const persistedAuthReducer = persistReducer(authPersistConfig, authReducer);
@@ -46,12 +46,11 @@ export const store = configureStore({
     page: pageReducer,
     syncLocation: syncLocationReducer,
     reloadApp: reloadAppReducer,
-
   },
-  middleware: getDefaultMiddleware =>
+  middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: {
-        ignoredActions: ['persist/PERSIST', 'persist/REHYDRATE'],
+        ignoredActions: ["persist/PERSIST", "persist/REHYDRATE"],
       },
     }),
 });

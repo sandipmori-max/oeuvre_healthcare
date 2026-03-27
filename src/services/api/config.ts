@@ -1,19 +1,28 @@
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import NetInfo from '@react-native-community/netinfo';
-import { Platform } from 'react-native';
+import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import NetInfo from "@react-native-community/netinfo";
+import { Platform } from "react-native";
 
 const ENV = {
   development: {
-    BASE_URL: Platform.OS === 'ios' ? 'https://support.deverp.net' : 'http://support.deverp.net',
+    BASE_URL:
+      Platform.OS === "ios"
+        ? "https://support.deverp.net"
+        : "http://support.deverp.net",
     TIMEOUT: 1800000,
   },
   staging: {
-    BASE_URL: Platform.OS === 'ios' ? 'https://support.deverp.net' : 'http://support.deverp.net',
+    BASE_URL:
+      Platform.OS === "ios"
+        ? "https://support.deverp.net"
+        : "http://support.deverp.net",
     TIMEOUT: 1800000,
   },
   production: {
-    BASE_URL: Platform.OS === 'ios' ? 'https://support.deverp.net' : 'http://support.deverp.net',
+    BASE_URL:
+      Platform.OS === "ios"
+        ? "https://support.deverp.net"
+        : "http://support.deverp.net",
     TIMEOUT: 1800000,
   },
 };
@@ -38,18 +47,18 @@ const apiClient: AxiosInstance = axios.create({
   baseURL: BASE_URL,
   timeout: TIMEOUT,
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
 });
 
 function unwrapString(value: any): any {
-  if (typeof value !== 'string') return value;
+  if (typeof value !== "string") return value;
 
   let current = value;
   while (true) {
     try {
       const parsed = JSON.parse(current);
-      if (typeof parsed === 'string') {
+      if (typeof parsed === "string") {
         current = parsed;
       } else {
         return parsed;
@@ -63,10 +72,10 @@ function unwrapString(value: any): any {
 function deepClean(obj: any): any {
   if (Array.isArray(obj)) {
     return obj.map(deepClean);
-  } else if (obj !== null && typeof obj === 'object') {
+  } else if (obj !== null && typeof obj === "object") {
     const cleaned: any = {};
     for (const key in obj) {
-      if (['Data', 'footer'].includes(key)) {
+      if (["Data", "footer"].includes(key)) {
         cleaned[key] = String(obj[key]);
       } else {
         cleaned[key] = deepClean(obj[key]);
@@ -83,12 +92,12 @@ apiClient.interceptors.request.use(
     const state = await NetInfo.fetch();
     if (!state.isConnected) {
       return Promise.reject({
-        message: 'No internet connection',
+        message: "No internet connection",
         statusCode: 0,
       });
     }
 
-    const token = await AsyncStorage.getItem('erp_token');
+    const token = await AsyncStorage.getItem("erp_token");
     if (token) {
       config.headers = {
         ...config.headers,
@@ -98,7 +107,7 @@ apiClient.interceptors.request.use(
 
     return config;
   },
-  error => Promise.reject(error),
+  (error) => Promise.reject(error),
 );
 apiClient.interceptors.response.use(
   (response: AxiosResponse<ApiResponse>) => {
@@ -107,24 +116,24 @@ apiClient.interceptors.response.use(
         let raw = response?.data?.d;
         let parsedData: any;
         try {
-          if (typeof raw === 'string') {
-            let sanitized = raw.replace(/[\u0000-\u001F]+/g, '');
-            sanitized = sanitized.replace(/^\uFEFF/, '');
+          if (typeof raw === "string") {
+            let sanitized = raw.replace(/[\u0000-\u001F]+/g, "");
+            sanitized = sanitized.replace(/^\uFEFF/, "");
             sanitized = sanitized.replace(/\\"/g, '"');
-            sanitized = sanitized.replace(/\\\\n/g, '');
-            sanitized = sanitized.replace(/\\\\/g, '');
+            sanitized = sanitized.replace(/\\\\n/g, "");
+            sanitized = sanitized.replace(/\\\\/g, "");
             parsedData = JSON.parse(sanitized);
-          } else if (typeof raw === 'object') {
+          } else if (typeof raw === "object") {
             parsedData = raw;
           } else {
-            throw new Error('Unsupported response format');
+            throw new Error("Unsupported response format");
           }
         } catch (error) {
-          if (typeof raw === 'string' && raw.includes(',')) {
-            const [successPart, ...msgParts] = raw.split(',');
+          if (typeof raw === "string" && raw.includes(",")) {
+            const [successPart, ...msgParts] = raw.split(",");
             parsedData = {
               success: successPart.trim(),
-              message: msgParts.join(',').trim(),
+              message: msgParts.join(",").trim(),
             };
           } else {
             parsedData = { message: raw };
@@ -133,14 +142,14 @@ apiClient.interceptors.response.use(
 
         const cleanedData = deepClean(parsedData);
 
-        if (String(cleanedData.success) !== '0') {
+        if (String(cleanedData.success) !== "0") {
           return {
             ...response,
             data: cleanedData,
           };
         } else {
           return Promise.reject({
-            message: cleanedData.message || 'API request failed',
+            message: cleanedData.message || "API request failed",
             statusCode: response.status,
             data: cleanedData,
           });
@@ -149,27 +158,27 @@ apiClient.interceptors.response.use(
       return response;
     } catch (err) {
       return Promise.reject({
-        message: 'Invalid response format',
+        message: "Invalid response format",
         statusCode: response.status,
         data: response.data,
       });
     }
   },
-  error => {
+  (error) => {
     if (error.response) {
       return Promise.reject({
-        message: error.response.data?.message || 'API error occurred',
+        message: error.response.data?.message || "API error occurred",
         statusCode: error.response.status,
         data: error.response.data,
       });
     } else if (error.request) {
       return Promise.reject({
-        message: 'No response from server',
+        message: "No response from server",
         statusCode: 0,
       });
     } else {
       return Promise.reject({
-        message: error.message || 'Unknown error occurred',
+        message: error.message || "Unknown error occurred",
         statusCode: 0,
       });
     }
@@ -177,5 +186,3 @@ apiClient.interceptors.response.use(
 );
 
 export default apiClient;
-
-

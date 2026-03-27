@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from "react";
 import {
   View,
   Keyboard,
@@ -11,35 +11,38 @@ import {
   Animated,
   Dimensions,
   ImageBackground,
-} from 'react-native';
-import DeviceInfo from 'react-native-device-info';
+  useWindowDimensions,
+} from "react-native";
+import DeviceInfo from "react-native-device-info";
 
-import { useAppDispatch, useAppSelector } from '../../../store/hooks';
-import {  getERPAppConfigMenuThunk, loginUserThunk } from '../../../store/slices/auth/thunk';
-import CustomAlert from '../../../components/alert/CustomAlert';
-import useTranslations from '../../../hooks/useTranslations';
-import { styles } from './login_style';
-import LoginHeader from './components/LoginHeader';
-import LoginForm from './components/LoginForm';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { ERP_COLOR_CODE } from '../../../utils/constants';
-import { setReloadApp } from '../../../store/slices/reloadApp/reloadAppSlice';
-import { ERP_GIF } from '../../../assets';
+import { useAppDispatch, useAppSelector } from "../../../store/hooks";
+import { getERPAppConfigMenuThunk, loginUserThunk } from "../../../store/slices/auth/thunk";
+import CustomAlert from "../../../components/alert/CustomAlert";
+import useTranslations from "../../../hooks/useTranslations";
+import { styles } from "./login_style";
+import LoginHeader from "./components/LoginHeader";
+import LoginForm from "./components/LoginForm";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { ERP_COLOR_CODE } from "../../../utils/constants";
+import { setReloadApp } from "../../../store/slices/reloadApp/reloadAppSlice";
+import { ERP_GIF } from "../../../assets";
 
 const LoginScreen = ({ navigation, route }: any) => {
   const { t } = useTranslations();
   const dispatch = useAppDispatch();
+  const { height, width } = useWindowDimensions();
+  const isLandscape = width > height;
 
   const isAddingAccount = route?.params?.isAddingAccount || false;
-  const { isLoading } = useAppSelector(state => state.auth);
-  const theme = useAppSelector(state => state?.theme.mode);
+  const { isLoading } = useAppSelector((state) => state.auth);
+  const theme = useAppSelector((state) => state?.theme.mode);
 
-  const [deviceId, setDeviceId] = useState<string>('');
+  const [deviceId, setDeviceId] = useState<string>("");
   const [alertVisible, setAlertVisible] = useState(false);
   const [alertConfig, setAlertConfig] = useState({
-    title: '',
-    message: '',
-    type: 'info' as 'error' | 'success' | 'info',
+    title: "",
+    message: "",
+    type: "info" as "error" | "success" | "info",
   });
   const [keyboardHeight, setKeyboardHeight] = useState(0);
 
@@ -47,14 +50,14 @@ const LoginScreen = ({ navigation, route }: any) => {
     const fetchDeviceName = async () => {
       const name = await DeviceInfo.getDeviceName();
       setDeviceId(name);
-      AsyncStorage.setItem('device', name);
+      AsyncStorage.setItem("device", name);
     };
     fetchDeviceName();
 
-    const keyboardDidShow = Keyboard.addListener('keyboardDidShow', e => {
+    const keyboardDidShow = Keyboard.addListener("keyboardDidShow", (e) => {
       setKeyboardHeight(e.endCoordinates.height + 10);
     });
-    const keyboardDidHide = Keyboard.addListener('keyboardDidHide', () => {
+    const keyboardDidHide = Keyboard.addListener("keyboardDidHide", () => {
       setKeyboardHeight(0);
     });
 
@@ -64,7 +67,7 @@ const LoginScreen = ({ navigation, route }: any) => {
     };
   }, []);
 
-  const handlePersistAfterLogin = async (
+ const handlePersistAfterLogin = async (
     company_code: string,
     password: string,
     user_credentials: { user: string; name?: string },
@@ -90,7 +93,7 @@ const LoginScreen = ({ navigation, route }: any) => {
   const showAlert = (config: {
     title: string;
     message: string;
-    type: 'error' | 'success' | 'info';
+    type: "error" | "success" | "info";
   }) => {
     setAlertConfig(config);
     setAlertVisible(true);
@@ -116,18 +119,18 @@ const LoginScreen = ({ navigation, route }: any) => {
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <KeyboardAvoidingView
         style={{ flex: 1, backgroundColor: ERP_COLOR_CODE.ERP_WHITE }}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
         <ImageBackground
-          source={theme === 'dark'  ? "" :ERP_GIF.BACK_IMG}
+          source={theme === "dark" ? "" : ERP_GIF.BACK_IMG}
           style={{
-            height: Dimensions.get('screen').height,
-            width: Dimensions.get('screen').width
+            height: Dimensions.get("screen").height,
+            width: Dimensions.get("screen").width,
           }}
-          resizeMode='cover'
+          resizeMode="cover"
         >
           <FlatList
-            data={['']}
+            data={[""]}
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"
             contentContainerStyle={{
@@ -136,52 +139,102 @@ const LoginScreen = ({ navigation, route }: any) => {
             }}
             renderItem={() => (
               <>
-                <View style={styles.formContainer}>
-                  <LoginHeader isAddingAccount={isAddingAccount} t={t} />
-                  <LoginForm
-                    deviceId={deviceId}
-                    isAddingAccount={isAddingAccount}
-                    isLoading={isLoading}
-                    onLoginSuccess={handlePersistAfterLogin}
-                    showAlert={showAlert}
-                  />
-                  {isAddingAccount && (
-                    <Animated.View
-                      style={{
-                        transform: [
-
-                          { scale: pressAnim },
-                        ],
-                      }}
-                    >
-                      <TouchableOpacity
-                        style={styles.cancelButton}
-                        onPress={() => navigation.goBack()}
-                        activeOpacity={0.8}
-                        onPressIn={onPressIn}
-                        onPressOut={onPressOut}
+                <View
+                  style={[
+                    styles.formContainer,
+                    isLandscape && {
+                      marginTop: 0,
+                      paddingHorizontal: 0,
+                      padding: 0,
+                    },
+                  ]}
+                >
+                  {isLandscape ? (
+                    <>
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          alignContent: "center",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
                       >
-                        <Text style={styles.cancelButtonText}>{t('auth.cancel')}</Text>
-                      </TouchableOpacity>
-                    </Animated.View>
+                        <View
+                          style={{
+                            left: -40,
+                            width: "40%",
+                          }}
+                        >
+                          <LoginHeader
+                            isAddingAccount={isAddingAccount}
+                            t={t}
+                          />
+                        </View>
+
+                        <View
+                          style={{
+                            width: "35%",
+                            top: 24,
+                            left: -20,
+                            right: 10,
+                          }}
+                        >
+                          <LoginForm
+                            deviceId={deviceId}
+                            isAddingAccount={isAddingAccount}
+                            isLoading={isLoading}
+                            onLoginSuccess={handlePersistAfterLogin}
+                            showAlert={showAlert}
+                          />
+                        </View>
+                      </View>
+                    </>
+                  ) : (
+                    <View>
+                      <LoginHeader isAddingAccount={isAddingAccount} t={t} />
+                      <LoginForm
+                        deviceId={deviceId}
+                        isAddingAccount={isAddingAccount}
+                        isLoading={isLoading}
+                        onLoginSuccess={handlePersistAfterLogin}
+                        showAlert={showAlert}
+                      />
+                      {isAddingAccount && (
+                        <Animated.View
+                          style={{
+                            transform: [{ scale: pressAnim }],
+                          }}
+                        >
+                          <TouchableOpacity
+                            style={styles.cancelButton}
+                            onPress={() => navigation.goBack()}
+                            activeOpacity={0.8}
+                            onPressIn={onPressIn}
+                            onPressOut={onPressOut}
+                          >
+                            <Text style={styles.cancelButtonText}>
+                              {t("auth.cancel")}
+                            </Text>
+                          </TouchableOpacity>
+                        </Animated.View>
+                      )}
+                    </View>
                   )}
                 </View>
-
-                <CustomAlert
-                  visible={alertVisible}
-                  title={alertConfig.title}
-                  message={alertConfig.message}
-                  type={alertConfig.type}
-                  onClose={() => setAlertVisible(false)}
-                  actionLoader={undefined} 
-                  closeHide={undefined}                
-                />
               </>
             )}
             keyExtractor={(item, index) => index.toString()}
           />
         </ImageBackground>
-
+        <CustomAlert
+          visible={alertVisible}
+          title={alertConfig.title}
+          message={alertConfig.message}
+          type={alertConfig.type}
+          onClose={() => setAlertVisible(false)}
+          actionLoader={undefined}
+          closeHide={undefined}
+        />
       </KeyboardAvoidingView>
     </TouchableWithoutFeedback>
   );

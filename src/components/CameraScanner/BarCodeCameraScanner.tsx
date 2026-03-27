@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   BackHandler,
   StyleSheet,
+  useWindowDimensions,
 } from "react-native";
 
 import { styles } from "./CameraScanner.styles";
@@ -31,6 +32,7 @@ import {
 
 import MaterialIcons from "@react-native-vector-icons/material-icons";
 import { useTranslation } from "react-i18next";
+import { ui } from "./style";
 
 export const BarCodeCameraScanner = ({
   setIsCameraShown,
@@ -41,7 +43,8 @@ export const BarCodeCameraScanner = ({
   const camera = useRef<Camera>(null);
   const isFocused = useIsFocused();
   const { appState } = useAppStateListener();
-
+const { height, width } = useWindowDimensions();  
+  const isLandscape = width > height;
   const [isCameraInitialized, setIsCameraInitialized] = useState(isIos);
   const [isActive, setIsActive] = useState(isIos);
   const [flash, setFlash] = useState<"on" | "off">(isIos ? "off" : "on");
@@ -112,8 +115,8 @@ export const BarCodeCameraScanner = ({
   if (!isFocused) return null;
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <Modal presentationStyle="fullScreen" animationType="slide">
+    <SafeAreaView style={styles.safeArea} >
+      <Modal presentationStyle="fullScreen" supportedOrientations={["portrait", "landscape"]}animationType="slide">
         <View style={{ flex: 1 }}>
 
           {/* CAMERA */}
@@ -173,42 +176,3 @@ export const BarCodeCameraScanner = ({
     </SafeAreaView>
   );
 };
-
-const ui = StyleSheet.create({
-  backButton: {
-    position: "absolute",
-    top: 40,
-    left: 20,
-    zIndex: 10,
-    padding: 6,
-  },
-
-  descriptionBox: {
-    position: "absolute",
-    top: 90,
-    width: "100%",
-    paddingHorizontal: 20,
-    zIndex: 10,
-  },
-  descriptionText: {
-    color: "#fff",
-    fontSize: 16,
-    backgroundColor: "rgba(0,0,0,0.45)",
-    padding: 10,
-    borderRadius: 6,
-  },
-
-  bottomPanel: {
-    position: "absolute",
-    bottom: 0,
-    width: "100%",
-    paddingVertical: 18,
-    alignItems: "center",
-    backgroundColor: "rgba(0,0,0,0.6)",
-  },
-  bottomText: {
-    color: "#fff",
-    fontSize: 16,
-    opacity: 0.8,
-  },
-});

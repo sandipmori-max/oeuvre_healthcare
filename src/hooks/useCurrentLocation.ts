@@ -54,7 +54,6 @@ export const useCurrentAddress = () => {
     setLoading(false);
   },
   (err) => {
-    console.log("GPS failed → fallback network");
 
     // ⭐ fallback network
     Geolocation.getCurrentPosition(

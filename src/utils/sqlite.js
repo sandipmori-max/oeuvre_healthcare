@@ -426,3 +426,57 @@ export const removePinCode = async (db) => {
   } catch (error) {
   }
 };
+
+const ERP_QUERY_TAP_COUNT_TABLE_CREATE = `
+  CREATE TABLE IF NOT EXISTS erp_menu_taps (
+    id TEXT NOT NULL,
+    userId TEXT NOT NULL,
+    tapCount INTEGER DEFAULT 0,
+    PRIMARY KEY (id, userId)
+  );
+`;
+
+export const createTapCountTable = async (db) => {
+  try {
+    await db.executeSql(ERP_QUERY_TAP_COUNT_TABLE_CREATE);
+  } catch (error) {}
+};
+
+export const increaseTapCount = async (db, id, userId) => {
+  try {
+    await db.executeSql(
+      `INSERT INTO erp_menu_taps (id, userId, tapCount)
+       VALUES (?, ?, 1)
+       ON CONFLICT(id, userId)
+       DO UPDATE SET tapCount = tapCount + 1`,
+      [id, userId]
+    );
+
+  } catch (error) {
+    console.log("error --------  ", error)
+  }
+};
+
+export const getTopTappedMenus = async (db, userId) => {
+  try {
+    const results = await db.executeSql(
+      `SELECT * FROM erp_menu_taps
+       WHERE userId = ?
+       ORDER BY tapCount DESC`,
+      [userId]
+    );
+
+    const rows = results[0].rows;
+    const taps = {};
+
+    for (let i = 0; i < rows.length; i++) {
+      const row = rows.item(i);
+      taps[row.id] = row.tapCount;
+    }
+
+    return taps;
+
+  } catch (error) {
+    return {};
+  }
+};

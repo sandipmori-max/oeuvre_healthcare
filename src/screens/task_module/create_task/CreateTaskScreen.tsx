@@ -8,6 +8,7 @@ import {
   Modal,
   ScrollView,
   StyleSheet,
+  useWindowDimensions,
 } from 'react-native';
 import DateTimePicker from 'react-native-modal-datetime-picker';
 import { ERP_COLOR_CODE } from '../../../utils/constants';
@@ -22,7 +23,8 @@ const dummyUsers = [
 const CreateTaskScreen = ({ onCreate }) => {
   const [title, setTitle] = useState('');
   const [desc, setDesc] = useState('');
-
+const { height, width } = useWindowDimensions();  
+  const isLandscape = width > height;
   // dropdown
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const [assignedTo, setAssignedTo] = useState<string[]>([]);
@@ -117,7 +119,7 @@ const CreateTaskScreen = ({ onCreate }) => {
       </View>
 
       {/* Dropdown Modal */}
-      <Modal visible={dropdownVisible} transparent animationType="slide">
+      <Modal visible={dropdownVisible} supportedOrientations={["portrait", "landscape"]} transparent animationType="slide">
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             {/* Modal Header */}

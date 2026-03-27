@@ -2,7 +2,7 @@ export interface PaginationParams {
   page?: number;
   limit?: number;
   sortBy?: string;
-  sortOrder?: 'asc' | 'desc';
+  sortOrder?: "asc" | "desc";
 }
 
 export interface PaginatedResponse<T> {
@@ -171,7 +171,7 @@ export interface AttendanceRecord {
   checkIn?: string;
   checkOut?: string;
   totalHours?: number;
-  status: 'present' | 'absent' | 'late' | 'half-day';
+  status: "present" | "absent" | "late" | "half-day";
   location?: {
     latitude: number;
     longitude: number;
@@ -213,7 +213,7 @@ export interface AppSettings {
     locationSharing: boolean;
     dataCollection: boolean;
   };
-  theme: 'light' | 'dark' | 'auto';
+  theme: "light" | "dark" | "auto";
   language: string;
 }
 
@@ -245,4 +245,3 @@ export interface AttendanceResponse {
   message?: string;
   data?: any;
 }
-

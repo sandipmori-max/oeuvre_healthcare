@@ -1,5 +1,5 @@
-import MaterialIcons from '@react-native-vector-icons/material-icons';
-import React, { useRef, useState } from 'react';
+import MaterialIcons from "@react-native-vector-icons/material-icons";
+import React, { useRef, useState } from "react";
 import {
   View,
   Text,
@@ -10,22 +10,31 @@ import {
   Dimensions,
   Image,
   TouchableWithoutFeedback,
-} from 'react-native';
-import SignatureScreen, { SignatureViewRef } from 'react-native-signature-canvas';
-import { ERP_COLOR_CODE } from '../../../../utils/constants';
-import { useBaseLink } from '../../../../hooks/useBaseLink';
-import { useAppSelector } from '../../../../store/hooks';
-import useTranslations from '../../../../hooks/useTranslations';
- 
-const SignaturePad: React.FC = ({isValidate, item, handleSignatureAttachment, infoData }: any) => {
+  useWindowDimensions,
+} from "react-native";
+import SignatureScreen, {
+  SignatureViewRef,
+} from "react-native-signature-canvas";
+import { ERP_COLOR_CODE } from "../../../../utils/constants";
+import { useBaseLink } from "../../../../hooks/useBaseLink";
+import { useAppSelector } from "../../../../store/hooks";
+import useTranslations from "../../../../hooks/useTranslations";
+
+const SignaturePad: React.FC = ({
+  isValidate,
+  item,
+  handleSignatureAttachment,
+  infoData,
+}: any) => {
   const signatureRef = useRef<SignatureViewRef>(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [savedSignature, setSavedSignature] = useState<string | null>(null);
   const baseLink = useBaseLink();
   const [cacheBuster, setCacheBuster] = useState(Date.now());
-  const theme = useAppSelector(state => state?.theme.mode);
-   const { t } = useTranslations();
-
+  const theme = useAppSelector((state) => state?.theme.mode);
+  const { t } = useTranslations();
+const { height, width } = useWindowDimensions();  
+  const isLandscape = width > height;
   const handleSignature = (signature: string) => {
     setSavedSignature(signature);
     handleSignatureAttachment(`${item?.field}.jpeg; ${signature}`, item?.field);
@@ -49,29 +58,42 @@ const SignaturePad: React.FC = ({isValidate, item, handleSignatureAttachment, in
   };
 
   return (
-    <View style={[styles.container, theme === 'dark' && {backgroundColor : 'black'}]}>
-      <Text style={[
-        theme === 'dark' && {
-          color:'white'
-        },
-        { marginVertical: 8, fontWeight: '600' }]}>{item?.fieldtitle}</Text>
+    <View
+      style={[
+        styles.container,
+        theme === "dark" && { backgroundColor: "black" },
+      ]}
+    >
+      <Text
+        style={[
+          theme === "dark" && {
+            color: "white",
+          },
+          { marginVertical: 8, fontWeight: "600" },
+        ]}
+      >
+        {item?.fieldtitle}
+      </Text>
 
       <View
         style={{
-          justifyContent: 'space-between',
-          flexDirection: 'row',
-          width: '100%',
+          justifyContent: "space-between",
+          flexDirection: "row",
+          width: "100%",
           padding: 4,
           borderWidth: 1,
           borderRadius: 8,
           borderColor: ERP_COLOR_CODE.ERP_BORDER_LINE,
-          backgroundColor: 'white'
+          backgroundColor: "white",
         }}
       >
-        <View>
-        </View>
-        <View style={{ height: 100, width: 100 , backgroundColor: 'white'}}>
-          <Image source={{ uri: getImageUri() }} style={styles.imageThumb} resizeMode="contain" />
+        <View></View>
+        <View style={{ height: 100, width: 100, backgroundColor: "white" }}>
+          <Image
+            source={{ uri: getImageUri() }}
+            style={styles.imageThumb}
+            resizeMode="contain"
+          />
         </View>
         <TouchableOpacity onPress={() => setModalVisible(true)}>
           <MaterialIcons name="edit" size={18} color="#000" />
@@ -81,6 +103,7 @@ const SignaturePad: React.FC = ({isValidate, item, handleSignatureAttachment, in
       <Modal
         animationType="slide"
         transparent
+        supportedOrientations={["portrait", "landscape"]}
         visible={modalVisible}
         onRequestClose={() => setModalVisible(false)}
       >
@@ -88,36 +111,71 @@ const SignaturePad: React.FC = ({isValidate, item, handleSignatureAttachment, in
           <View style={styles.overlay} />
         </TouchableWithoutFeedback>
 
-        <View style={[styles.bottomSheet, theme === 'dark' && {
-            borderWidth: 1,
-            borderColor: 'white',
-            backgroundColor:'black'
-          }]}>
+        <View
+          style={[
+            styles.bottomSheet,
+            theme === "dark" && {
+              borderWidth: 1,
+              borderColor: "white",
+              backgroundColor: "black",
+            },
+          ]}
+        >
           <View style={styles.modalHeader}>
-            <Text style={[styles.modalTitle, theme ==='dark' && {
-              color:'white'
-            }]}>{t("text.text39")}</Text>
+            <Text
+              style={[
+                styles.modalTitle,
+                theme === "dark" && {
+                  color: "white",
+                },
+              ]}
+            >
+              {t("text.text39")}
+            </Text>
             <View style={styles.buttonOverlay}>
-              <TouchableOpacity style={[styles.button, styles.saveButton]} onPress={handleSave}>
-                <MaterialIcons name="save" size={18} color={theme ==='dark' ? 'white' : 'black'} />
+              <TouchableOpacity
+                style={[styles.button, styles.saveButton]}
+                onPress={handleSave}
+              >
+                <MaterialIcons
+                  name="save"
+                  size={18}
+                  color={theme === "dark" ? "white" : "black"}
+                />
               </TouchableOpacity>
 
-              <TouchableOpacity style={[styles.button, styles.clearButton]} onPress={handleClear}>
-                <MaterialIcons name="auto-fix-high" size={18} color={theme ==='dark' ? 'white' : 'black'} />
+              <TouchableOpacity
+                style={[styles.button, styles.clearButton]}
+                onPress={handleClear}
+              >
+                <MaterialIcons
+                  name="auto-fix-high"
+                  size={18}
+                  color={theme === "dark" ? "white" : "black"}
+                />
               </TouchableOpacity>
 
               <TouchableOpacity
                 style={[styles.button, styles.closeButton]}
                 onPress={() => setModalVisible(false)}
               >
-                <MaterialIcons name="close" size={18} color={theme ==='dark' ? 'white' : 'black'} />
+                <MaterialIcons
+                  name="close"
+                  size={18}
+                  color={theme === "dark" ? "white" : "black"}
+                />
               </TouchableOpacity>
             </View>
           </View>
 
-          <View style={[styles.signatureBox, {
-            backgroundColor:'white'
-          }]}>
+          <View
+            style={[
+              styles.signatureBox,
+              {
+                backgroundColor: "white",
+              },
+            ]}
+          >
             <SignatureScreen
               ref={signatureRef}
               onOK={handleSignature}
@@ -153,22 +211,22 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   openButton: {
-    flexDirection: 'row',
-    width: '100%',
+    flexDirection: "row",
+    width: "100%",
     height: 38,
-    alignItems: 'center',
+    alignItems: "center",
     paddingHorizontal: 16,
     borderWidth: 0.5,
     borderRadius: 8,
-    justifyContent: 'center',
+    justifyContent: "center",
   },
   openButtonText: {
     fontSize: 14,
     marginLeft: 6,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   savedSignatureContainer: {
-    width: '100%',
+    width: "100%",
     padding: 8,
     borderWidth: 1,
     borderColor: ERP_COLOR_CODE.ERP_BORDER_LINE,
@@ -176,24 +234,24 @@ const styles = StyleSheet.create({
   },
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: "rgba(0,0,0,0.5)",
   },
   bottomSheet: {
-    height: Dimensions.get('window').height / 2.5,
+    height: Dimensions.get("window").height / 2.5,
     backgroundColor: ERP_COLOR_CODE.ERP_WHITE,
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
     padding: 16,
   },
   modalHeader: {
-    flexDirection: 'row',
+    flexDirection: "row",
     marginBottom: 10,
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   modalTitle: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   signatureBox: {
     flex: 1,
@@ -202,13 +260,13 @@ const styles = StyleSheet.create({
     backgroundColor: ERP_COLOR_CODE.ERP_WHITE,
   },
   buttonOverlay: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 8,
-    justifyContent: 'space-around',
+    justifyContent: "space-around",
   },
   button: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingVertical: 8,
     paddingHorizontal: 8,
     borderRadius: 8,

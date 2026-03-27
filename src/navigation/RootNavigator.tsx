@@ -10,6 +10,7 @@ import {
   Text,
   TouchableOpacity,
   StyleSheet,
+  useWindowDimensions,
 } from "react-native";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { checkAuthStateThunk, getERPAppConfigMenuThunk } from "../store/slices/auth/thunk";
@@ -81,7 +82,8 @@ const RootNavigator = () => {
     PERMISSION_DENIED: t("text1"),
     SERVICE_DISABLED: t("text2"),
   };
-
+const { height, width } = useWindowDimensions();  
+  const isLandscape = width > height;
   const { isLoading, isAuthenticated, accounts, user, appColorCode } =
     useAppSelector((state) => state.auth);
   const { reLoading } = useAppSelector((state) => state.reloadApp);
@@ -157,7 +159,7 @@ const RootNavigator = () => {
       } catch (error) {
         dispatch(updateAttendanceState(false));
 
-        console.log(error);
+        console.log("error======", error);
       }
     }, 1000);
 
@@ -170,6 +172,13 @@ const RootNavigator = () => {
     };
   }, [isAuthenticated, reLoading]);
   const app_id = user?.app_id;
+
+
+   useEffect(() => {
+    if(isAuthenticated){
+      dispatch(getERPAppConfigMenuThunk());
+    }
+  }, [isAuthenticated])
 
   useEffect(() => {
     const fetchDeviceName = async () => {
@@ -215,7 +224,7 @@ const RootNavigator = () => {
         } catch (error) {
           dispatch(updateAttendanceState(false));
 
-          console.log(error);
+          console.log("error*******", error);
         }
       }
       appState.current = nextAppState;
@@ -318,12 +327,6 @@ const RootNavigator = () => {
     };
   }, []);
 
-  useEffect(() => {
-    if(isAuthenticated){
-      dispatch(getERPAppConfigMenuThunk());
-    }
-  }, [isAuthenticated])
-
   // ------------------------- Focus -------------------------
   useEffect(() => {
     if (isAuthenticated) {
@@ -359,7 +362,7 @@ const RootNavigator = () => {
         } catch (error) {
           dispatch(updateAttendanceState(false));
 
-          console.log(error);
+          console.log("error//////", error);
         }
       }, 2500);
       // Cleanup to avoid memory leaks
@@ -388,9 +391,14 @@ const RootNavigator = () => {
         />
       )}
       {isAuthenticated && (
-        <Modal visible={backgroundDeniedModal} transparent>
-          <View style={styles.overlay}>
-            <View style={styles.modalContainer}>
+        <Modal visible={backgroundDeniedModal} supportedOrientations={["portrait", "landscape"]} transparent>
+          <View style={[styles.overlay,isLandscape && {
+                          alignContent:'center',
+                          alignItems:'center'
+                        }]}>
+            <View style={[styles.modalContainer, {
+              
+            }]}>
               <Text style={styles.title}>{t("test21")}</Text>
               <Text style={styles.message}>{t("test22")}</Text>
               <TouchableOpacity

@@ -13,7 +13,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var reactNativeFactory: RCTReactNativeFactory?
 
     // MARK: - Orientation control
-    var allowRotation: Bool = false // default portrait
+    var allowRotation: Bool = true // default portrait
 
     // MARK: - App Launch
     func application(

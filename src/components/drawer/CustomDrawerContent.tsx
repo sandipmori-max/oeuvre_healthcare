@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -6,44 +6,49 @@ import {
   ScrollView,
   Image,
   Animated,
-} from 'react-native';
+  useWindowDimensions,
+} from "react-native";
 import {
   DrawerContentComponentProps,
   DrawerContentScrollView,
   useDrawerStatus,
-} from '@react-navigation/drawer';
+} from "@react-navigation/drawer";
+import { useNavigation, useNavigationState } from "@react-navigation/native";
+import MaterialIcons from "@react-native-vector-icons/material-icons";
+import FastImage from "react-native-fast-image";
+
+import { useAppSelector } from "../../store/hooks";
 import {
-  useNavigation,
-  useNavigationState,
-} from '@react-navigation/native';
-import MaterialIcons from '@react-native-vector-icons/material-icons';
-import FastImage from 'react-native-fast-image';
+  firstLetterUpperCase,
+  handleEmailPress,
+  handlePhonePress,
+} from "../../utils/helpers";
+import { ERP_DRAWER_LIST } from "../../constants";
+import { styles } from "./drawer_style";
+import { useBaseLink } from "../../hooks/useBaseLink";
+import { DARK_COLOR, ERP_COLOR_CODE } from "../../utils/constants";
+import ContactRow from "./ContactRow";
+import ImageBottomSheetModal from "../bottomsheet/ImageBottomSheetModal";
+import { useTranslation } from "react-i18next";
+import TranslatedText from "../../screens/dashboard/tabs/home/TranslatedText";
+import InAppReview from "react-native-in-app-review";
+import AboutBottomSheet from "./AboutBottomSheet";
+import { ERP_ICON } from "../../assets";
 
-import { useAppSelector } from '../../store/hooks';
-import { firstLetterUpperCase, handleEmailPress, handlePhonePress } from '../../utils/helpers';
-import { ERP_DRAWER_LIST } from '../../constants';
-import { styles } from './drawer_style';
-import { useBaseLink } from '../../hooks/useBaseLink';
-import { DARK_COLOR, ERP_COLOR_CODE } from '../../utils/constants';
-import ContactRow from './ContactRow';
-import ImageBottomSheetModal from '../bottomsheet/ImageBottomSheetModal';
-import { NativeModules } from 'react-native';
-import { useTranslation } from 'react-i18next';
-import TranslatedText from '../../screens/dashboard/tabs/home/TranslatedText';
-
-const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
+const CustomDrawerContent: React.FC<DrawerContentComponentProps> = (props) => {
   const navigation = useNavigation();
-  const {t} = useTranslation();
+  const [showAbout, setShowAbout] = useState(false);
+  const { t } = useTranslation();
   const drawerStatus = useDrawerStatus();
   const [showModal, setShowModal] = useState(false);
-  const [img, setImg] = useState('')
-
-  const { user } = useAppSelector(state => state.auth);
-  const theme = useAppSelector(state => state.theme.mode);
+  const [img, setImg] = useState("");
+  const { height, width } = useWindowDimensions();
+  const isLandscape = width > height;
+  const { user } = useAppSelector((state) => state.auth);
+  const theme = useAppSelector((state) => state.theme.mode);
   const baseLink = useBaseLink();
-
   /* ================= SAFE CURRENT ROUTE ================= */
-  const currentRoute = useNavigationState(state => {
+  const currentRoute = useNavigationState((state) => {
     const route = state.routes[state.index];
     return route?.name;
   });
@@ -62,10 +67,10 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
 
   /* ================= RUN ON EVERY DRAWER OPEN ================= */
   useEffect(() => {
-    if (drawerStatus !== 'open') return;
+    if (drawerStatus !== "open") return;
 
     // reset menu items
-    menuAnim.forEach(anim => anim.setValue(-40));
+    menuAnim.forEach((anim) => anim.setValue(-40));
 
     // reset footer
     footerTranslateY.setValue(40);
@@ -92,7 +97,7 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
     // menu animation (left → right)
     Animated.stagger(
       70,
-      menuAnim.map(anim =>
+      menuAnim.map((anim) =>
         Animated.timing(anim, {
           toValue: 0,
           duration: 800,
@@ -115,6 +120,19 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
       }),
     ]).start();
   }, [drawerStatus]);
+  const [imageExists, setImageExists] = useState(true);
+
+  const handleReview = async () => {
+    try {
+      if (InAppReview.isAvailable()) {
+        await InAppReview.RequestInAppReview();
+      } else {
+        console.log("Not supported");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <DrawerContentScrollView
@@ -122,90 +140,121 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
       {...props}
       contentContainerStyle={{
         flexGrow: 1,
-        backgroundColor: theme === 'dark' ? DARK_COLOR : 'white',
+        backgroundColor: theme === "dark" ? DARK_COLOR : "white",
       }}
     >
-
       {/* ================= HEADER ================= */}
       <Animated.View
         style={{
-          minWidth: '100%',
+          minWidth: "100%",
           transform: [{ translateY: headerTranslateY }],
           opacity: headerOpacity,
         }}
       >
         <View
-         style={[
+          style={[
             styles.header,
-            theme === 'dark' && { backgroundColor: 'black' },
+            theme === "dark" && { backgroundColor: "black" },
           ]}
         >
           <View>
             <TouchableOpacity
-            onPress={() => {
-              setImg(`${baseLink}/FileUpload/1/UserMaster/${user?.id}/profileimage.jpeg?ts=${new Date().getTime()}`)
-              setShowModal(true)
-            }}
-          >
-            <FastImage
-              source={{
-                uri: `${baseLink}/FileUpload/1/UserMaster/${user?.id}/profileimage.jpeg?ts=${new Date().getTime()}`,
-                priority: FastImage.priority.normal,
-                cache: FastImage.cacheControl.web,
+              onPress={() => {
+                if (!imageExists) {
+                  return;
+                }
+                setImg(
+                  `${baseLink}/FileUpload/1/UserMaster/${
+                    user?.id
+                  }/profileimage.jpeg?ts=${new Date().getTime()}`,
+                );
+                setShowModal(true);
               }}
-              style={styles.profileImage}
-            />
-          </TouchableOpacity>
+            >
+              <FastImage
+                source={{
+                  uri: `${baseLink}/FileUpload/1/UserMaster/${
+                    user?.id
+                  }/profileimage.jpeg?ts=${new Date().getTime()}`,
+                  priority: FastImage.priority.normal,
+                  cache: FastImage.cacheControl.web,
+                }}
+                style={styles.profileImage}
+                onLoad={() => {
+                  setImageExists(true);
+                }}
+                onError={() => {
+                  setImageExists(false);
+                }}
+              />
+            </TouchableOpacity>
           </View>
-
 
           <View style={{ height: 28, width: 100 }} />
 
-          <TranslatedText 
-          text={firstLetterUpperCase(user?.name || '')}
-          numberOfLines={1}
-          style={[styles.username, { top: 8, color: '#FFF' }]}>
-            
-          </TranslatedText>
+          <TranslatedText
+            text={firstLetterUpperCase(user?.name || "")}
+            numberOfLines={1}
+            style={[styles.username, { top: 8, color: "#FFF" }]}
+          ></TranslatedText>
 
           <View style={{ height: 8, width: 100 }} />
 
-          <View style={{ top: 4, width: '100%', marginVertical: 1 }}>
+          <View style={{ top: 4, width: "100%", marginVertical: 1 }}>
             {user?.mobileno && (
               <TouchableOpacity
                 onPress={() => {
-                  handlePhonePress(user.mobileno)
+                  handlePhonePress(user?.mobileno);
                 }}
-                style={{ flexDirection: 'row', alignItems: 'center', padding: 6 }}>
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  padding: 6,
+                }}
+              >
                 <MaterialIcons name="call" color="white" size={14} />
-                <TranslatedText 
-                text={user.mobileno}
-                numberOfLines={1}
-                style={styles.userPhone}></TranslatedText>
+                <TranslatedText
+                  text={user?.mobileno}
+                  numberOfLines={1}
+                  style={styles.userPhone}
+                ></TranslatedText>
               </TouchableOpacity>
             )}
 
             {user?.emailid && (
               <TouchableOpacity
                 onPress={() => {
-                  handleEmailPress(user.emailid)
+                  handleEmailPress(user?.emailid);
                 }}
-                style={{ flexDirection: 'row', alignItems: 'center', padding: 6 }}>
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  padding: 6,
+                }}
+              >
                 <MaterialIcons name="mail-outline" color="white" size={14} />
                 <TranslatedText
-                text= {user.emailid}
-                numberOfLines={1} style={styles.userPhone}>
-                </TranslatedText>
+                  text={user?.emailid}
+                  numberOfLines={1}
+                  style={styles.userPhone}
+                ></TranslatedText>
               </TouchableOpacity>
             )}
 
             {user?.rolename && (
-              <View style={{ flexDirection: 'row', alignItems: 'center', padding: 6 }}>
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  padding: 6,
+                }}
+              >
                 <MaterialIcons name="person" color="white" size={14} />
-                <TranslatedText 
-                numberOfLines={1}
-                text={user.rolename}
-                style={styles.userPhone}></TranslatedText>
+                <TranslatedText
+                  numberOfLines={1}
+                  text={user?.rolename}
+                  style={styles.userPhone}
+                ></TranslatedText>
               </View>
             )}
           </View>
@@ -213,10 +262,16 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
       </Animated.View>
 
       {/* ================= MENU ================= */}
-      <ScrollView
 
-        showsVerticalScrollIndicator={false}>
-        <View style={styles.menuContainer}>
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <View
+          style={[
+            !isLandscape && styles.menuContainer,
+            {
+              marginTop: isLandscape ? 45 : 5,
+            },
+          ]}
+        >
           {ERP_DRAWER_LIST.map((item, index) => {
             const isActive = currentRoute === item.route;
 
@@ -229,32 +284,41 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
                   style={[
                     styles.drawerItem,
                     isActive && styles.activeItemBackground,
-                    isActive && theme === 'dark' && { backgroundColor: 'black' },
+                    isActive &&
+                      theme === "dark" && { backgroundColor: "black" },
                   ]}
                   onPress={() => {
-                    if (item?.route === 'Alert') {
-                      props?.navigation.navigate('List', {
+                    if (item?.route === "AboutUs") {
+                      setShowAbout(true);
+                      return;
+                    }
+                    if (item?.route === "AppRatting") {
+                      handleReview();
+                      return;
+                    }
+                    if (item?.route === "Alert") {
+                      props?.navigation.navigate("List", {
                         item: {
-                          title: 'Notification',
-                          name: 'Notification',
-                          url: 'DEVNOTIFY',
+                          title: "Notification",
+                          name: "Notification",
+                          url: "DEVNOTIFY",
                           isFromBusinessCard: false,
                           isFromAlertCard: true,
-                          id: '0',
-                        }
+                          id: "0",
+                        },
                       });
                       props?.navigation.closeDrawer();
-                      return
+                      return;
                     }
-                    if (item?.route === 'List') {
-                      props?.navigation.navigate('List', {
+                    if (item?.route === "List") {
+                      props?.navigation.navigate("List", {
                         item: {
-                          title: 'Business Card',
-                          name: 'Business Card',
-                          url: 'BusinessCardMst',
+                          title: "Business Card",
+                          name: "Business Card",
+                          url: "BusinessCardMst",
                           isFromBusinessCard: true,
-                          id: '0',
-                        }
+                          id: "0",
+                        },
                       });
                       props?.navigation.closeDrawer();
                       return;
@@ -262,16 +326,18 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
                     if (item?.route === "Attendance") {
                       // NativeModules.OrientationModule.enableLandscape();
                       props?.navigation.closeDrawer();
-                      navigation.navigate(item?.route, { isFor: 'Attendance' });
+                      navigation.navigate(item?.route, { isFor: "Attendance" });
                       return;
                     }
                     if (item?.route === "MyAttendance") {
                       props?.navigation.closeDrawer();
-                      navigation.navigate(item?.route, { isFor: 'MyAttendance' });
+                      navigation.navigate(item?.route, {
+                        isFor: "MyAttendance",
+                      });
                       return;
                     }
-                    if (item?.route === 'Home') {
-                      props?.navigation.navigate('Home', { screen: 'Home' });
+                    if (item?.route === "Home") {
+                      props?.navigation.navigate("Home", { screen: "Home" });
                       props?.navigation.closeDrawer();
                       return;
                     } else {
@@ -285,11 +351,11 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
                       name={item.icon}
                       size={20}
                       color={
-                        theme === 'dark'
-                          ? '#FFF'
+                        theme === "dark"
+                          ? "#FFF"
                           : isActive
-                            ? '#FFF'
-                            : '#000'
+                          ? "#FFF"
+                          : ERP_COLOR_CODE.ERP_APP_COLOR
                       }
                     />
                     <TranslatedText
@@ -298,18 +364,16 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
                         isActive && styles.activeText,
                         {
                           color:
-                            theme === 'dark'
-                              ? 'white'
+                            theme === "dark"
+                              ? "white"
                               : isActive
-                                ? '#FFF'
-                                : '#000',
+                              ? "#FFF"
+                              : "#000",
                         },
                       ]}
                       numberOfLines={1}
                       text={item.label}
-                    >
-                      
-                    </TranslatedText>
+                    ></TranslatedText>
                   </View>
                 </TouchableOpacity>
               </Animated.View>
@@ -323,6 +387,12 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
         onClose={() => setShowModal(false)}
         imageUrl={img}
       />
+
+      <AboutBottomSheet
+        visible={showAbout}
+        onClose={() => setShowAbout(false)}
+      />
+
       {/* ================= FOOTER ================= */}
       <Animated.View
         style={{
@@ -330,10 +400,10 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
           opacity: footerOpacity,
         }}
       >
-        <View style={{ alignItems: 'center', marginBottom: 0 }}>
+        <View style={{ alignItems: "center", marginBottom: 0 }}>
           <Image
             source={{
-              uri:  `${baseLink}fileupload/1/InvoiceByConfig/1/logo.jpg`
+              uri: `${baseLink}fileupload/1/InvoiceByConfig/1/logo.jpg`,
             }}
             style={{ height: 80, width: 80 }}
             resizeMode="contain"
@@ -346,22 +416,36 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
               styles.logoutText,
               {
                 fontSize: 12,
-                color: ERP_COLOR_CODE.ERP_777
+                color: ERP_COLOR_CODE.ERP_777,
               },
-              theme === 'dark' && { color: 'white' },
+              theme === "dark" && { color: "white" },
             ]}
           >
-            {t('test24')}
+            {t("test24")}
           </Text>
-          <Text
-            style={[
-              styles.logoutText,
-              theme === 'dark' && { color: 'white' },
-            ]}
-          >
-            (c) DevERP Solutions Pvt. Ltd.
-          </Text>
-          <ContactRow />
+          <View style={{ flexDirection: "row" }}>
+            <Image
+              source={ERP_ICON.DEV_APP_LOGO}
+              style={{
+                height: 20,
+                width: 20,
+              }}
+              resizeMode="contain"
+            />
+            <Text
+              style={[
+                styles.logoutText,
+                theme === "dark" && { color: "white" },
+                {
+                  marginLeft: 8
+                }
+              ]}
+            >
+              (c) DevERP Solutions Pvt. Ltd.
+            </Text>
+          </View>
+
+          {/* <ContactRow /> */}
         </View>
       </Animated.View>
     </DrawerContentScrollView>

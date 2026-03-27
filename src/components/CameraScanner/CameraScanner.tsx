@@ -23,7 +23,7 @@ import { ICameraScannerProps } from '../../utils/helpers/types';
 import { getWindowHeight, getWindowWidth, isIos } from '../../utils/helpers';
 import MaterialIcons from '@react-native-vector-icons/material-icons';
 import { useTranslation } from 'react-i18next';
-
+import { uiStyles } from './style';
 
 export const CameraScanner = ({
   setIsCameraShown,
@@ -84,8 +84,8 @@ export const CameraScanner = ({
 
   if (isFocused && device) {
     return (
-      <SafeAreaView style={styles.safeArea}>
-        <Modal presentationStyle="fullScreen" animationType="slide">
+      <SafeAreaView style={styles.safeArea} >
+        <Modal supportedOrientations={["portrait", "landscape"]} presentationStyle="fullScreen" animationType="slide">
           {/* ---------- Header ---------- */}
           <View style={uiStyles.header}>
             <Text style={uiStyles.headerTitle}>{t('test19')}</Text>
@@ -142,52 +142,3 @@ export const CameraScanner = ({
     );
   }
 };
-export const uiStyles = StyleSheet.create({
-  header: {
-    width: '100%',
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    backgroundColor: 'rgba(0,0,0,0.65)',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    zIndex: 50,
-  },
-
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: 'white',
-  },
-
-  closeBtn: {
-    padding: 4,
-  },
-
-  descriptionContainer: {
-    paddingHorizontal: 20,
-    paddingVertical: 14,
-    backgroundColor: 'rgba(0,0,0,0.45)',
-  },
-
-  descriptionText: {
-    fontSize: 14,
-    color: 'white',
-    opacity: 0.9,
-  },
-
-  bottomPanel: {
-    position: 'absolute',
-    bottom: 0,
-    width: '100%',
-    paddingVertical: 18,
-    alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.6)',
-  },
-
-  bottomText: {
-    color: '#fff',
-    fontSize: 16,
-    opacity: 0.8,
-  },
-});

@@ -1,5 +1,5 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { getAjaxThunk } from './thunk';
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { getAjaxThunk } from "./thunk";
 
 interface AjaxState {
   loading: boolean;
@@ -14,18 +14,18 @@ const initialState: AjaxState = {
 };
 
 const ajaxSlice = createSlice({
-  name: 'ajax',
+  name: "ajax",
   initialState,
   reducers: {
-    resetAjaxState: state => {
+    resetAjaxState: (state) => {
       state.loading = false;
       state.error = null;
       state.response = null;
     },
   },
-  extraReducers: builder => {
+  extraReducers: (builder) => {
     builder
-      .addCase(getAjaxThunk.pending, state => {
+      .addCase(getAjaxThunk.pending, (state) => {
         state.loading = true;
         state.error = null;
         state.response = null;

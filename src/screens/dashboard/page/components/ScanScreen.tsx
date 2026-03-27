@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -6,22 +6,22 @@ import {
   Alert,
   BackHandler,
   StyleSheet,
-} from 'react-native';
+} from "react-native";
 
- import { RESULTS } from 'react-native-permissions';
-import { usePermissions } from '../../../../permissions/usePermissions';
-import { EPermissionTypes } from '../../../../constants';
-import { goToSettings } from '../../../../utils/helpers';
-import { CameraScanner } from '../../../../components/CameraScanner/CameraScanner';
-import { ERP_COLOR_CODE } from '../../../../utils/constants';
-import { useAppSelector } from '../../../../store/hooks';
-import MaterialIcons from '@react-native-vector-icons/material-icons';
+import { RESULTS } from "react-native-permissions";
+import { usePermissions } from "../../../../permissions/usePermissions";
+import { EPermissionTypes } from "../../../../constants";
+import { goToSettings } from "../../../../utils/helpers";
+import { CameraScanner } from "../../../../components/CameraScanner/CameraScanner";
+import { ERP_COLOR_CODE } from "../../../../utils/constants";
+import { useAppSelector } from "../../../../store/hooks";
+import MaterialIcons from "@react-native-vector-icons/material-icons";
 
 const ScanScreen = ({ item }: any) => {
   const { askPermissions } = usePermissions(EPermissionTypes.CAMERA);
   const [cameraShown, setCameraShown] = useState(false);
-  const [qrText, setQrText] = useState('');
-  const theme = useAppSelector(state => state?.theme.mode);
+  const [qrText, setQrText] = useState("");
+  const theme = useAppSelector((state) => state?.theme.mode);
 
   // Handle back button press
   function handleBackButtonClick() {
@@ -33,7 +33,7 @@ const ScanScreen = ({ item }: any) => {
   }
 
   useEffect(() => {
-    BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick);
+    BackHandler.addEventListener("hardwareBackPress", handleBackButtonClick);
 
     return () => {
       // BackHandler.removeEventListener('hardwareBackPress', handleBackButtonClick);
@@ -43,7 +43,7 @@ const ScanScreen = ({ item }: any) => {
   // Request Camera Permission
   const takePermissions = async () => {
     askPermissions()
-      .then(response => {
+      .then((response) => {
         if (
           response.type === RESULTS.LIMITED ||
           response.type === RESULTS.GRANTED
@@ -51,27 +51,27 @@ const ScanScreen = ({ item }: any) => {
           setCameraShown(true);
         }
       })
-      .catch(error => {
-        if ('isError' in error && error.isError) {
+      .catch((error) => {
+        if ("isError" in error && error.isError) {
           Alert.alert(
             error.errorMessage ||
-            'Something went wrong while taking camera permission',
+              "Something went wrong while taking camera permission",
           );
         }
 
-        if ('type' in error) {
+        if ("type" in error) {
           if (error.type === RESULTS.UNAVAILABLE) {
-            Alert.alert('This feature is not supported on this device');
+            Alert.alert("This feature is not supported on this device");
           } else if (
             error.type === RESULTS.BLOCKED ||
             error.type === RESULTS.DENIED
           ) {
             Alert.alert(
-              'Permission Denied',
-              'Please give permission from settings to continue using camera.',
+              "Permission Denied",
+              "Please give permission from settings to continue using camera.",
               [
-                { text: 'Cancel', style: 'cancel' },
-                { text: 'Go To Settings', onPress: () => goToSettings() },
+                { text: "Cancel", style: "cancel" },
+                { text: "Go To Settings", onPress: () => goToSettings() },
               ],
             );
           }
@@ -88,47 +88,40 @@ const ScanScreen = ({ item }: any) => {
   return (
     <View style={{ paddingVertical: 10 }}>
       {/* Field Label */}
-      <Text
-        style={[
-          styles.label,
-          theme === 'dark' && { color: 'white' },
-        ]}
-      >
+      <Text style={[styles.label, theme === "dark" && { color: "white" }]}>
         {item?.fieldtitle}
       </Text>
 
       {/* Tooltip */}
       {item?.tooltip !== item?.fieldtitle && (
-        <Text
-          style={[
-            styles.subLabel,
-            theme === 'dark' && { color: 'white' },
-          ]}
-        >
+        <Text style={[styles.subLabel, theme === "dark" && { color: "white" }]}>
           {item?.tooltip}
         </Text>
       )}
 
-      {item?.mandatory === '1' && (
+      {item?.mandatory === "1" && (
         <Text style={{ color: ERP_COLOR_CODE.ERP_ERROR }}>*</Text>
       )}
 
       {/* Scan Button or Camera */}
       <View style={[cameraShown && styles.container]}>
-
         {!cameraShown && (
-         <TouchableOpacity
-           onPress={takePermissions}
-           activeOpacity={0.8}
-           style={styles.squareScanCard}
-         >
-           <MaterialIcons name="qr-code-scanner" size={42} color={ERP_COLOR_CODE.ERP_APP_COLOR} />
-           <Text style={styles.squareScanText}>Scan Barcode</Text>
-         </TouchableOpacity>
+          <TouchableOpacity
+            onPress={takePermissions}
+            activeOpacity={0.8}
+            style={styles.squareScanCard}
+          >
+            <MaterialIcons
+              name="qr-code-scanner"
+              size={42}
+              color={ERP_COLOR_CODE.ERP_APP_COLOR}
+            />
+            <Text style={styles.squareScanText}>Scan Barcode</Text>
+          </TouchableOpacity>
         )}
 
         {/* Show Scanned Value */}
-        {qrText !== '' && !cameraShown && (
+        {qrText !== "" && !cameraShown && (
           <View style={styles.resultBox}>
             <MaterialIcons name="check-circle" size={20} color="green" />
             <Text style={styles.resultText}>Scanned: {qrText}</Text>
@@ -153,12 +146,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: 12,
-    backgroundColor: 'white',
+    backgroundColor: "white",
   },
   label: {
     fontSize: 15,
     color: ERP_COLOR_CODE.ERP_333,
-    fontWeight: '700',
+    fontWeight: "700",
     marginBottom: 4,
   },
   subLabel: {
@@ -170,19 +163,19 @@ const styles = StyleSheet.create({
 
   /* New Modern Scan Button */
   scanButton: {
-    width: '100%',
-    backgroundColor: '#1976D2',
+    width: "100%",
+    backgroundColor: "#1976D2",
     borderRadius: 10,
     paddingVertical: 14,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
     gap: 10,
   },
   scanButtonText: {
-    color: 'white',
+    color: "white",
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
 
   /* Scan Result Box */
@@ -190,35 +183,35 @@ const styles = StyleSheet.create({
     marginTop: 12,
     padding: 10,
     borderRadius: 8,
-    backgroundColor: '#E8F5E9',
-    flexDirection: 'row',
-    alignItems: 'center',
+    backgroundColor: "#E8F5E9",
+    flexDirection: "row",
+    alignItems: "center",
     gap: 8,
   },
   resultText: {
     fontSize: 15,
-    color: '#2E7D32',
-    fontWeight: '600',
+    color: "#2E7D32",
+    fontWeight: "600",
   },
 
   itemText: {
     fontSize: 17,
-    color: 'black',
+    color: "black",
   },
   squareScanCard: {
-  width: "100%",
-  aspectRatio: 2.8,
-  borderRadius: 12,
-   borderWidth: 1.5,
-  borderColor: ERP_COLOR_CODE.ERP_999,
-  justifyContent: "center",
-  alignItems: "center",
-  marginTop: 10,
-},
-squareScanText: {
-  marginTop: 10,
-  fontSize: 16,
-  fontWeight: "600",
-  color: ERP_COLOR_CODE.ERP_APP_COLOR,
-},
+    width: "100%",
+    aspectRatio: 2.8,
+    borderRadius: 12,
+    borderWidth: 1.5,
+    borderColor: ERP_COLOR_CODE.ERP_999,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 10,
+  },
+  squareScanText: {
+    marginTop: 10,
+    fontSize: 16,
+    fontWeight: "600",
+    color: ERP_COLOR_CODE.ERP_APP_COLOR,
+  },
 });

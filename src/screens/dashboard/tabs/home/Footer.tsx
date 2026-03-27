@@ -1,9 +1,9 @@
-import React, { useRef, useEffect } from 'react';
-import { Animated, Text, View, Dimensions } from 'react-native';
-import AutoHeightWebView from '../../page/components/AutoHeightWebView';
-import TranslatedText from './TranslatedText';
+import React, { useRef, useEffect } from "react";
+import { Animated, Text, View, Dimensions } from "react-native";
+import AutoHeightWebView from "../../page/components/AutoHeightWebView";
+import TranslatedText from "./TranslatedText";
 
-const { width } = Dimensions.get('screen');
+const { width } = Dimensions.get("screen");
 
 const MarqueeFooter = ({ html }) => {
   const translateX = useRef(new Animated.Value(width)).current;
@@ -19,9 +19,18 @@ const MarqueeFooter = ({ html }) => {
   }, []);
 
   return (
-    <View style={{ overflow: 'hidden', backgroundColor: '#f0f8ff', padding: 10, borderRadius: 5 }}>
-      <Animated.View style={{ flexDirection: 'row', transform: [{ translateX }] }}>
-        <Text>{html.replace(/<[^>]+>/g, '')}</Text>
+    <View
+      style={{
+        overflow: "hidden",
+        backgroundColor: "#f0f8ff",
+        padding: 10,
+        borderRadius: 5,
+      }}
+    >
+      <Animated.View
+        style={{ flexDirection: "row", transform: [{ translateX }] }}
+      >
+        <Text>{html.replace(/<[^>]+>/g, "")}</Text>
       </Animated.View>
     </View>
   );
@@ -36,9 +45,9 @@ const Footer = ({
   textColor,
   isFromListPage,
 }) => {
-  const isHTML = typeof footer === 'string' && footer.trim().startsWith('<');
-  const isMarquee = footer.includes('<marquee');
- 
+  const isHTML = typeof footer === "string" && footer.trim().startsWith("<");
+  const isMarquee = footer.includes("<marquee");
+
   if (isMarquee) {
     return <MarqueeFooter html={footer} />;
   } else if (isHTML) {
@@ -57,12 +66,12 @@ const Footer = ({
       <TranslatedText
         style={{
           color: accentColors[index % accentColors.length],
-          fontSize: 16,
-          fontWeight: '600',
+          fontSize: 14,
+          fontWeight: "600",
         }}
         text={footer}
-         numberOfLines={1}      > 
-      </TranslatedText>
+        numberOfLines={1}
+      ></TranslatedText>
     );
   }
 };

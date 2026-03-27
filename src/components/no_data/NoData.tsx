@@ -1,18 +1,19 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Animated, View } from 'react-native';
-import FastImage from 'react-native-fast-image';
-import { useFocusEffect } from '@react-navigation/native';
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { Animated, Platform, useWindowDimensions, View } from "react-native";
+import FastImage from "react-native-fast-image";
+import { useFocusEffect } from "@react-navigation/native";
 
-import { ERP_GIF } from '../../assets';
-import { styles } from './no_data_style';
-import { useAppSelector } from '../../store/hooks';
-import { useTranslation } from 'react-i18next';
-import { ERP_COLOR_CODE } from '../../utils/constants';
+import { ERP_GIF } from "../../assets";
+import { styles } from "./no_data_style";
+import { useAppSelector } from "../../store/hooks";
+import { useTranslation } from "react-i18next";
+import { ERP_COLOR_CODE } from "../../utils/constants";
 
-const NoData = ({isShowTop = true}: any) => {
-  const {t} = useTranslation()
-  const theme = useAppSelector(state => state?.theme.mode);
-
+const NoData = ({ isShowTop = true }: any) => {
+  const { t } = useTranslation();
+  const theme = useAppSelector((state) => state?.theme.mode);
+  const { height, width } = useWindowDimensions();
+  const isLandscape = width > height;
   const opacity = useRef(new Animated.Value(0)).current;
 
   const imageTranslateY = useRef(new Animated.Value(20)).current;
@@ -33,7 +34,7 @@ const NoData = ({isShowTop = true}: any) => {
       return () => {
         setShouldRender(false);
       };
-    }, [])
+    }, []),
   );
 
   useEffect(() => {
@@ -65,47 +66,129 @@ const NoData = ({isShowTop = true}: any) => {
 
   return (
     <>
-    {isShowTop &&  <View style={{height: 16, width: '100%', backgroundColor: theme === 'dark' ? 'black' : ERP_COLOR_CODE.ERP_APP_COLOR, borderBottomLeftRadius: 12, borderBottomRightRadius: 12}}></View>}
-     <Animated.View
-      style={[
-        styles.container,
-        theme === 'dark' && { backgroundColor: 'black' },
-        { opacity },
-      ]}
-    >
-      {/* GIF */}
+      {isShowTop && (
+        <View
+          style={{
+            height: Platform.OS === "ios" ? 16 : 6,
+            width: "100%",
+            backgroundColor:
+              theme === "dark" ? "black" : ERP_COLOR_CODE.ERP_APP_COLOR,
+            borderBottomLeftRadius: 12,
+            borderBottomRightRadius: 12,
+          }}
+        ></View>
+      )}
       <Animated.View
-        style={{ transform: [{ translateY: imageTranslateY }] }}
+        style={[
+          styles.container,
+          theme === "dark" && { backgroundColor: "black" },
+          { opacity },
+        ]}
       >
-        <FastImage
-          source={ERP_GIF.NO_DATA}
-          style={styles.image}
-          resizeMode="contain"
-        />
+        {isLandscape ? (
+          <>
+            <View
+              style={{
+                flexDirection: "row",
+              }}
+            >
+              <View
+                style={{
+                  width: "50%",
+
+                  justifyContent: "center",
+                  alignContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Animated.View
+                  style={{ transform: [{ translateY: imageTranslateY }] }}
+                >
+                  <FastImage
+                    source={ERP_GIF.NO_DATA}
+                    style={[
+                      styles.image,
+                      {
+                        height: 150,
+                        width: 150,
+                      },
+                    ]}
+                    resizeMode="contain"
+                  />
+                </Animated.View>
+              </View>
+              <View
+                style={{
+                  width: "50%",
+                  justifyContent: "center",
+                  alignContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                {/* TITLE */}
+                <Animated.Text
+                  style={[
+                    styles.title,
+                    { transform: [{ translateX: titleTranslateX }] },
+                  ]}
+                >
+                  {t("test8")}
+                </Animated.Text>
+
+                {/* SUBTITLE */}
+                <Animated.Text
+                  style={[
+                    styles.subtitle,
+                    { transform: [{ translateX: subtitleTranslateX }] },
+                  ]}
+                >
+                  {t("test9")}
+                </Animated.Text>
+              </View>
+            </View>
+          </>
+        ) : (
+          <>
+            {/* GIF */}
+            <Animated.View
+              style={{ transform: [{ translateY: imageTranslateY }] }}
+            >
+              <FastImage
+                source={ERP_GIF.NO_DATA}
+                style={[
+                  styles.image,
+                  {
+                    width: width * 0.6,
+                    height: width * 0.6,
+                  },
+                ]}
+                resizeMode="contain"
+              />
+            </Animated.View>
+
+            {/* TITLE */}
+            <Animated.Text
+              style={[
+                styles.title,
+                { transform: [{ translateX: titleTranslateX }] },
+              ]}
+            >
+              {t("test8")}
+            </Animated.Text>
+
+            {/* SUBTITLE */}
+            <Animated.Text
+              style={[
+                styles.subtitle,
+                { transform: [{ translateX: subtitleTranslateX }] },
+              ]}
+            >
+              {t("test9")}
+            </Animated.Text>
+          </>
+        )}
       </Animated.View>
-
-      {/* TITLE */}
-      <Animated.Text
-        style={[
-          styles.title,
-          { transform: [{ translateX: titleTranslateX }] },
-        ]}
-      >
-        {t('test8')}
-      </Animated.Text>
-
-      {/* SUBTITLE */}
-      <Animated.Text
-        style={[
-          styles.subtitle,
-          { transform: [{ translateX: subtitleTranslateX }] },
-        ]}
-      >
-        {t('test9')}
-      </Animated.Text>
-    </Animated.View>
     </>
-   
   );
 };
 

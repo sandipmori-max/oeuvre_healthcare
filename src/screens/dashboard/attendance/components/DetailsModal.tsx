@@ -5,9 +5,9 @@ import {
   Text,
   TouchableOpacity,
   Animated,
-  Dimensions,
   ScrollView,
   Easing,
+  useWindowDimensions,
 } from 'react-native';
 import { formatTo12Hour, getWorkedHours2 } from '../../../../utils/helpers';
 import MaterialIcons from '@react-native-vector-icons/material-icons';
@@ -18,9 +18,10 @@ import useTranslations from '../../../../hooks/useTranslations';
 import ImageBottomSheetModal from '../../../../components/bottomsheet/ImageBottomSheetModal';
 import TranslatedText from '../../tabs/home/TranslatedText';
 
-const { height } = Dimensions.get('screen');
 
 const DetailsBottomSheet = ({ visible, onClose, item, baseLink }: any) => {
+  const { height, width } = useWindowDimensions();
+  const isLandscape = width > height;
   const theme = useAppSelector(state => state?.theme.mode);
   const { t } = useTranslations();
   const [showImgModal, setShowImgModal] = useState(false);
@@ -64,24 +65,38 @@ const DetailsBottomSheet = ({ visible, onClose, item, baseLink }: any) => {
       visible={visible}
       transparent
       onRequestClose={onClose}
+      supportedOrientations={["portrait", "landscape"]}
     >
       <Animated.View
-        style={{
+        style={[{
           flex: 1,
           backgroundColor: 'rgba(0,0,0,0.6)',
           justifyContent: 'flex-end',
           opacity: backdropOpacity,
-        }}
+        },
+       isLandscape && {
+        width: '100%',
+        alignContent:'center',
+        alignItems:'center'
+       }
+      ]}
       >
         <Animated.View
           style={[{
-            height: height * 0.45,
             backgroundColor: theme === 'dark' ? 'black' : ERP_COLOR_CODE.ERP_WHITE,
             borderTopLeftRadius: 20,
             borderTopRightRadius: 20,
             padding: 16,
             transform: [{ translateY: sheetTranslateY }],
           },
+          (!isLandscape) && {
+              height: height * 0.45,
+          },
+          isLandscape && {
+            width: '50%'
+          },
+
+          
           theme === 'dark' && {
             borderWidth: 1,
             borderColor: 'white'

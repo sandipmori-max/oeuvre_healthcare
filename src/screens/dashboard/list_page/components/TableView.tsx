@@ -1,12 +1,17 @@
-import { View, Text, TouchableOpacity, Dimensions, FlatList } from 'react-native';
-import React from 'react';
-import { styles } from '../list_page_style';
-import { formatHeaderTitle } from '../../../../utils/helpers';
-import NoData from '../../../../components/no_data/NoData';
-import { useNavigation } from '@react-navigation/native';
-import { DARK_COLOR, ERP_COLOR_CODE } from '../../../../utils/constants';
-import Footer from '../../tabs/home/Footer';
-import MemoizedFooterView from './MemoizedFooterView';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Dimensions,
+  FlatList,
+} from "react-native";
+import React from "react";
+import { styles } from "../list_page_style";
+import { formatHeaderTitle } from "../../../../utils/helpers";
+import NoData from "../../../../components/no_data/NoData";
+import { useNavigation } from "@react-navigation/native";
+import { DARK_COLOR, ERP_COLOR_CODE } from "../../../../utils/constants";
+import MemoizedFooterView from "./MemoizedFooterView";
 
 const TableView = ({
   configData,
@@ -21,35 +26,41 @@ const TableView = ({
   totalQty,
   isFromBusinessCard,
 }: any) => {
-  const screenWidth = Dimensions.get('window').width;
+  const screenWidth = Dimensions.get("window").width;
   const navigation = useNavigation();
 
   const getButtonMeta = (key: string) => {
-    if (!key || !configData?.length) return { label: 'Action', color: ERP_COLOR_CODE.ERP_COLOR };
+    if (!key || !configData?.length)
+      return { label: "Action", color: ERP_COLOR_CODE.ERP_COLOR };
     const configItem = configData?.find(
-      cfg => cfg?.datafield?.toLowerCase() === key?.toLowerCase(),
+      (cfg) => cfg?.datafield?.toLowerCase() === key?.toLowerCase(),
     );
     return {
-      label: configItem?.headertext || 'Action',
+      label: configItem?.headertext || "Action",
       color: configItem?.colorcode || ERP_COLOR_CODE.ERP_COLOR,
     };
   };
 
   const allKeys =
     filteredData && filteredData.length > 0
-      ? Object.keys(filteredData[0]).filter(key => key !== 'id')
+      ? Object.keys(filteredData[0]).filter((key) => key !== "id")
       : [];
 
   function splitInto4Columns(keys: string[]): Record<string, string[]> {
-    const result: Record<string, string[]> = { clm1: [], clm2: [], clm3: [], clm4: [] };
-    const filteredKeys = keys?.filter(key => !key.startsWith('btn_'));
+    const result: Record<string, string[]> = {
+      clm1: [],
+      clm2: [],
+      clm3: [],
+      clm4: [],
+    };
+    const filteredKeys = keys?.filter((key) => !key.startsWith("btn_"));
     const firstFour = filteredKeys.slice(0, 4);
     const rest = filteredKeys.slice(4);
 
-    result.clm1.push(firstFour[0] || '');
-    result.clm2.push(firstFour[1] || '');
-    result.clm3.push(firstFour[2] || '');
-    result.clm4.push(firstFour[3] || '');
+    result.clm1.push(firstFour[0] || "");
+    result.clm2.push(firstFour[1] || "");
+    result.clm3.push(firstFour[2] || "");
+    result.clm4.push(firstFour[3] || "");
 
     rest.forEach((key, index) => {
       const colIndex = index % 4;
@@ -61,15 +72,20 @@ const TableView = ({
   }
 
   function splitInto4Rows(keys: string[]): Record<string, string[]> {
-    const result: Record<string, string[]> = { clm1: [], clm2: [], clm3: [], clm4: [] };
+    const result: Record<string, string[]> = {
+      clm1: [],
+      clm2: [],
+      clm3: [],
+      clm4: [],
+    };
 
     const firstFour = keys.slice(0, 4);
     const rest = keys.slice(4);
 
-    result.clm1.push(firstFour[0] || '');
-    result.clm2.push(firstFour[1] || '');
-    result.clm3.push(firstFour[2] || '');
-    result.clm4.push(firstFour[3] || '');
+    result.clm1.push(firstFour[0] || "");
+    result.clm2.push(firstFour[1] || "");
+    result.clm3.push(firstFour[2] || "");
+    result.clm4.push(firstFour[3] || "");
 
     rest.forEach((key, index) => {
       const colIndex = index % 4;
@@ -86,11 +102,17 @@ const TableView = ({
   const TableHeader = () => (
     <View style={[styles.tableRow, styles.tableHeaderRow]}>
       {Object.values(columns).map((colItems, colIndex) => (
-        <View key={`col-${colIndex}`} style={{ flexDirection: 'column', marginRight: 1 }}>
-          {colItems.map(key => (
+        <View
+          key={`col-${colIndex}`}
+          style={{ flexDirection: "column", marginRight: 1 }}
+        >
+          {colItems.map((key) => (
             <Text
               key={key}
-              style={[styles.tableHeaderCell, { minWidth: 96, maxWidth: 100, marginBottom: 0 }]}
+              style={[
+                styles.tableHeaderCell,
+                { minWidth: 96, maxWidth: 100, marginBottom: 0 },
+              ]}
               numberOfLines={1}
             >
               {formatHeaderTitle(key)}
@@ -103,10 +125,10 @@ const TableView = ({
 
   const renderItem = ({ item, index }: { item: any; index: number }) => {
     const isEven = index % 2 === 0;
-    const rowBackgroundColor = isEven ? ERP_COLOR_CODE.ERP_WHITE : '#f8faf3ff';
+    const rowBackgroundColor = isEven ? ERP_COLOR_CODE.ERP_WHITE : "#f8faf3ff";
     const authUser = item?.authuser;
 
-    const btnKeys = Object.keys(item).filter(key => key.startsWith('btn_'));
+    const btnKeys = Object.keys(item).filter((key) => key.startsWith("btn_"));
 
     return (
       <TouchableOpacity
@@ -116,42 +138,51 @@ const TableView = ({
           }
           if (item?.id !== undefined) {
             setIsFilterVisible(false);
-            setSearchQuery('');
-            navigation.navigate('Page', {
+            setSearchQuery("");
+            navigation.navigate("Page", {
               item,
               title: pageParamsName,
               id: item?.id,
               url: pageName,
               isFromBusinessCard: isFromBusinessCard,
-              isFromProfile: false
+              isFromProfile: false,
             });
           }
         }}
       >
-        {' '}
+        {" "}
         <View
-          style={[styles.tableRow, { backgroundColor: rowBackgroundColor, flexDirection: 'row' }]}
+          style={[
+            styles.tableRow,
+            { backgroundColor: rowBackgroundColor, flexDirection: "row" },
+          ]}
         >
           {Object.values(rows).map((colItems, colIndex) => (
-            <View key={`row-col-${colIndex}`} style={{ flexDirection: 'column', marginRight: 1 }}>
+            <View
+              key={`row-col-${colIndex}`}
+              style={{ flexDirection: "column", marginRight: 1 }}
+            >
               {colItems
-                .filter(key => !key.startsWith('btn_'))
-                .map(key => {
+                .filter((key) => !key.startsWith("btn_"))
+                .map((key) => {
                   let value = item[key];
-                  if (typeof value === 'object' && value !== null) {
+                  if (typeof value === "object" && value !== null) {
                     value = JSON.stringify(value);
                   } else if (value === null || value === undefined) {
-                    value = '';
+                    value = "";
                   } else {
                     value = String(value);
                   }
                   return (
                     <Text
                       key={`${key}-${item?.id || Math.random()}`}
-                      style={[styles.tableCell, { minWidth: 96, maxWidth: '25%', marginBottom: 0 }]}
+                      style={[
+                        styles.tableCell,
+                        { minWidth: 96, maxWidth: "25%", marginBottom: 0 },
+                      ]}
                       numberOfLines={1}
                     >
-                      {value || '-'}
+                      {value || "-"}
                     </Text>
                   );
                 })}
@@ -162,17 +193,24 @@ const TableView = ({
           style={{
             borderBottomWidth: 1,
             borderBottomColor: ERP_COLOR_CODE.ERP_BORDER_LINE,
-            flexDirection: 'row',
-            flexWrap: 'wrap',
-            alignItems: 'center',
+            flexDirection: "row",
+            flexWrap: "wrap",
+            alignItems: "center",
             minWidth: 120,
           }}
         >
           {btnKeys?.length > 0 && (
-            <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginTop: 14, gap: 8 }}>
+            <View
+              style={{
+                flexDirection: "row",
+                flexWrap: "wrap",
+                marginTop: 14,
+                gap: 8,
+              }}
+            >
               {btnKeys?.map((key, idx) => {
                 const actionValue = item[key];
-                const authUser = item['authuser'];
+                const authUser = item["authuser"];
                 const { label, color } = getButtonMeta(key);
 
                 return (
@@ -185,14 +223,23 @@ const TableView = ({
                       borderRadius: 6,
                       flexGrow: 1,
                       maxWidth: (screenWidth - 64) / 2,
-                      alignItems: 'center',
+                      alignItems: "center",
                     }}
                     onPress={() => {
-                      handleActionButtonPressed(actionValue, label, color, item?.id);
+                      handleActionButtonPressed(
+                        actionValue,
+                        label,
+                        color,
+                        item?.id,
+                      );
                     }}
                   >
                     <Text
-                      style={{ color: ERP_COLOR_CODE.ERP_WHITE, fontWeight: '600', fontSize: 13 }}
+                      style={{
+                        color: ERP_COLOR_CODE.ERP_WHITE,
+                        fontWeight: "600",
+                        fontSize: 13,
+                      }}
                     >
                       {label}
                     </Text>
@@ -202,7 +249,9 @@ const TableView = ({
             </View>
           )}
         </View>
-        <View>{item?.html && <MemoizedFooterView item={item} index={index} />}</View>
+        <View>
+          {item?.html && <MemoizedFooterView item={item} index={index} />}
+        </View>
       </TouchableOpacity>
     );
   };
@@ -212,12 +261,12 @@ const TableView = ({
         <View
           style={{
             flex: 1,
-            justifyContent: 'center',
-            alignItems: 'center',
+            justifyContent: "center",
+            alignItems: "center",
             backgroundColor: ERP_COLOR_CODE.ERP_WHITE,
           }}
         >
-          <NoData isShowTop = {false}/>
+          <NoData isShowTop={false} />
         </View>
       </>
     );
@@ -230,7 +279,7 @@ const TableView = ({
       }}
     >
       <FlatList
-        data={['']}
+        data={[""]}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
         keyExtractor={(item, index) => index.toString()}
@@ -254,7 +303,7 @@ const TableView = ({
             marginTop: 6,
             padding: 8,
             borderRadius: 8,
-            backgroundColor: '#f1f1f1',
+            backgroundColor: "#f1f1f1",
             borderWidth: 1,
             borderColor: ERP_COLOR_CODE.ERP_ddd,
             marginBottom: 12,
@@ -263,26 +312,32 @@ const TableView = ({
           {
             <View
               style={{
-                justifyContent: 'space-between',
-                flexDirection: 'row',
+                justifyContent: "space-between",
+                flexDirection: "row",
               }}
             >
               {totalQty && (
                 <View
                   style={{
-                    justifyContent: 'space-between',
-                    flexDirection: 'row',
-                    width: '50%',
+                    justifyContent: "space-between",
+                    flexDirection: "row",
+                    width: "50%",
                   }}
                 >
-                  <Text style={{ fontSize: 14, fontWeight: '700', color: ERP_COLOR_CODE.ERP_333 }}>
+                  <Text
+                    style={{
+                      fontSize: 14,
+                      fontWeight: "700",
+                      color: ERP_COLOR_CODE.ERP_333,
+                    }}
+                  >
                     Total Qty
                   </Text>
                   <Text
                     style={{
                       fontSize: 16,
-                      fontWeight: 'bold',
-                      color: '#28a745',
+                      fontWeight: "bold",
+                      color: "#28a745",
                       marginLeft: 8,
                     }}
                   >
@@ -294,19 +349,25 @@ const TableView = ({
               {totalAmount && (
                 <View
                   style={{
-                    justifyContent: 'space-between',
-                    flexDirection: 'row',
-                    width: '50%',
+                    justifyContent: "space-between",
+                    flexDirection: "row",
+                    width: "50%",
                   }}
                 >
-                  <Text style={{ fontSize: 14, fontWeight: '700', color: ERP_COLOR_CODE.ERP_333 }}>
+                  <Text
+                    style={{
+                      fontSize: 14,
+                      fontWeight: "700",
+                      color: ERP_COLOR_CODE.ERP_333,
+                    }}
+                  >
                     Total Amount
                   </Text>
                   <Text
                     style={{
                       fontSize: 16,
-                      fontWeight: 'bold',
-                      color: '#28a745',
+                      fontWeight: "bold",
+                      color: "#28a745",
                       marginLeft: 8,
                     }}
                   >
@@ -319,11 +380,17 @@ const TableView = ({
 
           <View
             style={{
-              justifyContent: 'space-between',
-              flexDirection: 'row',
+              justifyContent: "space-between",
+              flexDirection: "row",
             }}
           >
-            <Text style={{ fontSize: 14, fontWeight: '700', color: ERP_COLOR_CODE.ERP_333 }}>
+            <Text
+              style={{
+                fontSize: 14,
+                fontWeight: "700",
+                color: ERP_COLOR_CODE.ERP_333,
+              }}
+            >
               {filteredData?.length} Row(s)
             </Text>
           </View>

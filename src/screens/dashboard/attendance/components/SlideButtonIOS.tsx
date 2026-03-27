@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, ActivityIndicator, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, TouchableOpacity, ActivityIndicator, StyleSheet, Dimensions, useWindowDimensions } from 'react-native';
 import MaterialIcons from '@react-native-vector-icons/material-icons';
 import { ERP_COLOR_CODE } from '../../../../utils/constants';
 import useTranslations from '../../../../hooks/useTranslations';
@@ -23,7 +23,8 @@ const SlideButtonIOS: React.FC<Props> = ({
   completed = false,
 }) => {
   const { t } = useTranslations();
-
+  const { height, width } = useWindowDimensions();  
+  const isLandscape = width > height;
   return (
     <TouchableOpacity
       onPress={() => {
@@ -32,7 +33,14 @@ const SlideButtonIOS: React.FC<Props> = ({
       style={styles.container}
       activeOpacity={0.7}
     >
-      <View style={[styles.sliderContainer, { borderColor: successColor }]}>
+      <View style={[styles.sliderContainer, { borderColor: successColor },
+
+        isLandscape ? {
+          width: '100%'
+        } : {
+          width: width - 20
+        }
+      ]}>
         <Text style={styles.label}>
           {loading ? t("text.text22") : completed ? t('text.text23') : label}
         </Text>

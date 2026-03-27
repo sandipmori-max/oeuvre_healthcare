@@ -1,19 +1,18 @@
-import { Platform, StyleSheet } from 'react-native';
-import { ERP_COLOR_CODE } from '../../../../../utils/constants';
+import { Platform, StyleSheet } from "react-native";
+import { ERP_COLOR_CODE } from "../../../../../utils/constants";
 
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginTop: Platform.OS === 'ios' ? 40 : 10,
+    marginTop: Platform.OS === "ios" ? 40 : 4,
     backgroundColor: ERP_COLOR_CODE.ERP_WHITE,
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     padding: 12,
     backgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR,
     borderBottomWidth: 1,
-     
   },
   back: {
     width: 24,
@@ -22,7 +21,7 @@ export const styles = StyleSheet.create({
   },
   title: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     color: ERP_COLOR_CODE.ERP_WHITE,
   },
   closeButton: {
@@ -32,7 +31,7 @@ export const styles = StyleSheet.create({
   },
   closeButtonText: {
     color: ERP_COLOR_CODE.ERP_BLACK,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   accountsList: {
     flex: 1,
@@ -51,8 +50,8 @@ export const styles = StyleSheet.create({
     backgroundColor: ERP_COLOR_CODE.ERP_WHITE,
   },
   accountContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   avatar: {
     backgroundColor: ERP_COLOR_CODE.ERP_e0e0e0,
@@ -66,8 +65,9 @@ export const styles = StyleSheet.create({
     paddingRight: 12,
   },
   accountName: {
+    width: "90%",
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
     color: ERP_COLOR_CODE.ERP_333,
   },
   accountEmail: {
@@ -91,32 +91,32 @@ export const styles = StyleSheet.create({
   activeLabel: {
     color: ERP_COLOR_CODE.ERP_WHITE,
     fontSize: 12,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   removeButton: {
-    position: 'absolute',
+    position: "absolute",
     top: 10,
     right: 10,
     width: 24,
     height: 24,
     borderRadius: 12,
     backgroundColor: ERP_COLOR_CODE.ERP_ERROR,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   removeButtonText: {
     color: ERP_COLOR_CODE.ERP_WHITE,
     fontSize: 12,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   addAccountButton: {
     margin: 16,
     padding: 16,
     backgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR,
     borderRadius: 8,
-    alignItems: 'center',
-    flexDirection: 'row',
-    justifyContent: 'center',
+    alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "center",
     gap: 4,
     //  shadowColor: ERP_COLOR_CODE.ERP_BLACK,
     // shadowOffset: { width: 0, height: 1 },
@@ -128,6 +128,6 @@ export const styles = StyleSheet.create({
   addAccountText: {
     color: ERP_COLOR_CODE.ERP_WHITE,
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
 });

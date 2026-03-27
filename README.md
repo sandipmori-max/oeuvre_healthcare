@@ -464,6 +464,9 @@ Google Support
 
 
 
+
+
+
 Login screen
 -----------
 login_style -  
@@ -855,7 +858,7 @@ Login screen
     if(isAuthenticated){
       dispatch(getERPAppConfigMenuThunk());
     }
-  }, [isAuthenticated])
+  }, [isAuthenticated]) 
 
 
 HomeTab - onRefresh

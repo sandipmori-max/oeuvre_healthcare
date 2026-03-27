@@ -67,7 +67,7 @@ const TaskDetailsBottomSheet = ({
     dateString ? new Date(dateString).toISOString().split('T')[0] : '—';
 
   return (
-    <Modal transparent visible={visible} animationType="none">
+    <Modal supportedOrientations={["portrait", "landscape"]} transparent visible={visible} animationType="none">
       <TouchableOpacity style={styles.overlay} onPress={onClose} />
       <Animated.View style={[styles.bottomSheet, { transform: [{ translateY }] }]}>
         <View style={styles.header}>

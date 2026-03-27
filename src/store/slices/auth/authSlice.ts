@@ -1,5 +1,5 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { AuthState, MenuItem, DashboardItem } from './type';
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { AuthState, MenuItem, DashboardItem } from "./type";
 import {
   checkAuthStateThunk,
   loginUserThunk,
@@ -9,7 +9,7 @@ import {
   getERPMenuThunk,
   getERPDashboardThunk,
   getERPAppConfigMenuThunk,
-} from './thunk';
+} from "./thunk";
 
 const initialState: AuthState = {
   user: null,
@@ -24,28 +24,28 @@ const initialState: AuthState = {
   isDashboardLoading: false,
   activeToken: null,
   isPinLoaded: false,
-  dashboardFromDate: '',
-  dashboardToDate: '',
-  dashboardBranch: '',
-  dashboardType: '',
-  dashboardBranchId: '',
-  dashboardTypeId: '',
+  dashboardFromDate: "",
+  dashboardToDate: "",
+  dashboardBranch: "",
+  dashboardType: "",
+  dashboardBranchId: "",
+  dashboardTypeId: "",
   appDrawerMenuList: [],
   appBottomMenuList: [],
-  appColorCode: '',
+  appColorCode: "",
   isPinVerifyLoaded: false,
   attendanceDone: false,
   locationLogs: [],
 };
 
 const authSlice = createSlice({
-  name: 'auth',
+  name: "auth",
   initialState,
   reducers: {
-    clearError: state => {
+    clearError: (state) => {
       state.error = null;
     },
-     addLocation: (state, action) => {
+    addLocation: (state, action) => {
       state.locationLogs.unshift(action.payload);
     },
     updatePinVerifyLoadedState: (state, action: PayloadAction<boolean>) => {
@@ -54,22 +54,21 @@ const authSlice = createSlice({
     updateAttendanceState: (state, action: PayloadAction<boolean>) => {
       state.attendanceDone = action.payload;
     },
-    setIsPinLoaded: state => {
+    setIsPinLoaded: (state) => {
       state.isPinLoaded = true;
     },
     setLoading: (state, action: PayloadAction<boolean>) => {
       state.isLoading = action.payload;
     },
-    clearAuthState: state => {
-      
-      state.dashboardBranch = '';
-      state.dashboardBranchId = '',
-      state.dashboardFromDate = '',
-      state.dashboardToDate = '',
-      state.dashboardType = '',
-      state.dashboardTypeId = ''
+    clearAuthState: (state) => {
+      state.dashboardBranch = "";
+      (state.dashboardBranchId = ""),
+        (state.dashboardFromDate = ""),
+        (state.dashboardToDate = ""),
+        (state.dashboardType = ""),
+        (state.dashboardTypeId = "");
     },
-    logout: state => {
+    logout: (state) => {
       state.user = null;
       state.accounts = [];
       state.activeAccountId = null;
@@ -96,13 +95,19 @@ const authSlice = createSlice({
     setActiveToken: (state, action: PayloadAction<string | null>) => {
       state.activeToken = action?.payload;
     },
-    setActiveDashboardBranchId: (state, action: PayloadAction<string | null>) => {
+    setActiveDashboardBranchId: (
+      state,
+      action: PayloadAction<string | null>,
+    ) => {
       state.dashboardBranchId = action?.payload;
     },
     setActiveDashboardTypeId: (state, action: PayloadAction<string | null>) => {
       state.dashboardTypeId = action?.payload;
     },
-    setActiveDashboardFromDate: (state, action: PayloadAction<string | null>) => {
+    setActiveDashboardFromDate: (
+      state,
+      action: PayloadAction<string | null>,
+    ) => {
       state.dashboardFromDate = action?.payload;
     },
     setActiveDashboardToDate: (state, action: PayloadAction<string | null>) => {
@@ -114,12 +119,11 @@ const authSlice = createSlice({
     setActiveDashboardType: (state, action: PayloadAction<string | null>) => {
       state.dashboardType = action?.payload;
     },
-    
   },
-  extraReducers: builder => {
+  extraReducers: (builder) => {
     builder
 
-      .addCase(checkAuthStateThunk.pending, state => {
+      .addCase(checkAuthStateThunk.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(checkAuthStateThunk.fulfilled, (state, action) => {
@@ -128,7 +132,7 @@ const authSlice = createSlice({
           if (action?.payload?.accounts) {
             state.accounts = action?.payload?.accounts;
           } else {
-            state.accounts = state?.accounts.map(acc => ({
+            state.accounts = state?.accounts.map((acc) => ({
               ...acc,
               isActive: acc?.id === action?.payload?.accountId,
             }));
@@ -147,7 +151,7 @@ const authSlice = createSlice({
         state.error = action?.payload as string;
       })
 
-      .addCase(loginUserThunk.pending, state => {
+      .addCase(loginUserThunk.pending, (state) => {
         state.isLoading = true;
         state.error = null;
       })
@@ -158,7 +162,7 @@ const authSlice = createSlice({
         if (action?.payload?.accounts) {
           state.accounts = action?.payload?.accounts;
         } else {
-          state.accounts = state?.accounts.map(acc => ({
+          state.accounts = state?.accounts.map((acc) => ({
             ...acc,
             isActive: acc?.id === action?.payload?.accountId,
           }));
@@ -174,7 +178,7 @@ const authSlice = createSlice({
         state.isAuthenticated = false;
         state.error = action.payload as string;
       })
-      .addCase(switchAccountThunk.pending, state => {
+      .addCase(switchAccountThunk.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(switchAccountThunk.fulfilled, (state, action) => {
@@ -184,7 +188,7 @@ const authSlice = createSlice({
         if (action?.payload?.accounts) {
           state.accounts = action?.payload?.accounts;
         } else {
-          state.accounts = state?.accounts.map(acc => ({
+          state.accounts = state?.accounts.map((acc) => ({
             ...acc,
             isActive: acc?.id === action?.payload?.accountId,
           }));
@@ -198,7 +202,7 @@ const authSlice = createSlice({
         state.error = action?.payload as string;
       })
 
-      .addCase(removeAccountThunk.pending, state => {
+      .addCase(removeAccountThunk.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(removeAccountThunk.fulfilled, (state, action) => {
@@ -206,7 +210,7 @@ const authSlice = createSlice({
         if (action?.payload?.accounts) {
           state.accounts = action?.payload?.accounts;
         } else {
-          state.accounts = state?.accounts.map(acc => ({
+          state.accounts = state?.accounts.map((acc) => ({
             ...acc,
             isActive: acc?.id === action?.payload?.accountId,
           }));
@@ -222,7 +226,7 @@ const authSlice = createSlice({
         state.error = action?.payload as string;
       })
 
-      .addCase(logoutUserThunk.fulfilled, state => {
+      .addCase(logoutUserThunk.fulfilled, (state) => {
         state.isLoading = false;
         state.user = null;
         state.accounts = [];
@@ -238,7 +242,7 @@ const authSlice = createSlice({
         state.error = action?.payload as string;
       })
 
-      .addCase(getERPMenuThunk.pending, state => {
+      .addCase(getERPMenuThunk.pending, (state) => {
         state.isMenuLoading = true;
         state.menu = [];
       })
@@ -246,7 +250,7 @@ const authSlice = createSlice({
         state.menu = [];
         try {
           let menuData;
-          if (typeof action.payload === 'string') {
+          if (typeof action.payload === "string") {
             menuData = JSON.parse(action.payload);
           } else {
             menuData = action.payload;
@@ -262,18 +266,17 @@ const authSlice = createSlice({
                 if (innerData?.success === 1 && innerData?.menus) {
                   menus = innerData.menus;
                 }
-              } catch (innerParseError) {
-              }
+              } catch (innerParseError) {}
             }
           }
 
           state.menu = menus.map((menu: any, index: number) => ({
             id: `menu_${index}`,
-            name: menu?.Name || '',
-            url: menu?.Link || '',
-            icon: menu?.Image || '',
+            name: menu?.Name || "",
+            url: menu?.Link || "",
+            icon: menu?.Image || "",
             children: menu?.Datas || [],
-            title: menu?.Title || '',
+            title: menu?.Title || "",
             isReport: menu?.IsReport,
           }));
           state.error = null;
@@ -288,23 +291,23 @@ const authSlice = createSlice({
         state.error = action.payload as string;
       })
 
-      .addCase(getERPAppConfigMenuThunk.pending, state => {
+      .addCase(getERPAppConfigMenuThunk.pending, (state) => {
         state.isMenuLoading = true;
         state.menu = [];
       })
       .addCase(getERPAppConfigMenuThunk.fulfilled, (state, action) => {
-         try {
+        try {
           let menuData;
-          if (typeof action.payload === 'string') {
+          if (typeof action.payload === "string") {
             menuData = JSON.parse(action.payload);
           } else {
             menuData = action.payload;
           }
 
-          state.appBottomMenuList = menuData?.bottom
-          state.appDrawerMenuList = menuData?.drawer
-          state.appColorCode = menuData?.hexacolor
-  
+          state.appBottomMenuList = menuData?.bottom;
+          state.appDrawerMenuList = menuData?.drawer;
+          state.appColorCode = menuData?.hexacolor;
+
           state.error = null;
           state.isMenuLoading = false;
         } catch (error) {
@@ -317,14 +320,13 @@ const authSlice = createSlice({
         state.error = action.payload as string;
       })
 
-
-      .addCase(getERPDashboardThunk.pending, state => {
+      .addCase(getERPDashboardThunk.pending, (state) => {
         state.isDashboardLoading = true;
       })
       .addCase(getERPDashboardThunk.fulfilled, (state, action) => {
         try {
           let dashboardData;
-          if (typeof action?.payload === 'string') {
+          if (typeof action?.payload === "string") {
             dashboardData = JSON.parse(action?.payload);
           } else {
             dashboardData = action?.payload;
@@ -337,8 +339,7 @@ const authSlice = createSlice({
               if (innerData?.success === 1 && innerData?.dbs) {
                 dashboardItems = innerData.dbs;
               }
-            } catch (innerParseError) {
-            }
+            } catch (innerParseError) {}
           } else if (dashboardData?.success === 1 && dashboardData?.dbs) {
             dashboardItems = dashboardData?.dbs;
           } else if (dashboardData.d) {
@@ -347,27 +348,26 @@ const authSlice = createSlice({
               if (innerData?.success === 1 && innerData?.dbs) {
                 dashboardItems = innerData.dbs;
               }
-            } catch (innerParseError) {
-            }
+            } catch (innerParseError) {}
           }
-          state.dashboard = dashboardItems.length > 0 ? dashboardItems?.map((item: any, index: number) => ({
-            id: item?.Link || `dashboard_${index}`,
-            name: item?.Name || '',
-            data: item?.Data || '',
-            url: item?.Link || '',
-            title: item?.Title || '',
-            isReport: item.IsReport || '',
-            footer: item?.footer || '',
-          })): [];
+          state.dashboard =
+            dashboardItems.length > 0
+              ? dashboardItems?.map((item: any, index: number) => ({
+                  id: item?.Link || `dashboard_${index}`,
+                  name: item?.Name || "",
+                  data: item?.Data || "",
+                  url: item?.Link || "",
+                  title: item?.Title || "",
+                  isReport: item.IsReport || "",
+                  footer: item?.footer || "",
+                }))
+              : [];
           state.error = null;
-          
         } catch (error) {
           state.dashboard = [];
         }
-        
       })
       .addCase(getERPDashboardThunk.rejected, (state, action) => {
-         
         state.error = action.payload as string;
       });
   },
@@ -393,6 +393,6 @@ export const {
   clearAuthState,
   updatePinVerifyLoadedState,
   updateAttendanceState,
-  addLocation
+  addLocation,
 } = authSlice.actions;
 export default authSlice.reducer;

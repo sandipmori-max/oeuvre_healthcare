@@ -9,6 +9,7 @@ import {
   SafeAreaView,
   BackHandler,
   Modal,
+  useWindowDimensions,
 } from "react-native";
 import { Camera, useCameraDevice } from "react-native-vision-camera";
 import RNFS from "react-native-fs";
@@ -22,7 +23,8 @@ const MAX_SIZE_MB = 25;
 export default function VideoRecorder({ item }: any) {
   const cameraRef = useRef(null);
   const device = useCameraDevice("back");
-
+const { height, width } = useWindowDimensions();  
+  const isLandscape = width > height;
   const [showCamera, setShowCamera] = useState(false);
   const [permissionsGranted, setPermissionsGranted] = useState(false);
 
@@ -93,7 +95,7 @@ export default function VideoRecorder({ item }: any) {
     const sizeMB = stat.size / (1024 * 1024);
     return sizeMB <= MAX_SIZE_MB;
   };
- 
+
   const startRecording = () => {
     setIsRecording(true);
     setRecordTime(0);
@@ -102,7 +104,6 @@ export default function VideoRecorder({ item }: any) {
       flash: "off",
 
       onRecordingFinished: async (video) => {
-
         setIsRecording(false);
         setLoading(true);
 
@@ -131,7 +132,7 @@ export default function VideoRecorder({ item }: any) {
   const stopRecording = () => {
     try {
       cameraRef.current.stopRecording();
-    } catch (_) { }
+    } catch (_) {}
     setIsRecording(false);
   };
   if (!showCamera) {
@@ -142,7 +143,9 @@ export default function VideoRecorder({ item }: any) {
         </Text>
 
         {item?.tooltip !== item?.fieldtitle && (
-          <Text style={[styles.subLabel, theme === "dark" && { color: "white" }]}>
+          <Text
+            style={[styles.subLabel, theme === "dark" && { color: "white" }]}
+          >
             {item?.tooltip}
           </Text>
         )}
@@ -151,22 +154,35 @@ export default function VideoRecorder({ item }: any) {
           <Text style={{ color: ERP_COLOR_CODE.ERP_ERROR }}>*</Text>
         )}
 
-        <TouchableOpacity style={styles.squareCard} onPress={requestPermissions}>
-          <MaterialIcons name="videocam" size={40} color={ERP_COLOR_CODE.ERP_APP_COLOR} />
+        <TouchableOpacity
+          style={styles.squareCard}
+          onPress={requestPermissions}
+        >
+          <MaterialIcons
+            name="videocam"
+            size={40}
+            color={ERP_COLOR_CODE.ERP_APP_COLOR}
+          />
           <Text style={styles.squareCardText}>Record Video</Text>
         </TouchableOpacity>
-
       </View>
     );
   }
 
   return (
-    <Modal visible={showCamera} animationType="slide" presentationStyle="fullScreen">
+    <Modal
+      visible={showCamera}
+      animationType="slide"
+      presentationStyle="fullScreen"
+      supportedOrientations={["portrait", "landscape"]}
+    >
       <SafeAreaView style={styles.fullScreen}>
         {!permissionsGranted || !device ? (
           <View style={styles.loader}>
             <ActivityIndicator size="large" color="#fff" />
-            <Text style={{ color: "#fff", marginTop: 10 }}>Loading camera...</Text>
+            <Text style={{ color: "#fff", marginTop: 10 }}>
+              Loading camera...
+            </Text>
           </View>
         ) : (
           <>
@@ -198,13 +214,23 @@ export default function VideoRecorder({ item }: any) {
               {loading ? (
                 <ActivityIndicator size="large" color="#fff" />
               ) : isRecording ? (
-                <TouchableOpacity style={styles.stopBtn} onPress={stopRecording}>
+                <TouchableOpacity
+                  style={styles.stopBtn}
+                  onPress={stopRecording}
+                >
                   <MaterialIcons name="stop" size={32} color="#fff" />
                   <Text style={styles.bottomText}>Stop</Text>
                 </TouchableOpacity>
               ) : (
-                <TouchableOpacity style={styles.recordBtn} onPress={startRecording}>
-                  <MaterialIcons name="fiber-manual-record" size={36} color="red" />
+                <TouchableOpacity
+                  style={styles.recordBtn}
+                  onPress={startRecording}
+                >
+                  <MaterialIcons
+                    name="fiber-manual-record"
+                    size={36}
+                    color="red"
+                  />
                   <Text style={styles.bottomText}>Start Recording</Text>
                 </TouchableOpacity>
               )}

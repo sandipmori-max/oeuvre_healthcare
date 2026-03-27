@@ -1,7 +1,7 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { AttendanceResponse } from '../../../services/api';
-import { AttendanceState } from './type';
-import { getLastPunchInThunk, markAttendanceThunk } from './thunk';
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { AttendanceResponse } from "../../../services/api";
+import { AttendanceState } from "./type";
+import { getLastPunchInThunk, markAttendanceThunk } from "./thunk";
 
 const initialState: AttendanceState = {
   loading: false,
@@ -10,21 +10,21 @@ const initialState: AttendanceState = {
 };
 
 const attendanceSlice = createSlice({
-  name: 'attendance',
+  name: "attendance",
   initialState,
   reducers: {
-    resetAttendanceState: state => {
+    resetAttendanceState: (state) => {
       state.loading = false;
       state.error = null;
       state.response = null;
     },
-    setResponse : (state, action: any) => {
+    setResponse: (state, action: any) => {
       state.response = action.payload;
     },
   },
-  extraReducers: builder => {
+  extraReducers: (builder) => {
     builder
-      .addCase(markAttendanceThunk.pending, state => {
+      .addCase(markAttendanceThunk.pending, (state) => {
         state.loading = true;
         state.error = null;
         state.response = null;
@@ -41,14 +41,17 @@ const attendanceSlice = createSlice({
         state.error = action.payload as string;
       })
 
-      .addCase(getLastPunchInThunk.pending, state => {
+      .addCase(getLastPunchInThunk.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(getLastPunchInThunk.fulfilled, (state, action: PayloadAction<AttendanceResponse>) => {
-        state.loading = false;
-        state.response = action.payload;
-      })
+      .addCase(
+        getLastPunchInThunk.fulfilled,
+        (state, action: PayloadAction<AttendanceResponse>) => {
+          state.loading = false;
+          state.response = action.payload;
+        },
+      )
       .addCase(getLastPunchInThunk.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
@@ -56,5 +59,5 @@ const attendanceSlice = createSlice({
   },
 });
 
-export const { resetAttendanceState , setResponse} = attendanceSlice.actions;
+export const { resetAttendanceState, setResponse } = attendanceSlice.actions;
 export default attendanceSlice.reducer;

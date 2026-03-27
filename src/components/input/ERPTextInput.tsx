@@ -41,10 +41,10 @@ const ERPTextInput: React.FC<ERPTextInputProps> = ({
   }, [touched, error]);
   return (
     <View style={[styles.inputContainer, containerStyle, ,]}>
-      {label ? <Text 
-    
+      {label ? <TranslatedText 
+      text={label}
       numberOfLines={1}
-      style={[styles.inputLabel, labelStyle]}>{label}</Text> : null}
+      style={[styles.inputLabel, labelStyle]}></TranslatedText> : null}
 
       <View style={styles.inputWrapper}>
         <View

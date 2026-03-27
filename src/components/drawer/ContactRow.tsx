@@ -30,7 +30,7 @@ const ContactRow = () => {
       >
         <MaterialIcons
           size={14}
-          color={theme === 'dark' ? 'white' : ERP_COLOR_CODE.ERP_BLACK}
+          color={theme === 'dark' ? 'white' : 'green'}
           name="phone"
         />
         <Text style={{
@@ -51,7 +51,7 @@ const ContactRow = () => {
       >
         <MaterialIcons
           size={14}
-          color={theme === 'dark' ? 'white' : ERP_COLOR_CODE.ERP_BLACK}
+          color={theme === 'dark' ? 'white' : ERP_COLOR_CODE.ERP_ERROR}
           name="email"
         />
         <Text style={{

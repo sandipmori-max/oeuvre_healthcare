@@ -4,16 +4,15 @@ import {
   Image,
   TextInput,
   AppState,
-  Dimensions,
   Animated,
   TouchableOpacity,
   Platform,
+  useWindowDimensions,
 } from "react-native";
 import React, { useState, useRef, useEffect } from "react";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import Geolocation from "@react-native-community/geolocation";
-import { launchCamera } from "react-native-image-picker";
 
 import { AttendanceFormValues, UserLocation } from "../types";
 import {
@@ -37,16 +36,20 @@ import ImageBottomSheetModal from "../../../../components/bottomsheet/ImageBotto
 import TranslatedText from "../../tabs/home/TranslatedText";
 import { updateAttendanceState } from "../../../../store/slices/auth/authSlice";
 import SlideButtonIOS from "./SlideButtonIOS";
-
+import RNFS from "react-native-fs";
+import ImageResizer from "@bam.tech/react-native-image-resizer";
+// import RNFS from "react-native-fs";
 const AttendanceForm = ({ setBlockAction, resData }: any) => {
   const { t } = useTranslations();
   const [showModal, setShowModal] = useState(false);
   const [img, setImg] = useState("");
   const navigation = useNavigation();
   const dispatch = useAppDispatch();
-  const { user, attendanceDone: isAttendanceDone } =
-  useAppSelector((state) => state?.auth);
-
+  const { user, attendanceDone: isAttendanceDone } = useAppSelector(
+    (state) => state?.auth,
+  );
+  const { height, width } = useWindowDimensions();
+  const isLandscape = width > height;
   const baseLink = useBaseLink();
   const theme = useAppSelector((state) => state?.theme.mode);
   const [statusImage, setStatusImage] = useState<string | null>(null);
@@ -66,11 +69,10 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
   });
   const [alertMapVisible, setAlertMapVisible] = useState(false);
 
- 
   const [alertMapConfig, setAlertMapConfig] = useState({
     title: "",
     message: "",
-    type: "info" as "error" | "success" | "info" | 'location',
+    type: "info" as "error" | "success" | "info" | "location",
   });
   // -------------------- Pending Camera Action --------------------
   const pendingCameraAction = useRef<{
@@ -98,67 +100,65 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
     return () => subscription.remove();
   }, []);
 
-  const openCamera = (
-    setFieldValue: (field: keyof AttendanceFormValues, value: any) => void,
-    handleSubmit: () => void,
-  ) => {
-    console.log("---------------------9")
+  const openCamera = (setFieldValue, handleSubmit) => {
+    setLocationLoading(false);
+    setBlockAction(false);
+    navigation.navigate("FaceCameraScreen", {
+      onCapture: async (photoPath) => {
+        setTimeout(async () => {
+          try {
+            setLocationLoading(true);
+            setBlockAction(true);
+            if (!photoPath) {
+              setLocationLoading(false);
+              setBlockAction(false);
+              return;
+            }
 
-    launchCamera(
-       {
-        mediaType: "photo",
-        cameraType: "back",
-        quality: 0.5,
-        maxWidth: 1024,
-        maxHeight: 1024,
-        includeBase64: true,
-        saveToPhotos: false,
+            const photoUri = "file://" + photoPath;
+            const compressedPhoto = await ImageResizer.createResizedImage(
+              photoPath,
+              600, // optional: adjust to safe dimensions
+              600,
+              "JPEG",
+              60,
+              0
+            );
+
+            const base64 = await RNFS.readFile(compressedPhoto.uri, "base64");
+            // const base64 = await RNFS.readFile(photoPath, "base64");
+
+            if (base64) {
+              setFieldValue(
+                "imageBase64",
+                `${
+                  resData?.success === 1 || resData?.success === "1"
+                    ? "punchOut.jpeg"
+                    : "punchIn.jpeg"
+                }; data:image/jpeg;base64,${base64}`,
+              );
+            }
+
+            setStatusImage(photoUri);
+
+            setTimeout(() => {
+              handleSubmit();
+            }, 1000);
+          } catch (error) {
+            console.log("---------------------11", error);
+
+            setLocationLoading(false);
+            setBlockAction(false);
+          }
+        }, 300);
       },
-      (response) => {
-    console.log("---------------------10")
-
-        try {
-          if (response?.didCancel || response?.errorCode) {
-    console.log("---------------------11", response)
-
-          setLocationLoading(false);
-          setBlockAction(false);
-          return;
-        }
-        const photoUri = response?.assets?.[0]?.uri;
-    console.log("---------------------12", photoUri)
-
-        const asset = response?.assets?.[0];
-        if (!photoUri) return;
-        if (asset?.base64) {
-          setFieldValue(
-            "imageBase64",
-            `${
-              resData?.success === 1 || resData?.success === "1"
-                ? "punchOut.jpeg"
-                : "punchIn.jpeg"
-            }; data:${asset?.type};base64,${asset?.base64}`,
-          );
-        }
-        setStatusImage(photoUri);
-        setTimeout(() => {
-          handleSubmit();
-        }, 1000);
-        } catch (error) {
-    console.log("---------------------11", error)
-          
-        }
-      },
-    );
+    });
   };
 
   const handleStatusToggle = async (
     setFieldValue: (field: keyof AttendanceFormValues, value: any) => void,
     handleSubmit: () => void,
   ) => {
-     
-     
-    console.log("---------------------1")
     const enabled = await DeviceInfo.isLocationEnabled();
     if (!enabled) {
       setBlocked(false);
@@ -170,17 +170,12 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
       setLocationAlertVisible(false);
     }
     setBlockAction(true);
-    console.log("---------------------2")
-    
+
     if (locationLoading) return;
-    console.log("---------------------3")
 
     const hasPermission = await requestCameraAndLocationPermission();
-    console.log("---------------------4")
-    
-    if (!hasPermission) {
-    console.log("---------------------5")
 
+    if (!hasPermission) {
       pendingCameraAction.current = { setFieldValue, handleSubmit };
       setAlertConfig({
         title: t("errors.permissionRequired"),
@@ -201,10 +196,7 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
     const getLocationWithRetry = () => {
       Geolocation.getCurrentPosition(
         (position) => {
-    console.log("---------------------6")
-
           const { latitude, longitude } = position?.coords;
-    console.log("---------------------7", position)
 
           setUserLocation({ latitude, longitude });
           setFieldValue("latitude", String(latitude));
@@ -212,7 +204,7 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
           openCamera(setFieldValue, handleSubmit);
         },
         (error) => {
-    console.log("-----------------------******")
+          console.log("-----------------------******", error);
 
           setAlertConfig({
             title: t("errors.locationError"),
@@ -327,7 +319,6 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
       style={{
         width: "100%",
         padding: 16,
-        // backgroundColor: theme === 'dark' ? 'black' : 'white'
       }}
     >
       <Formik
@@ -363,9 +354,9 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
           )
             .unwrap()
             .then((res) => {
-              if(resData?.success === 1 || resData?.success === "1"){
+              if (resData?.success === 1 || resData?.success === "1") {
                 dispatch(updateAttendanceState(true));
-              }else{
+              } else {
                 dispatch(updateAttendanceState(false));
               }
               setAttendanceDone(true);
@@ -379,15 +370,14 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
               setBlockAction(false);
 
               setTimeout(() => {
-                 setAlertVisible(false);
+                setAlertVisible(false);
 
                 setAlertMapConfig({
                   title: "Location tracked status",
-                  message:
-                    !isAttendanceDone
-                      ? "You will be tracked until Punch Out"
-                      : "tracked stop",
-                  type: 'location',
+                  message: !isAttendanceDone
+                    ? "You will be tracked until Punch Out"
+                    : "tracked stop",
+                  type: "location",
                 });
                 setAlertMapVisible(true);
               }, 1100);
@@ -414,203 +404,435 @@ const AttendanceForm = ({ setBlockAction, resData }: any) => {
               },
             ]}
           >
-            <View style={styles.profileRow}>
-              <View style={styles.imageCol}>
-                {`${baseLink}/FileUpload/1/UserMaster/${user?.id}/profileimage.jpeg` ? (
-                  <TouchableOpacity
-                    onPress={() => {
-                      setImg(
-                        `${baseLink}/FileUpload/1/UserMaster/${user?.id}/profileimage.jpeg`,
-                      );
-                      setShowModal(true);
+            {isLandscape ? (
+              <>
+                <View style={{ flexDirection: "row" }}>
+                  <View style={{ width: "50%", justifyContent: "center" }}>
+                    <View style={styles.profileRow}>
+                      <View style={styles.imageCol}>
+                        {`${baseLink}/FileUpload/1/UserMaster/${user?.id}/profileimage.jpeg` ? (
+                          <TouchableOpacity
+                            onPress={() => {
+                              setImg(
+                                `${baseLink}/FileUpload/1/UserMaster/${user?.id}/profileimage.jpeg`,
+                              );
+                              setShowModal(true);
+                            }}
+                          >
+                            <Animated.View
+                              style={{
+                                opacity: fadeProfile,
+                                transform: [{ translateY: animProfile }],
+                              }}
+                            >
+                              <View style={styles.profileRow}>
+                                <ProfileImage
+                                  userId={user?.id}
+                                  baseLink={baseLink}
+                                  userName={firstLetterUpperCase(
+                                    user?.name || "",
+                                  )}
+                                />
+                              </View>
+                            </Animated.View>
+                          </TouchableOpacity>
+                        ) : (
+                          <View
+                            style={[
+                              styles.profileAvatar,
+                              {
+                                justifyContent: "center",
+                                alignItems: "center",
+                                backgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR,
+                              },
+                            ]}
+                          >
+                            <Animated.View
+                              style={{
+                                opacity: fadeName,
+                                transform: [{ translateY: animName }],
+                              }}
+                            >
+                              <TranslatedText
+                                text={firstLetterUpperCase(user?.name || "")}
+                                numberOfLines={1}
+                                style={{
+                                  color: ERP_COLOR_CODE.ERP_WHITE,
+                                  fontWeight: "bold",
+                                  fontSize: 26,
+                                }}
+                              ></TranslatedText>
+                            </Animated.View>
+                          </View>
+                        )}
+                      </View>
+                    </View>
+                  </View>
+
+                  <View style={{ width: "50%" }}>
+                    <View style={{}}>
+                      <Animated.View
+                        style={{
+                          opacity: fadeRemark,
+                          transform: [{ translateY: animRemark }],
+                        }}
+                      >
+                        <View style={styles.formGroup}>
+                          <Text
+                            style={[
+                              styles.label,
+                              theme === "dark" && {
+                                color: "white",
+                              },
+                            ]}
+                          >
+                            {t("attendance.employeeName")}
+                          </Text>
+                          <TextInput
+                            style={[
+                              styles.input,
+                              styles.inputReadonly,
+                              theme === "dark" && {
+                                borderWidth: 1,
+                                borderColor: "white",
+                                color: "black",
+                                backgroundColor: "black",
+                              },
+                              {
+                                backgroundColor: ERP_COLOR_CODE.ERP_BORDER_LINE,
+                              },
+                            ]}
+                            value={formatName(values?.name)}
+                            editable={false}
+                          />
+                          {touched?.name && errors?.name ? (
+                            <TranslatedText
+                              numberOfLines={1}
+                              text={errors?.name}
+                              style={styles.errorText}
+                            ></TranslatedText>
+                          ) : null}
+                        </View>
+                        <View style={styles.formGroup}>
+                          <Text
+                            style={[
+                              styles.label,
+                              theme === "dark" && {
+                                color: "white",
+                              },
+                            ]}
+                          >
+                            {resData?.success === 1 || resData?.success === "1"
+                              ? t("attendance.outremark")
+                              : t("attendance.remark")}
+                          </Text>
+
+                          <TextInput
+                            style={[
+                              styles.input,
+                              { minHeight: 100, textAlignVertical: "top" },
+                              theme === "dark" && {
+                                borderWidth: 1,
+                                borderColor: "white",
+                                color: "white",
+                                backgroundColor: "black",
+                              },
+                            ]}
+                            placeholderTextColor={
+                              theme === "dark" ? "white" : "black"
+                            }
+                            value={values?.remark}
+                            onChangeText={(text) =>
+                              setFieldValue("remark", text)
+                            }
+                            placeholder={t("attendance.enterRemark")}
+                            multiline
+                            numberOfLines={3}
+                          />
+                        </View>
+                      </Animated.View>
+                      {statusImage && (
+                        <View>
+                          <Image
+                            source={{ uri: statusImage }}
+                            style={styles.selfyAvatar}
+                          />
+                          <Text style={styles.imageLabel}>
+                            {t("attendance.capturedPhoto")}
+                          </Text>
+                        </View>
+                      )}
+                      <View>
+                        <Animated.View
+                          style={{
+                            opacity: fadeButton,
+                            transform: [{ translateY: animButton }],
+                          }}
+                        >
+                          <View>
+                            {Platform.OS === "ios" ? (
+                              <SlideButtonIOS
+                                label={
+                                  resData?.success === 1 ||
+                                  resData?.success === "1"
+                                    ? `${t("text.texti3")} ${t(
+                                        "attendance.checkOut",
+                                      )}`
+                                    : `${t("text.texti3")} ${t(
+                                        "attendance.checkIn",
+                                      )}`
+                                }
+                                successColor={
+                                  resData?.success === 1 ||
+                                  resData?.success === "1"
+                                    ? ERP_COLOR_CODE.ERP_ERROR
+                                    : ERP_COLOR_CODE.ERP_APP_COLOR
+                                }
+                                loading={locationLoading}
+                                completed={attendanceDone}
+                                onSlideSuccess={() => {
+                                  handleStatusToggle(
+                                    setFieldValue,
+                                    handleSubmit,
+                                  );
+                                }}
+                              />
+                            ) : (
+                              <SlideButton
+                                label={
+                                  resData?.success === 1 ||
+                                  resData?.success === "1"
+                                    ? `${t("text.text3")} ${t(
+                                        "attendance.checkOut",
+                                      )}`
+                                    : `${t("text.text3")} ${t(
+                                        "attendance.checkIn",
+                                      )}`
+                                }
+                                successColor={
+                                  resData?.success === 1 ||
+                                  resData?.success === "1"
+                                    ? ERP_COLOR_CODE.ERP_ERROR
+                                    : ERP_COLOR_CODE.ERP_APP_COLOR
+                                }
+                                loading={locationLoading}
+                                completed={attendanceDone}
+                                blocked={blocked}
+                                onSlideSuccess={() => {
+                                  handleStatusToggle(
+                                    setFieldValue,
+                                    handleSubmit,
+                                  );
+                                }}
+                              />
+                            )}
+                          </View>
+                        </Animated.View>
+                      </View>
+                    </View>
+                  </View>
+                </View>
+              </>
+            ) : (
+              <>
+                <View style={styles.profileRow}>
+                  <View style={styles.imageCol}>
+                    {`${baseLink}/FileUpload/1/UserMaster/${user?.id}/profileimage.jpeg` ? (
+                      <TouchableOpacity
+                        onPress={() => {
+                          setImg(
+                            `${baseLink}/FileUpload/1/UserMaster/${user?.id}/profileimage.jpeg`,
+                          );
+                          setShowModal(true);
+                        }}
+                      >
+                        <Animated.View
+                          style={{
+                            opacity: fadeProfile,
+                            transform: [{ translateY: animProfile }],
+                          }}
+                        >
+                          <View style={styles.profileRow}>
+                            <ProfileImage
+                              userId={user?.id}
+                              baseLink={baseLink}
+                              userName={firstLetterUpperCase(user?.name || "")}
+                            />
+                          </View>
+                        </Animated.View>
+                      </TouchableOpacity>
+                    ) : (
+                      <View
+                        style={[
+                          styles.profileAvatar,
+                          {
+                            justifyContent: "center",
+                            alignItems: "center",
+                            backgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR,
+                          },
+                        ]}
+                      >
+                        <Animated.View
+                          style={{
+                            opacity: fadeName,
+                            transform: [{ translateY: animName }],
+                          }}
+                        >
+                          <TranslatedText
+                            text={firstLetterUpperCase(user?.name || "")}
+                            numberOfLines={1}
+                            style={{
+                              color: ERP_COLOR_CODE.ERP_WHITE,
+                              fontWeight: "bold",
+                              fontSize: 26,
+                            }}
+                          ></TranslatedText>
+                        </Animated.View>
+                      </View>
+                    )}
+                  </View>
+                </View>
+
+                <View style={{}}>
+                  <Animated.View
+                    style={{
+                      opacity: fadeRemark,
+                      transform: [{ translateY: animRemark }],
                     }}
                   >
-                    <Animated.View
-                      style={{
-                        opacity: fadeProfile,
-                        transform: [{ translateY: animProfile }],
-                      }}
-                    >
-                      <View style={styles.profileRow}>
-                        <ProfileImage
-                          userId={user?.id}
-                          baseLink={baseLink}
-                          userName={firstLetterUpperCase(user?.name || "")}
+                    <View style={styles.formGroup}>
+                      <Text
+                        style={[
+                          styles.label,
+                          theme === "dark" && {
+                            color: "white",
+                          },
+                        ]}
+                      >
+                        {t("attendance.employeeName")}
+                      </Text>
+                      <TextInput
+                        style={[
+                          styles.input,
+                          styles.inputReadonly,
+                          theme === "dark" && {
+                            borderWidth: 1,
+                            borderColor: "white",
+                            color: "black",
+                            backgroundColor: "black",
+                          },
+                          { backgroundColor: ERP_COLOR_CODE.ERP_BORDER_LINE },
+                        ]}
+                        value={formatName(values?.name)}
+                        editable={false}
+                      />
+                      {touched?.name && errors?.name ? (
+                        <TranslatedText
+                          numberOfLines={1}
+                          text={errors?.name}
+                          style={styles.errorText}
+                        ></TranslatedText>
+                      ) : null}
+                    </View>
+                    <View style={styles.formGroup}>
+                      <Text
+                        style={[
+                          styles.label,
+                          theme === "dark" && {
+                            color: "white",
+                          },
+                        ]}
+                      >
+                        {resData?.success === 1 || resData?.success === "1"
+                          ? t("attendance.outremark")
+                          : t("attendance.remark")}
+                      </Text>
+
+                      <TextInput
+                        style={[
+                          styles.input,
+                          { minHeight: 100, textAlignVertical: "top" },
+                          theme === "dark" && {
+                            borderWidth: 1,
+                            borderColor: "white",
+                            color: "white",
+                            backgroundColor: "black",
+                          },
+                        ]}
+                        placeholderTextColor={
+                          theme === "dark" ? "white" : "black"
+                        }
+                        value={values?.remark}
+                        onChangeText={(text) => setFieldValue("remark", text)}
+                        placeholder={t("attendance.enterRemark")}
+                        multiline
+                        numberOfLines={3}
+                      />
+                    </View>
+                  </Animated.View>
+                  {statusImage && (
+                    <View>
+                      <Image
+                        source={{ uri: statusImage }}
+                        style={styles.selfyAvatar}
+                      />
+                      <Text style={styles.imageLabel}>
+                        {t("attendance.capturedPhoto")}
+                      </Text>
+                    </View>
+                  )}
+                  <Animated.View
+                    style={{
+                      opacity: fadeButton,
+                      transform: [{ translateY: animButton }],
+                    }}
+                  >
+                    <View>
+                      {Platform.OS === "ios" ? (
+                        <SlideButtonIOS
+                          label={
+                            resData?.success === 1 || resData?.success === "1"
+                              ? `${t("text.texti3")} ${t(
+                                  "attendance.checkOut",
+                                )}`
+                              : `${t("text.texti3")} ${t("attendance.checkIn")}`
+                          }
+                          successColor={
+                            resData?.success === 1 || resData?.success === "1"
+                              ? ERP_COLOR_CODE.ERP_ERROR
+                              : ERP_COLOR_CODE.ERP_APP_COLOR
+                          }
+                          loading={locationLoading}
+                          completed={attendanceDone}
+                          onSlideSuccess={() => {
+                            handleStatusToggle(setFieldValue, handleSubmit);
+                          }}
                         />
-                      </View>
-                    </Animated.View>
-                  </TouchableOpacity>
-                ) : (
-                  <View
-                    style={[
-                      styles.profileAvatar,
-                      {
-                        justifyContent: "center",
-                        alignItems: "center",
-                        backgroundColor: ERP_COLOR_CODE.ERP_APP_COLOR,
-                      },
-                    ]}
-                  >
-                    <Animated.View
-                      style={{
-                        opacity: fadeName,
-                        transform: [{ translateY: animName }],
-                      }}
-                    >
-                      <TranslatedText
-                        text={firstLetterUpperCase(user?.name || "")}
-                        numberOfLines={1}
-                        style={{
-                          color: ERP_COLOR_CODE.ERP_WHITE,
-                          fontWeight: "bold",
-                          fontSize: 26,
-                        }}
-                      ></TranslatedText>
-                    </Animated.View>
-                  </View>
-                )}
-              </View>
-            </View>
-
-            <View style={{}}>
-              <Animated.View
-                style={{
-                  opacity: fadeRemark,
-                  transform: [{ translateY: animRemark }],
-                }}
-              >
-                <View style={styles.formGroup}>
-                  <Text
-                    style={[
-                      styles.label,
-                      theme === "dark" && {
-                        color: "white",
-                      },
-                    ]}
-                  >
-                    {t("attendance.employeeName")}
-                  </Text>
-                  <TextInput
-                    style={[
-                      styles.input,
-                      styles.inputReadonly,
-                      theme === "dark" && {
-                        borderWidth: 1,
-                        borderColor: "white",
-                        color: "black",
-                        backgroundColor: "black",
-                      },
-                      { backgroundColor: ERP_COLOR_CODE.ERP_BORDER_LINE },
-                    ]}
-                    value={formatName(values?.name)}
-                    editable={false}
-                  />
-                  {touched?.name && errors?.name ? (
-                    <TranslatedText
-                      numberOfLines={1}
-                      text={errors?.name}
-                      style={styles.errorText}
-                    ></TranslatedText>
-                  ) : null}
+                      ) : (
+                        <SlideButton
+                          label={
+                            resData?.success === 1 || resData?.success === "1"
+                              ? `${t("text.text3")} ${t("attendance.checkOut")}`
+                              : `${t("text.text3")} ${t("attendance.checkIn")}`
+                          }
+                          successColor={
+                            resData?.success === 1 || resData?.success === "1"
+                              ? ERP_COLOR_CODE.ERP_ERROR
+                              : ERP_COLOR_CODE.ERP_APP_COLOR
+                          }
+                          loading={locationLoading}
+                          completed={attendanceDone}
+                          blocked={blocked}
+                          onSlideSuccess={() => {
+                            handleStatusToggle(setFieldValue, handleSubmit);
+                          }}
+                        />
+                      )}
+                    </View>
+                  </Animated.View>
                 </View>
-                <View style={styles.formGroup}>
-                  <Text
-                    style={[
-                      styles.label,
-                      theme === "dark" && {
-                        color: "white",
-                      },
-                    ]}
-                  >
-                    {resData?.success === 1 || resData?.success === "1"
-                      ? t("attendance.outremark")
-                      : t("attendance.remark")}
-                  </Text>
-
-                  <TextInput
-                    style={[
-                      styles.input,
-                      { minHeight: 100, textAlignVertical: "top" },
-                      theme === "dark" && {
-                        borderWidth: 1,
-                        borderColor: "white",
-                        color: "white",
-                        backgroundColor: "black",
-                      },
-                    ]}
-                    placeholderTextColor={theme === "dark" ? "white" : "black"}
-                    value={values?.remark}
-                    onChangeText={(text) => setFieldValue("remark", text)}
-                    placeholder={t("attendance.enterRemark")}
-                    multiline
-                    numberOfLines={3}
-                  />
-                </View>
-              </Animated.View>
-              {statusImage && (
-                <View>
-                  <Image
-                    source={{ uri: statusImage }}
-                    style={styles.selfyAvatar}
-                  />
-                  <Text style={styles.imageLabel}>
-                    {t("attendance.capturedPhoto")}
-                  </Text>
-                </View>
-              )}
-              <Animated.View
-                style={{
-                  opacity: fadeButton,
-                  transform: [{ translateY: animButton }],
-                }}
-              >
-                <View>
-                  {
-                    Platform.OS === 'ios' ? <SlideButtonIOS
-                    label={
-                      resData?.success === 1 || resData?.success === "1"
-                        ? `${t("text.texti3")} ${t("attendance.checkOut")}`
-                        : `${t("text.texti3")} ${t("attendance.checkIn")}`  
-                    }
-                    successColor={
-                      resData?.success === 1 || resData?.success === "1"
-                        ? ERP_COLOR_CODE.ERP_ERROR
-                        : ERP_COLOR_CODE.ERP_APP_COLOR
-                    }
-                    loading={locationLoading}
-                    completed={attendanceDone}
-                    onSlideSuccess={() =>
-                    {
-                      handleStatusToggle(setFieldValue, handleSubmit)
-                    }
-                    }
-                  /> : <SlideButton
-                    label={
-
-                      
-                      resData?.success === 1 || resData?.success === "1"
-                        ? `${t("text.text3")} ${t("attendance.checkOut")}`
-                        : `${t("text.text3")} ${t("attendance.checkIn")}`
-                    }
-                    successColor={
-                      resData?.success === 1 || resData?.success === "1"
-                        ? ERP_COLOR_CODE.ERP_ERROR
-                        : ERP_COLOR_CODE.ERP_APP_COLOR
-                    }
-                    loading={locationLoading}
-                    completed={attendanceDone}
-                    blocked={blocked}
-                    onSlideSuccess={() =>
-                    {
-                      handleStatusToggle(setFieldValue, handleSubmit)
-                    }
-                    }
-                  />
-                  }
-                  
-                </View>
-              </Animated.View>
-            </View>
+              </>
+            )}
           </View>
         )}
       </Formik>

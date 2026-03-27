@@ -1,28 +1,51 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, TouchableOpacity, Modal, FlatList, Image, Animated, Easing, Platform, ActivityIndicator } from 'react-native';
-import { styles } from './components_style';
-import { useAppDispatch, useAppSelector } from '../../../../../store/hooks';
-import { removeAccountThunk, switchAccountThunk } from '../../../../../store/slices/auth/thunk';
-import { Account } from '../../../../../store/slices/auth/type';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { DevERPService } from '../../../../../services/api';
-import CustomAlert from '../../../../../components/alert/CustomAlert';
-import { ERP_ICON } from '../../../../../assets';
-import { useApi } from '../../../../../hooks/useApi';
-import { firstLetterUpperCase, formatDateHr, formatTimeTo12Hour, isTokenValid } from '../../../../../utils/helpers';
-import MaterialIcons from '@react-native-vector-icons/material-icons';
-import FastImage from 'react-native-fast-image';
-import { ERP_COLOR_CODE } from '../../../../../utils/constants';
-import { clearAuthState, setDashboard, setEmptyMenu } from '../../../../../store/slices/auth/authSlice';
-import { resetAjaxState } from '../../../../../store/slices/ajax/ajaxSlice';
-import { resetAttendanceState } from '../../../../../store/slices/attendance/attendanceSlice';
-import { resetDropdownState } from '../../../../../store/slices/dropdown/dropdownSlice';
-import { resetSyncLocationState } from '../../../../../store/slices/location/syncLocationSlice';
-import { getLastPunchInThunk } from '../../../../../store/slices/attendance/thunk';
-import { setReloadApp } from '../../../../../store/slices/reloadApp/reloadAppSlice';
-import ImageBottomSheetModal from '../../../../../components/bottomsheet/ImageBottomSheetModal';
-import { useTranslation } from 'react-i18next';
-import TranslatedText from '../../home/TranslatedText';
+import React, { useState, useRef, useEffect } from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Modal,
+  FlatList,
+  Image,
+  Animated,
+  Easing,
+  Platform,
+  useWindowDimensions,
+} from "react-native";
+import { styles } from "./components_style";
+import { useAppDispatch, useAppSelector } from "../../../../../store/hooks";
+import {
+  removeAccountThunk,
+  switchAccountThunk,
+} from "../../../../../store/slices/auth/thunk";
+import { Account } from "../../../../../store/slices/auth/type";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { DevERPService } from "../../../../../services/api";
+import CustomAlert from "../../../../../components/alert/CustomAlert";
+import { ERP_ICON } from "../../../../../assets";
+import { useApi } from "../../../../../hooks/useApi";
+import {
+  firstLetterUpperCase,
+  formatDateHr,
+  formatTimeTo12Hour,
+  isTokenValid,
+} from "../../../../../utils/helpers";
+import MaterialIcons from "@react-native-vector-icons/material-icons";
+import FastImage from "react-native-fast-image";
+import { ERP_COLOR_CODE } from "../../../../../utils/constants";
+import {
+  clearAuthState,
+  setDashboard,
+  setEmptyMenu,
+} from "../../../../../store/slices/auth/authSlice";
+import { resetAjaxState } from "../../../../../store/slices/ajax/ajaxSlice";
+import { resetAttendanceState } from "../../../../../store/slices/attendance/attendanceSlice";
+import { resetDropdownState } from "../../../../../store/slices/dropdown/dropdownSlice";
+import { resetSyncLocationState } from "../../../../../store/slices/location/syncLocationSlice";
+import { getLastPunchInThunk } from "../../../../../store/slices/attendance/thunk";
+import { setReloadApp } from "../../../../../store/slices/reloadApp/reloadAppSlice";
+import ImageBottomSheetModal from "../../../../../components/bottomsheet/ImageBottomSheetModal";
+import { useTranslation } from "react-i18next";
+import TranslatedText from "../../home/TranslatedText";
 
 interface AccountSwitcherProps {
   visible: boolean;
@@ -30,22 +53,29 @@ interface AccountSwitcherProps {
   onAddAccount: () => void;
 }
 
-const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onAddAccount, tapLoader }: any) => {
+const AccountSwitcher: React.FC<AccountSwitcherProps> = ({
+  visible,
+  onClose,
+  onAddAccount,
+  tapLoader,
+}: any) => {
   const dispatch = useAppDispatch();
-  const {t} = useTranslation()
+  const { t } = useTranslation();
   const { execute: validateCompanyCode } = useApi();
-  const theme = useAppSelector(state => state?.theme.mode);
-
-
+  const theme = useAppSelector((state) => state?.theme.mode);
+const { height, width } = useWindowDimensions();  
+  const isLandscape = width > height;
   const [showModal, setShowModal] = useState(false);
-  const [img, setImg] = useState('')
-  const { accounts, activeAccountId, user } = useAppSelector(state => state?.auth);
+  const [img, setImg] = useState("");
+  const { accounts, activeAccountId, user } = useAppSelector(
+    (state) => state?.auth,
+  );
   const [alertVisible, setAlertVisible] = useState(false);
   const [selectedAccount, setSelectedAccount] = useState<any>(null);
   const [alertConfig, setAlertConfig] = useState({
-    title: '',
-    message: '',
-    type: 'info' as 'error' | 'success' | 'info' | 'confirmation',
+    title: "",
+    message: "",
+    type: "info" as "error" | "success" | "info" | "confirmation",
   });
 
   // Animated values
@@ -126,7 +156,7 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
       dispatch(switchAccountThunk(accountId));
       dispatch(getLastPunchInThunk());
       setTimeout(() => {
-        dispatch(setReloadApp())
+        dispatch(setReloadApp());
       }, 1000);
     }
     onClose();
@@ -138,28 +168,27 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
         dispatch(removeAccountThunk(accountId));
       }
       setAlertConfig({
-        title: t('text91'),
-        message: t('text92'),
-        type: 'success',
+        title: t("text91"),
+        message: t("text92"),
+        type: "success",
       });
       setTimeout(() => {
         onClose();
-      }, 1800)
-
+      }, 1800);
     } catch (error) {
       setAlertConfig({
-        title: t('text93'),
-        message: t('text92'),
-        type: 'error',
+        title: t("text93"),
+        message: t("text92"),
+        type: "error",
       });
     }
   };
 
   const handleRemoveAccount = (account: Account) => {
     setAlertConfig({
-      title: t('text93'),
-      message: `${t('text94')} ${firstLetterUpperCase(account?.user?.name)} ?`,
-      type: 'confirmation',
+      title: t("text93"),
+      message: `${t("text94")} ${firstLetterUpperCase(account?.user?.name)} ?`,
+      type: "confirmation",
     });
     setSelectedAccount(account?.id);
     setAlertVisible(true);
@@ -170,9 +199,12 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
     const lastLogin = formatDateHr(item?.lastLoginAt, false);
     const lastLoginHr = formatTimeTo12Hour(item?.lastLoginAt);
 
-    let normalizedBase = (item?.user?.companyLink || '').replace(/\/+$/, '');
-    normalizedBase = normalizedBase.replace(/\/devws\/?/, '/');
-    normalizedBase = normalizedBase.replace(/^https:\/\//i, Platform.OS === 'ios' ? 'https://' : 'http://');
+    let normalizedBase = (item?.user?.companyLink || "").replace(/\/+$/, "");
+    normalizedBase = normalizedBase.replace(/\/devws\/?/, "/");
+    normalizedBase = normalizedBase.replace(
+      /^https:\/\//i,
+      Platform.OS === "ios" ? "https://" : "http://",
+    );
 
     return (
       <Animated.View
@@ -187,14 +219,20 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
             },
             //  { scale: pressItemAnim },
           ],
+          width: isLandscape ? '50%' : '100%',
+          marginLeft: isLandscape ? 4 : 0
         }}
       >
         <TouchableOpacity
-          style={[styles.accountItem, isActive && styles.activeAccount, theme === 'dark' && {
-            backgroundColor: 'black',
-            borderWidth: 1,
-            borderColor: 'white'
-          }]}
+          style={[
+            styles.accountItem,
+            isActive && styles.activeAccount,
+            theme === "dark" && {
+              backgroundColor: "black",
+              borderWidth: 1,
+              borderColor: "white",
+            },
+          ]}
           onPressIn={onPressItemIn}
           onPressOut={onPressItemOut}
           onPress={async () => {
@@ -206,14 +244,17 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
             dispatch(clearAuthState());
             dispatch(resetDropdownState());
             dispatch(resetSyncLocationState());
-            DevERPService.setAppId(item?.user?.app_id || '');
-            await AsyncStorage.setItem('appid', item?.user?.app_id);
+            DevERPService.setAppId(item?.user?.app_id || "");
+            await AsyncStorage.setItem("appid", item?.user?.app_id);
 
             if (isTokenValid(item?.user?.tokenValidTill)) {
-              DevERPService.setToken(item?.user?.token || '');
-              await AsyncStorage.setItem('erp_token', item?.user?.token || '');
-              await AsyncStorage.setItem('auth_token', item?.user?.token || '');
-              await AsyncStorage.setItem('erp_token_valid_till', item?.user?.token || '');
+              DevERPService.setToken(item?.user?.token || "");
+              await AsyncStorage.setItem("erp_token", item?.user?.token || "");
+              await AsyncStorage.setItem("auth_token", item?.user?.token || "");
+              await AsyncStorage.setItem(
+                "erp_token_valid_till",
+                item?.user?.token || "",
+              );
               const validation = await validateCompanyCode(() =>
                 DevERPService.validateCompanyCode(item?.user?.company_code),
               );
@@ -232,14 +273,20 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
           <View style={styles.accountContent}>
             <TouchableOpacity
               onPress={() => {
-                setImg(`${normalizedBase}/FileUpload/1/UserMaster/${item?.user?.id}/profileimage.jpeg?ts=${new Date().getTime()}`)
-                setShowModal(true)
+                setImg(
+                  `${normalizedBase}/FileUpload/1/UserMaster/${
+                    item?.user?.id
+                  }/profileimage.jpeg?ts=${new Date().getTime()}`,
+                );
+                setShowModal(true);
               }}
             >
               <FastImage
                 style={styles.avatar}
                 source={{
-                  uri: `${normalizedBase}/FileUpload/1/UserMaster/${item?.user?.id}/profileimage.jpeg?ts=${new Date().getTime()}`,
+                  uri: `${normalizedBase}/FileUpload/1/UserMaster/${
+                    item?.user?.id
+                  }/profileimage.jpeg?ts=${new Date().getTime()}`,
                   priority: FastImage.priority.normal,
                   cache: FastImage.cacheControl.web,
                 }}
@@ -247,45 +294,98 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
             </TouchableOpacity>
 
             <View style={styles.accountInfo}>
-              <TranslatedText 
-              text={firstLetterUpperCase(item?.user?.name || '')}
-              numberOfLines={1}
-              style={[styles.accountName, isActive && styles.activeText, theme === 'dark' && { color: 'white' }]}>
-              
-              </TranslatedText>
               <TranslatedText
-               numberOfLines={1}
-               text={item?.user?.companyName}
-                style={[styles.accountEmail, isActive && styles.activeText, theme === 'dark' && { color: 'white' }]}>
-                
-              </TranslatedText>
+                text={item?.user?.companyName}
+                numberOfLines={1}
+                style={[
+                  styles.accountName,
+                  isActive && styles.activeText,
+                  theme === "dark" && { color: "white" },
+                ]}
+              ></TranslatedText>
+              <TranslatedText
+                numberOfLines={1}
+                text={firstLetterUpperCase(item?.user?.name || "")}
+                style={[
+                  styles.accountEmail,
+                  isActive && styles.activeText,
+                  theme === "dark" && { color: "white" },
+                ]}
+              ></TranslatedText>
 
-              <View style={{ width: isActive ? '100%' : '80%', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                <View style={{ gap: 2, flexDirection: 'row', alignItems: 'center' }}>
-                  <MaterialIcons name={'date-range'} color={theme === 'dark' ? 'white' : ERP_COLOR_CODE.ERP_BLACK} size={18} />
+              <View
+                style={{
+                  width: isActive ? "100%" : "80%",
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
+              >
+                <View
+                  style={{ gap: 2, flexDirection: "row", alignItems: "center" }}
+                >
+                  <MaterialIcons
+                    name={"date-range"}
+                    color={
+                      theme === "dark" ? "white" : ERP_COLOR_CODE.ERP_BLACK
+                    }
+                    size={18}
+                  />
                   <TranslatedText
-                  numberOfLines={1}
-                  text={lastLogin}
-                  style={styles.lastLogin}></TranslatedText>
+                    numberOfLines={1}
+                    text={lastLogin}
+                    style={styles.lastLogin}
+                  ></TranslatedText>
                 </View>
-                <View style={{ gap: 2, flexDirection: 'row', alignItems: 'center' }}>
-                  <MaterialIcons name={'access-alarm'} color={theme === 'dark' ? 'white' : ERP_COLOR_CODE.ERP_BLACK} size={18} />
+                <View
+                  style={{ gap: 2, flexDirection: "row", alignItems: "center" }}
+                >
+                  <MaterialIcons
+                    name={"access-alarm"}
+                    color={
+                      theme === "dark" ? "white" : ERP_COLOR_CODE.ERP_BLACK
+                    }
+                    size={18}
+                  />
                   <TranslatedText
-                  numberOfLines={1}
-                  text={lastLoginHr}
-                  style={styles.lastLogin}></TranslatedText>
+                    numberOfLines={1}
+                    text={lastLoginHr}
+                    style={styles.lastLogin}
+                  ></TranslatedText>
                 </View>
               </View>
             </View>
             {isActive && (
-              <View style={[styles.activeIndicator, theme === 'dark' && { backgroundColor: 'white' }]}>
-                <Text style={[styles.activeLabel, theme === 'dark' && { color: 'black' }]}>Active</Text>
+              <View
+                style={[
+                  styles.activeIndicator,
+                  theme === "dark" && { backgroundColor: "white" },
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.activeLabel,
+                    theme === "dark" && { color: "black" },
+                  ]}
+                >
+                  Active
+                </Text>
               </View>
             )}
           </View>
           {!isActive && accounts?.length > 1 && (
-            <TouchableOpacity style={styles.removeButton} onPress={() => handleRemoveAccount(item)}>
-              <Text style={[styles.removeButtonText, theme === 'dark' && { color: 'black' }]}>✕</Text>
+            <TouchableOpacity
+              style={styles.removeButton}
+              onPress={() => handleRemoveAccount(item)}
+            >
+              <Text
+                style={[
+                  styles.removeButtonText,
+                  theme === "dark" && { color: "black" },
+                ]}
+              >
+                ✕
+              </Text>
             </TouchableOpacity>
           )}
         </TouchableOpacity>
@@ -327,42 +427,55 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
     }).start(onClose);
   };
 
-
   return (
-    <Modal visible={visible} transparent onRequestClose={handleClose}>
+    <Modal visible={visible} transparent  supportedOrientations={["portrait", "landscape"]} onRequestClose={handleClose}>
       <Animated.View
         style={[
           styles.container,
-          theme === 'dark' && { backgroundColor: 'black' },
+          theme === "dark" && { backgroundColor: "black" },
           {
-            transform: [{
-              translateY: slideAnim.interpolate({
-                inputRange: [0, 1],
-                outputRange: [800, 0],
-              }),
-            }],
+            transform: [
+              {
+                translateY: slideAnim.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [800, 0],
+                }),
+              },
+            ],
             opacity: slideAnim,
           },
+          isLandscape && {
+            marginTop : -2
+          }
         ]}
       >
-        <View style={[styles.header, theme === 'dark' && { backgroundColor: 'black' }]}>
+        <View
+          style={[
+            styles.header,
+            theme === "dark" && { backgroundColor: "black" },
+            
+          ]}
+        >
           <TouchableOpacity onPress={handleClose} style={styles.closeButton}>
-            {
-              Platform.OS === 'ios' ? <>
-              <MaterialIcons name="chevron-left" size={28} color="#fff" />
-          
-              </> :   <Image source={ERP_ICON.BACK} style={styles.back} />
-            }
+            {Platform.OS === "ios" ? (
+              <>
+                <MaterialIcons name="chevron-left" size={28} color="#fff" />
+              </>
+            ) : (
+              <Image source={ERP_ICON.BACK} style={styles.back} />
+            )}
           </TouchableOpacity>
-          <Text style={styles.title}>{t('text95')}</Text>
+          <Text style={styles.title}>{t("text95")}</Text>
         </View>
 
         <FlatList
+        key={isLandscape ? "landscape" : "portrait"}    
           data={accounts}
           renderItem={renderAccount}
           keyExtractor={(item, index) => index.toString()}
           style={styles.accountsList}
           showsVerticalScrollIndicator={false}
+          numColumns={isLandscape ? 2 : 1}
         />
 
         <Animated.View
@@ -381,13 +494,14 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
         >
           <TouchableOpacity
             style={[
-              styles.addAccountButton, theme === 'dark' && { backgroundColor: 'white' },
+              styles.addAccountButton,
+              theme === "dark" && { backgroundColor: "white" },
               tapLoader && {
-                backgroundColor: ERP_COLOR_CODE.ERP_999
-              }
+                backgroundColor: ERP_COLOR_CODE.ERP_999,
+              },
             ]}
             onPress={() => {
-              onAddAccount()
+              onAddAccount();
             }}
             onPressIn={onPressIn}
             onPressOut={onPressOut}
@@ -396,14 +510,17 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
               <MaterialIcons
                 name="person-add-alt"
                 size={24}
-                color={theme === 'dark' ? 'black' : 'white'}
+                color={theme === "dark" ? "black" : "white"}
               />
             }
 
-            <Text style={[styles.addAccountText, theme === 'dark' && { color: 'black' }]}>
-              {
-                tapLoader ? t('text96') : t('text97')
-              }
+            <Text
+              style={[
+                styles.addAccountText,
+                theme === "dark" && { color: "black" },
+              ]}
+            >
+              {tapLoader ? t("text96") : t("text97")}
             </Text>
           </TouchableOpacity>
         </Animated.View>
@@ -417,11 +534,12 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
           onClose={() => setAlertVisible(false)}
           onCancel={() => setAlertVisible(false)}
           onDone={() => handleRemovedAccount(selectedAccount)}
-          doneText={t('text98')}
-          cancelText={t('auth.cancel')}
+          doneText={t("text98")}
+          cancelText={t("auth.cancel")}
           color={ERP_COLOR_CODE.ERP_ERROR}
-          actionLoader={undefined} 
-          closeHide={undefined} />
+          actionLoader={undefined}
+          closeHide={undefined}
+        />
 
         <ImageBottomSheetModal
           visible={showModal}
@@ -429,7 +547,6 @@ const AccountSwitcher: React.FC<AccountSwitcherProps> = ({ visible, onClose, onA
           imageUrl={img}
         />
       </Animated.View>
-
     </Modal>
   );
 };

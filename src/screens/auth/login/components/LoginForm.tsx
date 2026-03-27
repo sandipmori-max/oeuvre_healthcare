@@ -3,8 +3,7 @@ import { View, Text, Animated, Platform } from 'react-native';
 import { Formik } from 'formik';
 import { getMessaging } from '@react-native-firebase/messaging';
 
-import { erp_login_validation_schema } from '../../../../utils/validations/login_validations';
-import { styles } from '../login_style';
+ import { styles } from '../login_style';
 import { useApi } from '../../../../hooks/useApi';
 import { DevERPService } from '../../../../services/api';
 import { LoginFormProps } from '../types';
@@ -149,7 +148,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
       >
         {({ handleChange, handleBlur, values, errors, touched, handleSubmit }) => (
           <>
-            {['user', 'password'].map((field, index) => (
+            {[  'user', 'password'].map((field, index) => (
               <Animated.View
                 key={field}
                 style={{

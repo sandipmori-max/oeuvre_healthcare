@@ -3,7 +3,6 @@ import { Text } from "react-native";
 import { useAppSelector } from "../../../../store/hooks";
 
 const translateSingle = async (text, langCode) => {
-  console.log("langCode", langCode)
   return text;
   // if(langCode === 'en'){
   //   return text;

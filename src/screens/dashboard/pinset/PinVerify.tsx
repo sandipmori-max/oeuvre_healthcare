@@ -1,5 +1,5 @@
-import MaterialIcons from '@react-native-vector-icons/material-icons';
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import MaterialIcons from "@react-native-vector-icons/material-icons";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import {
   View,
   Text,
@@ -11,31 +11,31 @@ import {
   NativeModules,
   Easing,
   ImageBackground,
-} from 'react-native';
-import { ERP_COLOR_CODE } from '../../../utils/constants';
-import { getDBConnection, getPinCode } from '../../../utils/sqlite';
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
-import CustomAlert from '../../../components/alert/CustomAlert';
-import { useAppDispatch } from '../../../store/hooks';
-import { updatePinVerifyLoadedState } from '../../../store/slices/auth/authSlice';
-import { ERP_GIF } from '../../../assets';
-import { useTranslation } from 'react-i18next';
+} from "react-native";
+import { ERP_COLOR_CODE } from "../../../utils/constants";
+import { getDBConnection, getPinCode } from "../../../utils/sqlite";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import CustomAlert from "../../../components/alert/CustomAlert";
+import { useAppDispatch } from "../../../store/hooks";
+import { updatePinVerifyLoadedState } from "../../../store/slices/auth/authSlice";
+import { ERP_GIF } from "../../../assets";
+import { useTranslation } from "react-i18next";
 
-const { width } = Dimensions.get('screen');
+const { width } = Dimensions.get("screen");
 
 const PinVerifyScreen = () => {
-  const {t} = useTranslation()
-  const dispatch = useAppDispatch()
-  const [pin, setPin] = useState<string>('');
+  const { t } = useTranslation();
+  const dispatch = useAppDispatch();
+  const [pin, setPin] = useState<string>("");
   const [attempts, setAttempts] = useState(0);
   const [isBlocked, setIsBlocked] = useState(false);
   const [countdown, setCountdown] = useState(60);
 
   const [alertVisible, setAlertVisible] = useState(false);
   const [alertConfig, setAlertConfig] = useState({
-    title: '',
-    message: '',
-    type: 'info' as 'error' | 'success' | 'info',
+    title: "",
+    message: "",
+    type: "info" as "error" | "success" | "info",
   });
 
   const navigation = useNavigation<any>();
@@ -66,10 +66,10 @@ const PinVerifyScreen = () => {
 
   // Optional: sound function (requires native setup)
   const playTapSound = () => {
-    if (Platform.OS === 'ios') {
+    if (Platform.OS === "ios") {
       const { AudioServices } = NativeModules;
       AudioServices?.playSystemSound?.(1104);
-    } else if (Platform.OS === 'android') {
+    } else if (Platform.OS === "android") {
       const { SoundModule } = NativeModules;
       SoundModule?.playTap?.();
     }
@@ -86,7 +86,7 @@ const PinVerifyScreen = () => {
   const handleDelete = () => {
     if (!isBlocked) {
       setPin(pin.slice(0, -1));
-      animateKey('del');
+      animateKey("del");
       playTapSound();
     }
   };
@@ -97,7 +97,7 @@ const PinVerifyScreen = () => {
     setAttempts(0);
 
     const timer = setInterval(() => {
-      setCountdown(prev => {
+      setCountdown((prev) => {
         if (prev <= 1) {
           clearInterval(timer);
           setIsBlocked(false);
@@ -114,9 +114,9 @@ const PinVerifyScreen = () => {
     if (pin.length < 4) {
       setAlertVisible(true);
       setAlertConfig({
-        title: t('text74'),
-        message: t('text75'),
-        type: 'error',
+        title: t("text74"),
+        message: t("text75"),
+        type: "error",
       });
       return;
     }
@@ -126,21 +126,21 @@ const PinVerifyScreen = () => {
       const savedPin = await getPinCode(db);
 
       if (savedPin === pin) {
-        dispatch(updatePinVerifyLoadedState(true))
-        navigation.replace('Drawer');
+        dispatch(updatePinVerifyLoadedState(true));
+        navigation.replace("Drawer");
       } else {
         const newAttempts = attempts + 1;
         setAttempts(newAttempts);
 
         setAlertVisible(true);
         setAlertConfig({
-          title: t('text76'),
-          message: t('text77'),
-          type: 'error',
+          title: t("text76"),
+          message: t("text77"),
+          type: "error",
         });
-        setPin('');
+        setPin("");
 
-        animateKey('ok'); // optional animation on wrong OK press
+        animateKey("ok"); // optional animation on wrong OK press
 
         if (newAttempts >= 3) {
           blockUser();
@@ -149,37 +149,45 @@ const PinVerifyScreen = () => {
     } catch (error) {
       setAlertVisible(true);
       setAlertConfig({
-        title: t('text78'),
-        message: error?.toString() || '',
-        type: 'error',
+        title: t("text78"),
+        message: error?.toString() || "",
+        type: "error",
       });
     }
   };
 
   const keypadRows = [
-    ['1', '2', '3'],
-    ['4', '5', '6'],
-    ['7', '8', '9'],
-    ['del', '0', 'ok'],
+    ["1", "2", "3"],
+    ["4", "5", "6"],
+    ["7", "8", "9"],
+    ["del", "0", "ok"],
   ];
 
   const titleAnim = useRef(new Animated.Value(0)).current;
   const subtitleAnim = useRef(new Animated.Value(0)).current;
 
   const pinAnims = useRef(
-    Array(4).fill(0).map(() => new Animated.Value(0))
+    Array(4)
+      .fill(0)
+      .map(() => new Animated.Value(0)),
   ).current;
 
   const pinPulseAnims = useRef(
-    Array(4).fill(0).map(() => new Animated.Value(0))
+    Array(4)
+      .fill(0)
+      .map(() => new Animated.Value(0)),
   ).current;
 
   const keyAnims = useRef(
-    Array(12).fill(0).map(() => new Animated.Value(0))
+    Array(12)
+      .fill(0)
+      .map(() => new Animated.Value(0)),
   ).current;
 
   const keyPulseAnims = useRef(
-    Array(12).fill(0).map(() => new Animated.Value(0))
+    Array(12)
+      .fill(0)
+      .map(() => new Animated.Value(0)),
   ).current;
 
   /** ---------------- Screen load animation ---------------- */
@@ -187,8 +195,8 @@ const PinVerifyScreen = () => {
     useCallback(() => {
       titleAnim.setValue(0);
       subtitleAnim.setValue(0);
-      pinAnims.forEach(a => a.setValue(0));
-      keyAnims.forEach(a => a.setValue(0));
+      pinAnims.forEach((a) => a.setValue(0));
+      keyAnims.forEach((a) => a.setValue(0));
 
       Animated.sequence([
         Animated.timing(titleAnim, {
@@ -206,32 +214,32 @@ const PinVerifyScreen = () => {
         Animated.parallel([
           Animated.stagger(
             60,
-            pinAnims.map(anim =>
+            pinAnims.map((anim) =>
               Animated.spring(anim, {
                 toValue: 1,
                 damping: 14,
                 stiffness: 160,
                 useNativeDriver: true,
-              })
-            )
+              }),
+            ),
           ),
           Animated.sequence([
             Animated.delay(120),
             Animated.stagger(
               40,
-              keyAnims.map(anim =>
+              keyAnims.map((anim) =>
                 Animated.timing(anim, {
                   toValue: 1,
                   duration: 220,
                   easing: Easing.out(Easing.ease),
                   useNativeDriver: true,
-                })
-              )
+                }),
+              ),
             ),
           ]),
         ]),
       ]).start();
-    }, [])
+    }, []),
   );
 
   /** ---------------- PIN dot pulse ---------------- */
@@ -277,205 +285,211 @@ const PinVerifyScreen = () => {
     ]).start();
   };
 
-
   return (
-    
-   <View >
-      
-       <ImageBackground
-              source={ERP_GIF.BACK_IMG}
-              style={styles.container}
-              resizeMode='cover'
-            >
-
-      {/* Header */}
-      <Animated.Text
-        style={[
-          styles.title,
-          {
-            opacity: titleAnim,
-            transform: [
-              {
-                translateY: titleAnim.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: [-10, 0],
-                }),
-              },
-            ],
-          },
-        ]}
+    <View>
+      <ImageBackground
+        source={ERP_GIF.BACK_IMG}
+        style={styles.container}
+        resizeMode="cover"
       >
-       {t('text79')}
-      </Animated.Text>
-
-      <Animated.Text
-        style={[
-          styles.subtitle,
-          {
-            opacity: subtitleAnim,
-            transform: [
-              {
-                translateY: subtitleAnim.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: [-6, 0],
-                }),
-              },
-            ],
-          },
-        ]}
-      >
-        {t('text80')}
-      </Animated.Text>
-
-      {/* Countdown if blocked */}
-      {isBlocked && (
-        <View style={{flexDirection:'row'}}>
-          <Text
-          style={{
-            fontSize: 16,
-            marginBottom: 20,
-            paddingHorizontal: 30,
-            textAlign: 'center',
-          }}
+        {/* Header */}
+        <Animated.Text
+          style={[
+            styles.title,
+            {
+              opacity: titleAnim,
+              transform: [
+                {
+                  translateY: titleAnim.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [-10, 0],
+                  }),
+                },
+              ],
+            },
+          ]}
         >
-          {t('text81')}{'\n'}{t('text82')} <Text  style={{
-            fontSize: 18,
-            marginBottom: 20,
-            paddingHorizontal: 30,
-            textAlign: 'center',
-            color: ERP_COLOR_CODE.ERP_ERROR
-          }}>{countdown}</Text> seconds
-        </Text>
+          {t("text79")}
+        </Animated.Text>
+
+        <Animated.Text
+          style={[
+            styles.subtitle,
+            {
+              opacity: subtitleAnim,
+              transform: [
+                {
+                  translateY: subtitleAnim.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [-6, 0],
+                  }),
+                },
+              ],
+            },
+          ]}
+        >
+          {t("text80")}
+        </Animated.Text>
+
+        {/* Countdown if blocked */}
+        {isBlocked && (
+          <View style={{ flexDirection: "row" }}>
+            <Text
+              style={{
+                fontSize: 16,
+                marginBottom: 20,
+                paddingHorizontal: 30,
+                textAlign: "center",
+              }}
+            >
+              {t("text81")}
+              {"\n"}
+              {t("text82")}{" "}
+              <Text
+                style={{
+                  fontSize: 18,
+                  marginBottom: 20,
+                  paddingHorizontal: 30,
+                  textAlign: "center",
+                  color: ERP_COLOR_CODE.ERP_ERROR,
+                }}
+              >
+                {countdown}
+              </Text>{" "}
+              seconds
+            </Text>
+          </View>
+        )}
+
+        {/* PIN Circles */}
+        <View style={styles.pinRow}>
+          {[0, 1, 2, 3].map((i) => (
+            <Animated.View
+              key={i}
+              style={[
+                styles.pinCircle,
+                {
+                  backgroundColor:
+                    i < pin.length ? ERP_COLOR_CODE.ERP_APP_COLOR : "#e5e7eb",
+                  opacity: pinAnims[i],
+                  transform: [
+                    {
+                      scale: Animated.multiply(
+                        pinAnims[i].interpolate({
+                          inputRange: [0, 1],
+                          outputRange: [0.6, 1],
+                        }),
+                        pinPulseAnims[i].interpolate({
+                          inputRange: [0, 1],
+                          outputRange: [1, 1.25],
+                        }),
+                      ),
+                    },
+                  ],
+                },
+              ]}
+            />
+          ))}
         </View>
-      )}
 
-      {/* PIN Circles */}
-      <View style={styles.pinRow}>
-        {[0, 1, 2, 3].map(i => (
-          <Animated.View
-            key={i}
-            style={[
-              styles.pinCircle,
-              {
-                backgroundColor:
-                  i < pin.length
-                    ? ERP_COLOR_CODE.ERP_APP_COLOR
-                    : '#e5e7eb',
-                opacity: pinAnims[i],
-                transform: [
-                  {
-                    scale: Animated.multiply(
-                      pinAnims[i].interpolate({
-                        inputRange: [0, 1],
-                        outputRange: [0.6, 1],
-                      }),
-                      pinPulseAnims[i].interpolate({
-                        inputRange: [0, 1],
-                        outputRange: [1, 1.25],
-                      })
-                    ),
-                  },
-                ],
-              },
-            ]}
-          />
-        ))}
-      </View>
+        {/* Keypad */}
+        <View style={styles.keypad}>
+          {keypadRows.map((row, rowIndex) => (
+            <View key={rowIndex} style={styles.keypadRow}>
+              {row.map((key, colIndex) => {
+                const keyIndex = rowIndex * 3 + colIndex;
 
-      {/* Keypad */}
-      <View style={styles.keypad}>
-        {keypadRows.map((row, rowIndex) => (
-          <View key={rowIndex} style={styles.keypadRow}>
-            {row.map((key, colIndex) => {
-              const keyIndex = rowIndex * 3 + colIndex;
-
-              return (
-                <Animated.View
-                  key={key}
-                  style={{
-                    opacity: keyAnims[keyIndex],
-                    transform: [
-                      {
-                        scale: Animated.multiply(
-                          keyAnims[keyIndex].interpolate({
-                            inputRange: [0, 1],
-                            outputRange: [0.85, 1],
-                          }),
-                          keyPulseAnims[keyIndex].interpolate({
-                            inputRange: [0, 1],
-                            outputRange: [1, 1.2],
-                          })
-                        ),
-                      },
-                    ],
-                  }}
-                >
-                  <TouchableOpacity
-                    style={styles.key}
-                    onPress={() => {
-                      if (isBlocked) return;
-
-                      triggerKeyPulse(keyIndex);
-
-                      if (key === 'del') handleDelete();
-                      else if (key === 'ok') handleVerifyPin();
-                      else handleKeyPress(key);
+                return (
+                  <Animated.View
+                    key={key}
+                    style={{
+                      opacity: keyAnims[keyIndex],
+                      transform: [
+                        {
+                          scale: Animated.multiply(
+                            keyAnims[keyIndex].interpolate({
+                              inputRange: [0, 1],
+                              outputRange: [0.85, 1],
+                            }),
+                            keyPulseAnims[keyIndex].interpolate({
+                              inputRange: [0, 1],
+                              outputRange: [1, 1.2],
+                            }),
+                          ),
+                        },
+                      ],
                     }}
                   >
-                    {key === 'del' ? (
-                      <MaterialIcons name="backspace" size={28} color="#374151" />
-                    ) : key === 'ok' ? (
-                      <MaterialIcons
-                        name="check-circle"
-                        size={36}
-                        color={pin.length === 4 ? '#16a34a' : '#9ca3af'}
-                      />
-                    ) : (
-                      <Text style={styles.keyText}>{key}</Text>
-                    )}
-                  </TouchableOpacity>
-                </Animated.View>
-              );
-            })}
-          </View>
-        ))}
-      </View>
+                    <TouchableOpacity
+                      style={styles.key}
+                      onPress={() => {
+                        if (isBlocked) return;
 
-      <CustomAlert
+                        triggerKeyPulse(keyIndex);
+
+                        if (key === "del") handleDelete();
+                        else if (key === "ok") handleVerifyPin();
+                        else handleKeyPress(key);
+                      }}
+                    >
+                      {key === "del" ? (
+                        <MaterialIcons
+                          name="backspace"
+                          size={28}
+                          color="#374151"
+                        />
+                      ) : key === "ok" ? (
+                        <MaterialIcons
+                          name="check-circle"
+                          size={36}
+                          color={pin.length === 4 ? "#16a34a" : "#9ca3af"}
+                        />
+                      ) : (
+                        <Text style={styles.keyText}>{key}</Text>
+                      )}
+                    </TouchableOpacity>
+                  </Animated.View>
+                );
+              })}
+            </View>
+          ))}
+        </View>
+
+        <CustomAlert
           visible={alertVisible}
           title={alertConfig.title}
           message={alertConfig.message}
           type={alertConfig.type}
           onClose={() => setAlertVisible(false)}
-          actionLoader={undefined} closeHide={undefined}      />
-            </ImageBackground>
-
+          actionLoader={undefined}
+          closeHide={undefined}
+        />
+      </ImageBackground>
     </View>
- 
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    height: Dimensions.get('screen').height,
-    width:Dimensions.get('screen').width,
+    height: Dimensions.get("screen").height,
+    width: Dimensions.get("screen").width,
     backgroundColor: ERP_COLOR_CODE.ERP_WHITE,
     paddingTop: 80,
-    alignItems: 'center',
+    alignItems: "center",
   },
   title: {
     fontSize: 24,
-    fontWeight: '700',
+    fontWeight: "700",
     marginBottom: 8,
-    color: '#111827',
+    color: "#111827",
   },
   subtitle: {
     fontSize: 15,
-    color: '#6b7280',
+    color: "#6b7280",
     marginBottom: 40,
   },
   pinRow: {
-    flexDirection: 'row',
+    flexDirection: "row",
     marginBottom: 50,
   },
   pinCircle: {
@@ -483,28 +497,28 @@ const styles = StyleSheet.create({
     height: 18,
     borderRadius: 9,
     marginHorizontal: 8,
-    borderWidth: 1
+    borderWidth: 1,
   },
   keypad: {
     width: width * 0.8,
   },
   keypadRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
+    flexDirection: "row",
+    justifyContent: "space-around",
     marginBottom: 20,
   },
   key: {
     width: 70,
     height: 70,
     borderRadius: 35,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 1,
   },
   keyText: {
     fontSize: 22,
-    fontWeight: '600',
-    color: '#111827',
+    fontWeight: "600",
+    color: "#111827",
   },
 });
 
